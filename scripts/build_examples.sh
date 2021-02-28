@@ -2,7 +2,7 @@
 
 PROJECT_ROOT=$(realpath $(dirname `realpath $0`)/..)
 SOURCE_ROOT=$PROJECT_ROOT/examples
-BUILD_PATH=$PROJECT_ROOT/build
+BUILD_PATH=$PROJECT_ROOT/.build
 
 # Parse the received commands
 while :; do
