@@ -7,3 +7,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.X.X] - 202X-XX-XX
 ### Added
 - Minimalist Linux implementation to run the `list_adapters` example.
+- Minimalist Windows implementation to run the `list_adapters` example.

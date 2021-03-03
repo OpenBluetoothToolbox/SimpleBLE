@@ -22,6 +22,13 @@ endif()
 # Configure the external header path
 set(SIMPLEBLE_USER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+# Configure common source files
+set(
+    SRC_SIMPLEBLE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Adapter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Exceptions.cpp
+)
+
 # Detect the operating system and load the necessary dependencies
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     message("-- [INFO] Linux Host Detected")
@@ -35,12 +42,40 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
         EXTERNAL_INCLUDE_DIRS
         ${SIMPLEDBUS_INCLUDES}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/linux
-    )    
-    
-
-elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows" AND NOT DEFINED CMAKE_SYSTEM_NAME)
+    )
+    set(
+        SRC_SIMPLEBLE_FILES
+        ${SRC_SIMPLEBLE_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/AdapterBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/Bluez.cpp
+    )
+elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     message("-- [INFO] Windows Host Detected")
-    message(FATAL_ERROR "This operating system is not yet supported.")
+    if(CMAKE_GENERATOR_PLATFORM MATCHES "^[Ww][Ii][Nn]32$")
+        set(WINDOWS_TARGET_ARCH x86)
+    elseif(CMAKE_GENERATOR_PLATFORM MATCHES "^[Xx]64$")
+        set(WINDOWS_TARGET_ARCH x64)
+    endif()
+
+    set(WINVERSION_CODE 0x0A00) # Selected Windows 10 based on https://docs.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt
+    
+    # Add all the special definitions that need to be added for the program to properly compile on windows.
+    set(SPECIAL_DEFINITIONS "/D_WIN32_WINNT=${WINVERSION_CODE} /D_USE_MATH_DEFINES")
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W2 /wd4251 ${SPECIAL_DEFINITIONS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W2 /wd4251 ${SPECIAL_DEFINITIONS}")
+
+    set(
+        EXTERNAL_INCLUDE_DIRS
+        ${SIMPLEDBUS_INCLUDES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/windows
+    )
+    set(
+        SRC_SIMPLEBLE_FILES
+        ${SRC_SIMPLEBLE_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/AdapterBase.cpp
+    )
+
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     message("-- [INFO] Darwin Host Detected")
     message(FATAL_ERROR "This operating system is not yet supported.")
@@ -52,12 +87,11 @@ message("-- [INFO] Building SimpleBLE")
 
 set(
     SIMPLE_BLE_ALL_INCLUDE_DIRS
+    ${SIMPLE_BLE_ALL_INCLUDE_DIRS}
     ${SIMPLEBLE_USER_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${EXTERNAL_INCLUDE_DIRS}
 )
-
-file(GLOB_RECURSE SRC_SIMPLEBLE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 add_library(simpleble-static STATIC ${SRC_SIMPLEBLE_FILES})
 add_library(simpleble SHARED ${SRC_SIMPLEBLE_FILES})
