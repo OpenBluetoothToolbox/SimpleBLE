@@ -78,7 +78,22 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     message("-- [INFO] Darwin Host Detected")
-    message(FATAL_ERROR "This operating system is not yet supported.")
+    set(
+        EXTERNAL_LIBRARIES
+        "-framework Foundation"
+        "-framework CoreBluetooth"
+        ObjC
+    )
+    set(
+        EXTERNAL_INCLUDE_DIRS
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/macos
+    )
+    set(
+        SRC_SIMPLEBLE_FILES
+        ${SRC_SIMPLEBLE_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/AdapterBase.mm
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/AdapterBaseMacOS.mm
+    )
 else()
     message(FATAL_ERROR "-- [ERROR] UNSUPPORTED SYSTEM: ${CMAKE_HOST_SYSTEM_NAME} ${CMAKE_SYSTEM_NAME}")
 endif()
