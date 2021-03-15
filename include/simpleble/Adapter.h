@@ -21,14 +21,19 @@ class Adapter {
     std::string identifier();
     BluetoothAddress address();
 
+    void scan_start();
+    void scan_stop();
+    void scan_for(int timeout_ms);
+    bool scan_is_active();
+
     void set_callback_on_scan_start(std::function<void()> on_scan_start);
     void set_callback_on_scan_stop(std::function<void()> on_scan_stop);
-    void set_callback_on_scan_seen(std::function<void(Peripheral)> on_scan_seen);
+    void set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated);
     void set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found);
 
     static std::vector<Adapter> get_adapters();
 
-  private:
+  protected:
     std::shared_ptr<AdapterBase> internal_;
 };
 

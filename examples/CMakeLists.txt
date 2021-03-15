@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.16.0)
 
 project(SimpleBLE_Examples)
 
@@ -12,3 +12,4 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/.. ${CMAKE_BINARY_DIR}/simpleble)
 include_directories(${SIMPLEBLE_INCLUDES})
 
 add_subdirectory(list_adapters)
+add_subdirectory(scan)

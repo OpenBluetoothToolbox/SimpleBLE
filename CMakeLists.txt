@@ -26,7 +26,10 @@ set(SIMPLEBLE_USER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(
     SRC_SIMPLEBLE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Adapter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Peripheral.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Exceptions.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AdapterBuilder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/PeripheralBuilder.cpp
 )
 
 # Detect the operating system and load the necessary dependencies
@@ -47,6 +50,7 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
         SRC_SIMPLEBLE_FILES
         ${SRC_SIMPLEBLE_FILES}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/AdapterBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/PeripheralBase.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/Bluez.cpp
     )
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")

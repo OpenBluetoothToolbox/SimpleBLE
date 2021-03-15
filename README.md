@@ -33,3 +33,13 @@ Adapters own peripherals.
       managed objects to be reclaimed by the operating system without
       causing memory leaks. In case this happens, an exception of
       type `SimpleBLE::Exception::InvalidReference` will be thrown.
+
+## Collaborating
+
+### Coding & Naming Conventions
+- This project follows the coding style guidelines specified in the `.clang-format` file.
+  They are roughly derived from Google's coding standard with a few differences, outlined
+  here:
+    - Class function names are expressed in `snake_case`.
+    - Class protected and private property names must end with an underscore (`_`).
+- 
