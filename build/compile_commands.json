@@ -1,0 +1,82 @@
+[
+{
+  "directory": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/build/simpleble",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -Dsimpleble_EXPORTS -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/include -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -fPIC -std=c++17 -o CMakeFiles/simpleble.dir/src/Adapter.cpp.o -c /Users/kdewald/Workspace/OpenSource/SimpleBLE/src/Adapter.cpp",
+  "file": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/Adapter.cpp"
+},
+{
+  "directory": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/build/simpleble",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -Dsimpleble_EXPORTS -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/include -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -fPIC -std=c++17 -o CMakeFiles/simpleble.dir/src/Peripheral.cpp.o -c /Users/kdewald/Workspace/OpenSource/SimpleBLE/src/Peripheral.cpp",
+  "file": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/Peripheral.cpp"
+},
+{
+  "directory": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/build/simpleble",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -Dsimpleble_EXPORTS -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/include -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -fPIC -std=c++17 -o CMakeFiles/simpleble.dir/src/Exceptions.cpp.o -c /Users/kdewald/Workspace/OpenSource/SimpleBLE/src/Exceptions.cpp",
+  "file": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/Exceptions.cpp"
+},
+{
+  "directory": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/build/simpleble",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -Dsimpleble_EXPORTS -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/include -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -fPIC -std=c++17 -o CMakeFiles/simpleble.dir/src/AdapterBuilder.cpp.o -c /Users/kdewald/Workspace/OpenSource/SimpleBLE/src/AdapterBuilder.cpp",
+  "file": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/AdapterBuilder.cpp"
+},
+{
+  "directory": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/build/simpleble",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -Dsimpleble_EXPORTS -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/include -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -fPIC -std=c++17 -o CMakeFiles/simpleble.dir/src/PeripheralBuilder.cpp.o -c /Users/kdewald/Workspace/OpenSource/SimpleBLE/src/PeripheralBuilder.cpp",
+  "file": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/PeripheralBuilder.cpp"
+},
+{
+  "directory": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/build/simpleble",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -Dsimpleble_EXPORTS -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/include -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -fPIC -std=c++17 -o CMakeFiles/simpleble.dir/src/macos/AdapterBase.mm.o -c /Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos/AdapterBase.mm",
+  "file": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos/AdapterBase.mm"
+},
+{
+  "directory": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/build/simpleble",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -Dsimpleble_EXPORTS -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/include -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -fPIC -std=c++17 -o CMakeFiles/simpleble.dir/src/macos/AdapterBaseMacOS.mm.o -c /Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos/AdapterBaseMacOS.mm",
+  "file": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos/AdapterBaseMacOS.mm"
+},
+{
+  "directory": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/build/simpleble",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++ -Dsimpleble_EXPORTS -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/include -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -fPIC -std=c++17 -o CMakeFiles/simpleble.dir/src/macos/PeripheralBase.mm.o -c /Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos/PeripheralBase.mm",
+  "file": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos/PeripheralBase.mm"
+},
+{
+  "directory": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/build/simpleble",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/include -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/simpleble-static.dir/src/Adapter.cpp.o -c /Users/kdewald/Workspace/OpenSource/SimpleBLE/src/Adapter.cpp",
+  "file": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/Adapter.cpp"
+},
+{
+  "directory": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/build/simpleble",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/include -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/simpleble-static.dir/src/Peripheral.cpp.o -c /Users/kdewald/Workspace/OpenSource/SimpleBLE/src/Peripheral.cpp",
+  "file": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/Peripheral.cpp"
+},
+{
+  "directory": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/build/simpleble",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/include -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/simpleble-static.dir/src/Exceptions.cpp.o -c /Users/kdewald/Workspace/OpenSource/SimpleBLE/src/Exceptions.cpp",
+  "file": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/Exceptions.cpp"
+},
+{
+  "directory": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/build/simpleble",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/include -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/simpleble-static.dir/src/AdapterBuilder.cpp.o -c /Users/kdewald/Workspace/OpenSource/SimpleBLE/src/AdapterBuilder.cpp",
+  "file": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/AdapterBuilder.cpp"
+},
+{
+  "directory": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/build/simpleble",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/include -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/simpleble-static.dir/src/PeripheralBuilder.cpp.o -c /Users/kdewald/Workspace/OpenSource/SimpleBLE/src/PeripheralBuilder.cpp",
+  "file": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/PeripheralBuilder.cpp"
+},
+{
+  "directory": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/build/simpleble",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/include -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/simpleble-static.dir/src/macos/AdapterBase.mm.o -c /Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos/AdapterBase.mm",
+  "file": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos/AdapterBase.mm"
+},
+{
+  "directory": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/build/simpleble",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/include -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/simpleble-static.dir/src/macos/AdapterBaseMacOS.mm.o -c /Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos/AdapterBaseMacOS.mm",
+  "file": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos/AdapterBaseMacOS.mm"
+},
+{
+  "directory": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/build/simpleble",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/include -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src -I/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=c++17 -o CMakeFiles/simpleble-static.dir/src/macos/PeripheralBase.mm.o -c /Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos/PeripheralBase.mm",
+  "file": "/Users/kdewald/Workspace/OpenSource/SimpleBLE/src/macos/PeripheralBase.mm"
+}
+]

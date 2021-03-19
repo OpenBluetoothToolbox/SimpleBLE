@@ -7,7 +7,7 @@
 )
 
 [string]$PROJECT_ROOT = Resolve-Path $($PSScriptRoot + "\..\..")
-[string]$BUILD_PATH = $PROJECT_ROOT + "\.build"
+[string]$BUILD_PATH = $PROJECT_ROOT + "\build"
 
 [string]$VSWHERE_PATH = Resolve-Path $($PROJECT_ROOT + "\scripts\windows\tools\vswhere.exe")
 # -products flag allows the system to also search for users who installed Visual Studio Build Tools 2019 (https://github.com/3F/hMSBuild/issues/12)

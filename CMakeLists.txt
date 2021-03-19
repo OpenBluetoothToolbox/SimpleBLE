@@ -19,6 +19,9 @@ else()
     set(STANDALONE false)
 endif()
 
+# Perform some overall CMake configurations
+#set(CMAKE_CXX_STANDARD 17)
+
 # Configure the external header path
 set(SIMPLEBLE_USER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
@@ -82,6 +85,7 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     message("-- [INFO] Darwin Host Detected")
+    set(CMAKE_CXX_EXTENSIONS OFF)
     set(
         EXTERNAL_LIBRARIES
         "-framework Foundation"
@@ -97,6 +101,7 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
         ${SRC_SIMPLEBLE_FILES}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/AdapterBase.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/AdapterBaseMacOS.mm
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/PeripheralBase.mm
     )
 else()
     message(FATAL_ERROR "-- [ERROR] UNSUPPORTED SYSTEM: ${CMAKE_HOST_SYSTEM_NAME} ${CMAKE_SYSTEM_NAME}")
@@ -115,8 +120,8 @@ set(
 add_library(simpleble-static STATIC ${SRC_SIMPLEBLE_FILES})
 add_library(simpleble SHARED ${SRC_SIMPLEBLE_FILES})
 
-set_target_properties(simpleble-static PROPERTIES CXX_STANDARD 17)
-set_target_properties(simpleble PROPERTIES CXX_STANDARD 17)
+set_property(TARGET simpleble-static PROPERTY CXX_STANDARD 17)
+set_property(TARGET simpleble PROPERTY CXX_STANDARD 17)
 
 target_include_directories(simpleble-static PRIVATE ${SIMPLE_BLE_ALL_INCLUDE_DIRS})
 target_include_directories(simpleble PRIVATE ${SIMPLE_BLE_ALL_INCLUDE_DIRS})

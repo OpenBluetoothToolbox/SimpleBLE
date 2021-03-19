@@ -8,5 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Minimalist Linux implementation to run the `list_adapters` example.
 - Minimalist Windows implementation to run the `list_adapters` example.
-- Minimalist MacOS implementation to run the `list_adapters` example.
+- Minimalist MacOS scaffolding to compile the `list_adapters` example.
 - Minimalist Linux implementation to run the `scan` example.
+- Minimalist MacOS scaffolding to compile the `scan` example.

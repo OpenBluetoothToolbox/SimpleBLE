@@ -1,0 +1,1 @@
+/Library/Developer/CommandLineTools/usr/bin/c++  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/example_list_adapters.dir/list_adapters.cpp.o -o ../bin/example_list_adapters  ../bin/libsimpleble-static.a -framework Foundation -framework CoreBluetooth -lObjC 

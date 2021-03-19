@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROJECT_ROOT=$(realpath $(dirname `realpath $0`)/../..)
-BUILD_PATH=$PROJECT_ROOT/.build
+BUILD_PATH=$PROJECT_ROOT/build
 
 # Parse the received commands
 while :; do

@@ -1,18 +1,21 @@
 #import "AdapterBaseMacOS.h"
 
-#import <CoreBluetooth/CoreBluetooth.h>
-#import <Foundation/Foundation.h>
+@implementation AdapterBaseMacOS
 
-using namespace SimpleBLE;
-
-AdapterBaseMacOS::AdapterBaseMacOS() {}
-
-AdapterBaseMacOS::~AdapterBaseMacOS() {}
-
-std::string AdapterBaseMacOS::identifier() {
-    return "Default Adapter";
+- (id)init {
+    self = [super init];
+    if (self) {
+        NSLog(@"Constructor worked!\n");
+    }
+    return self;
 }
 
-BluetoothAddress AdapterBaseMacOS::address() {
-    return "00:00:00:00:00:00";
+- (void)scanStart {
+    NSLog(@"Scan Start!\n");
 }
+
+- (void)scanStop {
+    NSLog(@"Scan Stop!\n");
+}
+
+@end

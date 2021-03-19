@@ -7,7 +7,7 @@
 )
 
 [string]$PROJECT_ROOT = Resolve-Path $($PSScriptRoot + "\..\..")
-[string]$BUILD_PATH = $PROJECT_ROOT + "\.build"
+[string]$BUILD_PATH = $PROJECT_ROOT + "\build"
 [string]$SOURCE_ROOT = $PROJECT_ROOT + "\examples"
 
 [string]$VSWHERE_PATH = Resolve-Path $($PROJECT_ROOT + "\scripts\windows\tools\vswhere.exe")

@@ -1,20 +1,12 @@
 #pragma once
 
-#include "AdapterBase.h"
-
 #import <Foundation/Foundation.h>
 
-namespace SimpleBLE {
+@interface AdapterBaseMacOS : NSObject {
+}
 
-class AdapterBaseMacOS : public AdapterBase {
-  public:
-    AdapterBaseMacOS();
-    ~AdapterBaseMacOS();
+- (void) scanStart;
 
-    std::string identifier() override;
-    BluetoothAddress address() override;
+- (void) scanStop;
 
-  private:
-};
-
-}  // namespace SimpleBLE
+@end
