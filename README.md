@@ -43,3 +43,10 @@ Adapters own peripherals.
     - Class function names are expressed in `snake_case`.
     - Class protected and private property names must end with an underscore (`_`).
 - 
+
+## Features per OS
+
+| Feature                 | Linux | Windows | MacOS |
+| ----------------------- | --- | --- | --- |
+| `list_adapters` example | X | X | |
+| `scan` example          | X | X | |

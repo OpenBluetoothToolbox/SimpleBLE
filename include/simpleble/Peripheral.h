@@ -1,6 +1,9 @@
 #pragma once
 
 #include <memory>
+#include <string>
+#include <vector>
+#include <functional>
 
 #include <simpleble/Exceptions.h>
 #include <simpleble/Types.h>
@@ -16,6 +19,18 @@ class Peripheral {
 
     std::string identifier();
     BluetoothAddress address();
+
+    void connect();
+    void disconnect();
+
+    std::vector<BluetoothService> services();
+
+    ByteArray read(BluetoothUUID service, BluetoothUUID characteristic);
+    void write_request(BluetoothUUID service, BluetoothUUID characteristic, ByteArray data);
+    void write_command(BluetoothUUID service, BluetoothUUID characteristic, ByteArray data);
+    void notify(BluetoothUUID service, BluetoothUUID characteristic, std::function<void(ByteArray payload)> callback);
+    void indicate(BluetoothUUID service, BluetoothUUID characteristic, std::function<void(ByteArray payload)> callback);
+    void unsubscribe(BluetoothUUID service, BluetoothUUID characteristic);
 
   protected:
     std::shared_ptr<PeripheralBase> internal_;
