@@ -1,12 +1,17 @@
 #pragma once
 
+#import <CoreBluetooth/CoreBluetooth.h>
 #import <Foundation/Foundation.h>
 
-@interface AdapterBaseMacOS : NSObject {
-}
+#include <functional>
+#include "AdapterBase.h"
 
-- (void) scanStart;
+@interface AdapterBaseMacOS : NSObject<CBCentralManagerDelegate>
 
-- (void) scanStop;
+- (instancetype)init:(SimpleBLE::AdapterBase*)adapter;
+
+- (void)scanStart;
+
+- (void)scanStop;
 
 @end

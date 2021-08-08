@@ -102,6 +102,7 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
         ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/AdapterBase.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/AdapterBaseMacOS.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/PeripheralBase.mm
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/PeripheralBaseMacOS.mm
     )
 else()
     message(FATAL_ERROR "-- [ERROR] UNSUPPORTED SYSTEM: ${CMAKE_HOST_SYSTEM_NAME} ${CMAKE_SYSTEM_NAME}")

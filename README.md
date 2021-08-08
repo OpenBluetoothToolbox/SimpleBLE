@@ -1,5 +1,11 @@
 # SimpleBLE
 
+
+
+## Installation
+
+**TODO:** Pull all external dependencies from repository/commits/tags, allowing the user to override the origin of these dependencies.
+
 `git submodule init`
 `git submodule update`
 
@@ -44,9 +50,17 @@ Adapters own peripherals.
     - Class protected and private property names must end with an underscore (`_`).
 - 
 
-## Features per OS
+## Examples per OS
 
-| Feature                 | Linux | Windows | MacOS |
-| ----------------------- | --- | --- | --- |
-| `list_adapters` example | X | X | |
-| `scan` example          | X | X | |
+The following table describes the available functionality of each example for each
+operating system.
+
+| Example                 | Linux | Windows | MacOS |
+| ----------------------- | ---   | ---     | ---   |
+| `list_adapters` example | X     | X       | E     |
+| `scan` example          | X     | X       | X     |
+
+**Nomenclature**
+- `X`: Supported
+- `E`: Emulated
+- `O`: Unsupported

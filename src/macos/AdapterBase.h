@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -8,6 +9,7 @@
 #include <simpleble/Exceptions.h>
 #include <simpleble/Peripheral.h>
 #include <simpleble/Types.h>
+#include "AdapterBaseTypes.h"
 
 namespace SimpleBLE {
 
@@ -35,10 +37,11 @@ class AdapterBase {
 
     static std::vector<std::shared_ptr<AdapterBase> > get_adapters();
 
-  protected:
+    void delegate_did_discover_peripheral(void* opaque_peripheral, advertising_data_t advertising_data);
 
+  protected:
     /**
-     * Holds a pointer to the Objective-C representation of this object. 
+     * Holds a pointer to the Objective-C representation of this object.
      */
     void* opaque_internal_;
 
@@ -46,6 +49,16 @@ class AdapterBase {
     std::function<void()> callback_on_scan_stop_;
     std::function<void(Peripheral)> callback_on_scan_updated_;
     std::function<void(Peripheral)> callback_on_scan_found_;
+
+    /**
+     * Holds a map of objective-c peripheral objects to their corresponding C++ objects.
+     *
+     * Whenever some sort of event happens on a peripheral, we need to find
+     * the corresponding PeripheralBase object. The PeripheralBase objects
+     * can be wrapped in disposable Peripheral objects, so there is no need
+     * be careful with them.
+     */
+    std::map<void*, std::shared_ptr<PeripheralBase> > peripherals_;
 };
 
 }  // namespace SimpleBLE
