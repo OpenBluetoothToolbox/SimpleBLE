@@ -16,3 +16,4 @@ include_directories(${SIMPLEBLE_INCLUDES})
 
 add_subdirectory(list_adapters)
 add_subdirectory(scan)
+add_subdirectory(connect)

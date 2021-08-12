@@ -8,10 +8,15 @@
 
 @interface PeripheralBaseMacOS : NSObject<CBPeripheralDelegate>
 
-- (instancetype)init:(CBPeripheral *)peripheral;
+- (instancetype)init:(CBPeripheral*)peripheral centralManager:(CBCentralManager*)centralManager;
 
-- (NSString *) identifier;
+- (NSString*)identifier;
+- (NSString*)address;
 
-- (NSString *) address;
+- (void)connect;
+- (void)disconnect;
+
+- (void)delegateDidConnect;
+- (void)delegateDidDisconnect;
 
 @end

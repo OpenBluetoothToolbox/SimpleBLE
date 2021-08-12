@@ -19,3 +19,19 @@ std::string Peripheral::identifier() {
 BluetoothAddress Peripheral::address() {
     return internal_->address();
 }
+
+void Peripheral::connect() {
+    return internal_->connect();
+}
+
+void Peripheral::disconnect() {
+    return internal_->disconnect();
+}
+
+void Peripheral::set_callback_on_connected(std::function<void()> on_connected) {
+    internal_->set_callback_on_connected(on_connected);
+}
+
+void Peripheral::set_callback_on_disconnected(std::function<void()> on_disconnected) {
+    internal_->set_callback_on_disconnected(on_disconnected);
+}

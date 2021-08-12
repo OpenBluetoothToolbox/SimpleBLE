@@ -35,6 +35,9 @@ class Peripheral {
     void indicate(BluetoothUUID service, BluetoothUUID characteristic, std::function<void(ByteArray payload)> callback);
     void unsubscribe(BluetoothUUID service, BluetoothUUID characteristic);
 
+    void set_callback_on_connected(std::function<void()> on_connected);
+    void set_callback_on_disconnected(std::function<void()> on_disconnected);
+
   protected:
     std::shared_ptr<PeripheralBase> internal_;
     

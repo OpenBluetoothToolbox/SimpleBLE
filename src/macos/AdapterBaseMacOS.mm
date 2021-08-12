@@ -120,7 +120,27 @@
     // TODO: Should we create a PeripheralBaseMacOS here?
 
     // TODO: Should we use @synchronized (self)??
-    _adapter->delegate_did_discover_peripheral(peripheral, advertisingData);
+    _adapter->delegate_did_discover_peripheral(peripheral, self.centralManager, advertisingData);
+}
+
+- (void)centralManager:(CBCentralManager*)central didConnectPeripheral:(CBPeripheral*)peripheral {
+    NSLog(@"didConnectPeripheral\n%@\n", peripheral);
+    _adapter->delegate_did_connect_peripheral(peripheral);
+}
+
+- (void)centralManager:(CBCentralManager*)central didDisconnectPeripheral:(CBPeripheral*)peripheral error:(NSError*)error {
+    NSLog(@"didDisconnectPeripheral\n");
+    if (error != nil) {
+        NSLog(@"Error: %@\n", error);
+    }
+    _adapter->delegate_did_connect_peripheral(peripheral);
+}
+
+- (void)centralManager:(CBCentralManager*)central didFailToConnectPeripheral:(CBPeripheral*)peripheral error:(NSError*)error {
+    NSLog(@"didFailToConnectPeripheral\n");
+    if (error != nil) {
+        NSLog(@"Error: %@\n", error);
+    }
 }
 
 @end

@@ -59,6 +59,7 @@ operating system.
 | ----------------------- | ---   | ---     | ---   |
 | `list_adapters` example | X     | X       | E     |
 | `scan` example          | X     | X       | X     |
+| `connect` example       | O     | O       | X     |
 
 **Nomenclature**
 - `X`: Supported

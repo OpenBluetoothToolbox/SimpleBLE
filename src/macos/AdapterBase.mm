@@ -67,11 +67,12 @@ void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_
 
 // Delegate methods passed for AdapterBaseMacOS
 
-void AdapterBase::delegate_did_discover_peripheral(void* opaque_peripheral, advertising_data_t advertising_data) {
+void AdapterBase::delegate_did_discover_peripheral(void* opaque_peripheral, void* opaque_adapter, advertising_data_t advertising_data) {
     if (this->peripherals_.count(opaque_peripheral) == 0) {
         // Create a new PeripheralBase object
-        std::shared_ptr<PeripheralBase> base_peripheral = std::make_shared<PeripheralBase>(opaque_peripheral, advertising_data);
-        
+        std::shared_ptr<PeripheralBase> base_peripheral = std::make_shared<PeripheralBase>(opaque_peripheral, opaque_adapter,
+                                                                                           advertising_data);
+
         // Store it in our table of seem peripherals
         this->peripherals_.insert(std::make_pair(opaque_peripheral, base_peripheral));
 
@@ -90,4 +91,24 @@ void AdapterBase::delegate_did_discover_peripheral(void* opaque_peripheral, adve
             this->callback_on_scan_updated_(peripheral_builder);
         }
     }
+}
+
+void AdapterBase::delegate_did_connect_peripheral(void* opaque_peripheral) {
+    if (this->peripherals_.count(opaque_peripheral) == 0) {
+        throw Exception::InvalidReference();
+    }
+
+    // Load the existing PeripheralBase object
+    std::shared_ptr<PeripheralBase> base_peripheral = this->peripherals_.at(opaque_peripheral);
+    base_peripheral->delegate_did_connect();
+}
+
+void AdapterBase::delegate_did_disconnect_peripheral(void* opaque_peripheral) {
+    if (this->peripherals_.count(opaque_peripheral) == 0) {
+        throw Exception::InvalidReference();
+    }
+
+    // Load the existing PeripheralBase object
+    std::shared_ptr<PeripheralBase> base_peripheral = this->peripherals_.at(opaque_peripheral);
+    base_peripheral->delegate_did_disconnect();
 }
