@@ -9,9 +9,12 @@ typedef std::string BluetoothAddress;
 typedef std::string BluetoothUUID;
 typedef std::string ByteArray;
 
+// IDEA: Extend BluetoothUUID to include a `uuid` function that
+// returns the same string, but provides a homogeneous interface.
+
 typedef struct {
-    BluetoothUUID service_uuid;
-    std::vector<BluetoothUUID> characteristic_uuids;
+    BluetoothUUID uuid;
+    std::vector<BluetoothUUID> characteristics;
 } BluetoothService;
 
 }  // namespace SimpleBLE

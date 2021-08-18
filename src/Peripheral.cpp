@@ -28,6 +28,14 @@ void Peripheral::disconnect() {
     return internal_->disconnect();
 }
 
+bool Peripheral::is_connected() {
+    return internal_->is_connected();
+}
+
+std::vector<BluetoothService> Peripheral::services() {
+    return internal_->services();
+}
+
 void Peripheral::set_callback_on_connected(std::function<void()> on_connected) {
     internal_->set_callback_on_connected(on_connected);
 }

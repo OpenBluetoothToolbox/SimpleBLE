@@ -18,6 +18,9 @@ class PeripheralBase {
 
     void connect();
     void disconnect();
+    bool is_connected();
+    
+    std::vector<BluetoothService> services();
 
     void set_callback_on_connected(std::function<void()> on_connected);
     void set_callback_on_disconnected(std::function<void()> on_disconnected);

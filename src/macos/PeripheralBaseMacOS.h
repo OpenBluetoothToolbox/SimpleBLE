@@ -4,6 +4,7 @@
 #import <Foundation/Foundation.h>
 
 #include <functional>
+#include <vector>
 #include "PeripheralBase.h"
 
 @interface PeripheralBaseMacOS : NSObject<CBPeripheralDelegate>
@@ -15,6 +16,8 @@
 
 - (void)connect;
 - (void)disconnect;
+- (bool)isConnected;
+- (std::vector<SimpleBLE::BluetoothService>)getServices;
 
 - (void)delegateDidConnect;
 - (void)delegateDidDisconnect;

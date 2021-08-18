@@ -42,10 +42,15 @@ int main(int argc, char* argv[]) {
         auto peripheral = peripherals[selection];
         std::cout << "Connecting to " << peripheral.identifier() << " [" << peripheral.address() << "]" << std::endl;
         peripheral.connect();
-        // TODO: List the services and characteristics of the device.
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+
+        auto service_list = peripheral.services();
+        for (auto service : service_list) {
+            std::cout << "Service: " << service.uuid << std::endl;
+            for (auto characteristic : service.characteristics) {
+                std::cout << "Characteristic: " << characteristic << std::endl;
+            }
+        }
         peripheral.disconnect();
-        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
     return 0;

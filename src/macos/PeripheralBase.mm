@@ -26,20 +26,28 @@ BluetoothAddress PeripheralBase::address() {
 void PeripheralBase::connect() {
     PeripheralBaseMacOS* internal = (PeripheralBaseMacOS*)opaque_internal_;
     [internal connect];
+    // TODO: Call callback
 }
 
 void PeripheralBase::disconnect() {
     PeripheralBaseMacOS* internal = (PeripheralBaseMacOS*)opaque_internal_;
     [internal disconnect];
+    // TODO: Call callback
 }
 
-void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) {
-    callback_on_connected_ = on_connected;
+bool PeripheralBase::is_connected() {
+    PeripheralBaseMacOS* internal = (PeripheralBaseMacOS*)opaque_internal_;
+    return [internal isConnected];
 }
 
-void PeripheralBase::set_callback_on_disconnected(std::function<void()> on_disconnected) {
-    callback_on_disconnected_ = on_disconnected;
+std::vector<BluetoothService> PeripheralBase::services() {
+    PeripheralBaseMacOS* internal = (PeripheralBaseMacOS*)opaque_internal_;
+    return [internal getServices];
 }
+
+void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) { callback_on_connected_ = on_connected; }
+
+void PeripheralBase::set_callback_on_disconnected(std::function<void()> on_disconnected) { callback_on_disconnected_ = on_disconnected; }
 
 void PeripheralBase::delegate_did_connect() {
     PeripheralBaseMacOS* internal = (PeripheralBaseMacOS*)opaque_internal_;
@@ -50,4 +58,3 @@ void PeripheralBase::delegate_did_disconnect() {
     PeripheralBaseMacOS* internal = (PeripheralBaseMacOS*)opaque_internal_;
     [internal delegateDidDisconnect];
 }
-
