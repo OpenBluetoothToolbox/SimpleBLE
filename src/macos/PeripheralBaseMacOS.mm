@@ -37,7 +37,7 @@
 }
 
 - (void)connect {
-    NSLog(@"Connecting to peripheral: %@", self.peripheral.name);
+    //NSLog(@"Connecting to peripheral: %@", self.peripheral.name);
     [self.centralManager connectPeripheral:self.peripheral options:@{}];  // TODO: Do we need to pass any options?
 
     NSDate* endDate = nil;
@@ -91,7 +91,7 @@
 }
 
 - (void)disconnect {
-    NSLog(@"Disconnecting peripheral: %@ - State was %ld", self.peripheral.name, self.peripheral.state);
+    //NSLog(@"Disconnecting peripheral: %@ - State was %ld", self.peripheral.name, self.peripheral.state);
     [self.centralManager cancelPeripheralConnection:self.peripheral];
 
     NSDate* endDate = nil;
@@ -153,18 +153,16 @@
 - (void)peripheral:(CBPeripheral*)peripheral didDiscoverServices:(NSError*)error {
     // NOTE: As we are currently polling the result of the discovery, this callback is not needed,
     // but might be useful in the future.
-    NSLog(@"Discovered services for peripheral: %@", peripheral.name);
     if (error != nil) {
-        NSLog(@"Error: %@\n", error);
+        NSLog(@"Error while discovering services for peripheral %@: %@\n", peripheral.name, error);
     }
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didDiscoverCharacteristicsForService:(CBService*)service error:(NSError*)error {
     // NOTE: As we are currently polling the result of the discovery, this callback is not needed,
     // but might be useful in the future.
-    NSLog(@"Discovered characteristics for service: %@", service.UUID);
     if (error != nil) {
-        NSLog(@"Error: %@\n", error);
+        NSLog(@"Error while discovering characteristics for service %@: %@\n", service.UUID, error);
     }
 }
 

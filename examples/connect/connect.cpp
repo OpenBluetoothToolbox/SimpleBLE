@@ -30,24 +30,27 @@ int main(int argc, char* argv[]) {
     // Scan for 5 seconds and return.
     adapter.scan_for(5000);
 
-    std::cout << "Please select a device to connect to." << std::endl;
+    std::cout << "The following devices were found:" << std::endl;
     for (int i = 0; i < peripherals.size(); i++) {
         std::cout << "[" << i << "] " << peripherals[i].identifier() << " [" << peripherals[i].address() << "]"
                   << std::endl;
     }
 
     int selection = -1;
+    std::cout << "Please select a device to connect to: ";
     std::cin >> selection;
+
     if (selection >= 0 && selection < peripherals.size()) {
         auto peripheral = peripherals[selection];
         std::cout << "Connecting to " << peripheral.identifier() << " [" << peripheral.address() << "]" << std::endl;
         peripheral.connect();
-
+        
+        std::cout << "Successfully connected, listing services." << std::endl;
         auto service_list = peripheral.services();
         for (auto service : service_list) {
             std::cout << "Service: " << service.uuid << std::endl;
             for (auto characteristic : service.characteristics) {
-                std::cout << "Characteristic: " << characteristic << std::endl;
+                std::cout << "  Characteristic: " << characteristic << std::endl;
             }
         }
         peripheral.disconnect();
