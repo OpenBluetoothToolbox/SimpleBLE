@@ -45,6 +45,15 @@ std::vector<BluetoothService> PeripheralBase::services() {
     return [internal getServices];
 }
 
+ByteArray PeripheralBase::read(BluetoothUUID service, BluetoothUUID characteristic) {
+    PeripheralBaseMacOS* internal = (PeripheralBaseMacOS*)opaque_internal_;
+
+    NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
+    NSString* characteristic_uuid = [NSString stringWithCString:characteristic.c_str() encoding:NSString.defaultCStringEncoding];
+
+    return [internal read:service_uuid characteristic_uuid:characteristic_uuid];
+}
+
 void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) { callback_on_connected_ = on_connected; }
 
 void PeripheralBase::set_callback_on_disconnected(std::function<void()> on_disconnected) { callback_on_disconnected_ = on_disconnected; }

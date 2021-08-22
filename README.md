@@ -65,3 +65,7 @@ operating system.
 - `X`: Supported
 - `E`: Emulated
 - `O`: Unsupported
+
+
+## Known Issues
+- MacOS implementation has incomplete error handling and might crash if invalid parameters are passed.

@@ -22,10 +22,10 @@ class Peripheral {
 
     void connect();
     void disconnect();
-    bool is_connected(); // TODO
+    bool is_connected();
     bool is_connectable(); // TODO
 
-    std::vector<BluetoothService> services(); // TODO
+    std::vector<BluetoothService> services();
     // TODO: Add manufacturer data
 
     ByteArray read(BluetoothUUID service, BluetoothUUID characteristic);

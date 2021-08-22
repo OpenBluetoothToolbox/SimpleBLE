@@ -36,6 +36,10 @@ std::vector<BluetoothService> Peripheral::services() {
     return internal_->services();
 }
 
+ByteArray Peripheral::read(BluetoothUUID service, BluetoothUUID characteristic) {
+    return internal_->read(service, characteristic);
+}
+
 void Peripheral::set_callback_on_connected(std::function<void()> on_connected) {
     internal_->set_callback_on_connected(on_connected);
 }

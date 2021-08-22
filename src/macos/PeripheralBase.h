@@ -22,6 +22,8 @@ class PeripheralBase {
     
     std::vector<BluetoothService> services();
 
+    ByteArray read(BluetoothUUID service, BluetoothUUID characteristic);
+
     void set_callback_on_connected(std::function<void()> on_connected);
     void set_callback_on_disconnected(std::function<void()> on_disconnected);
 

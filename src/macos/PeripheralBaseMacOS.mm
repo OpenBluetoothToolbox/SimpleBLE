@@ -7,6 +7,11 @@
 @property(strong) CBPeripheral* peripheral;
 @property(strong) CBCentralManager* centralManager;
 
+- (CBService*)findService:(NSString*)uuid;
+- (CBCharacteristic*)findCharacteristic:(NSString*)uuid service:(CBService*)service;
+- (std::pair<CBService*, CBCharacteristic*>)findServiceAndCharacteristic:(NSString*)service_uuid
+                                                     characteristic_uuid:(NSString*)characteristic_uuid;
+
 @end
 
 @implementation PeripheralBaseMacOS
@@ -37,7 +42,7 @@
 }
 
 - (void)connect {
-    //NSLog(@"Connecting to peripheral: %@", self.peripheral.name);
+    // NSLog(@"Connecting to peripheral: %@", self.peripheral.name);
     [self.centralManager connectPeripheral:self.peripheral options:@{}];  // TODO: Do we need to pass any options?
 
     NSDate* endDate = nil;
@@ -91,7 +96,7 @@
 }
 
 - (void)disconnect {
-    //NSLog(@"Disconnecting peripheral: %@ - State was %ld", self.peripheral.name, self.peripheral.state);
+    // NSLog(@"Disconnecting peripheral: %@ - State was %ld", self.peripheral.name, self.peripheral.state);
     [self.centralManager cancelPeripheralConnection:self.peripheral];
 
     NSDate* endDate = nil;
@@ -135,6 +140,61 @@
     }
 
     return services;
+}
+
+- (SimpleBLE::ByteArray)read:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid {
+    std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
+                                                                                       characteristic_uuid:characteristic_uuid];
+
+    if (serviceAndCharacteristic.first == nil || serviceAndCharacteristic.second == nil) {
+        // TODO: Raise an exception.
+        NSLog(@"Could not find service and characteristic.");
+        return SimpleBLE::ByteArray();
+    }
+
+    // TODO: A proper mechanism is required to handle pending reads of all characteristics.
+
+    return std::string();
+}
+
+#pragma mark - Auxiliary methods
+
+- (CBService*)findService:(NSString*)uuid {
+    CBUUID* service_uuid = [CBUUID UUIDWithString:uuid];
+
+    for (CBService* service in self.peripheral.services) {
+        if ([service.UUID isEqual:service_uuid]) {
+            return service;
+        }
+    }
+
+    // TODO Raise an exception.
+    return nil;
+}
+
+- (CBCharacteristic*)findCharacteristic:(NSString*)uuid service:(CBService*)service {
+    CBUUID* characteristic_uuid = [CBUUID UUIDWithString:uuid];
+
+    if (service == nil) {
+        // TODO Raise an exception.
+        return nil;
+    }
+
+    for (CBCharacteristic* characteristic in service.characteristics) {
+        if ([characteristic.UUID isEqual:characteristic_uuid]) {
+            return characteristic;
+        }
+    }
+
+    // TODO Raise an exception.
+    return nil;
+}
+
+- (std::pair<CBService*, CBCharacteristic*>)findServiceAndCharacteristic:(NSString*)service_uuid
+                                                     characteristic_uuid:(NSString*)characteristic_uuid {
+    CBService* service = [self findService:service_uuid];
+    CBCharacteristic* characteristic = [self findCharacteristic:characteristic_uuid service:service];
+    return std::pair<CBService*, CBCharacteristic*>(service, characteristic);
 }
 
 #pragma mark - CBCentralManagerDelegate
