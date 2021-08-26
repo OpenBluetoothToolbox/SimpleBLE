@@ -99,6 +99,7 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     set(
         SRC_SIMPLEBLE_FILES
         ${SRC_SIMPLEBLE_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/Utils.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/AdapterBase.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/AdapterBaseMacOS.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/PeripheralBase.mm

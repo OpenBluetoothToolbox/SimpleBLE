@@ -46,8 +46,7 @@ int main(int argc, char* argv[]) {
         peripheral.connect();
         
         std::cout << "Successfully connected, listing services." << std::endl;
-        auto service_list = peripheral.services();
-        for (auto service : service_list) {
+        for (auto service : peripheral.services()) {
             std::cout << "Service: " << service.uuid << std::endl;
             for (auto characteristic : service.characteristics) {
                 std::cout << "  Characteristic: " << characteristic << std::endl;

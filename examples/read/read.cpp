@@ -57,36 +57,30 @@ int main(int argc, char* argv[]) {
         std::cout << "Connecting to " << peripheral.identifier() << " [" << peripheral.address() << "]" << std::endl;
         peripheral.connect();
 
-        std::cout << "Successfully connected, checking if the NUS service is present..." << std::endl;
-        bool service_present = false;
-        auto service_list = peripheral.services();
-        for (auto service : service_list) {
-            if (service.uuid == "6e400001-b5a3-f393-e0a9-e50e24dcca9e") {
-                service_present = true;
+        std::cout << "Successfully connected, printing services and characteristics.." << std::endl;
+
+        // Store all service and characteristic uuids in a vector.
+        std::vector<std::pair<SimpleBLE::BluetoothUUID, SimpleBLE::BluetoothUUID>> uuids;
+        for (auto service : peripheral.services()) {
+            for (auto characteristic : service.characteristics) {
+                uuids.push_back(std::make_pair(service.uuid, characteristic));
             }
         }
 
-        if (!service_present) {
-            std::cout << "NUS service not found." << std::endl;
-            peripheral.disconnect();
-        } else {
-            std::cout << "NUS service found." << std::endl;
-            peripheral.write_command(NUS_service, NUS_tx, "Hello World!");
-
-            peripheral.notify(NUS_service, NUS_rx, [&](SimpleBLE::ByteArray bytes) {
-                std::cout << "Received: ";
-                print_byte_array(bytes);
-            });
-
-            std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::cout << "The following services and characteristics were found:" << std::endl;
+        for (int i = 0; i < uuids.size(); i++) {
+            std::cout << "[" << i << "] " << uuids[i].first << " " << uuids[i].second << std::endl;
         }
 
-        // std::cout << "NUS service is present, writing a message..." << std::endl;
-        // auto nus_service = peripheral.service("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
-        // auto nus_characteristic = nus_service.characteristic("6e400002-b5a3-f393-e0a9-e50e24dcca9e");
-        // nus_characteristic.write("Hello World!");
-        // std::cout << "Message written." << std::endl;
+        std::cout << "Please select a characteristic to read: ";
+        std::cin >> selection;
 
+        if (selection >= 0 && selection < uuids.size()) {
+            // Attempt to read the characteristic.
+            SimpleBLE::ByteArray rx_data = peripheral.read(uuids[selection].first, uuids[selection].second);
+            std::cout << "Characteristic contents were: ";
+            print_byte_array(rx_data);
+        }
         peripheral.disconnect();
     }
 

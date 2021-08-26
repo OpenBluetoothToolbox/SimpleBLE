@@ -1,6 +1,15 @@
 #import "PeripheralBaseMacOS.h"
+#import "Utils.h"
+
+typedef struct {
+    BOOL readPending;
+    BOOL writePending;
+    std::function<void(SimpleBLE::ByteArray)> valueChangedCallback;
+} characteristic_extras_t;
 
 @interface PeripheralBaseMacOS () {
+    // NOTE: This dictionary assumes that all characteristic UUIDs are unique, which could not always be the case.
+    std::map<std::string, characteristic_extras_t> characteristic_extras_;
 }
 
 // Private properties
@@ -92,6 +101,13 @@
             // TODO: Raise an exception.
             NSLog(@"Characteristics could not be discovered for service %@", service.UUID);
         }
+
+        // For each characteristic, create the associated extra properties.
+        for (CBCharacteristic* characteristic in service.characteristics) {
+            characteristic_extras_t extras;
+            extras.readPending = NO;
+            characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)] = extras;
+        }
     }
 }
 
@@ -128,12 +144,12 @@
     // For each service, load the UUID and the corresponding characteristics.
     for (CBService* service in self.peripheral.services) {
         SimpleBLE::BluetoothService bluetoothService;
-        bluetoothService.uuid = [[service.UUID UUIDString] UTF8String];
+        bluetoothService.uuid = uuidToSimpleBLE(service.UUID);
 
         // Load all the characteristics for this service.
         NSArray<CBCharacteristic*>* characteristics = service.characteristics;
         for (CBCharacteristic* characteristic in characteristics) {
-            bluetoothService.characteristics.push_back([[characteristic.UUID UUIDString] UTF8String]);
+            bluetoothService.characteristics.push_back(uuidToSimpleBLE(characteristic.UUID));
         }
 
         services.push_back(bluetoothService);
@@ -152,9 +168,96 @@
         return SimpleBLE::ByteArray();
     }
 
-    // TODO: A proper mechanism is required to handle pending reads of all characteristics.
+    CBCharacteristic* characteristic = serviceAndCharacteristic.second;
+    characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending = YES;
+    [self.peripheral readValueForCharacteristic:characteristic];
 
-    return std::string();
+    // Wait for the read to complete for up to 1 second.
+    NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
+    while (characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending && [NSDate.now compare:endDate] == NSOrderedAscending) {
+        [NSThread sleepForTimeInterval:0.01];
+    }
+
+    if (characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending) {
+        // TODO: Raise an exception.
+        NSLog(@"Characteristic %@ could not be read", characteristic.UUID);
+        return SimpleBLE::ByteArray();
+    }
+
+    return SimpleBLE::ByteArray((const char*)characteristic.value.bytes, characteristic.value.length);
+}
+
+- (void)writeRequest:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid payload:(NSData*)payload {
+    std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
+                                                                                       characteristic_uuid:characteristic_uuid];
+
+    if (serviceAndCharacteristic.first == nil || serviceAndCharacteristic.second == nil) {
+        // TODO: Raise an exception.
+        NSLog(@"Could not find service and characteristic.");
+    }
+
+    // NOTE: This write is unacknowledged.
+    CBCharacteristic* characteristic = serviceAndCharacteristic.second;
+    [self.peripheral writeValue:payload forCharacteristic:characteristic type:CBCharacteristicWriteWithoutResponse];
+}
+
+- (void)writeCommand:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid payload:(NSData*)payload {
+    std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
+                                                                                       characteristic_uuid:characteristic_uuid];
+
+    if (serviceAndCharacteristic.first == nil || serviceAndCharacteristic.second == nil) {
+        // TODO: Raise an exception.
+        NSLog(@"Could not find service and characteristic.");
+    }
+
+    CBCharacteristic* characteristic = serviceAndCharacteristic.second;
+    characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending = YES;
+    [self.peripheral writeValue:payload forCharacteristic:characteristic type:CBCharacteristicWriteWithResponse];
+
+    // Wait for the read to complete for up to 1 second.
+    NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
+    while (characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending &&
+           [NSDate.now compare:endDate] == NSOrderedAscending) {
+        [NSThread sleepForTimeInterval:0.01];
+    }
+
+    if (characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending) {
+        // TODO: Raise an exception.
+        NSLog(@"Characteristic %@ could not be written", characteristic.UUID);
+    }
+}
+
+- (void)notify:(NSString*)service_uuid
+    characteristic_uuid:(NSString*)characteristic_uuid
+               callback:(std::function<void(SimpleBLE::ByteArray)>)callback {
+    std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
+                                                                                       characteristic_uuid:characteristic_uuid];
+
+    if (serviceAndCharacteristic.first == nil || serviceAndCharacteristic.second == nil) {
+        // TODO: Raise an exception.
+        NSLog(@"Could not find service and characteristic.");
+    }
+
+    CBCharacteristic* characteristic = serviceAndCharacteristic.second;
+    characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback = callback;
+    [self.peripheral setNotifyValue:YES forCharacteristic:characteristic];
+
+    // Wait for the update to complete for up to 1 second.
+    NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
+    while (!characteristic.isNotifying && [NSDate.now compare:endDate] == NSOrderedAscending) {
+        [NSThread sleepForTimeInterval:0.01];
+    }
+
+    if (!characteristic.isNotifying) {
+        // TODO: Raise an exception.
+        NSLog(@"Could not enable notifications for characteristic %@", characteristic.UUID);
+    }
+}
+
+- (void)indicate:(NSString*)service_uuid
+    characteristic_uuid:(NSString*)characteristic_uuid
+               callback:(std::function<void(SimpleBLE::ByteArray)>)callback {
+    [self notify:service_uuid characteristic_uuid:characteristic_uuid callback:callback];
 }
 
 #pragma mark - Auxiliary methods
@@ -227,17 +330,33 @@
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    NSLog(@"Updated value for characteristic: %@", characteristic.UUID);
+    // NSLog(@"Updated value for characteristic: %@", characteristic.UUID);
     if (error != nil) {
         NSLog(@"Error: %@\n", error);
+        return;
+    }
+
+    // If the characteristic still had a pending read, clear the flag and return
+    if (characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending) {
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending = NO;
+        return;
+    }
+
+    // Check if the characteristic has a callback and call it
+    if (characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback != nil) {
+        SimpleBLE::ByteArray received_data((const char*)characteristic.value.bytes, characteristic.value.length);
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback(received_data);
     }
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    NSLog(@"Wrote value for characteristic: %@", characteristic.UUID);
+    // NSLog(@"Wrote value for characteristic: %@", characteristic.UUID);
     if (error != nil) {
         NSLog(@"Error: %@\n", error);
+        return;
     }
+
+    characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending = NO;
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral

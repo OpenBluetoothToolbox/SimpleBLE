@@ -54,6 +54,49 @@ ByteArray PeripheralBase::read(BluetoothUUID service, BluetoothUUID characterist
     return [internal read:service_uuid characteristic_uuid:characteristic_uuid];
 }
 
+void PeripheralBase::write_request(BluetoothUUID service, BluetoothUUID characteristic, ByteArray data) {
+    PeripheralBaseMacOS* internal = (PeripheralBaseMacOS*)opaque_internal_;
+
+    NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
+    NSString* characteristic_uuid = [NSString stringWithCString:characteristic.c_str() encoding:NSString.defaultCStringEncoding];
+    NSData* payload = [NSData dataWithBytes:(void*)data.c_str() length:data.size()];
+
+    [internal writeRequest:service_uuid characteristic_uuid:characteristic_uuid payload:payload];
+}
+
+void PeripheralBase::write_command(BluetoothUUID service, BluetoothUUID characteristic, ByteArray data) {
+    PeripheralBaseMacOS* internal = (PeripheralBaseMacOS*)opaque_internal_;
+
+    NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
+    NSString* characteristic_uuid = [NSString stringWithCString:characteristic.c_str() encoding:NSString.defaultCStringEncoding];
+    NSData* payload = [NSData dataWithBytes:(void*)data.c_str() length:data.size()];
+
+    [internal writeCommand:service_uuid characteristic_uuid:characteristic_uuid payload:payload];
+}
+
+void PeripheralBase::notify(BluetoothUUID service, BluetoothUUID characteristic, std::function<void(ByteArray payload)> callback) {
+    PeripheralBaseMacOS* internal = (PeripheralBaseMacOS*)opaque_internal_;
+
+    NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
+    NSString* characteristic_uuid = [NSString stringWithCString:characteristic.c_str() encoding:NSString.defaultCStringEncoding];
+    [internal notify:service_uuid characteristic_uuid:characteristic_uuid callback:callback];
+}
+
+void PeripheralBase::indicate(BluetoothUUID service, BluetoothUUID characteristic, std::function<void(ByteArray payload)> callback) {
+    PeripheralBaseMacOS* internal = (PeripheralBaseMacOS*)opaque_internal_;
+
+    NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
+    NSString* characteristic_uuid = [NSString stringWithCString:characteristic.c_str() encoding:NSString.defaultCStringEncoding];
+    [internal indicate:service_uuid characteristic_uuid:characteristic_uuid callback:callback];
+}
+
+void PeripheralBase::unsubscribe(BluetoothUUID service, BluetoothUUID characteristic) {
+    PeripheralBaseMacOS* internal = (PeripheralBaseMacOS*)opaque_internal_;
+
+    NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
+    NSString* characteristic_uuid = [NSString stringWithCString:characteristic.c_str() encoding:NSString.defaultCStringEncoding];
+}
+
 void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) { callback_on_connected_ = on_connected; }
 
 void PeripheralBase::set_callback_on_disconnected(std::function<void()> on_disconnected) { callback_on_disconnected_ = on_disconnected; }

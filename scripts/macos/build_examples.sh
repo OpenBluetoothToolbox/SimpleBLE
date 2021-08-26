@@ -36,4 +36,4 @@ fi
 mkdir -p $BUILD_PATH
 cd $BUILD_PATH
 cmake -H$SOURCE_ROOT
-make -j
+make -j1
