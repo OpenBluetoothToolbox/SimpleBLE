@@ -72,10 +72,15 @@ int main(int argc, char* argv[]) {
         std::cin >> selection;
 
         if (selection >= 0 && selection < uuids.size()) {
-            // Attempt to read the characteristic.
-            SimpleBLE::ByteArray rx_data = peripheral.read(uuids[selection].first, uuids[selection].second);
-            std::cout << "Characteristic contents were: ";
-            print_byte_array(rx_data);
+            // Subscribe to the characteristic.
+            peripheral.notify(uuids[selection].first, uuids[selection].second, [&](SimpleBLE::ByteArray bytes) {
+                std::cout << "Received: ";
+                print_byte_array(bytes);
+            });
+
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+
+            peripheral.unsubscribe(uuids[selection].first, uuids[selection].second);
         }
         peripheral.disconnect();
     }

@@ -260,6 +260,35 @@ typedef struct {
     [self notify:service_uuid characteristic_uuid:characteristic_uuid callback:callback];
 }
 
+- (void)unsubscribe:(NSString*)service_uuid
+    characteristic_uuid:(NSString*)characteristic_uuid {
+    std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
+                                                                                       characteristic_uuid:characteristic_uuid];
+
+    if (serviceAndCharacteristic.first == nil || serviceAndCharacteristic.second == nil) {
+        // TODO: Raise an exception.
+        NSLog(@"Could not find service and characteristic.");
+    }
+
+    CBCharacteristic* characteristic = serviceAndCharacteristic.second;
+    [self.peripheral setNotifyValue:NO forCharacteristic:characteristic];
+
+    // Wait for the update to complete for up to 1 second.
+    NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
+    while (characteristic.isNotifying && [NSDate.now compare:endDate] == NSOrderedAscending) {
+        [NSThread sleepForTimeInterval:0.01];
+    }
+
+    if (characteristic.isNotifying) {
+        // TODO: Raise an exception.
+        NSLog(@"Could not disable notifications for characteristic %@", characteristic.UUID);
+    } else {
+        // Only delete the callback if the characteristic is no longer notifying, to 
+        // prevent triggering a segfault.
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback = nil;
+    }
+}
+
 #pragma mark - Auxiliary methods
 
 - (CBService*)findService:(NSString*)uuid {

@@ -95,6 +95,7 @@ void PeripheralBase::unsubscribe(BluetoothUUID service, BluetoothUUID characteri
 
     NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
     NSString* characteristic_uuid = [NSString stringWithCString:characteristic.c_str() encoding:NSString.defaultCStringEncoding];
+    [internal unsubscribe:service_uuid characteristic_uuid:characteristic_uuid];
 }
 
 void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) { callback_on_connected_ = on_connected; }

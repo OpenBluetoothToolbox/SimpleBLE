@@ -64,12 +64,19 @@ operating system.
 | `list_adapters` example | X     | X       | E     |
 | `scan` example          | X     | X       | X     |
 | `connect` example       | O     | O       | X     |
+| `read` example          | O     | O       | X     |
+| `write` example         | O     | O       | X     |
+| `notify` example        | O     | O       | X     |
 
 **Nomenclature**
 - `X`: Supported
 - `E`: Emulated
 - `O`: Unsupported
 
-
-## Known Issues
-- MacOS implementation has incomplete error handling and might crash if invalid parameters are passed.
+## Known Issues / To-Do's
+- [MacOS] Implementation has incomplete error handling and might crash if invalid parameters are passed.
+- [MacOS] Timeout logic can be DRYed up.
+- [MacOS] Raise exceptions upon error.
+- [MacOS] `Peripheral::is_connected` is not implemented.
+- [MacOS] `onConnected` and `onDisconnected` callbacks are not implemented.
+- [MacOS] Service and characteristic UUIDs need to be normalized.

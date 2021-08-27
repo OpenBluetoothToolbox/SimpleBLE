@@ -24,6 +24,7 @@
 - (void)writeCommand:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid payload:(NSData*)payload;
 - (void)notify:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid callback:(std::function<void(SimpleBLE::ByteArray)>)callback; 
 - (void)indicate:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid callback:(std::function<void(SimpleBLE::ByteArray)>)callback; 
+- (void)unsubscribe:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid;
 
 - (void)delegateDidConnect;
 - (void)delegateDidDisconnect;
