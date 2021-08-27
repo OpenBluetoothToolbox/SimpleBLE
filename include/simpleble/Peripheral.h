@@ -1,9 +1,9 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
-#include <functional>
 
 #include <simpleble/Exceptions.h>
 #include <simpleble/Types.h>
@@ -23,7 +23,7 @@ class Peripheral {
     void connect();
     void disconnect();
     bool is_connected();
-    bool is_connectable(); // TODO
+    bool is_connectable();  // TODO: Implement
 
     std::vector<BluetoothService> services();
     // TODO: Add manufacturer data
@@ -35,12 +35,11 @@ class Peripheral {
     void indicate(BluetoothUUID service, BluetoothUUID characteristic, std::function<void(ByteArray payload)> callback);
     void unsubscribe(BluetoothUUID service, BluetoothUUID characteristic);
 
-    void set_callback_on_connected(std::function<void()> on_connected);
-    void set_callback_on_disconnected(std::function<void()> on_disconnected);
+    void set_callback_on_connected(std::function<void()> on_connected);        // TODO: Implement
+    void set_callback_on_disconnected(std::function<void()> on_disconnected);  // TODO: Implement
 
   protected:
     std::shared_ptr<PeripheralBase> internal_;
-    
 };
 
 }  // namespace SimpleBLE
