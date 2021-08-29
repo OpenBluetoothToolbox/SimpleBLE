@@ -5,7 +5,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project(SimpleBLE VERSION 0.1 LANGUAGES CXX)
 
 # Include all necessary CMake modules
-include(ExternalProject)
+include(FetchContent)
 
 # Detect if the project is being build within a project or standalone.
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
@@ -19,8 +19,16 @@ else()
     set(STANDALONE false)
 endif()
 
+# Load default parameters passed in through the command line.
+if(NOT SIMPLEDBUS_GIT_REPOSITORY)
+    set(SIMPLEDBUS_GIT_REPOSITORY "https://github.com/kdewald/SimpleDBus.git")
+endif()
+if(NOT SIMPLEDBUS_GIT_TAG)
+    set(SIMPLEDBUS_GIT_TAG "master")
+endif()
+
 # Perform some overall CMake configurations
-#set(CMAKE_CXX_STANDARD 17)
+#set(CMAKE_CXX_STANDARD 17) // TODO: Specify the standard only for this library
 
 # Configure the external header path
 set(SIMPLEBLE_USER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -38,7 +46,14 @@ set(
 # Detect the operating system and load the necessary dependencies
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     message("-- [INFO] Linux Host Detected")
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/linux/SimpleDBus ${CMAKE_BINARY_DIR}/simpledbus)
+
+    FetchContent_Declare(
+        simpledbus
+        GIT_REPOSITORY ${SIMPLEDBUS_GIT_REPOSITORY}
+        GIT_TAG ${SIMPLEDBUS_GIT_TAG}
+    )
+    FetchContent_MakeAvailable(simpledbus)
+
     set(
         EXTERNAL_LIBRARIES
         bluezdbus-static

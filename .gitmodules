@@ -1,4 +1,0 @@
-[submodule "extern/linux/SimpleDBus"]
-	path = extern/linux/SimpleDBus
-	url = git@github.com:kdewald/SimpleDBus.git
-	branch = develop

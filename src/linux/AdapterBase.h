@@ -15,9 +15,7 @@
 namespace SimpleBLE {
 
 class AdapterBase {
-  public:
-    static std::vector<std::shared_ptr<AdapterBase>> get_adapters();
-    
+  public:   
     AdapterBase(std::shared_ptr<BluezAdapter> adapter);
     ~AdapterBase();
 
@@ -33,6 +31,8 @@ class AdapterBase {
     void set_callback_on_scan_stop(std::function<void()> on_scan_stop);
     void set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated);
     void set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found);
+
+    static std::vector<std::shared_ptr<AdapterBase>> get_adapters();
 
   private: 
     std::weak_ptr<BluezAdapter> adapter_;
