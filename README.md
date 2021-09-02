@@ -7,6 +7,9 @@ features are added.
 
 ## Installation
 
+### Windows
+- Windows SDK Build 19041
+
 
 ## How to use
 
@@ -109,9 +112,12 @@ operating system.
 | `notify` example        | No    | No      | Yes      |
 
 ## Known Issues / To-Do's
+- [MacOS] Only the main system adapter can be detected.
 - [MacOS] Implementation has incomplete error handling and might crash if invalid parameters are passed.
 - [MacOS] Timeout logic can be DRYed up.
 - [MacOS] Raise exceptions upon error.
 - [MacOS] `Peripheral::is_connected` is not implemented.
 - [MacOS] `onConnected` and `onDisconnected` callbacks are not implemented.
 - [MacOS] Service and characteristic UUIDs need to be normalized.
+- [Windows] Unclear if multiple adapters can be detected.
+- [Windows] Scanning will sometimes return empty devices.

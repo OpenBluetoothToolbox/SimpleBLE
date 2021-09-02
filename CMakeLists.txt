@@ -96,6 +96,8 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         SRC_SIMPLEBLE_FILES
         ${SRC_SIMPLEBLE_FILES}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/AdapterBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/PeripheralBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/Utils.cpp
     )
 
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")

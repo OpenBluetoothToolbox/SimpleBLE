@@ -2,18 +2,44 @@
 #pragma comment(lib, "windowsapp")
 #include "AdapterBase.h"
 
-#include "winrt/Windows.Devices.Radios.h"
+#include "PeripheralBuilder.h"
+#include "Utils.h"
+
 #include "winrt/Windows.Devices.Bluetooth.h"
 #include "winrt/Windows.Devices.Enumeration.h"
+#include "winrt/Windows.Devices.Radios.h"
+#include "winrt/Windows.Foundation.Collections.h"
 #include "winrt/Windows.Foundation.h"
 #include "winrt/base.h"
 
 #include <iostream>
 #include <sstream>
 
-#define MAC_ADDRESS_STR_LENGTH (size_t) 17 // Two chars per byte, 5 chars for colon
-
 using namespace SimpleBLE;
+using namespace std::chrono_literals;
+
+AdapterBase::AdapterBase(std::string device_id)
+    : adapter_(BluetoothAdapter::FromIdAsync(winrt::to_hstring(device_id)).get()) {
+    auto device_information =
+        Devices::Enumeration::DeviceInformation::CreateFromIdAsync(winrt::to_hstring(device_id)).get();
+    identifier_ = winrt::to_string(device_information.Name());
+
+    // Configure the scanner object
+    scanner_ = Advertisement::BluetoothLEAdvertisementWatcher();
+    scanner_.Stopped([=](const auto& w, const Advertisement::BluetoothLEAdvertisementWatcherStoppedEventArgs args) {
+        this->_scan_stopped_callback();
+    });
+    scanner_.Received([&](const auto& w, const Advertisement::BluetoothLEAdvertisementReceivedEventArgs args) {
+        advertising_data_t data;
+        data.mac_address = _mac_address_to_str(args.BluetoothAddress());
+        data.identifier = winrt::to_string(args.Advertisement().LocalName());
+        data.connectable = args.IsConnectable();
+        // TODO: Extract manufacturer data
+        this->_scan_received_callback(data);
+    });
+}
+
+AdapterBase::~AdapterBase() {}
 
 std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
     // Initialize the WinRT backend.
@@ -23,40 +49,87 @@ std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
     auto device_information_collection = Devices::Enumeration::DeviceInformation::FindAllAsync(device_selector).get();
 
     std::vector<std::shared_ptr<AdapterBase>> adapter_list;
-    for (auto& dev_info : device_information_collection) {
+    for (uint32_t i = 0; i < device_information_collection.Size(); i++) {
+        auto dev_info = device_information_collection.GetAt(i);
         adapter_list.push_back(std::make_shared<AdapterBase>(winrt::to_string(dev_info.Id())));
     }
     return adapter_list;
 }
 
-AdapterBase::AdapterBase(std::string device_id)
-    : adapter_(BluetoothAdapter::FromIdAsync(winrt::to_hstring(device_id)).get()) {
-    
-    auto device_information = Devices::Enumeration::DeviceInformation::CreateFromIdAsync(winrt::to_hstring(device_id)).get();
-    identifier_ = winrt::to_string(device_information.Name());
-}
-
-AdapterBase::~AdapterBase() {}
-
 std::string AdapterBase::identifier() { return identifier_; }
 
-BluetoothAddress AdapterBase::address() { return AdapterBase::_mac_address_to_str(adapter_.BluetoothAddress()); }
+BluetoothAddress AdapterBase::address() { return _mac_address_to_str(adapter_.BluetoothAddress()); }
 
-std::string AdapterBase::_mac_address_to_str(uint64_t mac_address) {
-    uint8_t* mac_address_ptr = (uint8_t*) &mac_address;
-    char mac_address_str[MAC_ADDRESS_STR_LENGTH + 1] = {0}; // Include null terminator.
-
-    int position = 0;
-    position += sprintf(&mac_address_str[position], "%02x:%02x:%02x:", mac_address_ptr[5], mac_address_ptr[4], mac_address_ptr[3]);
-    position += sprintf(&mac_address_str[position], "%02x:%02x:%02x", mac_address_ptr[2], mac_address_ptr[1], mac_address_ptr[0]);
-    return std::string((const char*) mac_address_str);
+void AdapterBase::scan_start() {
+    scanner_.ScanningMode(Advertisement::BluetoothLEScanningMode::Active);
+    scan_is_active_ = true;
+    scanner_.Start();
 }
 
-uint64_t AdapterBase::_str_to_mac_address(std::string mac_address) {
-    // TODO: Validate input - Expected Format: XX:XX:XX:XX:XX:XX
-    uint64_t mac_address_number = 0;
-    uint8_t* mac_address_ptr = (uint8_t*) &mac_address_number;
-    sscanf(&mac_address.c_str()[0], "%02hhx:%02hhx:%02hhx:", &mac_address_ptr[5], &mac_address_ptr[4], &mac_address_ptr[3]);
-    sscanf(&mac_address.c_str()[9], "%02hhx:%02hhx:%02hhx:", &mac_address_ptr[2], &mac_address_ptr[1], &mac_address_ptr[0]);
-    return mac_address_number;
+void AdapterBase::scan_stop() {
+    scanner_.Stop();
+
+    std::unique_lock<std::mutex> lock(scan_stop_mutex_);
+    if (scan_stop_cv_.wait_for(lock, 1s, [=] { return !this->scan_is_active_; })) {
+        // Scan stopped
+    } else {
+        // Scan did not stop
+        // TODO: Throw exception
+    }
+}
+
+void AdapterBase::scan_for(int timeout_ms) {
+    scan_start();
+    std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
+    scan_stop();
+}
+
+bool AdapterBase::scan_is_active() { return scan_is_active_; }
+
+void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start) {
+    callback_on_scan_start_ = on_scan_start;
+}
+void AdapterBase::set_callback_on_scan_stop(std::function<void()> on_scan_stop) {
+    callback_on_scan_stop_ = on_scan_stop;
+}
+void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) {
+    callback_on_scan_updated_ = on_scan_updated;
+}
+void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {
+    callback_on_scan_found_ = on_scan_found;
+}
+
+// Private functions
+
+void AdapterBase::_scan_stopped_callback() {
+    scan_is_active_ = false;
+    scan_stop_cv_.notify_all();
+    if (callback_on_scan_stop_) {
+        callback_on_scan_stop_();
+    }
+}
+
+void AdapterBase::_scan_received_callback(advertising_data_t data) {
+    if (this->peripherals_.count(data.mac_address) == 0) {
+        // Create a new PeripheralBase object
+        std::shared_ptr<PeripheralBase> base_peripheral = std::make_shared<PeripheralBase>(data);
+
+        // Store it in our table of seem peripherals
+        this->peripherals_.insert(std::make_pair(data.mac_address, base_peripheral));
+
+        // Convert the base object into an external-facing Peripheral object
+        PeripheralBuilder peripheral_builder(base_peripheral);
+        if (this->callback_on_scan_found_) {
+            this->callback_on_scan_found_(peripheral_builder);
+        }
+    } else {
+        // Load the existing PeripheralBase object
+        std::shared_ptr<PeripheralBase> base_peripheral = this->peripherals_.at(data.mac_address);
+
+        // Convert the base object into an external-facing Peripheral object
+        PeripheralBuilder peripheral_builder(base_peripheral);
+        if (this->callback_on_scan_updated_) {
+            this->callback_on_scan_updated_(peripheral_builder);
+        }
+    }
 }

@@ -4,10 +4,17 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <atomic>
+#include <condition_variable>
 
 #include <simpleble/Exceptions.h>
+#include <simpleble/Peripheral.h>
 #include <simpleble/Types.h>
 
+#include "AdapterBaseTypes.h"
+#include "PeripheralBase.h"
+
+#include "winrt/Windows.Devices.Bluetooth.Advertisement.h"
 #include "winrt/Windows.Devices.Bluetooth.h"
 
 using namespace winrt::Windows;
@@ -23,25 +30,35 @@ class AdapterBase {
     std::string identifier();
     BluetoothAddress address();
 
+    void scan_start();
+    void scan_stop();
+    void scan_for(int timeout_ms);
+    bool scan_is_active();
+
     void set_callback_on_scan_start(std::function<void()> on_scan_start);
     void set_callback_on_scan_stop(std::function<void()> on_scan_stop);
-    void set_callback_on_scan_seen(std::function<void()> on_scan_seen);    // TODO: HOW TO PASS INTERNAL PERIPHERAL?
-    void set_callback_on_scan_found(std::function<void()> on_scan_found);  // TODO: HOW TO PASS INTERNAL PERIPHERAL?
+    void set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated);
+    void set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found);
 
     static std::vector<std::shared_ptr<AdapterBase>> get_adapters();
 
   private:
-
     BluetoothAdapter adapter_;
     std::string identifier_;
+    struct Advertisement::BluetoothLEAdvertisementWatcher scanner_;
 
-    std::function<void()> callback_on_scan_start;
-    std::function<void()> callback_on_scan_stop;
-    std::function<void()> callback_on_scan_seen;   // TODO: HOW TO PASS INTERNAL PERIPHERAL?
-    std::function<void()> callback_on_scan_found;  // TODO: HOW TO PASS INTERNAL PERIPHERAL?
+    std::atomic_bool scan_is_active_ {false};
+    std::condition_variable scan_stop_cv_;
+    std::mutex scan_stop_mutex_;
+    std::map<BluetoothAddress, std::shared_ptr<PeripheralBase> > peripherals_;
 
-    static std::string _mac_address_to_str(uint64_t mac_address);
-    static uint64_t _str_to_mac_address(std::string mac_address);
+    void _scan_stopped_callback();
+    void _scan_received_callback(advertising_data_t data);
+
+    std::function<void()> callback_on_scan_start_;
+    std::function<void()> callback_on_scan_stop_;
+    std::function<void(Peripheral)> callback_on_scan_updated_;
+    std::function<void(Peripheral)> callback_on_scan_found_;
 };
 
 }  // namespace SimpleBLE
