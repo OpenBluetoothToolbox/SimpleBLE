@@ -12,14 +12,20 @@
 using namespace SimpleBLE;
 
 PeripheralBase::PeripheralBase(advertising_data_t advertising_data) {
+    identifier_ = advertising_data.identifier;
+    address_ = advertising_data.mac_address;
     device_ = BluetoothLEDevice::FromBluetoothAddressAsync(_str_to_mac_address(advertising_data.mac_address)).get();
 }
 
 PeripheralBase::~PeripheralBase() {}
 
-std::string PeripheralBase::identifier() { return winrt::to_string(device_.Name()); }
+std::string PeripheralBase::identifier() {
+    return identifier_;
+}
 
-BluetoothAddress PeripheralBase::address() { return _mac_address_to_str(device_.BluetoothAddress()); }
+BluetoothAddress PeripheralBase::address() {
+    return address_;
+}
 
 void PeripheralBase::connect() {}
 

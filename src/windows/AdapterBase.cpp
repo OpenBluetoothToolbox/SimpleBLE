@@ -64,6 +64,10 @@ void AdapterBase::scan_start() {
     scanner_.ScanningMode(Advertisement::BluetoothLEScanningMode::Active);
     scan_is_active_ = true;
     scanner_.Start();
+
+    if (callback_on_scan_start_) {
+        callback_on_scan_start_();
+    }
 }
 
 void AdapterBase::scan_stop() {
@@ -73,8 +77,8 @@ void AdapterBase::scan_stop() {
     if (scan_stop_cv_.wait_for(lock, 1s, [=] { return !this->scan_is_active_; })) {
         // Scan stopped
     } else {
-        // Scan did not stop
-        // TODO: Throw exception
+        // Scan did not stop, this can be because some other process
+        // is using the adapter.
     }
 }
 

@@ -44,6 +44,12 @@ class PeripheralBase {
   private:
 
     BluetoothLEDevice device_ = nullptr;
+
+    // NOTE: For some reason, calling device_.Name() or device_.BluetoothAddress()
+    // seems to crash with  certain devices. To prevent this problem, we'll use
+    // the values from the advertising data instead.
+    std::string identifier_;
+    BluetoothAddress address_;
 };
 
 }  // namespace SimpleBLE
