@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
         auto peripheral = peripherals[selection];
         std::cout << "Connecting to " << peripheral.identifier() << " [" << peripheral.address() << "]" << std::endl;
         peripheral.connect();
-        
+
         std::cout << "Successfully connected, listing services." << std::endl;
         for (auto service : peripheral.services()) {
             std::cout << "Service: " << service.uuid << std::endl;
@@ -53,6 +53,10 @@ int main(int argc, char* argv[]) {
             }
         }
         peripheral.disconnect();
+
+        // Sleep for an additional second before returning.
+        // If there are any unexpected events, this example will help debug them.
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
     return 0;

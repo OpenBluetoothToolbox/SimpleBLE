@@ -1,5 +1,6 @@
 #pragma once
 
+#include <condition_variable>
 #include <functional>
 #include <map>
 #include <memory>
@@ -9,9 +10,11 @@
 
 #include "AdapterBaseTypes.h"
 
+#include "winrt/Windows.Devices.Bluetooth.GenericAttributeProfile.h"
 #include "winrt/Windows.Devices.Bluetooth.h"
 
 using namespace winrt::Windows::Devices::Bluetooth;
+using namespace winrt::Windows::Devices::Bluetooth::GenericAttributeProfile;
 
 namespace SimpleBLE {
 
@@ -42,14 +45,25 @@ class PeripheralBase {
     void set_callback_on_disconnected(std::function<void()> on_disconnected);
 
   private:
-
     BluetoothLEDevice device_ = nullptr;
 
-    // NOTE: For some reason, calling device_.Name() or device_.BluetoothAddress()
-    // seems to crash with  certain devices. To prevent this problem, we'll use
-    // the values from the advertising data instead.
+    // NOTE: Calling device_.Name() or device_.BluetoothAddress() might
+    // cause a crash on some devices.
+    // This is because any operation on the object before it is connected will
+    // initiate a connection, which can then cause further cascading failures.
+    // See:
+    // https://docs.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.bluetoothledevice.frombluetoothaddressasync
     std::string identifier_;
     BluetoothAddress address_;
+
+    std::condition_variable disconnection_cv_;
+    std::mutex disconnection_mutex_;
+    std::map<std::string, std::map<std::string, GattCharacteristic>> characteristics_map;
+
+    std::function<void()> callback_on_connected_;
+    std::function<void()> callback_on_disconnected_;
+
+    bool _attempt_connect();
 };
 
 }  // namespace SimpleBLE

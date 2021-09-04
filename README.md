@@ -67,26 +67,26 @@ or just be ignored.
 
 | API                                                  | Linux | Windows | MacOS |
 | ---------------------------------------------------- | ----- | ------- | ----- |
-| `SimpleBLE::Adapter::identifier`                     | Yes   | No      | Yes   |
-| `SimpleBLE::Adapter::address`                        | Yes   | No      | Yes   |
-| `SimpleBLE::Adapter::scan_start`                     | Yes   | No      | Yes   |
-| `SimpleBLE::Adapter::scan_stop`                      | Yes   | No      | Yes   |
-| `SimpleBLE::Adapter::scan_for`                       | Yes   | No      | Yes   |
-| `SimpleBLE::Adapter::scan_is_active`                 | Yes   | No      | Yes   |
+| `SimpleBLE::Adapter::identifier`                     | Yes   | Yes     | Yes   |
+| `SimpleBLE::Adapter::address`                        | Yes   | Yes     | Yes   |
+| `SimpleBLE::Adapter::scan_start`                     | Yes   | Yes     | Yes   |
+| `SimpleBLE::Adapter::scan_stop`                      | Yes   | Yes     | Yes   |
+| `SimpleBLE::Adapter::scan_for`                       | Yes   | Yes     | Yes   |
+| `SimpleBLE::Adapter::scan_is_active`                 | Yes   | Yes     | Yes   |
 | `SimpleBLE::Adapter::scan_get_results`               | No    | No      | No    |
-| `SimpleBLE::Adapter::set_callback_on_scan_start`     | No    | No      | Yes   |
-| `SimpleBLE::Adapter::set_callback_on_scan_stop`      | No    | No      | Yes   |
-| `SimpleBLE::Adapter::set_callback_on_scan_updated`   | No    | No      | Yes   |
-| `SimpleBLE::Adapter::set_callback_on_scan_found`     | No    | No      | Yes   |
-| `SimpleBLE::Adapter::get_adapters`                   | No    | No      | Yes   |
+| `SimpleBLE::Adapter::set_callback_on_scan_start`     | No    | Yes     | Yes   |
+| `SimpleBLE::Adapter::set_callback_on_scan_stop`      | No    | Yes     | Yes   |
+| `SimpleBLE::Adapter::set_callback_on_scan_updated`   | No    | Yes     | Yes   |
+| `SimpleBLE::Adapter::set_callback_on_scan_found`     | No    | Yes     | Yes   |
+| `SimpleBLE::Adapter::get_adapters`                   | No    | Yes     | Yes   |
 | ---------------------------------------------------- | ----- | ------- | ----- |
-| `SimpleBLE::Peripheral::identifier`                  | No    | No      | Yes   |
-| `SimpleBLE::Peripheral::address`                     | No    | No      | Yes   |
-| `SimpleBLE::Peripheral::connect`                     | No    | No      | Yes   |
-| `SimpleBLE::Peripheral::disconnect`                  | No    | No      | Yes   |
-| `SimpleBLE::Peripheral::is_connected`                | No    | No      | Yes   |
+| `SimpleBLE::Peripheral::identifier`                  | No    | Yes     | Yes   |
+| `SimpleBLE::Peripheral::address`                     | No    | Yes     | Yes   |
+| `SimpleBLE::Peripheral::connect`                     | No    | Yes     | Yes   |
+| `SimpleBLE::Peripheral::disconnect`                  | No    | Yes     | Yes   |
+| `SimpleBLE::Peripheral::is_connected`                | No    | Yes     | Yes   |
 | `SimpleBLE::Peripheral::is_connectable`              | No    | No      | No    |
-| `SimpleBLE::Peripheral::services`                    | No    | No      | Yes   |
+| `SimpleBLE::Peripheral::services`                    | No    | Yes     | Yes   |
 | `SimpleBLE::Peripheral::manufacturer_data`           | No    | No      | No    |
 | `SimpleBLE::Peripheral::read`                        | No    | No      | Yes   |
 | `SimpleBLE::Peripheral::write_request`               | No    | No      | Yes   |
@@ -94,8 +94,8 @@ or just be ignored.
 | `SimpleBLE::Peripheral::notify`                      | No    | No      | Yes   |
 | `SimpleBLE::Peripheral::indicate`                    | No    | No      | Yes   |
 | `SimpleBLE::Peripheral::unsubscribe`                 | No    | No      | Yes   |
-| `SimpleBLE::Peripheral::set_callback_on_connected`   | No    | No      | No    |
-| `SimpleBLE::Peripheral::set_callback_on_disconnected`| No    | No      | No    |
+| `SimpleBLE::Peripheral::set_callback_on_connected`   | No    | Yes     | No    |
+| `SimpleBLE::Peripheral::set_callback_on_disconnected`| No    | Yes     | No    |
 
 ## Examples per OS
 
@@ -112,6 +112,7 @@ operating system.
 | `notify` example        | No    | No      | Yes      |
 
 ## Known Issues / To-Do's
+- [Linux] Fork safety is not guaranteed.
 - [MacOS] Only the main system adapter can be detected.
 - [MacOS] Implementation has incomplete error handling and might crash if invalid parameters are passed.
 - [MacOS] Timeout logic can be DRYed up.
@@ -120,4 +121,3 @@ operating system.
 - [MacOS] `onConnected` and `onDisconnected` callbacks are not implemented.
 - [MacOS] Service and characteristic UUIDs need to be normalized.
 - [Windows] Unclear if multiple adapters can be detected.
-- [Windows] Scanning will sometimes return empty devices.
