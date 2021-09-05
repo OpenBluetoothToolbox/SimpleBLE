@@ -106,7 +106,7 @@ operating system.
 | ----------------------- | ---   | ------- | -------- |
 | `list_adapters` example | Yes   | Yes     | Emulated |
 | `scan` example          | Yes   | Yes     | Yes      |
-| `connect` example       | No    | No      | Yes      |
+| `connect` example       | No    | Yes     | Yes      |
 | `read` example          | No    | No      | Yes      |
 | `write` example         | No    | No      | Yes      |
 | `notify` example        | No    | No      | Yes      |

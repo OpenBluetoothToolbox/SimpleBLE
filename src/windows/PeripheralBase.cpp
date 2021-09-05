@@ -2,6 +2,7 @@
 #pragma comment(lib, "windowsapp")
 
 #include "PeripheralBase.h"
+#include <simpleble/Exceptions.h>
 #include "Utils.h"
 
 #include "winrt/Windows.Foundation.Collections.h"
@@ -49,7 +50,7 @@ void PeripheralBase::connect() {
 }
 
 void PeripheralBase::disconnect() {
-    characteristics_map.clear();
+    characteristics_map_.clear();
     if (device_ != nullptr) {
         device_.Close();
     }
@@ -69,7 +70,7 @@ bool PeripheralBase::is_connected() {
 
 std::vector<BluetoothService> PeripheralBase::services() {
     std::vector<BluetoothService> list_of_services;
-    for (auto& service : characteristics_map) {
+    for (auto& service : characteristics_map_) {
         BluetoothService ble_service;
         ble_service.uuid = service.first;
         for (auto& characteristic : service.second) {
@@ -80,19 +81,70 @@ std::vector<BluetoothService> PeripheralBase::services() {
     return list_of_services;
 }
 
-ByteArray PeripheralBase::read(BluetoothUUID service, BluetoothUUID characteristic) { return ""; }
+ByteArray PeripheralBase::read(BluetoothUUID service, BluetoothUUID characteristic) {
+    GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
 
-void PeripheralBase::write_request(BluetoothUUID service, BluetoothUUID characteristic, ByteArray data) {}
+    // Validate that the operation can be performed.
+    uint32_t gatt_characteristic_prop = (uint32_t)gatt_characteristic.CharacteristicProperties();
+    if ((gatt_characteristic_prop & (uint32_t)GattCharacteristicProperties::Read) == 0) {
+        throw SimpleBLE::Exception::OperationNotSupported();
+    }
 
-void PeripheralBase::write_command(BluetoothUUID service, BluetoothUUID characteristic, ByteArray data) {}
+    // Read the value.
+    auto result = gatt_characteristic.ReadValueAsync().get();
+
+    if (result.Status() != GenericAttributeProfile::GattCommunicationStatus::Success) {
+        throw SimpleBLE::Exception::OperationFailed();
+    }
+
+    return "";
+}
+
+void PeripheralBase::write_request(BluetoothUUID service, BluetoothUUID characteristic, ByteArray data) {
+    GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
+
+    // Validate that the operation can be performed.
+    uint32_t gatt_characteristic_prop = (uint32_t)gatt_characteristic.CharacteristicProperties();
+    if ((gatt_characteristic_prop & (uint32_t)GattCharacteristicProperties::WriteWithoutResponse) == 0) {
+        throw SimpleBLE::Exception::OperationNotSupported();
+    }
+}
+
+void PeripheralBase::write_command(BluetoothUUID service, BluetoothUUID characteristic, ByteArray data) {
+    GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
+
+    // Validate that the operation can be performed.
+    uint32_t gatt_characteristic_prop = (uint32_t)gatt_characteristic.CharacteristicProperties();
+    if ((gatt_characteristic_prop & (uint32_t)GattCharacteristicProperties::Write) == 0) {
+        throw SimpleBLE::Exception::OperationNotSupported();
+    }
+}
 
 void PeripheralBase::notify(BluetoothUUID service, BluetoothUUID characteristic,
-                            std::function<void(ByteArray payload)> callback) {}
+                            std::function<void(ByteArray payload)> callback) {
+    GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
+
+    // Validate that the operation can be performed.
+    uint32_t gatt_characteristic_prop = (uint32_t)gatt_characteristic.CharacteristicProperties();
+    if ((gatt_characteristic_prop & (uint32_t)GattCharacteristicProperties::Notify) == 0) {
+        throw SimpleBLE::Exception::OperationNotSupported();
+    }
+}
 
 void PeripheralBase::indicate(BluetoothUUID service, BluetoothUUID characteristic,
-                              std::function<void(ByteArray payload)> callback) {}
+                              std::function<void(ByteArray payload)> callback) {
+    GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
 
-void PeripheralBase::unsubscribe(BluetoothUUID service, BluetoothUUID characteristic) {}
+    // Validate that the operation can be performed.
+    uint32_t gatt_characteristic_prop = (uint32_t)gatt_characteristic.CharacteristicProperties();
+    if ((gatt_characteristic_prop & (uint32_t)GattCharacteristicProperties::Indicate) == 0) {
+        throw SimpleBLE::Exception::OperationNotSupported();
+    }
+}
+
+void PeripheralBase::unsubscribe(BluetoothUUID service, BluetoothUUID characteristic) {
+    GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
+}
 
 void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) {
     callback_on_connected_ = on_connected;
@@ -105,7 +157,7 @@ void PeripheralBase::set_callback_on_disconnected(std::function<void()> on_disco
 // Private methods
 
 bool PeripheralBase::_attempt_connect() {
-    characteristics_map.clear();
+    characteristics_map_.clear();
 
     // We need to cache all services and characteristics in the class, else
     // the underlying objects will be garbage collected.
@@ -132,8 +184,21 @@ bool PeripheralBase::_attempt_connect() {
             // For each characteristic...
             // Store the underlying object pointer in a map.
             std::string characteristic_uuid = guid_to_uuid(characteristic.Uuid());
-            characteristics_map[service_uuid].emplace(characteristic_uuid, characteristic);
+            characteristics_map_[service_uuid].emplace(characteristic_uuid, characteristic);
         }
     }
     return true;
+}
+
+GattCharacteristic PeripheralBase::_fetch_characteristic(const BluetoothUUID& service_uuid,
+                                                         const BluetoothUUID& characteristic_uuid) {
+    if (characteristics_map_.count(service_uuid) == 0) {
+        throw SimpleBLE::Exception::ServiceNotFound(service_uuid);
+    }
+
+    if (characteristics_map_[service_uuid].count(characteristic_uuid) == 0) {
+        throw SimpleBLE::Exception::CharacteristicNotFound(characteristic_uuid);
+    }
+
+    return characteristics_map_[service_uuid].at(characteristic_uuid);
 }

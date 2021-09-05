@@ -58,12 +58,14 @@ class PeripheralBase {
 
     std::condition_variable disconnection_cv_;
     std::mutex disconnection_mutex_;
-    std::map<std::string, std::map<std::string, GattCharacteristic>> characteristics_map;
+    std::map<BluetoothUUID, std::map<BluetoothUUID, GattCharacteristic>> characteristics_map_;
 
     std::function<void()> callback_on_connected_;
     std::function<void()> callback_on_disconnected_;
 
     bool _attempt_connect();
+    GattCharacteristic _fetch_characteristic(const BluetoothUUID& service_uuid,
+                                              const BluetoothUUID& characteristic_uuid);
 };
 
 }  // namespace SimpleBLE

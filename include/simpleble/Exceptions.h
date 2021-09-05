@@ -22,6 +22,16 @@ class CharacteristicNotFound : public std::runtime_error {
     CharacteristicNotFound(BluetoothUUID uuid);
 };
 
+class OperationNotSupported : public std::runtime_error {
+  public:
+    OperationNotSupported();
+};
+
+class OperationFailed : public std::runtime_error {
+  public:
+    OperationFailed();
+};
+
 }  // namespace Exception
 
 }  // namespace SimpleBLE
