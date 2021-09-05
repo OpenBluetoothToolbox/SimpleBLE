@@ -88,12 +88,12 @@ or just be ignored.
 | `SimpleBLE::Peripheral::is_connectable`              | No    | No      | No    |
 | `SimpleBLE::Peripheral::services`                    | No    | Yes     | Yes   |
 | `SimpleBLE::Peripheral::manufacturer_data`           | No    | No      | No    |
-| `SimpleBLE::Peripheral::read`                        | No    | No      | Yes   |
-| `SimpleBLE::Peripheral::write_request`               | No    | No      | Yes   |
-| `SimpleBLE::Peripheral::write_command`               | No    | No      | Yes   |
-| `SimpleBLE::Peripheral::notify`                      | No    | No      | Yes   |
-| `SimpleBLE::Peripheral::indicate`                    | No    | No      | Yes   |
-| `SimpleBLE::Peripheral::unsubscribe`                 | No    | No      | Yes   |
+| `SimpleBLE::Peripheral::read`                        | No    | Yes     | Yes   |
+| `SimpleBLE::Peripheral::write_request`               | No    | Yes     | Yes   |
+| `SimpleBLE::Peripheral::write_command`               | No    | Yes     | Yes   |
+| `SimpleBLE::Peripheral::notify`                      | No    | Yes     | Yes   |
+| `SimpleBLE::Peripheral::indicate`                    | No    | Yes     | Yes   |
+| `SimpleBLE::Peripheral::unsubscribe`                 | No    | Yes     | Yes   |
 | `SimpleBLE::Peripheral::set_callback_on_connected`   | No    | Yes     | No    |
 | `SimpleBLE::Peripheral::set_callback_on_disconnected`| No    | Yes     | No    |
 
@@ -107,9 +107,9 @@ operating system.
 | `list_adapters` example | Yes   | Yes     | Emulated |
 | `scan` example          | Yes   | Yes     | Yes      |
 | `connect` example       | No    | Yes     | Yes      |
-| `read` example          | No    | No      | Yes      |
-| `write` example         | No    | No      | Yes      |
-| `notify` example        | No    | No      | Yes      |
+| `read` example          | No    | Yes     | Yes      |
+| `write` example         | No    | Yes     | Yes      |
+| `notify` example        | No    | Yes     | Yes      |
 
 ## Known Issues / To-Do's
 - [Linux] Fork safety is not guaranteed.
@@ -121,3 +121,4 @@ operating system.
 - [MacOS] `onConnected` and `onDisconnected` callbacks are not implemented.
 - [MacOS] Service and characteristic UUIDs need to be normalized.
 - [Windows] Unclear if multiple adapters can be detected.
+- [All] Add a signal handler to ensure all objects are disconnected when the program exits.

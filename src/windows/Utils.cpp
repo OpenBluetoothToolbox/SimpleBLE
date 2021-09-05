@@ -1,7 +1,7 @@
 #include "Utils.h"
 
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 
 #define MAC_ADDRESS_STR_LENGTH (size_t)17  // Two chars per byte, 5 chars for colon
 
@@ -77,6 +77,16 @@ std::string guid_to_uuid(const winrt::guid& guid) {
         helper << std::hex << std::setw(2) << std::setfill('0') << (int)guid.Data4[2 + i];
     }
     return helper.str();
+}
+
+ByteArray ibuffer_to_bytearray(const IBuffer& buffer) {
+    return ByteArray((const char*)buffer.data(), buffer.Length());
+}
+
+IBuffer bytearray_to_ibuffer(const ByteArray& array) {
+    Buffer buffer = Buffer(array.size());
+    memcpy(buffer.data(), array.data(), array.size());
+    return buffer;
 }
 
 }  // namespace SimpleBLE
