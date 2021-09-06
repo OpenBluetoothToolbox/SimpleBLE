@@ -1,5 +1,6 @@
 # SimpleBLE
 
+The ultimate cr
 
 Each major version of the library will have a stable API that will be fully
 forwards compatible, only increasing the minor version number when new
@@ -74,28 +75,28 @@ or just be ignored.
 | `SimpleBLE::Adapter::scan_for`                       | Yes   | Yes     | Yes   |
 | `SimpleBLE::Adapter::scan_is_active`                 | Yes   | Yes     | Yes   |
 | `SimpleBLE::Adapter::scan_get_results`               | No    | No      | No    |
-| `SimpleBLE::Adapter::set_callback_on_scan_start`     | No    | Yes     | Yes   |
-| `SimpleBLE::Adapter::set_callback_on_scan_stop`      | No    | Yes     | Yes   |
-| `SimpleBLE::Adapter::set_callback_on_scan_updated`   | No    | Yes     | Yes   |
-| `SimpleBLE::Adapter::set_callback_on_scan_found`     | No    | Yes     | Yes   |
-| `SimpleBLE::Adapter::get_adapters`                   | No    | Yes     | Yes   |
+| `SimpleBLE::Adapter::set_callback_on_scan_start`     | Yes   | Yes     | Yes   |
+| `SimpleBLE::Adapter::set_callback_on_scan_stop`      | Yes   | Yes     | Yes   |
+| `SimpleBLE::Adapter::set_callback_on_scan_updated`   | Yes   | Yes     | Yes   |
+| `SimpleBLE::Adapter::set_callback_on_scan_found`     | Yes   | Yes     | Yes   |
+| `SimpleBLE::Adapter::get_adapters`                   | Yes   | Yes     | Yes   |
 | ---------------------------------------------------- | ----- | ------- | ----- |
-| `SimpleBLE::Peripheral::identifier`                  | No    | Yes     | Yes   |
-| `SimpleBLE::Peripheral::address`                     | No    | Yes     | Yes   |
-| `SimpleBLE::Peripheral::connect`                     | No    | Yes     | Yes   |
-| `SimpleBLE::Peripheral::disconnect`                  | No    | Yes     | Yes   |
-| `SimpleBLE::Peripheral::is_connected`                | No    | Yes     | Yes   |
+| `SimpleBLE::Peripheral::identifier`                  | Yes   | Yes     | Yes   |
+| `SimpleBLE::Peripheral::address`                     | Yes   | Yes     | Yes   |
+| `SimpleBLE::Peripheral::connect`                     | Yes   | Yes     | Yes   |
+| `SimpleBLE::Peripheral::disconnect`                  | Yes   | Yes     | Yes   |
+| `SimpleBLE::Peripheral::is_connected`                | Yes   | Yes     | Yes   |
 | `SimpleBLE::Peripheral::is_connectable`              | No    | No      | No    |
-| `SimpleBLE::Peripheral::services`                    | No    | Yes     | Yes   |
+| `SimpleBLE::Peripheral::services`                    | Yes   | Yes     | Yes   |
 | `SimpleBLE::Peripheral::manufacturer_data`           | No    | No      | No    |
 | `SimpleBLE::Peripheral::read`                        | No    | Yes     | Yes   |
-| `SimpleBLE::Peripheral::write_request`               | No    | Yes     | Yes   |
-| `SimpleBLE::Peripheral::write_command`               | No    | Yes     | Yes   |
+| `SimpleBLE::Peripheral::write_request`               | Yes   | Yes     | Yes   |
+| `SimpleBLE::Peripheral::write_command`               | Yes   | Yes     | Yes   |
 | `SimpleBLE::Peripheral::notify`                      | No    | Yes     | Yes   |
-| `SimpleBLE::Peripheral::indicate`                    | No    | Yes     | Yes   |
-| `SimpleBLE::Peripheral::unsubscribe`                 | No    | Yes     | Yes   |
-| `SimpleBLE::Peripheral::set_callback_on_connected`   | No    | Yes     | No    |
-| `SimpleBLE::Peripheral::set_callback_on_disconnected`| No    | Yes     | No    |
+| `SimpleBLE::Peripheral::indicate`                    | Yes   | Yes     | Yes   |
+| `SimpleBLE::Peripheral::unsubscribe`                 | Yes   | Yes     | Yes   |
+| `SimpleBLE::Peripheral::set_callback_on_connected`   | Yes   | Yes     | No    |
+| `SimpleBLE::Peripheral::set_callback_on_disconnected`| Yes   | Yes     | No    |
 
 ## Examples per OS
 
@@ -106,19 +107,29 @@ operating system.
 | ----------------------- | ---   | ------- | -------- |
 | `list_adapters` example | Yes   | Yes     | Emulated |
 | `scan` example          | Yes   | Yes     | Yes      |
-| `connect` example       | No    | Yes     | Yes      |
-| `read` example          | No    | Yes     | Yes      |
-| `write` example         | No    | Yes     | Yes      |
-| `notify` example        | No    | Yes     | Yes      |
+| `connect` example       | Yes   | Yes     | Yes      |
+| `read` example          | Yes   | Yes     | Yes      |
+| `write` example         | Yes   | Yes     | Yes      |
+| `notify` example        | Yes   | Yes     | Yes      |
 
 ## Known Issues / To-Do's
 - [Linux] Fork safety is not guaranteed.
+- [Linux] `SimpleBLE::Peripheral::read` does not work.
+- [Linux] `SimpleBLE::Peripheral::notify` runs slowly..
 - [MacOS] Only the main system adapter can be detected.
 - [MacOS] Implementation has incomplete error handling and might crash if invalid parameters are passed.
 - [MacOS] Timeout logic can be DRYed up.
 - [MacOS] Raise exceptions upon error.
-- [MacOS] `Peripheral::is_connected` is not implemented.
-- [MacOS] `onConnected` and `onDisconnected` callbacks are not implemented.
 - [MacOS] Service and characteristic UUIDs need to be normalized.
 - [Windows] Unclear if multiple adapters can be detected.
 - [All] Add a signal handler to ensure all objects are disconnected when the program exits.
+- [All] Add safe version of the library that won't trigger any exceptions.
+- [All] Replace C-style casts with C++ style casts.
+- [All] Add C wrappers for the library.
+- [All] Add Python bindings for the library.
+- [All] Add Javascript bindings for the library.
+- [All] Add Kotlin bindings for the library.
+
+## Ideas
+- Explore if callbacks can be wrapped in shared pointers to prevent them from being prematurely deleted.
+- Explore if callbacks can be handled in a separate thread to prevent blocking the main thread.

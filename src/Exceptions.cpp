@@ -12,4 +12,4 @@ CharacteristicNotFound::CharacteristicNotFound(BluetoothUUID uuid)
 
 OperationNotSupported::OperationNotSupported() : std::runtime_error("The requested operation is not supported.") {}
 
-OperationFailed::OperationFailed() : std::runtime_error("The requested operation is not supported.") {}
+OperationFailed::OperationFailed() : std::runtime_error("The requested operation has failed.") {}

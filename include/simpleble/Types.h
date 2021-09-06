@@ -6,11 +6,15 @@
 namespace SimpleBLE {
 
 typedef std::string BluetoothAddress;
-typedef std::string BluetoothUUID;
-typedef std::string ByteArray;
 
 // IDEA: Extend BluetoothUUID to include a `uuid` function that
 // returns the same string, but provides a homogeneous interface.
+typedef std::string BluetoothUUID;
+
+// IDEA: Extend ByteArray to be constructed by a vector of bytes
+// and pointers to uint8_t.
+typedef std::string ByteArray;
+
 
 typedef struct {
     BluetoothUUID uuid;

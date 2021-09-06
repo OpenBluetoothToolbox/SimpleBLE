@@ -24,7 +24,7 @@ if(NOT SIMPLEDBUS_GIT_REPOSITORY)
     set(SIMPLEDBUS_GIT_REPOSITORY "https://github.com/kdewald/SimpleDBus.git")
 endif()
 if(NOT SIMPLEDBUS_GIT_TAG)
-    set(SIMPLEDBUS_GIT_TAG "master")
+    set(SIMPLEDBUS_GIT_TAG "feature/simpleble")
 endif()
 
 # Perform some overall CMake configurations

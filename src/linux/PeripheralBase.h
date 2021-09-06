@@ -7,6 +7,8 @@
 
 #include <bluezdbus/BluezDevice.h>
 
+#include <condition_variable>
+
 namespace SimpleBLE {
 
 class PeripheralBase {
@@ -37,6 +39,25 @@ class PeripheralBase {
 
   private:
     std::weak_ptr<BluezDevice> device_;
+
+    std::string identifier_;
+    BluetoothAddress address_;
+
+    std::condition_variable connection_cv_;
+    std::mutex connection_mutex_;
+
+    std::condition_variable disconnection_cv_;
+    std::mutex disconnection_mutex_;
+
+    std::function<void()> callback_on_connected_;
+    std::function<void()> callback_on_disconnected_;
+
+    bool _attempt_connect();
+    bool _attempt_disconnect();
+
+    std::shared_ptr<BluezDevice> _get_device();
+
+    std::shared_ptr<BluezGattCharacteristic> _get_characteristic(BluetoothUUID service_uuid, BluetoothUUID characteristic_uuid);
 };
 
 }  // namespace SimpleBLE
