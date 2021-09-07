@@ -1,26 +1,61 @@
 # SimpleBLE
 
-The ultimate cr
+The ultimate fully-fledged cross-platform BLE library, designed for simplicity
+and ease of use.
 
-Each major version of the library will have a stable API that will be fully
-forwards compatible, only increasing the minor version number when new
-features are added.
+All specific operating system quirks are handled to provide a consistent behavior
+across all platforms. Each major version of the library will have a stable API
+that will be fully forwards compatible.
 
-## Installation
+Some basic examples of key features have also been provided.
 
-### Windows
-- Windows SDK Build 19041
+If you want to use the library and need help. **Please reach out!**
+You can find me at: kevin at dewald dot me
 
+## Build Instructions
+The project is built using [CMake](http://cmake.org/). The basic main flow is as follows:
 
-## How to use
+```bash
+  mkdir build
+  cd build
+  cmake .. # Replace path to '../examples' to build the examples
+  make
+```
 
+The build will generate both a static and a shared library.
+**TODO:** Expand this part of the documentation.
 
+A set of helper scripts are provided to simplify the process of building the
+library, but are not required.
 
+### Windows Requirements
+- [Visual Studio 2019](https://visualstudio.microsoft.com/)
+  - Make sure you install the C++ toolchain with Windows SDK Build 19041 at least.
+
+**NOTE**: It might be easier to use the bundled helper scripts to build for Windows.
+
+### Linux Requirements
+The Linux implementation of SimpleBLE is built upon [SimpleDBus](https://github.com/kdewald/SimpleDBus),
+which in turn requires [libdbus](https://dbus.freedesktop.org/doc/dbus-c/latest/).
+- `libdbus-1-dev`
+  - On Ubuntu: `sudo apt-get install libdbus-1-dev`
+
+**NOTE**: See the [Security](#security) section for more information on how to
+override the default paths for external dependencies.
+
+### macOS Requirements
+- [Xcode Command Line Tools](https://developer.apple.com/xcode/)
+
+### In-source builds
+Building the library from source is possible by cloning the repository and linking
+to it on your `CMakeLists.txt` file.
+
+```cmake
+add_subdirectory(<path-to-simpleble> ${CMAKE_BINARY_DIR}/simpleble)
+include_directories(${SIMPLEBLE_INCLUDES})
+```
 
 ## Architecture
-
-There is one master object that owns all adapters.
-Adapters own peripherals.
 
 ### Layers and their responsibilities
 - External layer
@@ -34,21 +69,24 @@ Adapters own peripherals.
     - Each OS target has to implement the full public API specified in
       the external layer, using private methods and properties for 
       the specific requirements of each environment.
-    - In some cases, whenever possible, these objects wrap their
-      underlying OS representation in a weak pointer to allow these 
-      managed objects to be reclaimed by the operating system without
-      causing memory leaks. In case this happens, an exception of
-      type `SimpleBLE::Exception::InvalidReference` will be thrown.
+    - Two convenience classes, `SimpleBLE::AdapterBuilder` and
+      `SimpleBLE::PeripheralBuilder` are provided for the case of
+      allowing access to private methods during the build process.
 
 ### Security
 
 One key security feature of the library is it allows the user to specify
 the URLs and tags of all internal dependencies, thus allowing compilation
 from internal or secure sources without the risk of those getting compromised.
+This is done by specifying the additional command line arguments to
+the `cmake` command:
 
-The following CMake parameters allow for this customization:
 - `SIMPLEDBUS_GIT_REPOSITORY`
+  Call CMake with `-DSIMPLEDBUS_GIT_REPOSITORY=<path>` to override the
+  default location of the SimpleDBus repository.
 - `SIMPLEDBUS_GIT_TAG`
+  Call CMake with `-DSIMPLEDBUS_GIT_TAG=<tag>` to override the default
+  tag of the SimpleDBus repository.
 
 ## Collaborating
 
@@ -58,9 +96,9 @@ The following CMake parameters allow for this customization:
   here:
     - Class function names are expressed in `snake_case`.
     - Class protected and private property names must end with an underscore (`_`).
-- 
+    - Class protected and private method names must start with an underscore (`_`).
 
-## API per OS
+### API per OS
 
 The following tables describe the state of each available API per operating system.
 Any field that is not specified as supported will throw a compilation error if used
@@ -98,20 +136,6 @@ or just be ignored.
 | `SimpleBLE::Peripheral::set_callback_on_connected`   | Yes   | Yes     | No    |
 | `SimpleBLE::Peripheral::set_callback_on_disconnected`| Yes   | Yes     | No    |
 
-## Examples per OS
-
-The following table describes the available functionality of each example for each
-operating system.
-
-| Example                 | Linux | Windows | MacOS    |
-| ----------------------- | ---   | ------- | -------- |
-| `list_adapters` example | Yes   | Yes     | Emulated |
-| `scan` example          | Yes   | Yes     | Yes      |
-| `connect` example       | Yes   | Yes     | Yes      |
-| `read` example          | Yes   | Yes     | Yes      |
-| `write` example         | Yes   | Yes     | Yes      |
-| `notify` example        | Yes   | Yes     | Yes      |
-
 ## Known Issues / To-Do's
 - [Linux] Fork safety is not guaranteed.
 - [Linux] `SimpleBLE::Peripheral::read` does not work.
@@ -133,3 +157,6 @@ operating system.
 ## Ideas
 - Explore if callbacks can be wrapped in shared pointers to prevent them from being prematurely deleted.
 - Explore if callbacks can be handled in a separate thread to prevent blocking the main thread.
+
+## License
+All components within this project that have not been bundled from external creators, are licensed under the terms of the [MIT Licence](LICENCE.md).
