@@ -6,10 +6,12 @@
 
 namespace SimpleBLE {
 
-class PeripheralSafe : public Peripheral {
+namespace Safe {
+
+class Peripheral : public SimpleBLE::Peripheral {
   public:
-    PeripheralSafe(Peripheral& peripheral);
-    ~PeripheralSafe();
+    Peripheral(SimpleBLE::Peripheral& peripheral);
+    ~Peripheral();
 
     std::optional<std::string> identifier() noexcept;
     std::optional<BluetoothAddress> address() noexcept;
@@ -34,5 +36,7 @@ class PeripheralSafe : public Peripheral {
     bool set_callback_on_connected(std::function<void()> on_connected) noexcept;
     bool set_callback_on_disconnected(std::function<void()> on_disconnected) noexcept;
 };
+
+}  // namespace Safe
 
 }  // namespace SimpleBLE

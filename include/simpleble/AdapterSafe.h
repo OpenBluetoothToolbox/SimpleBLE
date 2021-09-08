@@ -5,10 +5,12 @@
 
 namespace SimpleBLE {
 
-class AdapterSafe : public Adapter {
+namespace Safe {
+
+class Adapter : public SimpleBLE::Adapter {
   public:
-    AdapterSafe(Adapter& adapter);
-    ~AdapterSafe();
+    Adapter(SimpleBLE::Adapter& adapter);
+    ~Adapter();
 
     std::optional<std::string> identifier() noexcept;
     std::optional<BluetoothAddress> address() noexcept;
@@ -17,14 +19,16 @@ class AdapterSafe : public Adapter {
     bool scan_stop() noexcept;
     bool scan_for(int timeout_ms) noexcept;
     std::optional<bool> scan_is_active() noexcept;
-    std::optional<std::vector<PeripheralSafe>> scan_get_results() noexcept;
+    std::optional<std::vector<SimpleBLE::Safe::Peripheral>> scan_get_results() noexcept;
 
     bool set_callback_on_scan_start(std::function<void()> on_scan_start) noexcept;
     bool set_callback_on_scan_stop(std::function<void()> on_scan_stop) noexcept;
-    bool set_callback_on_scan_updated(std::function<void(PeripheralSafe)> on_scan_updated) noexcept;
-    bool set_callback_on_scan_found(std::function<void(PeripheralSafe)> on_scan_found) noexcept;
+    bool set_callback_on_scan_updated(std::function<void(SimpleBLE::Safe::Peripheral)> on_scan_updated) noexcept;
+    bool set_callback_on_scan_found(std::function<void(SimpleBLE::Safe::Peripheral)> on_scan_found) noexcept;
 
-    static std::optional<std::vector<AdapterSafe>> get_adapters() noexcept;
+    static std::optional<std::vector<SimpleBLE::Safe::Adapter>> get_adapters() noexcept;
 };
+
+}  // namespace Safe
 
 }  // namespace SimpleBLE
