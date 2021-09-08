@@ -14,7 +14,7 @@ std::string _mac_address_to_str(uint64_t mac_address) {
     int position = 0;
     // cppcheck-suppress objectIndex
     position += sprintf(&mac_address_str[position], "%02x:%02x:%02x:", mac_address_ptr[5], mac_address_ptr[4],
-                        mac_address_ptr[3]);
+                        mac_address_ptr[3]);  // cppcheck-suppress objectIndex
     // cppcheck-suppress objectIndex
     position += sprintf(&mac_address_str[position], "%02x:%02x:%02x", mac_address_ptr[2], mac_address_ptr[1],
                         mac_address_ptr[0]);
@@ -27,7 +27,7 @@ uint64_t _str_to_mac_address(std::string mac_address) {
     uint8_t* mac_address_ptr = (uint8_t*)&mac_address_number;
     // cppcheck-suppress objectIndex
     sscanf(&mac_address.c_str()[0], "%02hhx:%02hhx:%02hhx:", &mac_address_ptr[5], &mac_address_ptr[4],
-           &mac_address_ptr[3]);
+           &mac_address_ptr[3]);  // cppcheck-suppress objectIndex
     // cppcheck-suppress objectIndex
     sscanf(&mac_address.c_str()[9], "%02hhx:%02hhx:%02hhx:", &mac_address_ptr[2], &mac_address_ptr[1],
            &mac_address_ptr[0]);
