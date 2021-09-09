@@ -1,5 +1,5 @@
-#include <simpleble/PeripheralSafe.h>
 #include <simpleble/Exceptions.h>
+#include <simpleble/PeripheralSafe.h>
 
 // Note: This file is extremely verbose with the usage of namespace to
 // ensure that the functions are not ambiguous.
@@ -58,7 +58,8 @@ std::optional<std::vector<SimpleBLE::BluetoothService>> SimpleBLE::Safe::Periphe
     }
 }
 
-std::optional<SimpleBLE::ByteArray> SimpleBLE::Safe::Peripheral::read(BluetoothUUID service, BluetoothUUID characteristic) noexcept {
+std::optional<SimpleBLE::ByteArray> SimpleBLE::Safe::Peripheral::read(BluetoothUUID service,
+                                                                      BluetoothUUID characteristic) noexcept {
     try {
         return SimpleBLE::Peripheral::read(service, characteristic);
     } catch (const SimpleBLE::Exception::BaseException& e) {
@@ -66,7 +67,8 @@ std::optional<SimpleBLE::ByteArray> SimpleBLE::Safe::Peripheral::read(BluetoothU
     }
 }
 
-bool SimpleBLE::Safe::Peripheral::write_request(BluetoothUUID service, BluetoothUUID characteristic, ByteArray data) noexcept {
+bool SimpleBLE::Safe::Peripheral::write_request(BluetoothUUID service, BluetoothUUID characteristic,
+                                                ByteArray data) noexcept {
     try {
         SimpleBLE::Peripheral::write_request(service, characteristic, data);
         return true;
@@ -75,7 +77,8 @@ bool SimpleBLE::Safe::Peripheral::write_request(BluetoothUUID service, Bluetooth
     }
 }
 
-bool SimpleBLE::Safe::Peripheral::write_command(BluetoothUUID service, BluetoothUUID characteristic, ByteArray data) noexcept {
+bool SimpleBLE::Safe::Peripheral::write_command(BluetoothUUID service, BluetoothUUID characteristic,
+                                                ByteArray data) noexcept {
     try {
         SimpleBLE::Peripheral::write_command(service, characteristic, data);
         return true;
@@ -85,7 +88,7 @@ bool SimpleBLE::Safe::Peripheral::write_command(BluetoothUUID service, Bluetooth
 }
 
 bool SimpleBLE::Safe::Peripheral::notify(BluetoothUUID service, BluetoothUUID characteristic,
-                              std::function<void(ByteArray payload)> callback) noexcept {
+                                         std::function<void(ByteArray payload)> callback) noexcept {
     try {
         SimpleBLE::Peripheral::notify(service, characteristic, callback);
         return true;
@@ -95,7 +98,7 @@ bool SimpleBLE::Safe::Peripheral::notify(BluetoothUUID service, BluetoothUUID ch
 }
 
 bool SimpleBLE::Safe::Peripheral::indicate(BluetoothUUID service, BluetoothUUID characteristic,
-                                std::function<void(ByteArray payload)> callback) noexcept {
+                                           std::function<void(ByteArray payload)> callback) noexcept {
     try {
         SimpleBLE::Peripheral::indicate(service, characteristic, callback);
         return true;
