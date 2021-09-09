@@ -11,7 +11,7 @@ jobs:
     - name: Install CppCheck
       run: |
         sudo -H apt-get update -y
-        sudo -H apt-get install cppcheck
+        sudo -H apt-get install -y cppcheck
       env:
         DEBIAN_FRONTEND: noninteractive
     - name: Run Cppcheck
