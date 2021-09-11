@@ -45,6 +45,12 @@ set(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PeripheralSafe.cpp
 )
 
+set(
+    SRC_SIMPLEBLE_C_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src_c/adapter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src_c/peripheral.cpp
+)
+
 # Detect the operating system and load the necessary dependencies
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     message("-- [INFO] Linux Host Detected")
@@ -140,15 +146,25 @@ set(
 
 add_library(simpleble-static STATIC ${SRC_SIMPLEBLE_FILES})
 add_library(simpleble SHARED ${SRC_SIMPLEBLE_FILES})
+add_library(simpleble-c-static STATIC ${SRC_SIMPLEBLE_C_FILES})
+add_library(simpleble-c SHARED ${SRC_SIMPLEBLE_C_FILES})
 
 set_property(TARGET simpleble-static PROPERTY CXX_STANDARD 17)
 set_property(TARGET simpleble PROPERTY CXX_STANDARD 17)
+set_property(TARGET simpleble-static PROPERTY POSITION_INDEPENDENT_CODE ON)
+set_property(TARGET simpleble PROPERTY POSITION_INDEPENDENT_CODE ON)
+set_property(TARGET simpleble-c-static PROPERTY POSITION_INDEPENDENT_CODE ON)
+set_property(TARGET simpleble-c PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(simpleble-static PRIVATE ${SIMPLE_BLE_ALL_INCLUDE_DIRS})
 target_include_directories(simpleble PRIVATE ${SIMPLE_BLE_ALL_INCLUDE_DIRS})
+target_include_directories(simpleble-c-static PRIVATE ${SIMPLE_BLE_ALL_INCLUDE_DIRS})
+target_include_directories(simpleble-c PRIVATE ${SIMPLE_BLE_ALL_INCLUDE_DIRS})
 
 target_link_libraries(simpleble-static PUBLIC ${EXTERNAL_LIBRARIES})
 target_link_libraries(simpleble PUBLIC ${EXTERNAL_LIBRARIES})
+target_link_libraries(simpleble-c-static PUBLIC simpleble-static)
+target_link_libraries(simpleble-c PUBLIC simpleble-static)
 
 # Export the variables needed by the parent project
 if(NOT ${STANDALONE})
