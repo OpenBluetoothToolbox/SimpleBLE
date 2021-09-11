@@ -151,6 +151,8 @@ add_library(simpleble-c SHARED ${SRC_SIMPLEBLE_C_FILES})
 
 set_property(TARGET simpleble-static PROPERTY CXX_STANDARD 17)
 set_property(TARGET simpleble PROPERTY CXX_STANDARD 17)
+set_property(TARGET simpleble-c-static PROPERTY CXX_STANDARD 17)
+set_property(TARGET simpleble-c PROPERTY CXX_STANDARD 17)
 set_property(TARGET simpleble-static PROPERTY POSITION_INDEPENDENT_CODE ON)
 set_property(TARGET simpleble PROPERTY POSITION_INDEPENDENT_CODE ON)
 set_property(TARGET simpleble-c-static PROPERTY POSITION_INDEPENDENT_CODE ON)
