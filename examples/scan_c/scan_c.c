@@ -4,10 +4,10 @@
 
 #include "simpleble_c/simpleble.h"
 
-static void adapter_on_scan_start(simpleble_adapter_t adapter);
-static void adapter_on_scan_stop(simpleble_adapter_t adapter);
-static void adapter_on_scan_found(simpleble_adapter_t adapter, simpleble_peripheral_t peripheral);
-static void adapter_on_scan_updated(simpleble_adapter_t adapter, simpleble_peripheral_t peripheral);
+static void adapter_on_scan_start(simpleble_adapter_t adapter, void* userdata);
+static void adapter_on_scan_stop(simpleble_adapter_t adapter, void* userdata);
+static void adapter_on_scan_found(simpleble_adapter_t adapter, simpleble_peripheral_t peripheral, void* userdata);
+static void adapter_on_scan_updated(simpleble_adapter_t adapter, simpleble_peripheral_t peripheral, void* userdata);
 
 int main(int argc, char* argv[]) {
     // NOTE: It's necessary to call this function before any other to allow the
@@ -25,10 +25,10 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    simpleble_adapter_set_callback_on_scan_start(adapter, adapter_on_scan_start);
-    simpleble_adapter_set_callback_on_scan_stop(adapter, adapter_on_scan_stop);
-    simpleble_adapter_set_callback_on_scan_found(adapter, adapter_on_scan_found);
-    simpleble_adapter_set_callback_on_scan_updated(adapter, adapter_on_scan_updated);
+    simpleble_adapter_set_callback_on_scan_start(adapter, adapter_on_scan_start, NULL);
+    simpleble_adapter_set_callback_on_scan_stop(adapter, adapter_on_scan_stop, NULL);
+    simpleble_adapter_set_callback_on_scan_found(adapter, adapter_on_scan_found, NULL);
+    simpleble_adapter_set_callback_on_scan_updated(adapter, adapter_on_scan_updated, NULL);
 
     simpleble_adapter_scan_for(adapter, 5000);
 
@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-static void adapter_on_scan_start(simpleble_adapter_t adapter) {
+static void adapter_on_scan_start(simpleble_adapter_t adapter, void* userdata) {
     char* identifier = simpleble_adapter_identifier(adapter);
 
     if (identifier == NULL) {
@@ -56,7 +56,7 @@ static void adapter_on_scan_start(simpleble_adapter_t adapter) {
     free(identifier);
 }
 
-static void adapter_on_scan_stop(simpleble_adapter_t adapter) {
+static void adapter_on_scan_stop(simpleble_adapter_t adapter, void* userdata) {
     char* identifier = simpleble_adapter_identifier(adapter);
 
     if (identifier == NULL) {
@@ -69,7 +69,7 @@ static void adapter_on_scan_stop(simpleble_adapter_t adapter) {
     free(identifier);
 }
 
-static void adapter_on_scan_found(simpleble_adapter_t adapter, simpleble_peripheral_t peripheral) {
+static void adapter_on_scan_found(simpleble_adapter_t adapter, simpleble_peripheral_t peripheral, void* userdata) {
     char* adapter_identifier = simpleble_adapter_identifier(adapter);
     char* peripheral_identifier = simpleble_peripheral_identifier(peripheral);
     char* peripheral_address = simpleble_peripheral_address(peripheral);
@@ -86,7 +86,7 @@ static void adapter_on_scan_found(simpleble_adapter_t adapter, simpleble_periphe
     free(peripheral_identifier);
 }
 
-static void adapter_on_scan_updated(simpleble_adapter_t adapter, simpleble_peripheral_t peripheral) {
+static void adapter_on_scan_updated(simpleble_adapter_t adapter, simpleble_peripheral_t peripheral, void* userdata) {
     char* adapter_identifier = simpleble_adapter_identifier(adapter);
     char* peripheral_identifier = simpleble_peripheral_identifier(peripheral);
     char* peripheral_address = simpleble_peripheral_address(peripheral);

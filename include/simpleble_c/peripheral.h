@@ -159,7 +159,7 @@ simpleble_err_t simpleble_peripheral_write_command(simpleble_peripheral_t handle
 simpleble_err_t simpleble_peripheral_notify(simpleble_peripheral_t handle, simpleble_uuid_t service,
                                             simpleble_uuid_t characteristic,
                                             void (*callback)(simpleble_uuid_t service, simpleble_uuid_t characteristic,
-                                                             uint8_t* data, size_t data_length));
+                                                             uint8_t* data, size_t data_length, void* userdata), void* userdata);
 
 /**
  * @brief
@@ -172,7 +172,7 @@ simpleble_err_t simpleble_peripheral_notify(simpleble_peripheral_t handle, simpl
  */
 simpleble_err_t simpleble_peripheral_indicate(
     simpleble_peripheral_t handle, simpleble_uuid_t service, simpleble_uuid_t characteristic,
-    void (*callback)(simpleble_uuid_t service, simpleble_uuid_t characteristic, uint8_t* data, size_t data_length));
+    void (*callback)(simpleble_uuid_t service, simpleble_uuid_t characteristic, uint8_t* data, size_t data_length, void* userdata), void* userdata);
 
 /**
  * @brief
@@ -193,7 +193,7 @@ simpleble_err_t simpleble_peripheral_unsubscribe(simpleble_peripheral_t handle, 
  * @return simpleble_err_t
  */
 simpleble_err_t simpleble_peripheral_set_callback_on_connected(simpleble_peripheral_t handle,
-                                                               void (*callback)(simpleble_peripheral_t peripheral));
+                                                               void (*callback)(simpleble_peripheral_t peripheral, void* userdata), void* userdata);
 
 /**
  * @brief
@@ -203,7 +203,7 @@ simpleble_err_t simpleble_peripheral_set_callback_on_connected(simpleble_periphe
  * @return simpleble_err_t
  */
 simpleble_err_t simpleble_peripheral_set_callback_on_disconnected(simpleble_peripheral_t handle,
-                                                                  void (*callback)(simpleble_peripheral_t peripheral));
+                                                                  void (*callback)(simpleble_peripheral_t peripheral, void* userdata), void* userdata);
 
 #ifdef __cplusplus
 }
