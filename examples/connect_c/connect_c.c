@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
         simpleble_peripheral_t peripheral = peripheral_list[i];
         char* peripheral_identifier = simpleble_peripheral_identifier(peripheral);
         char* peripheral_address = simpleble_peripheral_address(peripheral);
-        printf("[%ld] %s [%s]\n", i, peripheral_identifier, peripheral_address);
+        printf("[%zu] %s [%s]\n", i, peripheral_identifier, peripheral_address);
         free(peripheral_identifier);
         free(peripheral_address);
     }

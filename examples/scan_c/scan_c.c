@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef _WIN32
+#define SLEEP_SEC(x) _sleep(x*1000)
+#else
 #include <unistd.h>
+#define SLEEP_SEC(x) sleep(x)
+#endif
 
 #include "simpleble_c/simpleble.h"
 
@@ -35,7 +41,7 @@ int main(int argc, char* argv[]) {
     // Sleep for an additional second before returning.
     // If there are any detections during this period, it means that the
     // internal peripheral took longer to stop than anticipated.
-    sleep(1);
+    SLEEP_SEC(1);
 
     // Let's not forget to release the associated handle.
     simpleble_adapter_release_handle(adapter);
