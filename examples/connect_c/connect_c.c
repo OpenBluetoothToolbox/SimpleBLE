@@ -46,8 +46,8 @@ int main(int argc, char* argv[]) {
         char* peripheral_identifier = simpleble_peripheral_identifier(peripheral);
         char* peripheral_address = simpleble_peripheral_address(peripheral);
         printf("[%zu] %s [%s]\n", i, peripheral_identifier, peripheral_address);
-        free(peripheral_identifier);
-        free(peripheral_address);
+        simpleble_free(peripheral_identifier);
+        simpleble_free(peripheral_address);
     }
 
     int selection = -1;
@@ -64,8 +64,8 @@ int main(int argc, char* argv[]) {
     char* peripheral_identifier = simpleble_peripheral_identifier(peripheral);
     char* peripheral_address = simpleble_peripheral_address(peripheral);
     printf("Connecting to %s [%s]\n", peripheral_identifier, peripheral_address);
-    free(peripheral_identifier);
-    free(peripheral_address);
+    simpleble_free(peripheral_identifier);
+    simpleble_free(peripheral_address);
 
     err_code = simpleble_peripheral_connect(peripheral);
     if (err_code != SIMPLEBLE_SUCCESS) {
@@ -118,7 +118,7 @@ static void adapter_on_scan_start(simpleble_adapter_t adapter, void* userdata) {
     printf("Adapter %s started scanning.\n", identifier);
 
     // Let's not forget to clear the allocated memory.
-    free(identifier);
+    simpleble_free(identifier);
 }
 
 static void adapter_on_scan_stop(simpleble_adapter_t adapter, void* userdata) {
@@ -131,7 +131,7 @@ static void adapter_on_scan_stop(simpleble_adapter_t adapter, void* userdata) {
     printf("Adapter %s stopped scanning.\n", identifier);
 
     // Let's not forget to clear the allocated memory.
-    free(identifier);
+    simpleble_free(identifier);
 }
 
 static void adapter_on_scan_found(simpleble_adapter_t adapter, simpleble_peripheral_t peripheral, void* userdata) {
@@ -154,6 +154,6 @@ static void adapter_on_scan_found(simpleble_adapter_t adapter, simpleble_periphe
     }
 
     // Let's not forget to release all allocated memory.
-    free(peripheral_identifier);
-    free(peripheral_address);
+    simpleble_free(peripheral_identifier);
+    simpleble_free(peripheral_address);
 }

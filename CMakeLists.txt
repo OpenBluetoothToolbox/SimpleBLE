@@ -47,6 +47,7 @@ set(
 
 set(
     SRC_SIMPLEBLE_C_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src_c/simpleble.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src_c/adapter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src_c/peripheral.cpp
 )

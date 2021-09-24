@@ -83,7 +83,7 @@ ByteArray ibuffer_to_bytearray(const IBuffer& buffer) { return ByteArray((const 
 
 IBuffer bytearray_to_ibuffer(const ByteArray& array) {
     DataWriter writer;
-    for(auto& byte : array) {
+    for (auto& byte : array) {
         writer.WriteByte(byte);
     }
     return writer.DetachBuffer();

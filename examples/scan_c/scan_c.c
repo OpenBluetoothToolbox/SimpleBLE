@@ -59,7 +59,7 @@ static void adapter_on_scan_start(simpleble_adapter_t adapter, void* userdata) {
     printf("Adapter %s started scanning.\n", identifier);
 
     // Let's not forget to clear the allocated memory.
-    free(identifier);
+    simpleble_free(identifier);
 }
 
 static void adapter_on_scan_stop(simpleble_adapter_t adapter, void* userdata) {
@@ -72,7 +72,7 @@ static void adapter_on_scan_stop(simpleble_adapter_t adapter, void* userdata) {
     printf("Adapter %s stopped scanning.\n", identifier);
 
     // Let's not forget to clear the allocated memory.
-    free(identifier);
+    simpleble_free(identifier);
 }
 
 static void adapter_on_scan_found(simpleble_adapter_t adapter, simpleble_peripheral_t peripheral, void* userdata) {
@@ -88,8 +88,8 @@ static void adapter_on_scan_found(simpleble_adapter_t adapter, simpleble_periphe
 
     // Let's not forget to release the associated handles and memory
     simpleble_peripheral_release_handle(peripheral);
-    free(peripheral_address);
-    free(peripheral_identifier);
+    simpleble_free(peripheral_address);
+    simpleble_free(peripheral_identifier);
 }
 
 static void adapter_on_scan_updated(simpleble_adapter_t adapter, simpleble_peripheral_t peripheral, void* userdata) {
@@ -105,6 +105,6 @@ static void adapter_on_scan_updated(simpleble_adapter_t adapter, simpleble_perip
 
     // Let's not forget to release the associated handle.
     // Let's not forget to release the associated handles and memory
-    free(peripheral_address);
-    free(peripheral_identifier);
+    simpleble_free(peripheral_address);
+    simpleble_free(peripheral_identifier);
 }
