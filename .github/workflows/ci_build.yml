@@ -68,25 +68,25 @@ jobs:
         cmake-version: '3.16.x'
     - name: Compile Lib for MacOS arm64
       run: |
-        mkdir $GITHUB_WORKSPACE/build
+        mkdir $GITHUB_WORKSPACE/build_arm64
         cd $GITHUB_WORKSPACE/build
         cmake -DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release ..
         make -j2
     - name: Compile Examples for MacOS arm64
       run: |
-        mkdir $GITHUB_WORKSPACE/build_examples
+        mkdir $GITHUB_WORKSPACE/build_examples_arm64
         cd $GITHUB_WORKSPACE/build_examples
         cmake -DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release ../examples
         make -j2
     - name: Compile Lib for MacOS x86
       run: |
-        mkdir $GITHUB_WORKSPACE/build
+        mkdir $GITHUB_WORKSPACE/build_x86
         cd $GITHUB_WORKSPACE/build
         cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release ..
         make -j2
     - name: Compile Examples for MacOS x86
       run: |
-        mkdir $GITHUB_WORKSPACE/build_examples
+        mkdir $GITHUB_WORKSPACE/build_examples_x86
         cd $GITHUB_WORKSPACE/build_examples
         cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release ../examples
         make -j2

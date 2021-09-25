@@ -1,4 +1,4 @@
-name: ClangFormat
+name: CI Lint
 
 on: [push, pull_request]
 
@@ -15,7 +15,7 @@ jobs:
         extensions: 'h,cpp,c'
         clangFormatVersion: 11
         inplace: False
-        
+
   cppcheck:
     runs-on: ubuntu-latest
 
