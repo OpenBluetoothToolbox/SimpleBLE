@@ -123,8 +123,8 @@ or just be ignored.
 | `SimpleBLE::Adapter::scan_start`                     | Yes   | Yes     | Yes   |
 | `SimpleBLE::Adapter::scan_stop`                      | Yes   | Yes     | Yes   |
 | `SimpleBLE::Adapter::scan_for`                       | Yes   | Yes     | Yes   |
-| `SimpleBLE::Adapter::scan_is_active`                 | Yes   | Yes     | Yes   |
-| `SimpleBLE::Adapter::scan_get_results`               | No    | No      | No    |
+| `SimpleBLE::Adapter::scan_is_active`                 | Yes   | Yes     | No    |
+| `SimpleBLE::Adapter::scan_get_results`               | No    | Yes     | No    |
 | `SimpleBLE::Adapter::set_callback_on_scan_start`     | Yes   | Yes     | Yes   |
 | `SimpleBLE::Adapter::set_callback_on_scan_stop`      | Yes   | Yes     | Yes   |
 | `SimpleBLE::Adapter::set_callback_on_scan_updated`   | Yes   | Yes     | Yes   |

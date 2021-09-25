@@ -54,7 +54,12 @@ void AdapterBase::scan_for(int timeout_ms) {
     this->scan_stop();
 }
 
-bool AdapterBase::scan_is_active() { return false; }
+bool AdapterBase::scan_is_active() { 
+    // TODO: Implement
+    return false;
+}
+
+std::vector<Peripheral> AdapterBase::scan_get_results() { return {}; }
 
 void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start) { callback_on_scan_start_ = on_scan_start; }
 

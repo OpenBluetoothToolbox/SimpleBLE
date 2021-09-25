@@ -101,6 +101,10 @@ bool AdapterBase::scan_is_active() {
     }
 }
 
+std::vector<Peripheral> AdapterBase::scan_get_results() { 
+    // TODO: Implement
+    return {}; }
+
 void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start) {
     callback_on_scan_start_ = on_scan_start;
 }
