@@ -54,12 +54,19 @@ void AdapterBase::scan_for(int timeout_ms) {
     this->scan_stop();
 }
 
-bool AdapterBase::scan_is_active() { 
-    // TODO: Implement
-    return false;
+bool AdapterBase::scan_is_active() {
+    AdapterBaseMacOS* internal = (AdapterBaseMacOS*)opaque_internal_;
+    return [internal scanIsActive];
 }
 
-std::vector<Peripheral> AdapterBase::scan_get_results() { return {}; }
+std::vector<Peripheral> AdapterBase::scan_get_results() {
+    std::vector<Peripheral> peripherals;
+    for (auto& [opaque_peripheral, base_peripheral] : this->peripherals_) {
+        PeripheralBuilder peripheral_builder(base_peripheral);
+        peripherals.push_back(peripheral_builder);
+    }
+    return peripherals;
+}
 
 void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start) { callback_on_scan_start_ = on_scan_start; }
 
