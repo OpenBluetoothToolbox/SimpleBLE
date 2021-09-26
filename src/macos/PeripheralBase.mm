@@ -8,7 +8,7 @@ using namespace SimpleBLE;
 PeripheralBase::PeripheralBase(void* opaque_peripheral, void* opaque_adapter, advertising_data_t advertising_data) {
     this->opaque_internal_ = [[PeripheralBaseMacOS alloc] init:(CBPeripheral*)opaque_peripheral
                                                 centralManager:(CBCentralManager*)opaque_adapter];
-    this->is_connectable_ = advertising_data.is_connectable;
+    this->is_connectable_ = advertising_data.connectable;
     this->manual_disconnect_triggered_ = false;
 }
 
