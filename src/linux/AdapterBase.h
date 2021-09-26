@@ -38,7 +38,7 @@ class AdapterBase {
   private:
     std::weak_ptr<BluezAdapter> adapter_;
 
-    std::set<BluetoothAddress> seen_devices_;
+    std::map<BluetoothAddress, Peripheral> seen_devices_;
 
     std::function<void()> callback_on_scan_start_;
     std::function<void()> callback_on_scan_stop_;
