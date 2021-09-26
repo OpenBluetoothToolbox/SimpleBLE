@@ -138,7 +138,7 @@ or just be ignored.
 | `SimpleBLE::Peripheral::is_connected`                | Yes   | Yes     | Yes   |
 | `SimpleBLE::Peripheral::is_connectable`              | No    | No      | Yes   |
 | `SimpleBLE::Peripheral::services`                    | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::manufacturer_data`           | No    | No      | No    |
+| `SimpleBLE::Peripheral::manufacturer_data`           | No    | No      | Yes   |
 | `SimpleBLE::Peripheral::read`                        | No    | Yes     | Yes   |
 | `SimpleBLE::Peripheral::write_request`               | Yes   | Yes     | Yes   |
 | `SimpleBLE::Peripheral::write_command`               | Yes   | Yes     | Yes   |

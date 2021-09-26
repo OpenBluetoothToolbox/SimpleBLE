@@ -90,6 +90,11 @@ std::vector<BluetoothService> PeripheralBase::services() {
     return list_of_services;
 }
 
+std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() {
+    // TODO: Implement
+    return {};
+}
+
 ByteArray PeripheralBase::read(BluetoothUUID service, BluetoothUUID characteristic) {
     GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
 
