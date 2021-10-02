@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include "winrt/base.h"
+
 #include "simpleble/Adapter.h"
 
 int main(int argc, char* argv[]) {

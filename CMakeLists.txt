@@ -88,19 +88,6 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         set(WINDOWS_TARGET_ARCH x64)
     endif()
 
-    set(WINVERSION_CODE 0x0A00) # Selected Windows 10 based on https://docs.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt
-    
-    # Add all the special definitions that need to be added for the program to properly compile on windows.
-    # /D_WIN32_WINNT -> Specifies the minimum version of Windows that the application is compatible with.
-    # /D_USE_MATH_DEFINES -> Specifies that the math.h header file should be included.
-    # /Gd -> Use __cdecl as the default calling convention. https://docs.microsoft.com/en-us/cpp/cpp/cdecl
-    string(APPEND SPECIAL_DEFINITIONS "/D_WIN32_WINNT=${WINVERSION_CODE}")
-    string(APPEND SPECIAL_DEFINITIONS "/D_USE_MATH_DEFINES")
-    string(APPEND SPECIAL_DEFINITIONS "/Gd")
-
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W2 /wd4251 ${SPECIAL_DEFINITIONS}")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W2 /wd4251 ${SPECIAL_DEFINITIONS}")
-
     set(
         EXTERNAL_INCLUDE_DIRS
         ${SIMPLEDBUS_INCLUDES}
@@ -177,6 +164,41 @@ target_link_libraries(simpleble-static PUBLIC ${EXTERNAL_LIBRARIES})
 target_link_libraries(simpleble PUBLIC ${EXTERNAL_LIBRARIES})
 target_link_libraries(simpleble-c-static PUBLIC simpleble-static)
 target_link_libraries(simpleble-c PUBLIC simpleble-static)
+
+# Append any compilation flags to each specific target
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+
+    set(WINVERSION_CODE 0x0A00) # Selected Windows 10 based on https://docs.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt
+    
+    # Add all the special definitions that need to be added for the program to properly compile on windows.
+    
+    # /D_WIN32_WINNT -> Specifies the minimum version of Windows that the application is compatible with.
+    list(APPEND COMPILE_DEFINITIONS "/D_WIN32_WINNT=${WINVERSION_CODE}")
+    # /D_USE_MATH_DEFINES -> Specifies that the math.h header file should be included.
+    list(APPEND COMPILE_DEFINITIONS "/D_USE_MATH_DEFINES")
+
+    foreach(DEFINITION ${COMPILE_DEFINITIONS})
+        target_compile_definitions(simpleble-static PRIVATE ${DEFINITION})
+        target_compile_definitions(simpleble PRIVATE ${DEFINITION})
+        target_compile_definitions(simpleble-c-static PRIVATE ${DEFINITION})
+        target_compile_definitions(simpleble-c PRIVATE ${DEFINITION})
+    endforeach()
+    
+    # /Gd -> Use __cdecl as the default calling convention. https://docs.microsoft.com/en-us/cpp/cpp/cdecl
+    list(APPEND COMPILE_OPTIONS "/Gd")
+    # /WX -> Treats all warnings as errors.
+    list(APPEND COMPILE_OPTIONS "/WX")
+
+    foreach(OPTION ${COMPILE_OPTIONS})
+        target_compile_options(simpleble-static PRIVATE ${OPTION})
+        target_compile_options(simpleble PRIVATE ${OPTION})
+        target_compile_options(simpleble-c-static PRIVATE ${OPTION})
+        target_compile_options(simpleble-c PRIVATE ${OPTION})
+    endforeach()
+
+elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+endif()
 
 # Export the variables needed by the parent project
 if(NOT ${STANDALONE})
