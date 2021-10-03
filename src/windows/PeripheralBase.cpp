@@ -19,6 +19,8 @@ PeripheralBase::PeripheralBase(advertising_data_t advertising_data) {
     identifier_ = advertising_data.identifier;
     address_ = advertising_data.mac_address;
     device_ = BluetoothLEDevice::FromBluetoothAddressAsync(_str_to_mac_address(advertising_data.mac_address)).get();
+    manufacturer_data_ = advertising_data.manufacturer_data;
+    connectable_ = advertising_data.connectable;
 }
 
 PeripheralBase::~PeripheralBase() {}
@@ -70,11 +72,7 @@ bool PeripheralBase::is_connected() {
 }
 
 bool PeripheralBase::is_connectable() {
-    // TODO its a stub, replace with real implementation
-    if (is_connected()) {
-        return false;
-    }
-    return true;
+    return connectable_;
 }
 
 std::vector<BluetoothService> PeripheralBase::services() {
@@ -90,10 +88,7 @@ std::vector<BluetoothService> PeripheralBase::services() {
     return list_of_services;
 }
 
-std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() {
-    // TODO: Implement
-    return {};
-}
+std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() { return manufacturer_data_; }
 
 ByteArray PeripheralBase::read(BluetoothUUID service, BluetoothUUID characteristic) {
     GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
