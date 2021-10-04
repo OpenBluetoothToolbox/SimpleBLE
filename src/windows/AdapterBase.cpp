@@ -34,7 +34,7 @@ AdapterBase::AdapterBase(std::string device_id)
         data.mac_address = _mac_address_to_str(args.BluetoothAddress());
         data.identifier = winrt::to_string(args.Advertisement().LocalName());
         data.connectable = args.IsConnectable();
-        
+
         // Parse manufacturer data
         auto manufacturer_data = args.Advertisement().ManufacturerData();
         for (auto& item : manufacturer_data) {

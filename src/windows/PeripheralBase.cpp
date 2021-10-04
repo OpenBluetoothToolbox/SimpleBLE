@@ -71,9 +71,7 @@ bool PeripheralBase::is_connected() {
     return device_ != nullptr && device_.ConnectionStatus() == BluetoothConnectionStatus::Connected;
 }
 
-bool PeripheralBase::is_connectable() {
-    return connectable_;
-}
+bool PeripheralBase::is_connectable() { return connectable_; }
 
 std::vector<BluetoothService> PeripheralBase::services() {
     std::vector<BluetoothService> list_of_services;
