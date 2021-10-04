@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Safe implementation of `SimpleBLE::Adapter` and `SimpleBLE::Peripheral` classes.
 - CppCheck and ClangFormat CI checks. _(Thanks Andrey1994!)_
 - C-style API with examples.
+- Access to manufacturer data in the `SimpleBLE::Peripheral` class, for Windows and MacOS.
 
 ### Fixed
 - Compilation errors that came up during development. _(Thanks fidoriel!)_

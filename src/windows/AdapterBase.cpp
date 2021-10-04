@@ -34,7 +34,15 @@ AdapterBase::AdapterBase(std::string device_id)
         data.mac_address = _mac_address_to_str(args.BluetoothAddress());
         data.identifier = winrt::to_string(args.Advertisement().LocalName());
         data.connectable = args.IsConnectable();
-        // TODO: Extract manufacturer data
+
+        // Parse manufacturer data
+        auto manufacturer_data = args.Advertisement().ManufacturerData();
+        for (auto& item : manufacturer_data) {
+            uint16_t company_id = item.CompanyId();
+            ByteArray manufacturer_data_buffer = ibuffer_to_bytearray(item.Data());
+            data.manufacturer_data[company_id] = manufacturer_data_buffer;
+        }
+
         this->_scan_received_callback(data);
     });
 }
