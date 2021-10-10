@@ -107,6 +107,17 @@ the `cmake` command:
   Call CMake with `-DSIMPLEDBUS_GIT_TAG=<tag>` to override the default
   tag of the SimpleDBus repository.
 
+Alternatively, instead of specifying the repository and tag, the user can
+specify the path to a local version of the dependencies. This is done by
+specifying the additional command line arguments to the `cmake` command:
+
+  - `SIMPLEBLUEZ_LOCAL_PATH`
+    Call CMake with `-DSIMPLEBLUEZ_LOCAL_PATH=<path>` to override the
+    default location of the SimpleBluez repository.
+  - `SIMPLEDBUS_LOCAL_PATH`
+    Call CMake with `-DSIMPLEDBUS_LOCAL_PATH=<path>` to override the
+    default location of the SimpleDBus repository.
+
 ## Collaborating
 
 ### Coding & Naming Conventions

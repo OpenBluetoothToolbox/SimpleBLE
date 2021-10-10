@@ -56,12 +56,17 @@ set(
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     message("-- [INFO] Linux Host Detected")
 
-    FetchContent_Declare(
-        simplebluez
-        GIT_REPOSITORY ${SIMPLEBLUEZ_GIT_REPOSITORY}
-        GIT_TAG ${SIMPLEBLUEZ_GIT_TAG}
-    )
-    FetchContent_MakeAvailable(simplebluez)
+    if(NOT SIMPLEBLUEZ_LOCAL_PATH)
+        FetchContent_Declare(
+            simplebluez
+            GIT_REPOSITORY ${SIMPLEBLUEZ_GIT_REPOSITORY}
+            GIT_TAG ${SIMPLEBLUEZ_GIT_TAG}
+        )
+        FetchContent_MakeAvailable(simplebluez)
+    else()
+        message("-- [INFO] Using local SimpleBluez")
+        add_subdirectory(${SIMPLEBLUEZ_LOCAL_PATH} ${CMAKE_CURRENT_BINARY_DIR}/simplebluez)
+    endif()
 
     set(
         EXTERNAL_LIBRARIES
