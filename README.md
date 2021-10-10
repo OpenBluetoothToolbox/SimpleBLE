@@ -93,6 +93,13 @@ from internal or secure sources without the risk of those getting compromised.
 This is done by specifying the additional command line arguments to
 the `cmake` command:
 
+- `SIMPLEBLUEZ_GIT_REPOSITORY`
+  Call CMake with `-DSIMPLEBLUEZ_GIT_REPOSITORY=<path>` to override the
+  default location of the SimpleBluez repository.
+- `SIMPLEBLUEZ_GIT_TAG`
+  Call CMake with `-DSIMPLEBLUEZ_GIT_TAG=<tag>` to override the default
+  tag of the SimpleBluez repository.
+
 - `SIMPLEDBUS_GIT_REPOSITORY`
   Call CMake with `-DSIMPLEDBUS_GIT_REPOSITORY=<path>` to override the
   default location of the SimpleDBus repository.
@@ -136,10 +143,10 @@ or just be ignored.
 | `SimpleBLE::Peripheral::connect`                     | Yes   | Yes     | Yes   |
 | `SimpleBLE::Peripheral::disconnect`                  | Yes   | Yes     | Yes   |
 | `SimpleBLE::Peripheral::is_connected`                | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::is_connectable`              | No    | Yes     | Yes   |
+| `SimpleBLE::Peripheral::is_connectable`              | Yes   | Yes     | Yes   |
 | `SimpleBLE::Peripheral::services`                    | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::manufacturer_data`           | No    | Yes     | Yes   |
-| `SimpleBLE::Peripheral::read`                        | No    | Yes     | Yes   |
+| `SimpleBLE::Peripheral::manufacturer_data`           | Yes   | Yes     | Yes   |
+| `SimpleBLE::Peripheral::read`                        | Yes   | Yes     | Yes   |
 | `SimpleBLE::Peripheral::write_request`               | Yes   | Yes     | Yes   |
 | `SimpleBLE::Peripheral::write_command`               | Yes   | Yes     | Yes   |
 | `SimpleBLE::Peripheral::notify`                      | Yes   | Yes     | Yes   |
@@ -150,7 +157,6 @@ or just be ignored.
 
 ## Known Issues / To-Do's
 - [Linux] Fork safety is not guaranteed.
-- [Linux] `SimpleBLE::Peripheral::read` does not work.
 - [MacOS] Only the main system adapter can be detected.
 - [MacOS] Implementation has incomplete error handling and might crash if invalid parameters are passed.
 - [MacOS] Timeout logic can be DRYed up.

@@ -20,11 +20,11 @@ else()
 endif()
 
 # Load default parameters passed in through the command line.
-if(NOT SIMPLEDBUS_GIT_REPOSITORY)
-    set(SIMPLEDBUS_GIT_REPOSITORY "https://github.com/kdewald/SimpleDBus.git")
+if(NOT SIMPLEBLUEZ_GIT_REPOSITORY)
+    set(SIMPLEBLUEZ_GIT_REPOSITORY "https://github.com/OpenBluetoothToolbox/SimpleBluez.git")
 endif()
-if(NOT SIMPLEDBUS_GIT_TAG)
-    set(SIMPLEDBUS_GIT_TAG "feature/simpleble")
+if(NOT SIMPLEBLUEZ_GIT_TAG)
+    set(SIMPLEBLUEZ_GIT_TAG "master")
 endif()
 
 # Perform some overall CMake configurations
@@ -57,20 +57,20 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     message("-- [INFO] Linux Host Detected")
 
     FetchContent_Declare(
-        simpledbus
-        GIT_REPOSITORY ${SIMPLEDBUS_GIT_REPOSITORY}
-        GIT_TAG ${SIMPLEDBUS_GIT_TAG}
+        simplebluez
+        GIT_REPOSITORY ${SIMPLEBLUEZ_GIT_REPOSITORY}
+        GIT_TAG ${SIMPLEBLUEZ_GIT_TAG}
     )
-    FetchContent_MakeAvailable(simpledbus)
+    FetchContent_MakeAvailable(simplebluez)
 
     set(
         EXTERNAL_LIBRARIES
-        bluezdbus-static
+        simplebluez-static
         pthread
     )
     set(
         EXTERNAL_INCLUDE_DIRS
-        ${SIMPLEDBUS_INCLUDES}
+        ${SIMPLEBLUEZ_INCLUDES}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/linux
     )
     set(
@@ -90,7 +90,6 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 
     set(
         EXTERNAL_INCLUDE_DIRS
-        ${SIMPLEDBUS_INCLUDES}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/windows
     )
     set(
