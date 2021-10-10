@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Switched WinRT initialization to single-threaded.
 
 ### Changed
-- SimpleDBus dependency not migrated to OpenBluetoothToolbox.
+- SimpleBluez dependency migrated to OpenBluetoothToolbox.
 
 ## [0.0.1] - 2021-09-06
 
