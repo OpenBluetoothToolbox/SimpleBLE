@@ -85,6 +85,20 @@ include_directories(${SIMPLEBLE_INCLUDES})
       `SimpleBLE::PeripheralBuilder` are provided for the case of
       allowing access to private methods during the build process.
 
+### Concurrency
+
+When designing your application using SimpleBLE, concurrency is a key aspect
+that needs to be taken into account. This is because internally the library
+relies on a thread pool to handle asynchronous operations and poll the OS's
+Bluetooth stack, which can suffer from contention and potentially cause the
+program to crash or freeze if these threads are significantly delayed.
+
+This can have an important effect when using SimpleBLE with UI applications,
+such as WxWidgets or Unity.
+
+A future version of the library will rely on the use of a thread pool to run
+callbacks, thus mitigating the potential of these problems.
+
 ### Security
 
 One key security feature of the library is it allows the user to specify
@@ -174,6 +188,7 @@ or just be ignored.
 - [MacOS] Raise exceptions upon error.
 - [MacOS] Service and characteristic UUIDs need to be normalized.
 - [Windows] Unclear if multiple adapters can be detected.
+- [All] Run callbacks in separate threads to prevent blocking internal threads.
 - [All] Add a signal handler to ensure all objects are disconnected when the program exits.
 - [All] Add safe version of the library that won't trigger any exceptions.
 - [All] Replace C-style casts with C++ style casts.
