@@ -20,7 +20,6 @@ using namespace std::chrono_literals;
 
 AdapterBase::AdapterBase(std::string device_id)
     : adapter_(async_get(BluetoothAdapter::FromIdAsync(winrt::to_hstring(device_id)))) {
-
     auto device_information = async_get(
         Devices::Enumeration::DeviceInformation::CreateFromIdAsync(winrt::to_hstring(device_id)));
     identifier_ = winrt::to_string(device_information.Name());
