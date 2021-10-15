@@ -18,7 +18,8 @@ using namespace std::chrono_literals;
 PeripheralBase::PeripheralBase(advertising_data_t advertising_data) {
     identifier_ = advertising_data.identifier;
     address_ = advertising_data.mac_address;
-    device_ = BluetoothLEDevice::FromBluetoothAddressAsync(_str_to_mac_address(advertising_data.mac_address)).get();
+    device_ = async_get(
+        BluetoothLEDevice::FromBluetoothAddressAsync(_str_to_mac_address(advertising_data.mac_address)));
     manufacturer_data_ = advertising_data.manufacturer_data;
     connectable_ = advertising_data.connectable;
 }
@@ -98,7 +99,7 @@ ByteArray PeripheralBase::read(BluetoothUUID service, BluetoothUUID characterist
     }
 
     // Read the value.
-    auto result = gatt_characteristic.ReadValueAsync().get();
+    auto result = async_get(gatt_characteristic.ReadValueAsync());
     if (result.Status() != GenericAttributeProfile::GattCommunicationStatus::Success) {
         throw SimpleBLE::Exception::OperationFailed();
     }
@@ -118,7 +119,7 @@ void PeripheralBase::write_request(BluetoothUUID service, BluetoothUUID characte
     winrt::Windows::Storage::Streams::IBuffer buffer = bytearray_to_ibuffer(data);
 
     // Write the value.
-    auto result = gatt_characteristic.WriteValueAsync(buffer, GattWriteOption::WriteWithoutResponse).get();
+    auto result = async_get(gatt_characteristic.WriteValueAsync(buffer, GattWriteOption::WriteWithoutResponse));
     if (result != GenericAttributeProfile::GattCommunicationStatus::Success) {
         throw SimpleBLE::Exception::OperationFailed();
     }
@@ -137,7 +138,7 @@ void PeripheralBase::write_command(BluetoothUUID service, BluetoothUUID characte
     winrt::Windows::Storage::Streams::IBuffer buffer = bytearray_to_ibuffer(data);
 
     // Write the value.
-    auto result = gatt_characteristic.WriteValueAsync(buffer, GattWriteOption::WriteWithResponse).get();
+    auto result = async_get(gatt_characteristic.WriteValueAsync(buffer, GattWriteOption::WriteWithResponse));
     if (result != GenericAttributeProfile::GattCommunicationStatus::Success) {
         throw SimpleBLE::Exception::OperationFailed();
     }
@@ -161,10 +162,8 @@ void PeripheralBase::notify(BluetoothUUID service, BluetoothUUID characteristic,
     });
 
     // Start the notification.
-    auto result = gatt_characteristic
-                      .WriteClientCharacteristicConfigurationDescriptorWithResultAsync(
-                          GattClientCharacteristicConfigurationDescriptorValue::Notify)
-                      .get();
+    auto result = async_get(gatt_characteristic.WriteClientCharacteristicConfigurationDescriptorWithResultAsync(
+        GattClientCharacteristicConfigurationDescriptorValue::Notify));
 
     if (result.Status() != GenericAttributeProfile::GattCommunicationStatus::Success) {
         throw SimpleBLE::Exception::OperationFailed();
@@ -189,10 +188,8 @@ void PeripheralBase::indicate(BluetoothUUID service, BluetoothUUID characteristi
     });
 
     // Start the indication.
-    auto result = gatt_characteristic
-                      .WriteClientCharacteristicConfigurationDescriptorWithResultAsync(
-                          GattClientCharacteristicConfigurationDescriptorValue::Indicate)
-                      .get();
+    auto result = async_get(gatt_characteristic.WriteClientCharacteristicConfigurationDescriptorWithResultAsync(
+        GattClientCharacteristicConfigurationDescriptorValue::Indicate));
 
     if (result.Status() != GenericAttributeProfile::GattCommunicationStatus::Success) {
         throw SimpleBLE::Exception::OperationFailed();
@@ -203,10 +200,8 @@ void PeripheralBase::unsubscribe(BluetoothUUID service, BluetoothUUID characteri
     GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
 
     // Start the indication.
-    auto result = gatt_characteristic
-                      .WriteClientCharacteristicConfigurationDescriptorWithResultAsync(
-                          GattClientCharacteristicConfigurationDescriptorValue::None)
-                      .get();
+    auto result = async_get(gatt_characteristic.WriteClientCharacteristicConfigurationDescriptorWithResultAsync(
+        GattClientCharacteristicConfigurationDescriptorValue::None));
 
     if (result.Status() != GenericAttributeProfile::GattCommunicationStatus::Success) {
         throw SimpleBLE::Exception::OperationFailed();
@@ -228,7 +223,7 @@ bool PeripheralBase::_attempt_connect() {
 
     // We need to cache all services and characteristics in the class, else
     // the underlying objects will be garbage collected.
-    auto services_result = device_.GetGattServicesAsync(BluetoothCacheMode::Uncached).get();
+    auto services_result = async_get(device_.GetGattServicesAsync(BluetoothCacheMode::Uncached));
 
     // If reading services fails, raise an error.
     if (services_result.Status() != GenericAttributeProfile::GattCommunicationStatus::Success) {
@@ -239,7 +234,7 @@ bool PeripheralBase::_attempt_connect() {
     for (GattDeviceService&& service : gatt_services) {
         // For each service...
         std::string service_uuid = guid_to_uuid(service.Uuid());
-        auto characteristics_result = service.GetCharacteristicsAsync(BluetoothCacheMode::Uncached).get();
+        auto characteristics_result = async_get(service.GetCharacteristicsAsync(BluetoothCacheMode::Uncached));
 
         // If reading characteristics fails, raise an error.
         if (characteristics_result.Status() != GattCommunicationStatus::Success) {

@@ -193,6 +193,9 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     list(APPEND COMPILE_OPTIONS "/Gd")
     # /WX -> Treats all warnings as errors.
     list(APPEND COMPILE_OPTIONS "/WX")
+    # /W1 -> Use the lowest level of warnings, as there are some unsafe functions that MSVC doesn't like.
+    # TODO: This should be removed once the warnings are fixed.
+    list(APPEND COMPILE_OPTIONS "/W1")
 
     foreach(OPTION ${COMPILE_OPTIONS})
         target_compile_options(simpleble-static PRIVATE ${OPTION})
