@@ -132,7 +132,7 @@ simpleble_err_t simpleble_peripheral_read(simpleble_peripheral_t handle, simpleb
  * @return simpleble_err_t
  */
 simpleble_err_t simpleble_peripheral_write_request(simpleble_peripheral_t handle, simpleble_uuid_t service,
-                                                   simpleble_uuid_t characteristic, uint8_t* data, size_t data_length);
+                                                   simpleble_uuid_t characteristic, const uint8_t* data, size_t data_length);
 
 /**
  * @brief
@@ -145,7 +145,7 @@ simpleble_err_t simpleble_peripheral_write_request(simpleble_peripheral_t handle
  * @return simpleble_err_t
  */
 simpleble_err_t simpleble_peripheral_write_command(simpleble_peripheral_t handle, simpleble_uuid_t service,
-                                                   simpleble_uuid_t characteristic, uint8_t* data, size_t data_length);
+                                                   simpleble_uuid_t characteristic, const uint8_t* data, size_t data_length);
 
 /**
  * @brief
@@ -159,7 +159,7 @@ simpleble_err_t simpleble_peripheral_write_command(simpleble_peripheral_t handle
 simpleble_err_t simpleble_peripheral_notify(simpleble_peripheral_t handle, simpleble_uuid_t service,
                                             simpleble_uuid_t characteristic,
                                             void (*callback)(simpleble_uuid_t service, simpleble_uuid_t characteristic,
-                                                             uint8_t* data, size_t data_length, void* userdata),
+                                                             const uint8_t* data, size_t data_length, void* userdata),
                                             void* userdata);
 
 /**
@@ -174,7 +174,7 @@ simpleble_err_t simpleble_peripheral_notify(simpleble_peripheral_t handle, simpl
 simpleble_err_t simpleble_peripheral_indicate(simpleble_peripheral_t handle, simpleble_uuid_t service,
                                               simpleble_uuid_t characteristic,
                                               void (*callback)(simpleble_uuid_t service,
-                                                               simpleble_uuid_t characteristic, uint8_t* data,
+                                                               simpleble_uuid_t characteristic, const uint8_t* data,
                                                                size_t data_length, void* userdata),
                                               void* userdata);
 
