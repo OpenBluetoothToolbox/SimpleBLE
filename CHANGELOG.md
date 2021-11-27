@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.3] - XXXX-XX-XX
 
+### Changed
+- Referenced specific version of SimpleBluez to avoid breaking changes as those libraries evolve.
+
 ### Fixed
 - Scan will never stop sleeping on Linux.
 
