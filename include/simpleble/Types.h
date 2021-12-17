@@ -21,4 +21,13 @@ typedef struct {
     std::vector<BluetoothUUID> characteristics;
 } BluetoothService;
 
+typedef enum {
+    Unknown = 0,
+    Resetting = 1,
+    Unsupported = 2,
+    Unauthorized = 3,
+    PoweredOff = 4,
+    PoweredOn = 5,
+} BluetoothState;
+
 }  // namespace SimpleBLE

@@ -54,3 +54,7 @@ void Adapter::set_callback_on_scan_updated(std::function<void(Peripheral)> on_sc
 void Adapter::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {
     internal_->set_callback_on_scan_found(on_scan_found);
 }
+
+void Adapter::set_callback_on_state_changed(std::function<void(BluetoothState)> on_state_changed) {
+    internal_->set_callback_on_state_changed(on_state_changed);
+}

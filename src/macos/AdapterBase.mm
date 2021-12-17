@@ -77,6 +77,8 @@ void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> o
 }
 void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) { callback_on_scan_found_ = on_scan_found; }
 
+void AdapterBase::set_callback_on_state_changed(std::function<void(BluetoothState)> on_state_changed) { callback_on_state_changed_ = on_state_changed; }
+
 // Delegate methods passed for AdapterBaseMacOS
 
 void AdapterBase::delegate_did_discover_peripheral(void* opaque_peripheral, void* opaque_adapter, advertising_data_t advertising_data) {
@@ -123,4 +125,10 @@ void AdapterBase::delegate_did_disconnect_peripheral(void* opaque_peripheral) {
     // Load the existing PeripheralBase object
     std::shared_ptr<PeripheralBase> base_peripheral = this->peripherals_.at(opaque_peripheral);
     base_peripheral->delegate_did_disconnect();
+}
+
+void AdapterBase::delegate_did_change_state(BluetoothState state) {
+    if (this->callback_on_state_changed_) {
+        this->callback_on_state_changed_(state);
+    }
 }

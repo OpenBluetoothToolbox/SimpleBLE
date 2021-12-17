@@ -35,6 +35,7 @@ class AdapterBase {
     void set_callback_on_scan_stop(std::function<void()> on_scan_stop);
     void set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated);
     void set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found);
+    void set_callback_on_state_changed(std::function<void(BluetoothState)> on_state_changed);
 
     static std::vector<std::shared_ptr<AdapterBase> > get_adapters();
 
@@ -42,6 +43,7 @@ class AdapterBase {
                                           advertising_data_t advertising_data);
     void delegate_did_connect_peripheral(void* opaque_peripheral);
     void delegate_did_disconnect_peripheral(void* opaque_peripheral);
+    void delegate_did_change_state(BluetoothState state);
 
   protected:
     /**
@@ -53,6 +55,7 @@ class AdapterBase {
     std::function<void()> callback_on_scan_stop_;
     std::function<void(Peripheral)> callback_on_scan_updated_;
     std::function<void(Peripheral)> callback_on_scan_found_;
+    std::function<void(BluetoothState)> callback_on_state_changed_;
 
     /**
      * Holds a map of objective-c peripheral objects to their corresponding C++ objects.

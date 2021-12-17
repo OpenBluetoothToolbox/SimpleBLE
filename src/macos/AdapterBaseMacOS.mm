@@ -69,28 +69,38 @@
 #pragma mark - CBCentralManagerDelegate
 
 - (void)centralManagerDidUpdateState:(CBCentralManager*)central {
+    SimpleBLE::BluetoothState bts = SimpleBLE::Unknown;
+
     switch (central.state) {
         case CBManagerStateUnknown:
+            bts = SimpleBLE::BluetoothState::Unknown;
             // NSLog(@"CBManagerStateUnknown!\n");
             break;
         case CBManagerStateResetting:
+            bts = SimpleBLE::BluetoothState::Resetting;
             // NSLog(@"CBManagerStateResetting!\n");
             break;
         case CBManagerStateUnsupported:
+            bts = SimpleBLE::BluetoothState::Unsupported;
             // NSLog(@"CBManagerStateUnsupported!\n");
             break;
         case CBManagerStateUnauthorized:
+            bts = SimpleBLE::BluetoothState::Unauthorized;
             // NSLog(@"CBManagerStateUnauthorized!\n");
             break;
         case CBManagerStatePoweredOff:
+            bts = SimpleBLE::BluetoothState::PoweredOff;
             // NSLog(@"CBManagerStatePoweredOff!\n");
             // NOTE: Notify the user that the Bluetooth adapter is turned off.
             break;
         case CBManagerStatePoweredOn:
+            bts = SimpleBLE::BluetoothState::PoweredOn;
             // NOTE: This state is required to be able to operate CoreBluetooth.
             // NSLog(@"CBManagerStatePoweredOn!\n");
             break;
     }
+
+    _adapter->delegate_did_change_state(bts);
 }
 
 - (void)centralManager:(CBCentralManager*)central

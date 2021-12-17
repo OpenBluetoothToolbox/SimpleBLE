@@ -31,6 +31,7 @@ class Adapter {
     void set_callback_on_scan_stop(std::function<void()> on_scan_stop);
     void set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated);
     void set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found);
+    void set_callback_on_state_changed(std::function<void(BluetoothState)> on_state_changed);
 
     static std::vector<Adapter> get_adapters();
 
