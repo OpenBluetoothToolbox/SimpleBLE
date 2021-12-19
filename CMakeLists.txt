@@ -15,6 +15,9 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+    # Nice hack to automatically ignore the build directory
+    file(WRITE ${CMAKE_BINARY_DIR}/.gitignore "*")
 else()
     set(STANDALONE false)
 endif()
@@ -24,7 +27,7 @@ if(NOT SIMPLEBLUEZ_GIT_REPOSITORY)
     set(SIMPLEBLUEZ_GIT_REPOSITORY "https://github.com/OpenBluetoothToolbox/SimpleBluez.git")
 endif()
 if(NOT SIMPLEBLUEZ_GIT_TAG)
-    set(SIMPLEBLUEZ_GIT_TAG "262e1bf91a463548a5e47cadedadf21d6c0beb66") # References the latest stable commit that works.
+    set(SIMPLEBLUEZ_GIT_TAG feature/simpleble) # "v0.1.0")
 endif()
 
 # Perform some overall CMake configurations

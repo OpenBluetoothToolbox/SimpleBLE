@@ -10,13 +10,13 @@
 #include <simpleble/Peripheral.h>
 #include <simpleble/Types.h>
 
-#include <BluezAdapter.h>
+#include <simplebluez/Adapter.h>
 
 namespace SimpleBLE {
 
 class AdapterBase {
   public:
-    AdapterBase(std::shared_ptr<BluezAdapter> adapter);
+    AdapterBase(std::shared_ptr<SimpleBluez::Adapter> adapter);
     ~AdapterBase();
 
     std::string identifier();
@@ -36,7 +36,7 @@ class AdapterBase {
     static std::vector<std::shared_ptr<AdapterBase>> get_adapters();
 
   private:
-    std::weak_ptr<BluezAdapter> adapter_;
+    std::shared_ptr<SimpleBluez::Adapter> adapter_;
 
     std::map<BluetoothAddress, Peripheral> seen_devices_;
 

@@ -2,7 +2,7 @@
 
 #include <atomic>
 #include <thread>
-#include "BluezService.h"
+#include <simplebluez/Bluez.h>
 
 namespace SimpleBLE {
 
@@ -10,7 +10,7 @@ class Bluez {
   public:
     static Bluez* get();
 
-    BluezService bluez_service;
+    SimpleBluez::Bluez bluez;
 
   private:
     Bluez();
