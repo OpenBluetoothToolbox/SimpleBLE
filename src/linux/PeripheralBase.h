@@ -15,7 +15,7 @@ namespace SimpleBLE {
 class PeripheralBase {
   public:
     PeripheralBase(std::shared_ptr<SimpleBluez::Device> device);
-    ~PeripheralBase();
+    virtual ~PeripheralBase();
 
     std::string identifier();
     BluetoothAddress address();

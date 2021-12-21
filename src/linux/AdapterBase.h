@@ -17,7 +17,7 @@ namespace SimpleBLE {
 class AdapterBase {
   public:
     AdapterBase(std::shared_ptr<SimpleBluez::Adapter> adapter);
-    ~AdapterBase();
+    virtual ~AdapterBase();
 
     std::string identifier();
     BluetoothAddress address();

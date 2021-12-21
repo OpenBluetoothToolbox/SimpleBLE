@@ -59,6 +59,19 @@ set(
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     message("-- [INFO] Linux Host Detected")
 
+    # Append additional flags for address and thread sanitization
+    if(SIMPLEBLE_SANITIZE MATCHES "Address")
+        set(SIMPLEBLUEZ_SANITIZE ${SIMPLEBLE_SANITIZE})
+        set(EXTRA_COMPILE_OPTIONS ${EXTRA_COMPILE_OPTIONS} -fsanitize=address -fsanitize-recover=address -fno-omit-frame-pointer -fno-common -g)
+        set(EXTRA_LINK_OPTIONS ${EXTRA_LINK_OPTIONS} -fsanitize=address)
+    endif()
+
+    if(SIMPLEBLE_SANITIZE MATCHES "Thread")
+        set(SIMPLEBLUEZ_SANITIZE ${SIMPLEBLE_SANITIZE})
+        set(EXTRA_COMPILE_OPTIONS ${EXTRA_COMPILE_OPTIONS} -fsanitize=thread -fno-omit-frame-pointer -fno-common -g)
+        set(EXTRA_LINK_OPTIONS ${EXTRA_LINK_OPTIONS} -fsanitize=thread)
+    endif()
+
     if(NOT SIMPLEBLUEZ_LOCAL_PATH)
         FetchContent_Declare(
             simplebluez
@@ -174,6 +187,16 @@ target_link_libraries(simpleble-c PUBLIC simpleble-static)
 
 # Append any compilation flags to each specific target
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+    target_compile_options(simpleble-static PRIVATE ${EXTRA_COMPILE_OPTIONS})
+    target_compile_options(simpleble PRIVATE ${EXTRA_COMPILE_OPTIONS})
+    target_compile_options(simpleble-c-static PRIVATE ${EXTRA_COMPILE_OPTIONS})
+    target_compile_options(simpleble-c PRIVATE ${EXTRA_COMPILE_OPTIONS})
+
+    target_link_options(simpleble-static PRIVATE ${EXTRA_LINK_OPTIONS})
+    target_link_options(simpleble PRIVATE ${EXTRA_LINK_OPTIONS})
+    target_link_options(simpleble-c-static PRIVATE ${EXTRA_LINK_OPTIONS})
+    target_link_options(simpleble-c PRIVATE ${EXTRA_LINK_OPTIONS})
+
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 
     set(WINVERSION_CODE 0x0A00) # Selected Windows 10 based on https://docs.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt

@@ -149,7 +149,7 @@ bool PeripheralBase::_attempt_connect() {
     // Wait for the connection to be confirmed.
     // The condition variable will return false if the connection was not established.
     std::unique_lock<std::mutex> lock(connection_mutex_);
-    return connection_cv_.wait_for(lock, 1s, [this]() { return is_connected(); });
+    return connection_cv_.wait_for(lock, 2s, [this]() { return is_connected(); });
 }
 
 bool PeripheralBase::_attempt_disconnect() {

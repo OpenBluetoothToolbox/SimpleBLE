@@ -25,7 +25,7 @@ namespace SimpleBLE {
 class AdapterBase {
   public:
     AdapterBase(std::string device_id);
-    ~AdapterBase();
+    virtual ~AdapterBase();
 
     std::string identifier();
     BluetoothAddress address();
