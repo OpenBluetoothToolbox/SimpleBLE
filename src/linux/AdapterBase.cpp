@@ -3,8 +3,6 @@
 #include "PeripheralBase.h"
 #include "PeripheralBuilder.h"
 
-#include <iostream>
-
 using namespace SimpleBLE;
 
 std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {

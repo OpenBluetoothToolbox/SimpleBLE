@@ -5,12 +5,18 @@
 
 #include "Bluez.h"
 
-#include <iostream>
-
 using namespace SimpleBLE;
 using namespace std::chrono_literals;
 
-PeripheralBase::PeripheralBase(std::shared_ptr<SimpleBluez::Device> device) : device_(device) {
+PeripheralBase::PeripheralBase(std::shared_ptr<SimpleBluez::Device> device) : device_(device) {}
+
+PeripheralBase::~PeripheralBase() {}
+
+std::string PeripheralBase::identifier() { return device_->name(); }
+
+BluetoothAddress PeripheralBase::address() { return device_->address(); }
+
+void PeripheralBase::connect() {
     // Set the OnDisconnected callback
     device_->set_on_disconnected([this]() {
         this->disconnection_cv_.notify_all();
@@ -22,15 +28,7 @@ PeripheralBase::PeripheralBase(std::shared_ptr<SimpleBluez::Device> device) : de
 
     // Set the OnServicesResolved callback
     device_->set_on_services_resolved([this]() { this->connection_cv_.notify_all(); });
-}
 
-PeripheralBase::~PeripheralBase() {}
-
-std::string PeripheralBase::identifier() { return device_->name(); }
-
-BluetoothAddress PeripheralBase::address() { return device_->address(); }
-
-void PeripheralBase::connect() {
     // Attempt to connect to the device.
     for (size_t i = 0; i < 5; i++) {
         if (_attempt_connect()) {
