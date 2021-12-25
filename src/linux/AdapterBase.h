@@ -5,6 +5,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <atomic>
 
 #include <simpleble/Exceptions.h>
 #include <simpleble/Peripheral.h>
@@ -38,6 +39,7 @@ class AdapterBase {
   private:
     std::shared_ptr<SimpleBluez::Adapter> adapter_;
 
+    std::atomic_bool is_scanning_;
     std::map<BluetoothAddress, Peripheral> seen_devices_;
 
     std::function<void()> callback_on_scan_start_;

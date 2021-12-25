@@ -8,9 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Referenced specific version of SimpleBluez to avoid breaking changes as those libraries evolve.
+- (Linux) When `scan_stop` is called, it is now guaranteed that no more scan results will be received.
 
 ### Fixed
-- Scan will never stop sleeping on Linux.
+- (Linux) Scan will never stop sleeping.
 
 ## [0.0.2] - 2021-10-09
 
