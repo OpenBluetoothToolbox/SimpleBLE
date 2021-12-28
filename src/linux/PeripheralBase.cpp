@@ -10,7 +10,11 @@ using namespace std::chrono_literals;
 
 PeripheralBase::PeripheralBase(std::shared_ptr<SimpleBluez::Device> device) : device_(device) {}
 
-PeripheralBase::~PeripheralBase() {}
+PeripheralBase::~PeripheralBase() {
+    // TODO: A more extensive cleanup process is probably needed.
+    device_->clear_on_disconnected();
+    device_->clear_on_services_resolved();
+}
 
 std::string PeripheralBase::identifier() { return device_->name(); }
 

@@ -14,9 +14,9 @@ std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
     return adapter_list;
 }
 
-AdapterBase::AdapterBase(std::shared_ptr<SimpleBluez::Adapter> adapter) { adapter_ = adapter; }
+AdapterBase::AdapterBase(std::shared_ptr<SimpleBluez::Adapter> adapter) : adapter_(adapter) {}
 
-AdapterBase::~AdapterBase() {}
+AdapterBase::~AdapterBase() { adapter_->clear_on_device_updated(); }
 
 std::string AdapterBase::identifier() { return adapter_->identifier(); }
 
