@@ -15,6 +15,9 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+    # Nice hack to automatically ignore the build directory
+    file(WRITE ${CMAKE_BINARY_DIR}/.gitignore "*")
 else()
     set(STANDALONE false)
 endif()
@@ -24,7 +27,7 @@ if(NOT SIMPLEBLUEZ_GIT_REPOSITORY)
     set(SIMPLEBLUEZ_GIT_REPOSITORY "https://github.com/OpenBluetoothToolbox/SimpleBluez.git")
 endif()
 if(NOT SIMPLEBLUEZ_GIT_TAG)
-    set(SIMPLEBLUEZ_GIT_TAG "262e1bf91a463548a5e47cadedadf21d6c0beb66") # References the latest stable commit that works.
+    set(SIMPLEBLUEZ_GIT_TAG "v0.1.1")
 endif()
 
 # Perform some overall CMake configurations
@@ -55,6 +58,19 @@ set(
 # Detect the operating system and load the necessary dependencies
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     message("-- [INFO] Linux Host Detected")
+
+    # Append additional flags for address and thread sanitization
+    if(SIMPLEBLE_SANITIZE MATCHES "Address")
+        set(SIMPLEBLUEZ_SANITIZE ${SIMPLEBLE_SANITIZE})
+        set(EXTRA_COMPILE_OPTIONS ${EXTRA_COMPILE_OPTIONS} -fsanitize=address -fsanitize-recover=address -fno-omit-frame-pointer -fno-common -g)
+        set(EXTRA_LINK_OPTIONS ${EXTRA_LINK_OPTIONS} -fsanitize=address)
+    endif()
+
+    if(SIMPLEBLE_SANITIZE MATCHES "Thread")
+        set(SIMPLEBLUEZ_SANITIZE ${SIMPLEBLE_SANITIZE})
+        set(EXTRA_COMPILE_OPTIONS ${EXTRA_COMPILE_OPTIONS} -fsanitize=thread -fno-omit-frame-pointer -fno-common -g)
+        set(EXTRA_LINK_OPTIONS ${EXTRA_LINK_OPTIONS} -fsanitize=thread)
+    endif()
 
     if(NOT SIMPLEBLUEZ_LOCAL_PATH)
         FetchContent_Declare(
@@ -171,6 +187,16 @@ target_link_libraries(simpleble-c PUBLIC simpleble-static)
 
 # Append any compilation flags to each specific target
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+    target_compile_options(simpleble-static PRIVATE ${EXTRA_COMPILE_OPTIONS})
+    target_compile_options(simpleble PRIVATE ${EXTRA_COMPILE_OPTIONS})
+    target_compile_options(simpleble-c-static PRIVATE ${EXTRA_COMPILE_OPTIONS})
+    target_compile_options(simpleble-c PRIVATE ${EXTRA_COMPILE_OPTIONS})
+
+    target_link_options(simpleble-static PRIVATE ${EXTRA_LINK_OPTIONS})
+    target_link_options(simpleble PRIVATE ${EXTRA_LINK_OPTIONS})
+    target_link_options(simpleble-c-static PRIVATE ${EXTRA_LINK_OPTIONS})
+    target_link_options(simpleble-c PRIVATE ${EXTRA_LINK_OPTIONS})
+
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 
     set(WINVERSION_CODE 0x0A00) # Selected Windows 10 based on https://docs.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt

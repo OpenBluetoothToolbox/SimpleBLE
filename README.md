@@ -132,6 +132,18 @@ specifying the additional command line arguments to the `cmake` command:
     Call CMake with `-DSIMPLEDBUS_LOCAL_PATH=<path>` to override the
     default location of the SimpleDBus repository.
 
+### Tests
+Testing is currently not available for the library as a whole, yet there are some
+build settings that can be used to find issues with the library.
+
+#### (Linux) Address Sanitizer
+In order to run tests with Address Sanitizer, CMake needs to be called with
+the following option: `-DSIMPLEBLE_SANITIZE=Address`.
+
+#### (Linux) Thread Sanitizer
+In order to run tests with Thread Sanitizer, CMake needs to be called with
+the following option: `-DSIMPLEBLE_SANITIZE=Thread`.
+
 ## Collaborating
 
 ### Coding & Naming Conventions
@@ -141,44 +153,6 @@ specifying the additional command line arguments to the `cmake` command:
     - Class function names are expressed in `snake_case`.
     - Class protected and private property names must end with an underscore (`_`).
     - Class protected and private method names must start with an underscore (`_`).
-
-### API per OS
-
-The following tables describe the state of each available API per operating system.
-Any field that is not specified as supported will throw a compilation error if used
-or just be ignored.
-
-| API                                                  | Linux | Windows | MacOS |
-| ---------------------------------------------------- | ----- | ------- | ----- |
-| `SimpleBLE::Adapter::identifier`                     | Yes   | Yes     | Yes   |
-| `SimpleBLE::Adapter::address`                        | Yes   | Yes     | Yes   |
-| `SimpleBLE::Adapter::scan_start`                     | Yes   | Yes     | Yes   |
-| `SimpleBLE::Adapter::scan_stop`                      | Yes   | Yes     | Yes   |
-| `SimpleBLE::Adapter::scan_for`                       | Yes   | Yes     | Yes   |
-| `SimpleBLE::Adapter::scan_is_active`                 | Yes   | Yes     | Yes   |
-| `SimpleBLE::Adapter::scan_get_results`               | Yes   | Yes     | Yes   |
-| `SimpleBLE::Adapter::set_callback_on_scan_start`     | Yes   | Yes     | Yes   |
-| `SimpleBLE::Adapter::set_callback_on_scan_stop`      | Yes   | Yes     | Yes   |
-| `SimpleBLE::Adapter::set_callback_on_scan_updated`   | Yes   | Yes     | Yes   |
-| `SimpleBLE::Adapter::set_callback_on_scan_found`     | Yes   | Yes     | Yes   |
-| `SimpleBLE::Adapter::get_adapters`                   | Yes   | Yes     | Yes   |
-| ---------------------------------------------------- | ----- | ------- | ----- |
-| `SimpleBLE::Peripheral::identifier`                  | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::address`                     | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::connect`                     | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::disconnect`                  | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::is_connected`                | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::is_connectable`              | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::services`                    | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::manufacturer_data`           | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::read`                        | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::write_request`               | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::write_command`               | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::notify`                      | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::indicate`                    | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::unsubscribe`                 | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::set_callback_on_connected`   | Yes   | Yes     | Yes   |
-| `SimpleBLE::Peripheral::set_callback_on_disconnected`| Yes   | Yes     | Yes   |
 
 ## Known Issues / To-Do's
 - [Linux] Fork safety is not guaranteed.
@@ -190,15 +164,10 @@ or just be ignored.
 - [Windows] Unclear if multiple adapters can be detected.
 - [All] Run callbacks in separate threads to prevent blocking internal threads.
 - [All] Add a signal handler to ensure all objects are disconnected when the program exits.
-- [All] Add safe version of the library that won't trigger any exceptions.
 - [All] Replace C-style casts with C++ style casts.
 - [All] Add Python bindings for the library.
 - [All] Add Javascript bindings for the library.
 - [All] Add Kotlin bindings for the library.
-
-## Ideas
-- Explore if callbacks can be wrapped in shared pointers to prevent them from being prematurely deleted.
-- Explore if callbacks can be handled in a separate thread to prevent blocking the main thread.
 
 ## License
 All components within this project that have not been bundled from external creators, are licensed under the terms of the [MIT Licence](LICENCE.md).
