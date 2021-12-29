@@ -4,11 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.3] - XXXX-XX-XX
+## [0.1.0] - 2021-12-28
 
 ### Changed
 - Referenced specific version of SimpleBluez to avoid breaking changes as those libraries evolve.
 - (Linux) When `scan_stop` is called, it is now guaranteed that no more scan results will be received.
+- Updated Linux implementation to use SimpleBluez v0.1.1.
 
 ### Fixed
 - (Linux) Scan will never stop sleeping.
