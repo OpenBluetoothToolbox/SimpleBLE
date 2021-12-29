@@ -1,11 +1,11 @@
 #pragma once
 
+#include <atomic>
 #include <functional>
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
-#include <atomic>
 
 #include <simpleble/Exceptions.h>
 #include <simpleble/Peripheral.h>

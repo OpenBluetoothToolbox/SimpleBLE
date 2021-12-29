@@ -1,8 +1,8 @@
 #pragma once
 
+#include <simplebluez/Bluez.h>
 #include <atomic>
 #include <thread>
-#include <simplebluez/Bluez.h>
 
 namespace SimpleBLE {
 

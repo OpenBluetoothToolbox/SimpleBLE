@@ -30,7 +30,7 @@ void AdapterBase::scan_start() {
         if (!this->is_scanning_) {
             return;
         }
-        
+
         PeripheralBuilder peripheral_builder(std::make_shared<PeripheralBase>(device));
 
         if (this->seen_devices_.count(peripheral_builder.address()) == 0) {
