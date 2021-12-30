@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        os: [windows-2019]
+        os: [windows-2019, windows-2022]
 
     steps:
     - name: Clone Repository
@@ -23,28 +23,28 @@ jobs:
       run: |
         mkdir %GITHUB_WORKSPACE%\build32
         cd %GITHUB_WORKSPACE%\build32
-        cmake -G "Visual Studio 16 2019" -A Win32 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 ..
+        cmake -G "Visual Studio 16 2019" -A Win32 -DCMAKE_SYSTEM_VERSION=10.0.22000.0 ..
         cmake --build . --config Release -j 2 --parallel 2
       shell: cmd
     - name: Compile Lib for Windows x64
       run: |
         mkdir %GITHUB_WORKSPACE%\build64
         cd %GITHUB_WORKSPACE%\build64
-        cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 ..
+        cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION=10.0.22000.0 ..
         cmake --build . --config Release -j 2 --parallel 2
       shell: cmd
     - name: Compile Examples for Windows x86
       run: |
         mkdir %GITHUB_WORKSPACE%\build32examples
         cd %GITHUB_WORKSPACE%\build32examples
-        cmake -G "Visual Studio 16 2019" -A Win32 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 ../examples
+        cmake -G "Visual Studio 16 2019" -A Win32 -DCMAKE_SYSTEM_VERSION=10.0.22000.0 ../examples
         cmake --build . --config Release -j 2 --parallel 2
       shell: cmd
     - name: Compile Examples for Windows x64
       run: |
         mkdir %GITHUB_WORKSPACE%\build64examples
         cd %GITHUB_WORKSPACE%\build64examples
-        cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 ../examples
+        cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION=10.0.22000.0 ../examples
         cmake --build . --config Release -j 2 --parallel 2
       shell: cmd
 
