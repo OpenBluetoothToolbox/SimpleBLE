@@ -38,7 +38,7 @@ if ($clean) {
 New-Item -ItemType Directory -Force -Path "$BUILD_PATH" | Out-Null
 
 # Run CMake to create our build files.
-cmake -S "$SOURCE_ROOT" -B "$BUILD_PATH" -A $WINDOWS_ARCH
+cmake -S "$SOURCE_ROOT" -B "$BUILD_PATH" -A $WINDOWS_ARCH -DCMAKE_SYSTEM_VERSION="10.0.19041.0"
 
 # Run the compiler
 & $MSBUILD_PATH "$BUILD_PATH\SimpleBLE_Examples.sln" -nologo -m:8 /bl:output.binlog /verbosity:minimal /p:Configuration=$TARGET
