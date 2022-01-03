@@ -62,14 +62,29 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     # Append additional flags for address and thread sanitization
     if(SIMPLEBLE_SANITIZE MATCHES "Address")
         set(SIMPLEBLUEZ_SANITIZE ${SIMPLEBLE_SANITIZE})
-        set(EXTRA_COMPILE_OPTIONS ${EXTRA_COMPILE_OPTIONS} -fsanitize=address -fsanitize-recover=address -fno-omit-frame-pointer -fno-common -g)
-        set(EXTRA_LINK_OPTIONS ${EXTRA_LINK_OPTIONS} -fsanitize=address)
+
+        # Append additional compile options
+        list(APPEND COMPILE_OPTIONS -fsanitize=address)
+        list(APPEND COMPILE_OPTIONS -fsanitize-recover=address)
+        list(APPEND COMPILE_OPTIONS -fno-omit-frame-pointer)
+        list(APPEND COMPILE_OPTIONS -fno-common)
+        list(APPEND COMPILE_OPTIONS -g)
+
+        # Append additional link options
+        list(APPEND LINK_OPTIONS -fsanitize=address)
     endif()
 
     if(SIMPLEBLE_SANITIZE MATCHES "Thread")
         set(SIMPLEBLUEZ_SANITIZE ${SIMPLEBLE_SANITIZE})
-        set(EXTRA_COMPILE_OPTIONS ${EXTRA_COMPILE_OPTIONS} -fsanitize=thread -fno-omit-frame-pointer -fno-common -g)
-        set(EXTRA_LINK_OPTIONS ${EXTRA_LINK_OPTIONS} -fsanitize=thread)
+
+        # Append additional compile options
+        list(APPEND COMPILE_OPTIONS -fsanitize=thread)
+        list(APPEND COMPILE_OPTIONS -fno-omit-frame-pointer)
+        list(APPEND COMPILE_OPTIONS -fno-common)
+        list(APPEND COMPILE_OPTIONS -g)
+
+        # Append additional link options
+        list(APPEND LINK_OPTIONS -fsanitize=thread)
     endif()
 
     if(NOT SIMPLEBLUEZ_LOCAL_PATH)
@@ -107,6 +122,12 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         set(WINDOWS_TARGET_ARCH x86)
     elseif(CMAKE_GENERATOR_PLATFORM MATCHES "^[Xx]64$")
         set(WINDOWS_TARGET_ARCH x64)
+    endif()
+
+    # Append additional flags for address and thread sanitization
+    if(SIMPLEBLE_SANITIZE MATCHES "Address")
+        # TODO: Figure out how to properly link the MSVC address sanitizer libraries.
+        # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fsanitize=address /Zi /MD /DEBUG")
     endif()
 
     set(
@@ -187,16 +208,6 @@ target_link_libraries(simpleble-c PUBLIC simpleble-static)
 
 # Append any compilation flags to each specific target
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
-    target_compile_options(simpleble-static PRIVATE ${EXTRA_COMPILE_OPTIONS})
-    target_compile_options(simpleble PRIVATE ${EXTRA_COMPILE_OPTIONS})
-    target_compile_options(simpleble-c-static PRIVATE ${EXTRA_COMPILE_OPTIONS})
-    target_compile_options(simpleble-c PRIVATE ${EXTRA_COMPILE_OPTIONS})
-
-    target_link_options(simpleble-static PRIVATE ${EXTRA_LINK_OPTIONS})
-    target_link_options(simpleble PRIVATE ${EXTRA_LINK_OPTIONS})
-    target_link_options(simpleble-c-static PRIVATE ${EXTRA_LINK_OPTIONS})
-    target_link_options(simpleble-c PRIVATE ${EXTRA_LINK_OPTIONS})
-
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 
     set(WINVERSION_CODE 0x0A00) # Selected Windows 10 based on https://docs.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt
@@ -207,13 +218,6 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     list(APPEND COMPILE_DEFINITIONS "/D_WIN32_WINNT=${WINVERSION_CODE}")
     # /D_USE_MATH_DEFINES -> Specifies that the math.h header file should be included.
     list(APPEND COMPILE_DEFINITIONS "/D_USE_MATH_DEFINES")
-
-    foreach(DEFINITION ${COMPILE_DEFINITIONS})
-        target_compile_definitions(simpleble-static PRIVATE ${DEFINITION})
-        target_compile_definitions(simpleble PRIVATE ${DEFINITION})
-        target_compile_definitions(simpleble-c-static PRIVATE ${DEFINITION})
-        target_compile_definitions(simpleble-c PRIVATE ${DEFINITION})
-    endforeach()
     
     # /Gd -> Use __cdecl as the default calling convention. https://docs.microsoft.com/en-us/cpp/cpp/cdecl
     list(APPEND COMPILE_OPTIONS "/Gd")
@@ -223,15 +227,29 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     # TODO: This should be removed once the warnings are fixed.
     list(APPEND COMPILE_OPTIONS "/W1")
 
-    foreach(OPTION ${COMPILE_OPTIONS})
-        target_compile_options(simpleble-static PRIVATE ${OPTION})
-        target_compile_options(simpleble PRIVATE ${OPTION})
-        target_compile_options(simpleble-c-static PRIVATE ${OPTION})
-        target_compile_options(simpleble-c PRIVATE ${OPTION})
-    endforeach()
-
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
 endif()
+
+foreach(DEFINITION ${COMPILE_DEFINITIONS})
+    target_compile_definitions(simpleble-static PRIVATE ${DEFINITION})
+    target_compile_definitions(simpleble PRIVATE ${DEFINITION})
+    target_compile_definitions(simpleble-c-static PRIVATE ${DEFINITION})
+    target_compile_definitions(simpleble-c PRIVATE ${DEFINITION})
+endforeach()
+
+foreach(OPTION ${COMPILE_OPTIONS})
+    target_compile_options(simpleble-static PRIVATE ${OPTION})
+    target_compile_options(simpleble PRIVATE ${OPTION})
+    target_compile_options(simpleble-c-static PRIVATE ${OPTION})
+    target_compile_options(simpleble-c PRIVATE ${OPTION})
+endforeach()
+
+foreach(OPTION ${LINK_OPTIONS})
+    target_link_options(simpleble-static PRIVATE ${OPTION})
+    target_link_options(simpleble PRIVATE ${OPTION})
+    target_link_options(simpleble-c-static PRIVATE ${OPTION})
+    target_link_options(simpleble-c PRIVATE ${OPTION})
+endforeach()
 
 # Export the variables needed by the parent project
 if(NOT ${STANDALONE})
