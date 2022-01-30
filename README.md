@@ -12,6 +12,15 @@ Some basic examples of key features have also been provided.
 If you want to use the library and need help. **Please reach out!**
 You can find me at: kevin at dewald dot me
 
+## Supported Operating Systems
+- Linux
+  - Ubuntu 20.04 and newer.
+- macOS
+  - macOS 10.15 and newer.
+  - Note: 12.0 to 12.2 have known issues while scanning.
+- Windows
+  - Windows 10 and newer.
+
 ## Build Instructions
 The project is built using [CMake](http://cmake.org/). The basic main flow is as follows:
 
@@ -165,7 +174,6 @@ the following option: `-DSIMPLEBLE_SANITIZE=Thread`.
 - [All] Run callbacks in separate threads to prevent blocking internal threads.
 - [All] Add a signal handler to ensure all objects are disconnected when the program exits.
 - [All] Replace C-style casts with C++ style casts.
-- [All] Add Python bindings for the library.
 - [All] Add Javascript bindings for the library.
 - [All] Add Kotlin bindings for the library.
 
