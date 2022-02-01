@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - (Windows) Proper cleanup of callbacks during destruction.
 - (Windows) Async timeout reduced to 10 seconds.
+- (Linux) Returned characteristic value would be empty or outdated. _(Thanks ptenbrock!)_
 
 ## [0.1.0] - 2021-12-28
 
