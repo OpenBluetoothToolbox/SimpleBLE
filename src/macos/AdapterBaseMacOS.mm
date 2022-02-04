@@ -87,8 +87,8 @@
             // NOTE: Notify the user that the Bluetooth adapter is turned off.
             break;
         case CBManagerStatePoweredOn:
-            // NOTE: This state is required to be able to operate CoreBluetooth.
             // NSLog(@"CBManagerStatePoweredOn!\n");
+            // NOTE: This state is required to be able to operate CoreBluetooth.
             break;
     }
 }
