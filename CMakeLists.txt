@@ -145,6 +145,20 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     message("-- [INFO] Darwin Host Detected")
     set(CMAKE_CXX_EXTENSIONS OFF)
+
+    # Append additional flags for address and thread sanitization
+    if(SIMPLEBLE_SANITIZE MATCHES "Address")
+        # Append additional compile options
+        list(APPEND COMPILE_OPTIONS -fsanitize=address)
+        list(APPEND COMPILE_OPTIONS -fsanitize-recover=address)
+        list(APPEND COMPILE_OPTIONS -fno-omit-frame-pointer)
+        list(APPEND COMPILE_OPTIONS -fno-common)
+        list(APPEND COMPILE_OPTIONS -g)
+
+        # Append additional link options
+        list(APPEND PUBLIC_LINK_OPTIONS -fsanitize=address)
+    endif()
+
     set(
         EXTERNAL_LIBRARIES
         "-framework Foundation"
@@ -249,6 +263,13 @@ foreach(OPTION ${LINK_OPTIONS})
     target_link_options(simpleble PRIVATE ${OPTION})
     target_link_options(simpleble-c-static PRIVATE ${OPTION})
     target_link_options(simpleble-c PRIVATE ${OPTION})
+endforeach()
+
+foreach(OPTION ${PUBLIC_LINK_OPTIONS})
+    target_link_options(simpleble-static PUBLIC ${OPTION})
+    target_link_options(simpleble PUBLIC ${OPTION})
+    target_link_options(simpleble-c-static PUBLIC ${OPTION})
+    target_link_options(simpleble-c PUBLIC ${OPTION})
 endforeach()
 
 # Export the variables needed by the parent project
