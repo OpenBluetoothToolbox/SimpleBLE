@@ -3,8 +3,11 @@
 #import "PeripheralBase.h"
 #import "PeripheralBuilder.h"
 
+#import <CoreFoundation/CoreFoundation.h>
+
 #include <chrono>
 #include <thread>
+#include <iostream>
 
 using namespace SimpleBLE;
 
@@ -39,7 +42,7 @@ std::string AdapterBase::identifier() { return "Default Adapter"; }
 BluetoothAddress AdapterBase::address() { return "00:00:00:00:00:00"; }
 
 void AdapterBase::scan_start() {
-    AdapterBaseMacOS* internal = (__bridge_transfer AdapterBaseMacOS*)opaque_internal_;
+    AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)opaque_internal_;
     [internal scanStart];
 
     if (callback_on_scan_start_) {
@@ -48,7 +51,7 @@ void AdapterBase::scan_start() {
 }
 
 void AdapterBase::scan_stop() {
-    AdapterBaseMacOS* internal = (__bridge_transfer AdapterBaseMacOS*)opaque_internal_;
+    AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)opaque_internal_;
     [internal scanStop];
     if (callback_on_scan_stop_) {
         callback_on_scan_stop_();
@@ -62,7 +65,7 @@ void AdapterBase::scan_for(int timeout_ms) {
 }
 
 bool AdapterBase::scan_is_active() {
-    AdapterBaseMacOS* internal = (__bridge_transfer AdapterBaseMacOS*)opaque_internal_;
+    AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)opaque_internal_;
     return [internal scanIsActive];
 }
 

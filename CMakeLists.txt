@@ -159,6 +159,8 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
         list(APPEND PUBLIC_LINK_OPTIONS -fsanitize=address)
     endif()
 
+    list(APPEND COMPILE_OPTIONS -fobjc-arc)
+
     set(
         EXTERNAL_LIBRARIES
         "-framework Foundation"
