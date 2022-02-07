@@ -122,18 +122,18 @@
     }
 
     // TODO: Should we use @synchronized (self)??
-    _adapter->delegate_did_discover_peripheral(peripheral, self.centralManager, advertisingData);
+    _adapter->delegate_did_discover_peripheral((__bridge void*)peripheral, (__bridge void*)self.centralManager, advertisingData);
 }
 
 - (void)centralManager:(CBCentralManager*)central didConnectPeripheral:(CBPeripheral*)peripheral {
-    _adapter->delegate_did_connect_peripheral(peripheral);
+    _adapter->delegate_did_connect_peripheral((__bridge void*)peripheral);
 }
 
 - (void)centralManager:(CBCentralManager*)central didDisconnectPeripheral:(CBPeripheral*)peripheral error:(NSError*)error {
     if (error != nil) {
         NSLog(@"Peripheral %@ disconnected: %@\n", peripheral.name, error);
     }
-    _adapter->delegate_did_disconnect_peripheral(peripheral);
+    _adapter->delegate_did_disconnect_peripheral((__bridge void*)peripheral);
 }
 
 - (void)centralManager:(CBCentralManager*)central didFailToConnectPeripheral:(CBPeripheral*)peripheral error:(NSError*)error {
