@@ -3,11 +3,8 @@
 #import "PeripheralBase.h"
 #import "PeripheralBuilder.h"
 
-#import <CoreFoundation/CoreFoundation.h>
-
 #include <chrono>
 #include <thread>
-#include <iostream>
 
 using namespace SimpleBLE;
 
