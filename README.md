@@ -145,9 +145,12 @@ specifying the additional command line arguments to the `cmake` command:
 Testing is currently not available for the library as a whole, yet there are some
 build settings that can be used to find issues with the library.
 
-#### (Linux) Address Sanitizer
+#### (Linux, MacOS) Address Sanitizer
 In order to run tests with Address Sanitizer, CMake needs to be called with
 the following option: `-DSIMPLEBLE_SANITIZE=Address`.
+
+When using this feature on MacOS, it's important to use the `leaks` application to
+monitor for memory leaks, as AddressSanitizer does not support that feature.
 
 #### (Linux) Thread Sanitizer
 In order to run tests with Thread Sanitizer, CMake needs to be called with

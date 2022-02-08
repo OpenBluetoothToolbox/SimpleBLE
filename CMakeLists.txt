@@ -124,6 +124,23 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         set(WINDOWS_TARGET_ARCH x64)
     endif()
 
+    set(WINVERSION_CODE 0x0A00) # Selected Windows 10 based on https://docs.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt
+    
+    # Add all the special definitions that need to be added for the program to properly compile on windows.
+    
+    # /D_WIN32_WINNT -> Specifies the minimum version of Windows that the application is compatible with.
+    list(APPEND COMPILE_DEFINITIONS "/D_WIN32_WINNT=${WINVERSION_CODE}")
+    # /D_USE_MATH_DEFINES -> Specifies that the math.h header file should be included.
+    list(APPEND COMPILE_DEFINITIONS "/D_USE_MATH_DEFINES")
+    
+    # /Gd -> Use __cdecl as the default calling convention. https://docs.microsoft.com/en-us/cpp/cpp/cdecl
+    list(APPEND COMPILE_OPTIONS "/Gd")
+    # /WX -> Treats all warnings as errors.
+    list(APPEND COMPILE_OPTIONS "/WX")
+    # /W1 -> Use the lowest level of warnings, as there are some unsafe functions that MSVC doesn't like.
+    # TODO: This should be removed once the warnings are fixed.
+    list(APPEND COMPILE_OPTIONS "/W1")
+
     # Append additional flags for address and thread sanitization
     if(SIMPLEBLE_SANITIZE MATCHES "Address")
         # TODO: Figure out how to properly link the MSVC address sanitizer libraries.
@@ -145,6 +162,10 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     message("-- [INFO] Darwin Host Detected")
     set(CMAKE_CXX_EXTENSIONS OFF)
+
+    # Note to self: When dealing with memory issues/leaks, the following documentation is useful:
+    # - https://clang.llvm.org/docs/AutomaticReferenceCounting.html
+    # - https://developer.apple.com/library/archive/documentation/Performance/Conceptual/ManagingMemory/Articles/FindingLeaks.html
 
     # Append additional flags for address and thread sanitization
     if(SIMPLEBLE_SANITIZE MATCHES "Address")
@@ -223,28 +244,6 @@ target_link_libraries(simpleble-c-static PUBLIC simpleble-static)
 target_link_libraries(simpleble-c PUBLIC simpleble-static)
 
 # Append any compilation flags to each specific target
-if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
-elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-
-    set(WINVERSION_CODE 0x0A00) # Selected Windows 10 based on https://docs.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt
-    
-    # Add all the special definitions that need to be added for the program to properly compile on windows.
-    
-    # /D_WIN32_WINNT -> Specifies the minimum version of Windows that the application is compatible with.
-    list(APPEND COMPILE_DEFINITIONS "/D_WIN32_WINNT=${WINVERSION_CODE}")
-    # /D_USE_MATH_DEFINES -> Specifies that the math.h header file should be included.
-    list(APPEND COMPILE_DEFINITIONS "/D_USE_MATH_DEFINES")
-    
-    # /Gd -> Use __cdecl as the default calling convention. https://docs.microsoft.com/en-us/cpp/cpp/cdecl
-    list(APPEND COMPILE_OPTIONS "/Gd")
-    # /WX -> Treats all warnings as errors.
-    list(APPEND COMPILE_OPTIONS "/WX")
-    # /W1 -> Use the lowest level of warnings, as there are some unsafe functions that MSVC doesn't like.
-    # TODO: This should be removed once the warnings are fixed.
-    list(APPEND COMPILE_OPTIONS "/W1")
-
-elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
-endif()
 
 foreach(DEFINITION ${COMPILE_DEFINITIONS})
     target_compile_definitions(simpleble-static PRIVATE ${DEFINITION})
