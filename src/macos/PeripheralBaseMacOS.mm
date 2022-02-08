@@ -29,7 +29,7 @@ typedef struct {
     self = [super init];
     if (self) {
         // NOTE: It's important to make a copy of the peripheral and central objects into
-        // a strong property to prevent them from being deallocated by the garbage collector.
+        // a strong property to prevent them from being deallocated by ARC or the garbage collector.
         _peripheral = [peripheral copy];
         _centralManager = centralManager;
 
