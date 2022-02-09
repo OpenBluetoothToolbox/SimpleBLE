@@ -13,13 +13,12 @@ If you want to use the library and need help. **Please reach out!**
 You can find me at: kevin at dewald dot me
 
 ## Supported Operating Systems
-- Linux
-  - Ubuntu 20.04 and newer.
-- macOS
-  - macOS 10.15 and newer.
-  - Note: 12.0 to 12.2 have known issues while scanning.
-- Windows
-  - Windows 10 and newer.
+- Ubuntu Linux 20.04+
+- MacOS 10.15+
+  - Note: 12.0 to 12.2 have known issues.
+- Windows 10+
+- iOS
+  - So far untested, but should work.
 
 ## Build Instructions
 The project is built using [CMake](http://cmake.org/). The basic main flow is as follows:
@@ -152,7 +151,7 @@ the following option: `-DSIMPLEBLE_SANITIZE=Address`.
 When using this feature on MacOS, it's important to use the `leaks` application to
 monitor for memory leaks, as AddressSanitizer does not support that feature.
 
-#### (Linux) Thread Sanitizer
+#### (Linux, MacOS) Thread Sanitizer
 In order to run tests with Thread Sanitizer, CMake needs to be called with
 the following option: `-DSIMPLEBLE_SANITIZE=Thread`.
 
