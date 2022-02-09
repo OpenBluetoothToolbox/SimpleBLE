@@ -180,6 +180,17 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
         list(APPEND PUBLIC_LINK_OPTIONS -fsanitize=address)
     endif()
 
+    if(SIMPLEBLE_SANITIZE MATCHES "Thread")
+        # Append additional compile options
+        list(APPEND COMPILE_OPTIONS -fsanitize=thread)
+        list(APPEND COMPILE_OPTIONS -fno-omit-frame-pointer)
+        list(APPEND COMPILE_OPTIONS -fno-common)
+        list(APPEND COMPILE_OPTIONS -g)
+
+        # Append additional link options
+        list(APPEND PUBLIC_LINK_OPTIONS -fsanitize=thread)
+    endif()
+
     list(APPEND COMPILE_OPTIONS -fobjc-arc)
 
     set(
