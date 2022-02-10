@@ -1,8 +1,8 @@
 #include "PeripheralBase.h"
 
-#include <algorithm>
 #include <simpleble/Exceptions.h>
 #include <simplebluez/Exceptions.h>
+#include <algorithm>
 
 #include "Bluez.h"
 
@@ -112,8 +112,9 @@ ByteArray PeripheralBase::read(BluetoothUUID service, BluetoothUUID characterist
         if (device_->has_battery_interface()) {
             char percentage = device_->read_battery_percentage();
             return ByteArray(&percentage, 1);
+        } else {
+            throw;
         }
-        else throw;
     }
 }
 
@@ -133,7 +134,8 @@ void PeripheralBase::notify(BluetoothUUID service, BluetoothUUID characteristic,
     // TODO: Check if the property can be notified.
     try {
         auto characteristic_object = _get_characteristic(service, characteristic);
-        characteristic_object->set_on_value_changed([callback](SimpleBluez::ByteArray new_value) { callback(new_value); });
+        characteristic_object->set_on_value_changed(
+            [callback](SimpleBluez::ByteArray new_value) { callback(new_value); });
         characteristic_object->start_notify();
     } catch (Exception::ServiceNotFound& e) {
         if (device_->has_battery_interface()) {
@@ -141,8 +143,9 @@ void PeripheralBase::notify(BluetoothUUID service, BluetoothUUID characteristic,
                 char byte_value = new_value;
                 callback(ByteArray(&byte_value, 1));
             });
+        } else {
+            throw;
         }
-        else throw;
     }
 }
 
@@ -166,8 +169,9 @@ void PeripheralBase::unsubscribe(BluetoothUUID service, BluetoothUUID characteri
     } catch (Exception::ServiceNotFound& e) {
         if (device_->has_battery_interface()) {
             device_->clear_on_battery_percentage_changed();
+        } else {
+            throw;
         }
-        else throw;
     }
 }
 
