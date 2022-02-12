@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0] - 2021-XX-XX
 
 ### Added
-- (Linux) Support for emulated battery service.
+- (Linux) Support for emulated battery service. _(Thanks ptenbrock!)_
 
 ### Fixed
 - (Windows) Proper cleanup of callbacks during destruction.
