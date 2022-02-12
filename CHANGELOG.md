@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (MacOS) Fixed a bunch of memory leaks and enabled automatic reference counting.
 - (MacOS) Fixed race condition.
 
+### Changed
+- Updated Linux implementation to use SimpleBluez v0.2.0.
+
 ## [0.1.0] - 2021-12-28
 
 ### Changed

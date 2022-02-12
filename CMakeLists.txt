@@ -27,7 +27,7 @@ if(NOT SIMPLEBLUEZ_GIT_REPOSITORY)
     set(SIMPLEBLUEZ_GIT_REPOSITORY "https://github.com/OpenBluetoothToolbox/SimpleBluez.git")
 endif()
 if(NOT SIMPLEBLUEZ_GIT_TAG)
-    set(SIMPLEBLUEZ_GIT_TAG "v0.1.1")
+    set(SIMPLEBLUEZ_GIT_TAG "v0.2.0")
 endif()
 
 # Perform some overall CMake configurations
