@@ -30,9 +30,6 @@ if(NOT SIMPLEBLUEZ_GIT_TAG)
     set(SIMPLEBLUEZ_GIT_TAG "v0.2.0")
 endif()
 
-# Perform some overall CMake configurations
-#set(CMAKE_CXX_STANDARD 17) // TODO: Specify the standard only for this library
-
 # Configure the external header path
 set(SIMPLEBLE_USER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
