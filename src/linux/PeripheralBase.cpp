@@ -2,8 +2,12 @@
 
 #include <simpleble/Exceptions.h>
 #include <simplebluez/Exceptions.h>
+#include <algorithm>
 
 #include "Bluez.h"
+
+const SimpleBLE::BluetoothUUID BATTERY_SERVICE_UUID = "0000180f-0000-1000-8000-00805f9b34fb";
+const SimpleBLE::BluetoothUUID BATTERY_CHARACTERISTIC_UUID = "00002a19-0000-1000-8000-00805f9b34fb";
 
 using namespace SimpleBLE;
 using namespace std::chrono_literals;
@@ -77,6 +81,17 @@ std::vector<BluetoothService> PeripheralBase::services() {
         service_list.push_back(service);
     }
 
+    auto is_battery_service = [](const BluetoothService& service) { return service.uuid == BATTERY_SERVICE_UUID; };
+    if (std::find_if(service_list.begin(), service_list.end(), is_battery_service) == service_list.end()) {
+        // no battery service found -> emulate service via Battery1 interface if available
+        if (device_->has_battery_interface()) {
+            BluetoothService service;
+            service.uuid = BATTERY_SERVICE_UUID;
+            service.characteristics.push_back(BATTERY_CHARACTERISTIC_UUID);
+            service_list.push_back(service);
+        }
+    }
+
     return service_list;
 }
 
@@ -91,7 +106,16 @@ std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() {
 
 ByteArray PeripheralBase::read(BluetoothUUID service, BluetoothUUID characteristic) {
     // TODO: Check if the characteristic is readable.
-    return _get_characteristic(service, characteristic)->read();
+    try {
+        return _get_characteristic(service, characteristic)->read();
+    } catch (Exception::ServiceNotFound& e) {
+        if (device_->has_battery_interface()) {
+            char percentage = device_->read_battery_percentage();
+            return ByteArray(&percentage, 1);
+        } else {
+            throw;
+        }
+    }
 }
 
 void PeripheralBase::write_request(BluetoothUUID service, BluetoothUUID characteristic, ByteArray data) {
@@ -108,9 +132,21 @@ void PeripheralBase::notify(BluetoothUUID service, BluetoothUUID characteristic,
                             std::function<void(ByteArray payload)> callback) {
     // TODO: What to do if the characteristic is already being notified?
     // TODO: Check if the property can be notified.
-    auto characteristic_object = _get_characteristic(service, characteristic);
-    characteristic_object->set_on_value_changed([callback](SimpleBluez::ByteArray new_value) { callback(new_value); });
-    characteristic_object->start_notify();
+    try {
+        auto characteristic_object = _get_characteristic(service, characteristic);
+        characteristic_object->set_on_value_changed(
+            [callback](SimpleBluez::ByteArray new_value) { callback(new_value); });
+        characteristic_object->start_notify();
+    } catch (Exception::ServiceNotFound& e) {
+        if (device_->has_battery_interface()) {
+            device_->set_on_battery_percentage_changed([callback](uint8_t new_value) {
+                char byte_value = new_value;
+                callback(ByteArray(&byte_value, 1));
+            });
+        } else {
+            throw;
+        }
+    }
 }
 
 void PeripheralBase::indicate(BluetoothUUID service, BluetoothUUID characteristic,
@@ -120,14 +156,22 @@ void PeripheralBase::indicate(BluetoothUUID service, BluetoothUUID characteristi
 
 void PeripheralBase::unsubscribe(BluetoothUUID service, BluetoothUUID characteristic) {
     // TODO: What to do if the characteristic is not being notified?
-    auto characteristic_object = _get_characteristic(service, characteristic);
-    characteristic_object->stop_notify();
+    try {
+        auto characteristic_object = _get_characteristic(service, characteristic);
+        characteristic_object->stop_notify();
 
-    // Wait for the characteristic to stop notifying.
-    // TODO: Upgrade SimpleDBus to provide a way to wait for this signal.
-    auto timeout = std::chrono::system_clock::now() + 5s;
-    while (characteristic_object->notifying() && std::chrono::system_clock::now() < timeout) {
-        std::this_thread::sleep_for(50ms);
+        // Wait for the characteristic to stop notifying.
+        // TODO: Upgrade SimpleDBus to provide a way to wait for this signal.
+        auto timeout = std::chrono::system_clock::now() + 5s;
+        while (characteristic_object->notifying() && std::chrono::system_clock::now() < timeout) {
+            std::this_thread::sleep_for(50ms);
+        }
+    } catch (Exception::ServiceNotFound& e) {
+        if (device_->has_battery_interface()) {
+            device_->clear_on_battery_percentage_changed();
+        } else {
+            throw;
+        }
     }
 }
 
