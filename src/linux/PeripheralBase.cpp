@@ -71,25 +71,31 @@ bool PeripheralBase::is_connected() {
 bool PeripheralBase::is_connectable() { return device_->name() != ""; }
 
 std::vector<BluetoothService> PeripheralBase::services() {
+    bool is_battery_service_available = false;
+
     std::vector<BluetoothService> service_list;
     for (auto bluez_service : device_->services()) {
         BluetoothService service;
         service.uuid = bluez_service->uuid();
+
+        // Check if the service is the battery service.
+        if (service.uuid == BATTERY_SERVICE_UUID) {
+            is_battery_service_available = true;
+        }
+
         for (auto bluez_characteristic : bluez_service->characteristics()) {
             service.characteristics.push_back(bluez_characteristic->uuid());
         }
         service_list.push_back(service);
     }
 
-    auto is_battery_service = [](const BluetoothService& service) { return service.uuid == BATTERY_SERVICE_UUID; };
-    if (std::find_if(service_list.begin(), service_list.end(), is_battery_service) == service_list.end()) {
-        // no battery service found -> emulate service via Battery1 interface if available
-        if (device_->has_battery_interface()) {
-            BluetoothService service;
-            service.uuid = BATTERY_SERVICE_UUID;
-            service.characteristics.push_back(BATTERY_CHARACTERISTIC_UUID);
-            service_list.push_back(service);
-        }
+    // If the battery service is not available, and the device has the appropriate interface, add it.
+    if (!is_battery_service_available && device_->has_battery_interface()) {
+        // Emulate the battery service through the Battery1 interface.
+        BluetoothService service;
+        service.uuid = BATTERY_SERVICE_UUID;
+        service.characteristics.push_back(BATTERY_CHARACTERISTIC_UUID);
+        service_list.push_back(service);
     }
 
     return service_list;
@@ -105,17 +111,17 @@ std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() {
 }
 
 ByteArray PeripheralBase::read(BluetoothUUID service, BluetoothUUID characteristic) {
-    // TODO: Check if the characteristic is readable.
-    try {
-        return _get_characteristic(service, characteristic)->read();
-    } catch (Exception::ServiceNotFound& e) {
-        if (device_->has_battery_interface()) {
-            char percentage = device_->read_battery_percentage();
-            return ByteArray(&percentage, 1);
-        } else {
-            throw;
-        }
+    // Check if the user is attempting to read the battery service/characteristic and if so,
+    //  emulate the battery service through the Battery1 interface if it's not available.
+    if (service == BATTERY_SERVICE_UUID && characteristic == BATTERY_CHARACTERISTIC_UUID &&
+        device_->has_battery_interface()) {
+        // If this point is reached, the battery service needs to be emulated.
+        uint8_t battery_percentage = device_->battery_percentage();
+        return ByteArray(reinterpret_cast<char*>(&battery_percentage), 1);
     }
+
+    // Otherwise, attempt to read the characteristic using default mechanisms
+    return _get_characteristic(service, characteristic)->read();
 }
 
 void PeripheralBase::write_request(BluetoothUUID service, BluetoothUUID characteristic, ByteArray data) {
@@ -130,23 +136,22 @@ void PeripheralBase::write_command(BluetoothUUID service, BluetoothUUID characte
 
 void PeripheralBase::notify(BluetoothUUID service, BluetoothUUID characteristic,
                             std::function<void(ByteArray payload)> callback) {
+    // Check if the user is attempting to notify the battery service/characteristic and if so,
+    //  emulate the battery service through the Battery1 interface if it's not available.
+    if (service == BATTERY_SERVICE_UUID && characteristic == BATTERY_CHARACTERISTIC_UUID &&
+        device_->has_battery_interface()) {
+        // If this point is reached, the battery service needs to be emulated.
+        device_->set_on_battery_percentage_changed(
+            [callback](uint8_t new_value) { callback(ByteArray(reinterpret_cast<char*>(&new_value), 1)); });
+        return;
+    }
+
+    // Otherwise, attempt to read the characteristic using default mechanisms
     // TODO: What to do if the characteristic is already being notified?
     // TODO: Check if the property can be notified.
-    try {
-        auto characteristic_object = _get_characteristic(service, characteristic);
-        characteristic_object->set_on_value_changed(
-            [callback](SimpleBluez::ByteArray new_value) { callback(new_value); });
-        characteristic_object->start_notify();
-    } catch (Exception::ServiceNotFound& e) {
-        if (device_->has_battery_interface()) {
-            device_->set_on_battery_percentage_changed([callback](uint8_t new_value) {
-                char byte_value = new_value;
-                callback(ByteArray(&byte_value, 1));
-            });
-        } else {
-            throw;
-        }
-    }
+    auto characteristic_object = _get_characteristic(service, characteristic);
+    characteristic_object->set_on_value_changed([callback](SimpleBluez::ByteArray new_value) { callback(new_value); });
+    characteristic_object->start_notify();
 }
 
 void PeripheralBase::indicate(BluetoothUUID service, BluetoothUUID characteristic,
@@ -155,23 +160,24 @@ void PeripheralBase::indicate(BluetoothUUID service, BluetoothUUID characteristi
 }
 
 void PeripheralBase::unsubscribe(BluetoothUUID service, BluetoothUUID characteristic) {
-    // TODO: What to do if the characteristic is not being notified?
-    try {
-        auto characteristic_object = _get_characteristic(service, characteristic);
-        characteristic_object->stop_notify();
+    // Check if the user is attempting to read the battery service/characteristic and if so,
+    //  emulate the battery service through the Battery1 interface if it's not available.
+    if (service == BATTERY_SERVICE_UUID && characteristic == BATTERY_CHARACTERISTIC_UUID &&
+        device_->has_battery_interface()) {
+        // If this point is reached, the battery service needs to be emulated.
+        device_->clear_on_battery_percentage_changed();
+        return;
+    }
 
-        // Wait for the characteristic to stop notifying.
-        // TODO: Upgrade SimpleDBus to provide a way to wait for this signal.
-        auto timeout = std::chrono::system_clock::now() + 5s;
-        while (characteristic_object->notifying() && std::chrono::system_clock::now() < timeout) {
-            std::this_thread::sleep_for(50ms);
-        }
-    } catch (Exception::ServiceNotFound& e) {
-        if (device_->has_battery_interface()) {
-            device_->clear_on_battery_percentage_changed();
-        } else {
-            throw;
-        }
+    // TODO: What to do if the characteristic is not being notified?
+    auto characteristic_object = _get_characteristic(service, characteristic);
+    characteristic_object->stop_notify();
+
+    // Wait for the characteristic to stop notifying.
+    // TODO: Upgrade SimpleDBus to provide a way to wait for this signal.
+    auto timeout = std::chrono::system_clock::now() + 5s;
+    while (characteristic_object->notifying() && std::chrono::system_clock::now() < timeout) {
+        std::this_thread::sleep_for(50ms);
     }
 }
 
