@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated Linux implementation to use SimpleBluez v0.3.0.
 - Migrated to using safe callbacks from external vendor (kvn::safe_callback).
 
-
 ## [0.2.0] - 2021-02-13
 
 ### Added
