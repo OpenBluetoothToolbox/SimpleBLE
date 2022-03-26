@@ -1,10 +1,13 @@
 #pragma once
 
-#include <memory>
-
 #include <simpleble/Exceptions.h>
 #include <simpleble/Types.h>
+
 #include "AdapterBaseTypes.h"
+
+#include <kvn_safe_callback.hpp>
+
+#include <memory>
 
 namespace SimpleBLE {
 
@@ -49,8 +52,8 @@ class PeripheralBase {
 
     std::map<uint16_t, SimpleBLE::ByteArray> manufacturer_data_;
 
-    std::function<void()> callback_on_connected_;
-    std::function<void()> callback_on_disconnected_;
+    kvn::safe_callback<void()> callback_on_connected_;
+    kvn::safe_callback<void()> callback_on_disconnected_;
 };
 
 }  // namespace SimpleBLE

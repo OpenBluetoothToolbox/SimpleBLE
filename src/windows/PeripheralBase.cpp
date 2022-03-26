@@ -214,11 +214,19 @@ void PeripheralBase::unsubscribe(BluetoothUUID service, BluetoothUUID characteri
 }
 
 void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) {
-    callback_on_connected_ = on_connected;
+    if (on_connected) {
+        callback_on_connected_.load(on_connected);
+    } else {
+        callback_on_connected_.unload();
+    }
 }
 
 void PeripheralBase::set_callback_on_disconnected(std::function<void()> on_disconnected) {
-    callback_on_disconnected_ = on_disconnected;
+    if (on_disconnected) {
+        callback_on_disconnected_.load(on_disconnected);
+    } else {
+        callback_on_disconnected_.unload();
+    }
 }
 
 // Private methods
