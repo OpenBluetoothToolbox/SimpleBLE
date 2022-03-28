@@ -13,17 +13,19 @@ and ease of use. All specific operating system quirks are handled to provide
 a consistent behavior across all platforms. Each major version of the library
 will have a stable API that will be fully forwards compatible. 
 
-===================== ====================== ============================================ ==============
-Windows               Linux                  MacOS                                        iOS 
-===================== ====================== ============================================ ==============
-Windows 10 and newer  Ubuntu 20.04 and newer 10.15 and newer (except 12.0, 12.1 and 12.2) 15.0 and newer
-===================== ====================== ============================================ ==============
-
 If you want to use SimpleDBus and need help. **Please do not hesitate to reach out!**
 
 * Visit our `ReadTheDocs`_ page. 
 * Join our `Discord`_ server.
 * Contact me: ``kevin at dewald dot me``
+
+Supported platforms
+-------------------
+=========== ============= =================================== =====
+Windows     Linux         MacOS                               iOS
+=========== ============= =================================== =====
+Windows 10+ Ubuntu 20.04+ 10.15+ (except 12.0, 12.1 and 12.2) 15.0+
+=========== ============= =================================== =====
 
 Vendorization
 -------------
