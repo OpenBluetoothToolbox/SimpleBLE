@@ -27,7 +27,7 @@ if(NOT SIMPLEBLUEZ_GIT_REPOSITORY)
     set(SIMPLEBLUEZ_GIT_REPOSITORY "https://github.com/OpenBluetoothToolbox/SimpleBluez.git")
 endif()
 if(NOT SIMPLEBLUEZ_GIT_TAG)
-    set(SIMPLEBLUEZ_GIT_TAG "v0.2.1")
+    set(SIMPLEBLUEZ_GIT_TAG "v0.3.0")
 endif()
 
 # Configure the external header path
@@ -104,6 +104,7 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     set(
         EXTERNAL_INCLUDE_DIRS
         ${SIMPLEBLUEZ_INCLUDES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/external
         ${CMAKE_CURRENT_SOURCE_DIR}/src/linux
     )
     set(
@@ -146,6 +147,7 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 
     set(
         EXTERNAL_INCLUDE_DIRS
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/external
         ${CMAKE_CURRENT_SOURCE_DIR}/src/windows
     )
     set(
@@ -198,6 +200,7 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     )
     set(
         EXTERNAL_INCLUDE_DIRS
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/external
         ${CMAKE_CURRENT_SOURCE_DIR}/src/macos
     )
     set(

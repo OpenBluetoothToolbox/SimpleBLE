@@ -1,15 +1,16 @@
 #pragma once
 
-#include <memory>
-
 #include <simpleble/Exceptions.h>
 #include <simpleble/Types.h>
 
 #include <simplebluez/Characteristic.h>
 #include <simplebluez/Device.h>
 
+#include <kvn_safe_callback.hpp>
+
 #include <atomic>
 #include <condition_variable>
+#include <memory>
 
 namespace SimpleBLE {
 
@@ -50,8 +51,8 @@ class PeripheralBase {
     std::condition_variable disconnection_cv_;
     std::mutex disconnection_mutex_;
 
-    std::function<void()> callback_on_connected_;
-    std::function<void()> callback_on_disconnected_;
+    kvn::safe_callback<void()> callback_on_connected_;
+    kvn::safe_callback<void()> callback_on_disconnected_;
 
     bool _attempt_connect();
     bool _attempt_disconnect();
