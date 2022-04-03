@@ -32,6 +32,7 @@ class PeripheralBase {
     void disconnect();
     bool is_connected();
     bool is_connectable();
+    void unpair();
 
     std::vector<BluetoothService> services();
     std::map<uint16_t, ByteArray> manufacturer_data();
