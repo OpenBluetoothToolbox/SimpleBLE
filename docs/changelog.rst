@@ -10,6 +10,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 --------------------
 
 **Added**
+
 -  Pairing functionality has been validated on all supported operating systems.
    In the case of Windows and MacOS, the user will be required to interact with
    an operating system popup to pair the device, while on Linux all pairing 
