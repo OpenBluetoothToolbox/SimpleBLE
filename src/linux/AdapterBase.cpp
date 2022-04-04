@@ -31,7 +31,7 @@ void AdapterBase::scan_start() {
             return;
         }
 
-        PeripheralBuilder peripheral_builder(std::make_shared<PeripheralBase>(device));
+        PeripheralBuilder peripheral_builder(std::make_shared<PeripheralBase>(device, this->adapter_));
 
         if (this->seen_devices_.count(peripheral_builder.address()) == 0) {
             this->seen_devices_.insert(std::make_pair<>(peripheral_builder.address(), peripheral_builder));

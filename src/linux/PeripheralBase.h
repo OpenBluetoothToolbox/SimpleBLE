@@ -3,6 +3,7 @@
 #include <simpleble/Exceptions.h>
 #include <simpleble/Types.h>
 
+#include <simplebluez/Adapter.h>
 #include <simplebluez/Characteristic.h>
 #include <simplebluez/Device.h>
 
@@ -16,7 +17,7 @@ namespace SimpleBLE {
 
 class PeripheralBase {
   public:
-    PeripheralBase(std::shared_ptr<SimpleBluez::Device> device);
+    PeripheralBase(std::shared_ptr<SimpleBluez::Device> device, std::shared_ptr<SimpleBluez::Adapter> adapter);
     virtual ~PeripheralBase();
 
     std::string identifier();
@@ -26,6 +27,7 @@ class PeripheralBase {
     void disconnect();
     bool is_connected();
     bool is_connectable();
+    void unpair();
 
     std::vector<BluetoothService> services();
     std::map<uint16_t, ByteArray> manufacturer_data();
@@ -43,6 +45,7 @@ class PeripheralBase {
   private:
     std::atomic_bool battery_emulation_required_{false};
 
+    std::shared_ptr<SimpleBluez::Adapter> adapter_;
     std::shared_ptr<SimpleBluez::Device> device_;
 
     std::condition_variable connection_cv_;

@@ -72,6 +72,14 @@ simpleble_err_t simpleble_peripheral_is_connectable(simpleble_peripheral_t handl
  * @brief
  *
  * @param handle
+ * @return simpleble_err_t
+ */
+simpleble_err_t simpleble_peripheral_unpair(simpleble_peripheral_t handle);
+
+/**
+ * @brief
+ *
+ * @param handle
  * @return size_t
  */
 size_t simpleble_peripheral_services_count(simpleble_peripheral_t handle);
