@@ -55,7 +55,7 @@ external creators, are licensed under the terms of the `MIT Licence`_.
 
 .. _Discord: https://discord.gg/N9HqNEcvP3
 
-.. _ReadTheDocs: https://simpledbus.readthedocs.io/en/latest/
+.. _ReadTheDocs: https://simpleble.readthedocs.io/en/latest/
 
 .. _SimpleBluez: https://github.com/OpenBluetoothToolbox/SimpleBluez
 
