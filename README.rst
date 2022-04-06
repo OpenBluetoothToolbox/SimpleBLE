@@ -62,4 +62,4 @@ external creators, are licensed under the terms of the `MIT Licence`_.
 .. _SimpleDBus: https://github.com/OpenBluetoothToolbox/SimpleDBus
 
 .. |Latest Documentation Status| image:: https://readthedocs.org/projects/simpleble/badge?version=latest
-   :target: http://simpledbus.readthedocs.org/en/latest
+   :target: http://simpleble.readthedocs.org/en/latest
