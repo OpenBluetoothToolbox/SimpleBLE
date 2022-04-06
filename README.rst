@@ -1,7 +1,7 @@
 SimpleBLE
 ==========
 
-The ultimate fully-fledged cross-platform BLE library.
+The ultimate fully-fledged cross-platform library for Bluetooth Low Energy.
 
 |Latest Documentation Status|
 
