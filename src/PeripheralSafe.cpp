@@ -6,8 +6,6 @@
 
 SimpleBLE::Safe::Peripheral::Peripheral(SimpleBLE::Peripheral& peripheral) : SimpleBLE::Peripheral(peripheral) {}
 
-SimpleBLE::Safe::Peripheral::~Peripheral() {}
-
 std::optional<std::string> SimpleBLE::Safe::Peripheral::identifier() noexcept {
     try {
         return SimpleBLE::Peripheral::identifier();

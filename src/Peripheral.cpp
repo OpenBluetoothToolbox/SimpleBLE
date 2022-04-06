@@ -5,10 +5,6 @@
 
 using namespace SimpleBLE;
 
-Peripheral::Peripheral() {}
-
-Peripheral::~Peripheral() {}
-
 bool Peripheral::initialized() const { return internal_ != nullptr; }
 
 // TODO: Add validations to prevent calls into internal_ if not set.

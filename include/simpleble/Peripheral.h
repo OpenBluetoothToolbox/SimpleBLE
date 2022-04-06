@@ -16,8 +16,8 @@ class PeripheralBase;
 
 class Peripheral {
   public:
-    Peripheral();
-    virtual ~Peripheral();
+    Peripheral() = default;
+    virtual ~Peripheral() = default;
 
     bool initialized() const;
 

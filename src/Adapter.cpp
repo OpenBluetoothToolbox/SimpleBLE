@@ -17,10 +17,6 @@ std::vector<Adapter> Adapter::get_adapters() {
     return available_adapters;
 }
 
-Adapter::Adapter() {}
-
-Adapter::~Adapter() {}
-
 bool Adapter::initialized() const { return internal_ != nullptr; }
 
 // TODO: Add validations to prevent calls into internal_ if not set.
