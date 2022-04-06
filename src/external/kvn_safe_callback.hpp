@@ -31,7 +31,7 @@ class safe_callback<_Res(_ArgTypes...)> {
             return;
         }
         std::scoped_lock lock(_mutex);
-        _callback = callback;
+        _callback = std::move(callback);
         _is_loaded = true;
     }
 
@@ -48,7 +48,7 @@ class safe_callback<_Res(_ArgTypes...)> {
     _Res operator()(_ArgTypes... arguments) {
         if (_is_loaded) {
             std::scoped_lock lock(_mutex);
-            return _callback(arguments...);
+            return _callback(static_cast<_ArgTypes&&>(arguments)...);
         } else {
             return _Res();
         }

@@ -42,17 +42,17 @@ std::vector<Peripheral> Adapter::scan_get_results() { return internal_->scan_get
 std::vector<Peripheral> Adapter::get_paired_peripherals() { return internal_->get_paired_peripherals(); }
 
 void Adapter::set_callback_on_scan_start(std::function<void()> on_scan_start) {
-    internal_->set_callback_on_scan_start(on_scan_start);
+    internal_->set_callback_on_scan_start(std::move(on_scan_start));
 }
 
 void Adapter::set_callback_on_scan_stop(std::function<void()> on_scan_stop) {
-    internal_->set_callback_on_scan_stop(on_scan_stop);
+    internal_->set_callback_on_scan_stop(std::move(on_scan_stop));
 }
 
 void Adapter::set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) {
-    internal_->set_callback_on_scan_updated(on_scan_updated);
+    internal_->set_callback_on_scan_updated(std::move(on_scan_updated));
 }
 
 void Adapter::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {
-    internal_->set_callback_on_scan_found(on_scan_found);
+    internal_->set_callback_on_scan_found(std::move(on_scan_found));
 }
