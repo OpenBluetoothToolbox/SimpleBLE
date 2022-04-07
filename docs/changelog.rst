@@ -13,6 +13,10 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 -  Expose RSSI as a property of ``SimpleBLE::Peripheral``.
 
+**Changed**
+
+-  Updated Linux implementation to use SimpleBluez v0.4.0.
+
 [0.3.0] - 2022-04-03
 --------------------
 
