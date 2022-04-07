@@ -106,8 +106,7 @@ std::optional<SimpleBLE::ByteArray> SimpleBLE::Safe::Peripheral::read(BluetoothU
     }
 }
 
-bool SimpleBLE::Safe::Peripheral::write_request(BluetoothUUID const& service, 
-					        BluetoothUUID const& characteristic,
+bool SimpleBLE::Safe::Peripheral::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                                                 ByteArray data) noexcept {
     try {
         SimpleBLE::Peripheral::write_request(service, characteristic, data);
@@ -117,8 +116,7 @@ bool SimpleBLE::Safe::Peripheral::write_request(BluetoothUUID const& service,
     }
 }
 
-bool SimpleBLE::Safe::Peripheral::write_command(BluetoothUUID const& service, 
-						BluetoothUUID const& characteristic,
+bool SimpleBLE::Safe::Peripheral::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                                                 ByteArray data) noexcept {
     try {
         SimpleBLE::Peripheral::write_command(service, characteristic, data);
@@ -128,8 +126,7 @@ bool SimpleBLE::Safe::Peripheral::write_command(BluetoothUUID const& service,
     }
 }
 
-bool SimpleBLE::Safe::Peripheral::notify(BluetoothUUID const& service, 
-					 BluetoothUUID const& characteristic,
+bool SimpleBLE::Safe::Peripheral::notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                                          std::function<void(ByteArray payload)> callback) noexcept {
     try {
         SimpleBLE::Peripheral::notify(service, characteristic, std::move(callback));
@@ -139,8 +136,7 @@ bool SimpleBLE::Safe::Peripheral::notify(BluetoothUUID const& service,
     }
 }
 
-bool SimpleBLE::Safe::Peripheral::indicate(BluetoothUUID const& service, 
-					   BluetoothUUID const& characteristic,
+bool SimpleBLE::Safe::Peripheral::indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                                            std::function<void(ByteArray payload)> callback) noexcept {
     try {
         SimpleBLE::Peripheral::indicate(service, characteristic, std::move(callback));
@@ -150,8 +146,8 @@ bool SimpleBLE::Safe::Peripheral::indicate(BluetoothUUID const& service,
     }
 }
 
-bool SimpleBLE::Safe::Peripheral::unsubscribe(BluetoothUUID const& service, 
-					      BluetoothUUID const& characteristic) noexcept {
+bool SimpleBLE::Safe::Peripheral::unsubscribe(BluetoothUUID const& service,
+                                              BluetoothUUID const& characteristic) noexcept {
     try {
         SimpleBLE::Peripheral::unsubscribe(service, characteristic);
         return true;

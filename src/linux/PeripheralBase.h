@@ -38,8 +38,10 @@ class PeripheralBase {
     ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic);
     void write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray data);
     void write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray data);
-    void notify(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback);
-    void indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback);
+    void notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                std::function<void(ByteArray payload)> callback);
+    void indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                  std::function<void(ByteArray payload)> callback);
     void unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic);
 
     void set_callback_on_connected(std::function<void()> on_connected);
@@ -63,9 +65,8 @@ class PeripheralBase {
     bool _attempt_connect();
     bool _attempt_disconnect();
 
-    std::shared_ptr<SimpleBluez::Characteristic> _get_characteristic(
-	    BluetoothUUID const& service_uuid,
-	    BluetoothUUID const& characteristic_uuid);
+    std::shared_ptr<SimpleBluez::Characteristic> _get_characteristic(BluetoothUUID const& service_uuid,
+                                                                     BluetoothUUID const& characteristic_uuid);
 };
 
 }  // namespace SimpleBLE
