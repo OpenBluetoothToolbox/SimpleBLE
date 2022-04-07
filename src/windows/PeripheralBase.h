@@ -27,6 +27,7 @@ class PeripheralBase {
 
     std::string identifier();
     BluetoothAddress address();
+    int16_t rssi();
 
     void connect();
     void disconnect();
@@ -47,6 +48,8 @@ class PeripheralBase {
     void set_callback_on_connected(std::function<void()> on_connected);
     void set_callback_on_disconnected(std::function<void()> on_disconnected);
 
+    void update_advertising_data(advertising_data_t advertising_data);
+
   private:
     BluetoothLEDevice device_ = nullptr;
 
@@ -58,6 +61,7 @@ class PeripheralBase {
     // https://docs.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.bluetoothledevice.frombluetoothaddressasync
     std::string identifier_;
     BluetoothAddress address_;
+    int16_t rssi_;
     bool connectable_;
     winrt::event_token connection_status_changed_token_;
 

@@ -24,6 +24,14 @@ std::optional<SimpleBLE::BluetoothAddress> SimpleBLE::Safe::Peripheral::address(
     }
 }
 
+std::optional<int16_t> SimpleBLE::Safe::Peripheral::rssi() noexcept {
+    try {
+        return SimpleBLE::Peripheral::rssi();
+    } catch (const SimpleBLE::Exception::BaseException& e) {
+        return std::nullopt;
+    }
+}
+
 bool SimpleBLE::Safe::Peripheral::connect() noexcept {
     try {
         SimpleBLE::Peripheral::connect();

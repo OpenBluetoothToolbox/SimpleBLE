@@ -123,6 +123,7 @@ void AdapterBase::delegate_did_discover_peripheral(void* opaque_peripheral, void
     } else {
         // Load the existing PeripheralBase object
         std::shared_ptr<PeripheralBase> base_peripheral = this->peripherals_.at(opaque_peripheral);
+        base_peripheral->update_advertising_data(advertising_data);
 
         // Convert the base object into an external-facing Peripheral object
         PeripheralBuilder peripheral_builder(base_peripheral);

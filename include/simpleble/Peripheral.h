@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #include <simpleble/Exceptions.h>
 #include <simpleble/Types.h>
@@ -20,6 +21,7 @@ class Peripheral {
 
     std::string identifier();
     BluetoothAddress address();
+    int16_t rssi();
 
     void connect();
     void disconnect();

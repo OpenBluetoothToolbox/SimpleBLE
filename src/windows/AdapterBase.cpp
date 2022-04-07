@@ -38,6 +38,7 @@ AdapterBase::AdapterBase(std::string device_id)
             data.mac_address = _mac_address_to_str(args.BluetoothAddress());
             data.identifier = winrt::to_string(args.Advertisement().LocalName());
             data.connectable = args.IsConnectable();
+            data.rssi = args.RawSignalStrengthInDBm();
 
             // Parse manufacturer data
             auto manufacturer_data = args.Advertisement().ManufacturerData();
@@ -177,6 +178,9 @@ void AdapterBase::_scan_received_callback(advertising_data_t data) {
     } else {
         // Load the existing PeripheralBase object
         std::shared_ptr<PeripheralBase> base_peripheral = this->peripherals_.at(data.mac_address);
+
+        // Update the PeripheralBase object
+        base_peripheral->update_advertising_data(data);
 
         // Convert the base object into an external-facing Peripheral object
         PeripheralBuilder peripheral_builder(base_peripheral);

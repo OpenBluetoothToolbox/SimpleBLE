@@ -18,6 +18,7 @@ class PeripheralBase {
 
     std::string identifier();
     BluetoothAddress address();
+    int16_t rssi();
 
     void connect();
     void disconnect();
@@ -41,11 +42,15 @@ class PeripheralBase {
     void delegate_did_connect();
     void delegate_did_disconnect();
 
+    void update_advertising_data(advertising_data_t advertising_data);
+
   protected:
     /**
      * Holds a pointer to the Objective-C representation of this object.
      */
     void* opaque_internal_;
+
+    int16_t rssi_;
 
     bool is_connectable_;
 

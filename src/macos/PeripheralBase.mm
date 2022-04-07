@@ -36,6 +36,16 @@ BluetoothAddress PeripheralBase::address() {
     return std::string([[internal address] UTF8String]);
 }
 
+int16_t PeripheralBase::rssi() {
+    return rssi_;
+}
+
+void PeripheralBase::update_advertising_data(advertising_data_t advertising_data) {
+    is_connectable_ = advertising_data.connectable;
+    manufacturer_data_ = advertising_data.manufacturer_data;
+    rssi_ = advertising_data.rssi;
+}
+
 void PeripheralBase::connect() {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
     [internal connect];
