@@ -16,6 +16,7 @@ PeripheralBase::PeripheralBase(void* opaque_peripheral, void* opaque_adapter, ad
     is_connectable_ = advertising_data.connectable;
     manual_disconnect_triggered_ = false;
     manufacturer_data_ = advertising_data.manufacturer_data;
+    rssi_ = advertising_data.rssi;
 }
 
 PeripheralBase::~PeripheralBase() {
