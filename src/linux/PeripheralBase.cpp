@@ -26,6 +26,8 @@ std::string PeripheralBase::identifier() { return device_->name(); }
 
 BluetoothAddress PeripheralBase::address() { return device_->address(); }
 
+int16_t PeripheralBase::rssi() { return device_->rssi(); }
+
 void PeripheralBase::connect() {
     // Set the OnDisconnected callback
     device_->set_on_disconnected([this]() {

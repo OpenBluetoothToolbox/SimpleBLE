@@ -15,6 +15,7 @@ class Peripheral : public SimpleBLE::Peripheral {
 
     std::optional<std::string> identifier() noexcept;
     std::optional<BluetoothAddress> address() noexcept;
+    std::optional<int16_t> rssi() noexcept;
 
     bool connect() noexcept;
     bool disconnect() noexcept;

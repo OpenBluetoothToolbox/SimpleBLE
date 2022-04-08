@@ -15,6 +15,8 @@ std::string Peripheral::identifier() { return internal_->identifier(); }
 
 BluetoothAddress Peripheral::address() { return internal_->address(); }
 
+int16_t Peripheral::rssi() { return internal_->rssi(); }
+
 void Peripheral::connect() { internal_->connect(); }
 
 void Peripheral::disconnect() { internal_->disconnect(); }

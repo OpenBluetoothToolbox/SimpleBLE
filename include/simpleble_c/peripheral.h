@@ -38,6 +38,14 @@ char* simpleble_peripheral_address(simpleble_peripheral_t handle);
  * @brief
  *
  * @param handle
+ * @return int16_t
+ */
+int16_t simpleble_peripheral_rssi(simpleble_peripheral_t handle);
+
+/**
+ * @brief
+ *
+ * @param handle
  * @return simpleble_err_t
  */
 simpleble_err_t simpleble_peripheral_connect(simpleble_peripheral_t handle);

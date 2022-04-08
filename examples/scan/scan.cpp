@@ -30,11 +30,11 @@ int main(int argc, char* argv[]) {
     adapter.set_callback_on_scan_stop([]() { std::cout << "Scan stopped." << std::endl; });
 
     adapter.set_callback_on_scan_found([](SimpleBLE::Peripheral peripheral) {
-        std::cout << "Found device: " << peripheral.identifier() << " [" << peripheral.address() << "]" << std::endl;
+        std::cout << "Found device: " << peripheral.identifier() << " [" << peripheral.address() << "] " << peripheral.rssi() << " dBm" << std::endl;
     });
 
     adapter.set_callback_on_scan_updated([](SimpleBLE::Peripheral peripheral) {
-        std::cout << "Updated device: " << peripheral.identifier() << " [" << peripheral.address() << "]" << std::endl;
+        std::cout << "Updated device: " << peripheral.identifier() << " [" << peripheral.address() << "] " << peripheral.rssi() << " dBm" << std::endl;
     });
 
     // Scan for 5 seconds.

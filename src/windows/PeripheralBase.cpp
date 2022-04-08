@@ -18,6 +18,7 @@ using namespace std::chrono_literals;
 PeripheralBase::PeripheralBase(advertising_data_t advertising_data) {
     identifier_ = advertising_data.identifier;
     address_ = advertising_data.mac_address;
+    rssi_ = advertising_data.rssi;
     manufacturer_data_ = advertising_data.manufacturer_data;
     connectable_ = advertising_data.connectable;
     device_ = async_get(
@@ -33,6 +34,13 @@ PeripheralBase::~PeripheralBase() {
 std::string PeripheralBase::identifier() { return identifier_; }
 
 BluetoothAddress PeripheralBase::address() { return address_; }
+
+int16_t PeripheralBase::rssi() { return rssi_; }
+
+void PeripheralBase::update_advertising_data(advertising_data_t advertising_data) {
+    rssi_ = advertising_data.rssi;
+    manufacturer_data_ = advertising_data.manufacturer_data;
+}
 
 void PeripheralBase::connect() {
     // Attempt to connect to the device.
