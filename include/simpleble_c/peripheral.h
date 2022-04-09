@@ -80,6 +80,15 @@ simpleble_err_t simpleble_peripheral_is_connectable(simpleble_peripheral_t handl
  * @brief
  *
  * @param handle
+ * @param paired
+ * @return simpleble_err_t
+ */
+simpleble_err_t simpleble_peripheral_is_paired(simpleble_peripheral_t handle, bool* paired);
+
+/**
+ * @brief
+ *
+ * @param handle
  * @return simpleble_err_t
  */
 simpleble_err_t simpleble_peripheral_unpair(simpleble_peripheral_t handle);

@@ -104,6 +104,8 @@ void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_
     }
 }
 
+std::vector<Peripheral> AdapterBase::get_paired_peripherals() { throw Exception::OperationNotSupported(); }
+
 // Delegate methods passed for AdapterBaseMacOS
 
 void AdapterBase::delegate_did_discover_peripheral(void* opaque_peripheral, void* opaque_adapter, advertising_data_t advertising_data) {

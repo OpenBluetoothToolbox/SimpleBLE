@@ -74,6 +74,8 @@ bool PeripheralBase::is_connected() {
 
 bool PeripheralBase::is_connectable() { return device_->name() != ""; }
 
+bool PeripheralBase::is_paired() { return device_->paired(); }
+
 void PeripheralBase::unpair() {
     if (device_->paired()) {
         adapter_->device_remove(device_->path());

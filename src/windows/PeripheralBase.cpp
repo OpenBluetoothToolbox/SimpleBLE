@@ -87,6 +87,8 @@ bool PeripheralBase::is_connected() {
 
 bool PeripheralBase::is_connectable() { return connectable_; }
 
+bool PeripheralBase::is_paired() { throw Exception::OperationNotSupported(); }
+
 void PeripheralBase::unpair() { throw Exception::OperationNotSupported(); }
 
 std::vector<BluetoothService> PeripheralBase::services() {

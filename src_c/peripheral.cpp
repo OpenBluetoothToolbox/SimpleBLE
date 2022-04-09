@@ -92,6 +92,18 @@ simpleble_err_t simpleble_peripheral_is_connectable(simpleble_peripheral_t handl
     return is_connectable.has_value() ? SIMPLEBLE_SUCCESS : SIMPLEBLE_FAILURE;
 }
 
+simpleble_err_t simpleble_peripheral_is_paired(simpleble_peripheral_t handle, bool* paired) {
+    if (handle == nullptr || paired == nullptr) {
+        return SIMPLEBLE_FAILURE;
+    }
+
+    SimpleBLE::Safe::Peripheral* peripheral = (SimpleBLE::Safe::Peripheral*)handle;
+
+    std::optional<bool> is_paired = peripheral->is_paired();
+    *paired = is_paired.value_or(false);
+    return is_paired.has_value() ? SIMPLEBLE_SUCCESS : SIMPLEBLE_FAILURE;
+}
+
 simpleble_err_t simpleble_peripheral_unpair(simpleble_peripheral_t handle) {
     if (handle == nullptr) {
         return SIMPLEBLE_FAILURE;

@@ -101,7 +101,7 @@ size_t simpleble_adapter_scan_get_results_count(simpleble_adapter_t handle);
 /**
  * @brief
  *
- * @note The user is responsible for freeing the returned adapter object
+ * @note The user is responsible for freeing the returned peripheral object
  *       by calling `simpleble_peripheral_release_handle`.
  *
  * @param handle
@@ -109,6 +109,27 @@ size_t simpleble_adapter_scan_get_results_count(simpleble_adapter_t handle);
  * @return simpleble_peripheral_t
  */
 simpleble_peripheral_t simpleble_adapter_scan_get_results_handle(simpleble_adapter_t handle, size_t index);
+
+
+/**
+ * @brief
+ *
+ * @param handle
+ * @return size_t
+ */
+size_t simpleble_adapter_get_paired_peripherals_count(simpleble_adapter_t handle);
+
+/**
+ * @brief
+ *
+ * @note The user is responsible for freeing the returned peripheral object
+ *       by calling `simpleble_peripheral_release_handle`.
+ *
+ * @param handle
+ * @param index
+ * @return simpleble_peripheral_t
+ */
+simpleble_peripheral_t simpleble_adapter_get_paired_peripherals_handle(simpleble_adapter_t handle, size_t index);
 
 /**
  * @brief

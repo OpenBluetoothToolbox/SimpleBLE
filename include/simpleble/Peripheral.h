@@ -19,6 +19,8 @@ class Peripheral {
     Peripheral();
     virtual ~Peripheral();
 
+    bool initialized() const;
+
     std::string identifier();
     BluetoothAddress address();
     int16_t rssi();
@@ -27,6 +29,7 @@ class Peripheral {
     void disconnect();
     bool is_connected();
     bool is_connectable();
+    bool is_paired();
     void unpair();
 
     std::vector<BluetoothService> services();
