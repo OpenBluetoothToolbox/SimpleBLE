@@ -12,6 +12,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 **Added**
 
 -  Expose RSSI as a property of ``SimpleBLE::Peripheral``.
+-  Utils function to identify the current platform.
 
 **Changed**
 
