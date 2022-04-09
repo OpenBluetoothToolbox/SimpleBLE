@@ -13,6 +13,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 -  Expose RSSI as a property of ``SimpleBLE::Peripheral``.
 -  Utils function to identify the current platform.
+-  (Linux) ``SimpleBLE::Peripheral::is_paired`` method to check if a peripheral is paired.
+-  (Linux) ``SimpleBLE::Adapter::get_paired_peripherals`` method to list all paired peripherals.
+-  Function to validate whether an Adapter or Peripheral object is initialized.
 
 **Changed**
 

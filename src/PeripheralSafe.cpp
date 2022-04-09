@@ -66,6 +66,14 @@ std::optional<bool> SimpleBLE::Safe::Peripheral::is_connectable() noexcept {
     }
 }
 
+std::optional<bool> SimpleBLE::Safe::Peripheral::is_paired() noexcept {
+    try {
+        return SimpleBLE::Peripheral::is_paired();
+    } catch (const SimpleBLE::Exception::BaseException& e) {
+        return std::nullopt;
+    }
+}
+
 bool SimpleBLE::Safe::Peripheral::unpair() noexcept {
     try {
         SimpleBLE::Peripheral::unpair();

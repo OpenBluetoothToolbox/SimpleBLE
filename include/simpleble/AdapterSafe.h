@@ -26,6 +26,8 @@ class Adapter : public SimpleBLE::Adapter {
     bool set_callback_on_scan_updated(std::function<void(SimpleBLE::Safe::Peripheral)> on_scan_updated) noexcept;
     bool set_callback_on_scan_found(std::function<void(SimpleBLE::Safe::Peripheral)> on_scan_found) noexcept;
 
+    std::optional<std::vector<SimpleBLE::Safe::Peripheral>> get_paired_peripherals() noexcept;
+
     static std::optional<std::vector<SimpleBLE::Safe::Adapter>> get_adapters() noexcept;
 };
 

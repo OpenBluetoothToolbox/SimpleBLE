@@ -33,6 +33,7 @@ class PeripheralBase {
     void disconnect();
     bool is_connected();
     bool is_connectable();
+    bool is_paired();
     void unpair();
 
     std::vector<BluetoothService> services();

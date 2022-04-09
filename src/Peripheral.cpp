@@ -9,6 +9,8 @@ Peripheral::Peripheral() {}
 
 Peripheral::~Peripheral() {}
 
+bool Peripheral::initialized() const { return internal_ != nullptr; }
+
 // TODO: Add validations to prevent calls into internal_ if not set.
 
 std::string Peripheral::identifier() { return internal_->identifier(); }
@@ -24,6 +26,8 @@ void Peripheral::disconnect() { internal_->disconnect(); }
 bool Peripheral::is_connected() { return internal_->is_connected(); }
 
 bool Peripheral::is_connectable() { return internal_->is_connectable(); }
+
+bool Peripheral::is_paired() { return internal_->is_paired(); }
 
 void Peripheral::unpair() { internal_->unpair(); }
 

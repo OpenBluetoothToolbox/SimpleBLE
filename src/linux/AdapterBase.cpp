@@ -81,6 +81,18 @@ std::vector<Peripheral> AdapterBase::scan_get_results() {
     return peripherals;
 }
 
+std::vector<Peripheral> AdapterBase::get_paired_peripherals() {
+    std::vector<Peripheral> peripherals;
+
+    auto paired_list = adapter_->device_paired_get();
+    for (auto& device : paired_list) {
+        PeripheralBuilder peripheral_builder(std::make_shared<PeripheralBase>(device, this->adapter_));
+        peripherals.push_back(peripheral_builder);
+    }
+
+    return peripherals;
+}
+
 void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start) {
     if (on_scan_start) {
         callback_on_scan_start_.load(on_scan_start);

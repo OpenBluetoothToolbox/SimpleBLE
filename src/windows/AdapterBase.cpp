@@ -123,6 +123,8 @@ std::vector<Peripheral> AdapterBase::scan_get_results() {
     return peripherals;
 }
 
+std::vector<Peripheral> AdapterBase::get_paired_peripherals() { throw Exception::OperationNotSupported(); }
+
 void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start) {
     if (on_scan_start) {
         callback_on_scan_start_.load(on_scan_start);

@@ -21,6 +21,8 @@ Adapter::Adapter() {}
 
 Adapter::~Adapter() {}
 
+bool Adapter::initialized() const { return internal_ != nullptr; }
+
 // TODO: Add validations to prevent calls into internal_ if not set.
 
 std::string Adapter::identifier() { return internal_->identifier(); }
@@ -36,6 +38,8 @@ void Adapter::scan_for(int timeout_ms) { internal_->scan_for(timeout_ms); }
 bool Adapter::scan_is_active() { return internal_->scan_is_active(); }
 
 std::vector<Peripheral> Adapter::scan_get_results() { return internal_->scan_get_results(); }
+
+std::vector<Peripheral> Adapter::get_paired_peripherals() { return internal_->get_paired_peripherals(); }
 
 void Adapter::set_callback_on_scan_start(std::function<void()> on_scan_start) {
     internal_->set_callback_on_scan_start(on_scan_start);
