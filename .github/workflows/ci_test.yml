@@ -1,0 +1,112 @@
+name: CI Test
+
+on: [push, pull_request]
+
+jobs:
+
+# ------------------------------------------------------------
+  test-windows:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        os: [windows-2019]
+
+    steps:
+    - name: Clone Repository
+      uses: actions/checkout@v2
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+    - name: Clone and build GTest
+      run: |
+        git clone https://github.com/google/googletest
+        cmake --build . --config Release -j 4 --parallel 4
+      shell: bash
+    - name: Compile Tests for Windows x86
+      run: |
+        mkdir %GITHUB_WORKSPACE%\build_test
+        cd %GITHUB_WORKSPACE%\build_test
+        cmake -G "Visual Studio 16 2019" -A Win32 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 ../test
+        cmake --build . --config Release -j 4 --parallel 4
+      shell: cmd
+    - name: Run tests
+      run: |
+        cd $GITHUB_WORKSPACE/build_test
+        ls -al
+        ./simpleble_test.exe
+
+  # ------------------------------------------------------------
+  
+  test-macos:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        os: [macos-11.0]
+
+    steps:
+    - name: Clone Repository
+      uses: actions/checkout@v2
+    - name: Setup Cmake
+      uses: jwlawson/actions-setup-cmake@v1.4
+      with:
+        cmake-version: '3.16.x'
+    - name: Clone and build GTest
+      run: |
+        git clone https://github.com/google/googletest
+        cmake --build . --config Release -j 4 --parallel 4
+      shell: bash
+    - name: Compile Tests for MacOS arm64
+      run: |
+        mkdir $GITHUB_WORKSPACE/build_test
+        cd $GITHUB_WORKSPACE/build_test
+        cmake -DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release ../test
+        make -j2
+    - name: Run tests
+      run: |
+        cd $GITHUB_WORKSPACE/build_test
+        ./simpleble_test
+
+  # ------------------------------------------------------------
+
+  test-linux:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        os: [ubuntu-20.04]
+
+    steps:
+    - name: Clone Repository
+      uses: actions/checkout@v2
+    - name: Install Dependencies
+      run: |
+        sudo -H apt-get update -y
+        sudo -H apt-get install -y libdbus-1-dev
+      env:
+        DEBIAN_FRONTEND: noninteractive
+    - name: Setup Cmake
+      uses: jwlawson/actions-setup-cmake@v1.4
+      with:
+        cmake-version: '3.16.x'
+    - name: Clone and build GTest
+      run: |
+        git clone https://github.com/google/googletest
+        cmake --build . --config Release -j 4 --parallel 4
+      shell: bash
+    - name:  Compile Tests for Ubuntu
+      run: |
+        mkdir $GITHUB_WORKSPACE/build_test
+        cd $GITHUB_WORKSPACE/build_test
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release ../test
+        make -j2
+    - name: Run tests
+      run: |
+        cd $GITHUB_WORKSPACE/build_test
+        ./simpleble_test

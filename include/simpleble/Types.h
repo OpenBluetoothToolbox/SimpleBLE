@@ -21,4 +21,10 @@ typedef struct {
     std::vector<BluetoothUUID> characteristics;
 } BluetoothService;
 
+enum class OperatingSystem {
+    WINDOWS,
+    MACOS,
+    LINUX,
+};
+
 }  // namespace SimpleBLE
