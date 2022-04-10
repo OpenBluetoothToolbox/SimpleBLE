@@ -1,6 +1,6 @@
 #include <simpleble/Utils.h>
 
-using namespace SimpleBLE;
+namespace SimpleBLE {
 
 OperatingSystem get_operating_system() {
 #ifdef _WIN32
@@ -11,3 +11,5 @@ OperatingSystem get_operating_system() {
     return OperatingSystem::LINUX;
 #endif
 }
+
+}  // namespace SimpleBLE

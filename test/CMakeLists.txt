@@ -19,6 +19,7 @@ find_package(GTest REQUIRED)
 set(
   SRC_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/test_utils.cpp
 )
 
 add_executable(simpleble_test ${SRC_FILES})
