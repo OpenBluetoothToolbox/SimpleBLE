@@ -43,6 +43,7 @@ set(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PeripheralBuilder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AdapterSafe.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PeripheralSafe.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils.cpp
 )
 
 set(
