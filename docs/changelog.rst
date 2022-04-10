@@ -21,6 +21,11 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 -  Updated Linux implementation to use SimpleBluez v0.4.0.
 
+**Fixed**
+
+- (MacOS) Known peripherals would not get cleared at the beginning of a scanning session.
+- (Windows) Known peripherals would not get cleared at the beginning of a scanning session.
+
 [0.3.0] - 2022-04-03
 --------------------
 

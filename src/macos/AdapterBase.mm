@@ -39,6 +39,8 @@ std::string AdapterBase::identifier() { return "Default Adapter"; }
 BluetoothAddress AdapterBase::address() { return "00:00:00:00:00:00"; }
 
 void AdapterBase::scan_start() {
+    this->peripherals_.clear();
+
     AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)opaque_internal_;
     [internal scanStart];
 
