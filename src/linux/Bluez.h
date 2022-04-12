@@ -18,9 +18,13 @@ class Bluez {
     Bluez(Bluez& other) = delete;           // Remove the copy constructor
     void operator=(const Bluez&) = delete;  // Remove the copy assignment
 
-    std::thread* async_thread;
+    std::thread async_thread;
     std::atomic_bool async_thread_active;
     void async_thread_function();
+
+    void start_async_thread();
+    void stop_async_thread();
+
 };
 
 }  // namespace SimpleBLE
