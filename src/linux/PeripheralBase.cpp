@@ -136,15 +136,19 @@ ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const
     return _get_characteristic(service, characteristic)->read();
 }
 
-void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) {
+void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                   ByteArray const& data) {
     // TODO: Check if the characteristic is writable.
-    // TODO: SimpleBluez::Characteristic::write_request() should also take ByteArray by const reference (but that's another library)
+    // TODO: SimpleBluez::Characteristic::write_request() should also take ByteArray by const reference (but that's
+    // another library)
     _get_characteristic(service, characteristic)->write_request(data);
 }
 
-void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) {
+void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                   ByteArray const& data) {
     // TODO: Check if the characteristic is writable.
-    // TODO: SimpleBluez::Characteristic::write_command() should also take ByteArray by const reference (but that's another library)
+    // TODO: SimpleBluez::Characteristic::write_command() should also take ByteArray by const reference (but that's
+    // another library)
     _get_characteristic(service, characteristic)->write_command(data);
 }
 
