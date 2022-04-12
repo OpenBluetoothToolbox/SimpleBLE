@@ -27,10 +27,9 @@ class Peripheral : public SimpleBLE::Peripheral {
     std::optional<std::vector<BluetoothService>> services() noexcept;
     std::optional<std::map<uint16_t, ByteArray>> manufacturer_data() noexcept;
 
-    // TODO: The ByteArrays in the following functions could probably be passed by reference as well
     std::optional<ByteArray> read(BluetoothUUID const& service, BluetoothUUID const& characteristic) noexcept;
-    bool write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray data) noexcept;
-    bool write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray data) noexcept;
+    bool write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) noexcept;
+    bool write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) noexcept;
     bool notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                 std::function<void(ByteArray payload)> callback) noexcept;
     bool indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,

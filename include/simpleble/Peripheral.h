@@ -35,10 +35,9 @@ class Peripheral {
     std::vector<BluetoothService> services();
     std::map<uint16_t, ByteArray> manufacturer_data();
 
-    // TODO: The ByteArrays in the following functions could probably be passed by reference as well
     ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic);
-    void write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray data);
-    void write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray data);
+    void write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data);
+    void write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data);
     void notify(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback);
     void indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback);
     void unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic);

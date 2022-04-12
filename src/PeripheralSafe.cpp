@@ -107,7 +107,7 @@ std::optional<SimpleBLE::ByteArray> SimpleBLE::Safe::Peripheral::read(BluetoothU
 }
 
 bool SimpleBLE::Safe::Peripheral::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                                ByteArray data) noexcept {
+                                                ByteArray const& data) noexcept {
     try {
         SimpleBLE::Peripheral::write_request(service, characteristic, data);
         return true;
@@ -117,7 +117,7 @@ bool SimpleBLE::Safe::Peripheral::write_request(BluetoothUUID const& service, Bl
 }
 
 bool SimpleBLE::Safe::Peripheral::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                                ByteArray data) noexcept {
+                                                ByteArray const& data) noexcept {
     try {
         SimpleBLE::Peripheral::write_command(service, characteristic, data);
         return true;

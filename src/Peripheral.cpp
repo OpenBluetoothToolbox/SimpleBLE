@@ -45,7 +45,7 @@ ByteArray Peripheral::read(BluetoothUUID const& service, BluetoothUUID const& ch
     return internal_->read(service, characteristic);
 }
 
-void Peripheral::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray data) {
+void Peripheral::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) {
     if (!is_connected()) {
         throw Exception::OperationFailed();
     }
@@ -53,7 +53,7 @@ void Peripheral::write_request(BluetoothUUID const& service, BluetoothUUID const
     internal_->write_request(service, characteristic, data);
 }
 
-void Peripheral::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray data) {
+void Peripheral::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) {
     if (!is_connected()) {
         throw Exception::OperationFailed();
     }
