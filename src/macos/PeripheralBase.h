@@ -33,8 +33,10 @@ class PeripheralBase {
     ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic);
     void write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data);
     void write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data);
-    void notify(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback);
-    void indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback);
+    void notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                std::function<void(ByteArray payload)> callback);
+    void indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                  std::function<void(ByteArray payload)> callback);
     void unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic);
 
     void set_callback_on_connected(std::function<void()> on_connected);

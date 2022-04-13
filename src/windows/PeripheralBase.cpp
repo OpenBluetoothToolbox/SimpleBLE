@@ -123,7 +123,8 @@ ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const
     return ibuffer_to_bytearray(result.Value());
 }
 
-void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) {
+void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                   ByteArray const& data) {
     GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
 
     // Validate that the operation can be performed.
@@ -142,7 +143,8 @@ void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID c
     }
 }
 
-void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) {
+void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                   ByteArray const& data) {
     GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
 
     // Validate that the operation can be performed.
