@@ -28,8 +28,8 @@ int main(int argc, char* argv[]) {
 
     int adapter_selection = -1;
     while(adapter_selection < 0 || adapter_selection > adapter_list->size() - 1) {
-	    std::cout << "Please select an adapter: ";
-	    std::cin >> adapter_selection;
+        std::cout << "Please select an adapter: ";
+        std::cin >> adapter_selection;
     }
 
     SimpleBLE::Safe::Adapter& adapter = adapter_list->at(adapter_selection);

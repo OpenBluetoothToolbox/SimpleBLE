@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
 
     if (adapter_list.size() == 0) {
         std::cout << "No adapter was found." << std::endl;
-	    return 1;
+        return 1;
     }
 
     std::cout << "Available adapters: \n";
@@ -23,8 +23,8 @@ int main(int argc, char* argv[]) {
 
     int adapter_selection = -1;
     while(adapter_selection < 0 || adapter_selection > adapter_list.size() - 1) {
-	    std::cout << "Please select an adapter: ";
-	    std::cin >> adapter_selection;
+        std::cout << "Please select an adapter: ";
+        std::cin >> adapter_selection;
     }
 
     SimpleBLE::Adapter& adapter = adapter_list[adapter_selection];
