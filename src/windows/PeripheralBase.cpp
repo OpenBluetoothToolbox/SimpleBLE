@@ -106,7 +106,7 @@ std::vector<BluetoothService> PeripheralBase::services() {
 
 std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() { return manufacturer_data_; }
 
-ByteArray PeripheralBase::read(BluetoothUUID service, BluetoothUUID characteristic) {
+ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
 
     // Validate that the operation can be performed.
@@ -123,7 +123,7 @@ ByteArray PeripheralBase::read(BluetoothUUID service, BluetoothUUID characterist
     return ibuffer_to_bytearray(result.Value());
 }
 
-void PeripheralBase::write_request(BluetoothUUID service, BluetoothUUID characteristic, ByteArray const& data) {
+void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) {
     GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
 
     // Validate that the operation can be performed.
@@ -142,7 +142,7 @@ void PeripheralBase::write_request(BluetoothUUID service, BluetoothUUID characte
     }
 }
 
-void PeripheralBase::write_command(BluetoothUUID service, BluetoothUUID characteristic, ByteArray const& data) {
+void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) {
     GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
 
     // Validate that the operation can be performed.
@@ -161,7 +161,7 @@ void PeripheralBase::write_command(BluetoothUUID service, BluetoothUUID characte
     }
 }
 
-void PeripheralBase::notify(BluetoothUUID service, BluetoothUUID characteristic,
+void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                             std::function<void(ByteArray payload)> callback) {
     GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
 
@@ -187,7 +187,7 @@ void PeripheralBase::notify(BluetoothUUID service, BluetoothUUID characteristic,
     }
 }
 
-void PeripheralBase::indicate(BluetoothUUID service, BluetoothUUID characteristic,
+void PeripheralBase::indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                               std::function<void(ByteArray payload)> callback) {
     GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
 
@@ -213,7 +213,7 @@ void PeripheralBase::indicate(BluetoothUUID service, BluetoothUUID characteristi
     }
 }
 
-void PeripheralBase::unsubscribe(BluetoothUUID service, BluetoothUUID characteristic) {
+void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic);
 
     // Start the indication.
@@ -227,7 +227,7 @@ void PeripheralBase::unsubscribe(BluetoothUUID service, BluetoothUUID characteri
 
 void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) {
     if (on_connected) {
-        callback_on_connected_.load(on_connected);
+        callback_on_connected_.load(std::move(on_connected));
     } else {
         callback_on_connected_.unload();
     }
@@ -235,7 +235,7 @@ void PeripheralBase::set_callback_on_connected(std::function<void()> on_connecte
 
 void PeripheralBase::set_callback_on_disconnected(std::function<void()> on_disconnected) {
     if (on_disconnected) {
-        callback_on_disconnected_.load(on_disconnected);
+        callback_on_disconnected_.load(std::move(on_disconnected));
     } else {
         callback_on_disconnected_.unload();
     }
