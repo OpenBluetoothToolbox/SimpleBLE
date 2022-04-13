@@ -20,18 +20,16 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // Pick the first detected adapter as the default.
-    // TODO: Allow the user to pick an adapter.
     std::cout << "Available adapters: \n";
-
-    for (int i = 0; auto& adapter : *adapter_list) {
+    int i = 0;
+    for ( auto& adapter : *adapter_list) {
         std::cout << "[" << i++ << "] " << adapter.identifier().value() << " [" << adapter.address().value() << "]" << std::endl;
     }
 
     int adapter_selection = -1;
     while(adapter_selection < 0 || adapter_selection > adapter_list->size() - 1) {
-	std::cout << "Please select an adapter: ";
-	std::cin >> adapter_selection;
+	    std::cout << "Please select an adapter: ";
+	    std::cin >> adapter_selection;
     }
 
     SimpleBLE::Safe::Adapter& adapter = adapter_list->at(adapter_selection);
