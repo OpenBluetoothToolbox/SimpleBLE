@@ -15,8 +15,8 @@ class AdapterBase;
 
 class Adapter {
   public:
-    Adapter();
-    virtual ~Adapter();
+    Adapter() = default;
+    virtual ~Adapter() = default;
 
     bool initialized() const;
 

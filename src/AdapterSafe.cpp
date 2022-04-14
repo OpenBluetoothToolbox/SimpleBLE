@@ -2,8 +2,6 @@
 
 SimpleBLE::Safe::Adapter::Adapter(SimpleBLE::Adapter& adapter) : SimpleBLE::Adapter(adapter) {}
 
-SimpleBLE::Safe::Adapter::~Adapter() {}
-
 std::optional<std::string> SimpleBLE::Safe::Adapter::identifier() noexcept {
     try {
         return SimpleBLE::Adapter::identifier();
