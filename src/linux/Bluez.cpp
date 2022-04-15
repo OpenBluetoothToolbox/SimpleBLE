@@ -1,17 +1,8 @@
 #include "Bluez.h"
 #include <mutex>
 #include <unistd.h> // Linux-specific header for fork-related stuff
+#include <iostream> // TODO: this is only for temporary error handling
 
-
-/* 
- * Based on https://stackoverflow.com/questions/39890363/what-happens-when-a-thread-forks 
- * and https://man7.org/linux/man-pages/man3/fork.3p.html , "If a multi-
- * threaded process calls fork(), the new process shall contain
- * a replica of the calling thread". The other threads remain in some kind of "frozen" state.
- * I don't know how to wake them back up, and in order to avoid resource leaks caused by those 
- * suspended threads accumulating, it's best to stop the thread polling bluez.run_async() 
- * before forking, and restart it afterwards. 
- */
 
 using namespace SimpleBLE;
 
@@ -26,41 +17,36 @@ Bluez* Bluez::get() {
     // static std::mutex get_mutex;       // Static mutex to ensure thread safety when accessing the logger
     // std::scoped_lock lock(get_mutex);  // Unlock the mutex on function return
 
-    static Bluez instance;             // Static instance of the logger to ensure proper lifecycle management
+    // Static instance of the logger to ensure proper lifecycle management
+    static Bluez instance = []() -> Bluez { 
+	// Setting the fork handlers must be done here and not in the constructor of Bluez, because then
+	// Bluez::get() would have to be called from the constructor while instance is being initialized, 
+	// and that kind of recursion is UB [stmt.dcl#3].
+
+	// Remove old fork handlers, if any
+	// TODO: handle error better
+	if(pthread_atfork(nullptr, nullptr, nullptr)) std::cout << "pthread_atfork() error" << std::endl;
+
+	// Set the fork handlers
+	// TODO: handle error better
+	if(pthread_atfork(
+	    // This is called in the parent before fork():
+	    +[]() -> void { instance.stop_async_thread(); },
+	    // This is called in the parent after fork() completes:
+	    +[]() -> void { instance.start_async_thread(); },
+	    // This is called in the child after fork() completes:
+	    +[]() -> void { instance.start_async_thread(); }
+	)) std::cout << "pthread_atfork() error" << std::endl;
+	
+	// We're returning a pr-value, all copies are elided in this initialization
+	return {};
+    }();
 
     return &instance;
 }
 
 
 Bluez::Bluez() {
-    /*
-     * This solution would register functions to be called each time fork() is called.
-     * But since the child handler is not allowed to call any function that's not
-     * async-signal-safe (man 7 signal-safety), there's no way to use the handler
-     * to start a thread.
-     * Additionally, async_thread would have to be made static, since there's no way
-     * to pass user-data to pthread_atfork().
-     */
-
-    /*
-     * Overall, this seems like a bad solution. Perhaps it would be better to write
-     * our own wrapper for fork(), but that would be a change in the API of the library.
-     */
-       
-    /*
-    // Remove old fork handlers
-    if(pthread_atfork(nullptr, nullptr, nullptr) != 0) ; // TODO: handle error
-
-    // Set the fork handlers
-    if(pthread_atfork(
-	// This is called in the parent before fork():
-	+[]() -> void { async_thread_stop(); },
-	// This is called in the parent after fork() completes:
-	+[]() -> void { start_async_thread(); },
-	// This is called in the child after fork() completes:
-	+[]() -> void { start_async_thread(); }
-    ) != 0) ; // TODO: handle error
-    */
 
 
     bluez.init();
@@ -100,4 +86,5 @@ void Bluez::stop_async_thread() {
     async_thread.join();
 }
 
-
+void Bluez::set_fork_handlers() {
+}

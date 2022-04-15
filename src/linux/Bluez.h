@@ -25,6 +25,8 @@ class Bluez {
     void start_async_thread();
     void stop_async_thread();
 
+    static void set_fork_handlers();
+
 };
 
 }  // namespace SimpleBLE
