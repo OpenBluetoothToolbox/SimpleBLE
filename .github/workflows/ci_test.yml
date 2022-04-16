@@ -24,15 +24,15 @@ jobs:
         git clone https://github.com/google/googletest
         cd %GITHUB_WORKSPACE%\googletest
         cmake . -B build -Dgtest_force_shared_crt=ON
-        cmake --build .\build --config Release -j 4 --parallel 4
+        cmake --build .\build --config Release --parallel 4
         cmake --install .\build --prefix .\install
       shell: cmd
     - name: Compile Tests for Windows x86
       run: |
         mkdir %GITHUB_WORKSPACE%\build_test
         cd %GITHUB_WORKSPACE%\build_test
-        cmake -G "Visual Studio 16 2019" -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -DGTEST_ROOT=%GITHUB_WORKSPACE%\googletest\install ../test
-        cmake --build . --config Release -j 4 --parallel 4
+        cmake -G "Visual Studio 16 2019" -DCMAKE_SYSTEM_VERSION=10.0.22000.0 -DGTEST_ROOT=%GITHUB_WORKSPACE%\googletest\install ../test
+        cmake --build . --config Release --parallel 4
       shell: cmd
     - name: Run tests
       run: |
@@ -63,14 +63,14 @@ jobs:
         git clone https://github.com/google/googletest
         cd $GITHUB_WORKSPACE/googletest
         cmake . -B build
-        cmake --build ./build --config Release -j 4 --parallel 4
+        cmake --build ./build --config Release --parallel 4
         cmake --install ./build --prefix ./install
     - name: Compile Tests for MacOS arm64
       run: |
         mkdir $GITHUB_WORKSPACE/build_test
         cd $GITHUB_WORKSPACE/build_test
         cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release -DGTEST_ROOT=$GITHUB_WORKSPACE/googletest/install ../test
-        make -j2
+        cmake --build . --config Release --parallel 4
     - name: Run tests
       run: |
         cd $GITHUB_WORKSPACE/build_test
@@ -105,14 +105,14 @@ jobs:
         git clone https://github.com/google/googletest
         cd $GITHUB_WORKSPACE/googletest
         cmake . -B build
-        cmake --build ./build --config Release -j 4 --parallel 4
+        cmake --build ./build --config Release --parallel 4
         cmake --install ./build --prefix ./install
     - name:  Compile Tests for Ubuntu
       run: |
         mkdir $GITHUB_WORKSPACE/build_test
         cd $GITHUB_WORKSPACE/build_test
         cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release -DGTEST_ROOT=$GITHUB_WORKSPACE/googletest/install ../test
-        make -j2
+        cmake --build . --config Release --parallel 4
     - name: Run tests
       run: |
         cd $GITHUB_WORKSPACE/build_test
