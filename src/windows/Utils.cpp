@@ -4,6 +4,14 @@
 #include <iostream>
 #include <sstream>
 
+#include <sdkddkver.h>
+
+#if WDK_NTDDI_VERSION <= NTDDI_WIN10_VB
+// For Windows SDK version before 10.0.19041.0, remap functions to post-10.0.19041.0 versions
+#define WINRT_IMPL_CoGetApartmentType WINRT_CoGetApartmentType
+#define WINRT_IMPL_CoInitializeEx(ptr, type) WINRT_RoInitialize(type)
+#endif
+
 #define MAC_ADDRESS_STR_LENGTH (size_t)17  // Two chars per byte, 5 chars for colon
 
 namespace SimpleBLE {
@@ -11,12 +19,12 @@ namespace SimpleBLE {
 void initialize_winrt() {
     // Attempt to initialize the WinRT backend if not already set.
     int32_t cotype, qualifier;
-    WINRT_CoGetApartmentType(&cotype, &qualifier);
+    WINRT_IMPL_CoGetApartmentType(&cotype, &qualifier);
 
     if (cotype == -1 /* APTTYPE_CURRENT */) {
         // TODO: Investigate if multi or single threaded initialization is needed.
         winrt::apartment_type const type = winrt::apartment_type::multi_threaded;
-        winrt::hresult const result = WINRT_RoInitialize(static_cast<uint32_t>(type));
+        winrt::hresult const result = WINRT_IMPL_CoInitializeEx(nullptr, static_cast<uint32_t>(type));
     }
 }
 

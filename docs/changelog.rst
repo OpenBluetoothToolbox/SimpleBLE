@@ -20,6 +20,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 **Changed**
 
 -  Updated Linux implementation to use SimpleBluez v0.4.0.
+-  Added support for Windows SDK 10.0.22000.0
 
 **Fixed**
 
