@@ -4,6 +4,14 @@
 #include <iostream>
 #include <sstream>
 
+#include <sdkddkver.h>
+
+#if WDK_NTDDI_VERSION <= NTDDI_WIN10_VB
+// For Windows SDK version before 10.0.19041.0, remap functions to post-10.0.19041.0 versions
+#define WINRT_IMPL_CoGetApartmentType WINRT_CoGetApartmentType
+#define WINRT_IMPL_CoInitializeEx(ptr, type) WINRT_RoInitialize(type)
+#endif
+
 #define MAC_ADDRESS_STR_LENGTH (size_t)17  // Two chars per byte, 5 chars for colon
 
 namespace SimpleBLE {
