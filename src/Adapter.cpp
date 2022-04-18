@@ -19,36 +19,74 @@ std::vector<Adapter> Adapter::get_adapters() {
 
 bool Adapter::initialized() const { return internal_ != nullptr; }
 
-// TODO: Add validations to prevent calls into internal_ if not set.
+std::string Adapter::identifier() {
+    if (!initialized()) throw Exception::NotInitialized();
+    
+    return internal_->identifier();
+}
 
-std::string Adapter::identifier() { return internal_->identifier(); }
+BluetoothAddress Adapter::address() {
+    if (!initialized()) throw Exception::NotInitialized();
 
-BluetoothAddress Adapter::address() { return internal_->address(); }
+    return internal_->address();
+}
 
-void Adapter::scan_start() { internal_->scan_start(); }
+void Adapter::scan_start() {
+    if (!initialized()) throw Exception::NotInitialized();
 
-void Adapter::scan_stop() { internal_->scan_stop(); }
+    internal_->scan_start();
+}
 
-void Adapter::scan_for(int timeout_ms) { internal_->scan_for(timeout_ms); }
+void Adapter::scan_stop() {
+    if (!initialized()) throw Exception::NotInitialized();
 
-bool Adapter::scan_is_active() { return internal_->scan_is_active(); }
+    internal_->scan_stop();
+}
 
-std::vector<Peripheral> Adapter::scan_get_results() { return internal_->scan_get_results(); }
+void Adapter::scan_for(int timeout_ms) {
+    if (!initialized()) throw Exception::NotInitialized();
 
-std::vector<Peripheral> Adapter::get_paired_peripherals() { return internal_->get_paired_peripherals(); }
+    internal_->scan_for(timeout_ms);
+}
+
+bool Adapter::scan_is_active() {
+    if (!initialized()) throw Exception::NotInitialized();
+
+    return internal_->scan_is_active();
+}
+
+std::vector<Peripheral> Adapter::scan_get_results() {
+    if (!initialized()) throw Exception::NotInitialized();
+
+    return internal_->scan_get_results();
+}
+
+std::vector<Peripheral> Adapter::get_paired_peripherals() {
+    if (!initialized()) throw Exception::NotInitialized();
+
+    return internal_->get_paired_peripherals();
+}
 
 void Adapter::set_callback_on_scan_start(std::function<void()> on_scan_start) {
+    if (!initialized()) throw Exception::NotInitialized();
+
     internal_->set_callback_on_scan_start(std::move(on_scan_start));
 }
 
 void Adapter::set_callback_on_scan_stop(std::function<void()> on_scan_stop) {
+    if (!initialized()) throw Exception::NotInitialized();
+
     internal_->set_callback_on_scan_stop(std::move(on_scan_stop));
 }
 
 void Adapter::set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) {
+    if (!initialized()) throw Exception::NotInitialized();
+
     internal_->set_callback_on_scan_updated(std::move(on_scan_updated));
 }
 
 void Adapter::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {
+    if (!initialized()) throw Exception::NotInitialized();
+
     internal_->set_callback_on_scan_found(std::move(on_scan_found));
 }
