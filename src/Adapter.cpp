@@ -21,7 +21,7 @@ bool Adapter::initialized() const { return internal_ != nullptr; }
 
 std::string Adapter::identifier() {
     if (!initialized()) throw Exception::NotInitialized();
-    
+
     return internal_->identifier();
 }
 
