@@ -26,6 +26,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 - (MacOS) Known peripherals would not get cleared at the beginning of a scanning session.
 - (Windows) Known peripherals would not get cleared at the beginning of a scanning session.
+- Calling functions of uninitialized objects will now throw an exception instead of crashing.
 
 [0.3.0] - 2022-04-03
 --------------------
@@ -34,7 +35,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 -  Pairing functionality has been validated on all supported operating systems.
    In the case of Windows and MacOS, the user will be required to interact with
-   an operating system popup to pair the device, while on Linux all pairing 
+   an operating system popup to pair the device, while on Linux all pairing
    requests will automatically be accepted, with passcodes ``abc123`` or ``123456``.
 -  Unpair command has been added, although the only working implementation
    will be the linux one. Both Windows and MacOS require the user to manually
