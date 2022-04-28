@@ -7,49 +7,49 @@ using namespace SimpleBLE;
 
 bool Peripheral::initialized() const { return internal_ != nullptr; }
 
-std::string Peripheral::identifier() {
+std::string Peripheral::identifier() const {
     if (!initialized()) throw Exception::NotInitialized();
 
     return internal_->identifier();
 }
 
-BluetoothAddress Peripheral::address() {
+BluetoothAddress Peripheral::address() const {
     if (!initialized()) throw Exception::NotInitialized();
 
     return internal_->address();
 }
 
-int16_t Peripheral::rssi() {
+int16_t Peripheral::rssi() const {
     if (!initialized()) throw Exception::NotInitialized();
 
     return internal_->rssi();
 }
 
-void Peripheral::connect() {
+void Peripheral::connect() const {
     if (!initialized()) throw Exception::NotInitialized();
 
     internal_->connect();
 }
 
-void Peripheral::disconnect() {
+void Peripheral::disconnect() const {
     if (!initialized()) throw Exception::NotInitialized();
 
     internal_->disconnect();
 }
 
-bool Peripheral::is_connected() {
+bool Peripheral::is_connected() const {
     if (!initialized()) throw Exception::NotInitialized();
 
     return internal_->is_connected();
 }
 
-bool Peripheral::is_connectable() {
+bool Peripheral::is_connectable() const {
     if (!initialized()) throw Exception::NotInitialized();
 
     return internal_->is_connectable();
 }
 
-bool Peripheral::is_paired() {
+bool Peripheral::is_paired() const {
     if (!initialized()) throw Exception::NotInitialized();
 
     return internal_->is_paired();
@@ -61,14 +61,14 @@ void Peripheral::unpair() {
     internal_->unpair();
 }
 
-std::vector<BluetoothService> Peripheral::services() {
+std::vector<BluetoothService> Peripheral::services() const {
     if (!initialized()) throw Exception::NotInitialized();
     if (!is_connected()) throw Exception::OperationFailed();
 
     return internal_->services();
 }
 
-std::map<uint16_t, ByteArray> Peripheral::manufacturer_data() {
+std::map<uint16_t, ByteArray> Peripheral::manufacturer_data() const {
     if (!initialized()) throw Exception::NotInitialized();
 
     return internal_->manufacturer_data();

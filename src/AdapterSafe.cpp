@@ -2,7 +2,7 @@
 
 SimpleBLE::Safe::Adapter::Adapter(SimpleBLE::Adapter& adapter) : SimpleBLE::Adapter(adapter) {}
 
-std::optional<std::string> SimpleBLE::Safe::Adapter::identifier() noexcept {
+std::optional<std::string> SimpleBLE::Safe::Adapter::identifier() const noexcept {
     try {
         return SimpleBLE::Adapter::identifier();
     } catch (const SimpleBLE::Exception::BaseException&) {
@@ -10,7 +10,7 @@ std::optional<std::string> SimpleBLE::Safe::Adapter::identifier() noexcept {
     }
 }
 
-std::optional<SimpleBLE::BluetoothAddress> SimpleBLE::Safe::Adapter::address() noexcept {
+std::optional<SimpleBLE::BluetoothAddress> SimpleBLE::Safe::Adapter::address() const noexcept {
     try {
         return SimpleBLE::Adapter::address();
     } catch (const SimpleBLE::Exception::BaseException&) {
@@ -45,7 +45,7 @@ bool SimpleBLE::Safe::Adapter::scan_for(int timeout_ms) noexcept {
     }
 }
 
-std::optional<bool> SimpleBLE::Safe::Adapter::scan_is_active() noexcept {
+std::optional<bool> SimpleBLE::Safe::Adapter::scan_is_active() const noexcept {
     try {
         return SimpleBLE::Adapter::scan_is_active();
     } catch (const SimpleBLE::Exception::BaseException&) {
@@ -53,7 +53,7 @@ std::optional<bool> SimpleBLE::Safe::Adapter::scan_is_active() noexcept {
     }
 }
 
-std::optional<std::vector<SimpleBLE::Safe::Peripheral>> SimpleBLE::Safe::Adapter::scan_get_results() noexcept {
+std::optional<std::vector<SimpleBLE::Safe::Peripheral>> SimpleBLE::Safe::Adapter::scan_get_results() const noexcept {
     try {
         auto peripherals = SimpleBLE::Adapter::scan_get_results();
         std::vector<SimpleBLE::Safe::Peripheral> safe_peripherals;
@@ -67,7 +67,8 @@ std::optional<std::vector<SimpleBLE::Safe::Peripheral>> SimpleBLE::Safe::Adapter
     return std::nullopt;
 }
 
-std::optional<std::vector<SimpleBLE::Safe::Peripheral>> SimpleBLE::Safe::Adapter::get_paired_peripherals() noexcept {
+std::optional<std::vector<SimpleBLE::Safe::Peripheral>> SimpleBLE::Safe::Adapter::get_paired_peripherals()
+    const noexcept {
     try {
         auto peripherals = SimpleBLE::Adapter::get_paired_peripherals();
         std::vector<SimpleBLE::Safe::Peripheral> safe_peripherals;

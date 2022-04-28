@@ -21,19 +21,19 @@ class Peripheral {
 
     bool initialized() const;
 
-    std::string identifier();
-    BluetoothAddress address();
-    int16_t rssi();
+    std::string identifier() const;
+    BluetoothAddress address() const;
+    int16_t rssi() const;
 
-    void connect();
-    void disconnect();
-    bool is_connected();
-    bool is_connectable();
-    bool is_paired();
+    void connect() const;
+    void disconnect() const;
+    bool is_connected() const;
+    bool is_connectable() const;
+    bool is_paired() const;
     void unpair();
 
-    std::vector<BluetoothService> services();
-    std::map<uint16_t, ByteArray> manufacturer_data();
+    std::vector<BluetoothService> services() const;
+    std::map<uint16_t, ByteArray> manufacturer_data() const;
 
     ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic);
     void write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data);

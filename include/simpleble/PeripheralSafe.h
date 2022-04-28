@@ -13,19 +13,19 @@ class Peripheral : public SimpleBLE::Peripheral {
     Peripheral(SimpleBLE::Peripheral& peripheral);
     virtual ~Peripheral() = default;
 
-    std::optional<std::string> identifier() noexcept;
-    std::optional<BluetoothAddress> address() noexcept;
-    std::optional<int16_t> rssi() noexcept;
+    std::optional<std::string> identifier() const noexcept;
+    std::optional<BluetoothAddress> address() const noexcept;
+    std::optional<int16_t> rssi() const noexcept;
 
     bool connect() noexcept;
     bool disconnect() noexcept;
-    std::optional<bool> is_connected() noexcept;
-    std::optional<bool> is_connectable() noexcept;
-    std::optional<bool> is_paired() noexcept;
+    std::optional<bool> is_connected() const noexcept;
+    std::optional<bool> is_connectable() const noexcept;
+    std::optional<bool> is_paired() const noexcept;
     bool unpair() noexcept;
 
-    std::optional<std::vector<BluetoothService>> services() noexcept;
-    std::optional<std::map<uint16_t, ByteArray>> manufacturer_data() noexcept;
+    std::optional<std::vector<BluetoothService>> services() const noexcept;
+    std::optional<std::map<uint16_t, ByteArray>> manufacturer_data() const noexcept;
 
     std::optional<ByteArray> read(BluetoothUUID const& service, BluetoothUUID const& characteristic) noexcept;
     bool write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) noexcept;

@@ -22,11 +22,11 @@ PeripheralBase::~PeripheralBase() {
     device_->clear_on_services_resolved();
 }
 
-std::string PeripheralBase::identifier() { return device_->name(); }
+std::string PeripheralBase::identifier() const { return device_->name(); }
 
-BluetoothAddress PeripheralBase::address() { return device_->address(); }
+BluetoothAddress PeripheralBase::address() const { return device_->address(); }
 
-int16_t PeripheralBase::rssi() { return device_->rssi(); }
+int16_t PeripheralBase::rssi() const { return device_->rssi(); }
 
 void PeripheralBase::connect() {
     // Set the OnDisconnected callback
@@ -66,15 +66,15 @@ void PeripheralBase::disconnect() {
     }
 }
 
-bool PeripheralBase::is_connected() {
+bool PeripheralBase::is_connected() const {
     // NOTE: For Bluez, a device being connected means that it's both
     // connected and services have been resolved.
     return device_->connected() && device_->services_resolved();
 }
 
-bool PeripheralBase::is_connectable() { return device_->name() != ""; }
+bool PeripheralBase::is_connectable() const { return device_->name() != ""; }
 
-bool PeripheralBase::is_paired() { return device_->paired(); }
+bool PeripheralBase::is_paired() const { return device_->paired(); }
 
 void PeripheralBase::unpair() {
     if (device_->paired()) {
@@ -82,7 +82,7 @@ void PeripheralBase::unpair() {
     }
 }
 
-std::vector<BluetoothService> PeripheralBase::services() {
+std::vector<BluetoothService> PeripheralBase::services() const {
     bool is_battery_service_available = false;
 
     std::vector<BluetoothService> service_list;
@@ -113,7 +113,7 @@ std::vector<BluetoothService> PeripheralBase::services() {
     return service_list;
 }
 
-std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() {
+std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() const {
     std::map<uint16_t, ByteArray> manufacturer_data;
     for (auto& [manufacturer_id, value_array] : device_->manufacturer_data()) {
         manufacturer_data[manufacturer_id] = ByteArray((const char*)value_array.data(), value_array.size());

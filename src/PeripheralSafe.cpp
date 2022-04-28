@@ -6,7 +6,7 @@
 
 SimpleBLE::Safe::Peripheral::Peripheral(SimpleBLE::Peripheral& peripheral) : SimpleBLE::Peripheral(peripheral) {}
 
-std::optional<std::string> SimpleBLE::Safe::Peripheral::identifier() noexcept {
+std::optional<std::string> SimpleBLE::Safe::Peripheral::identifier() const noexcept {
     try {
         return SimpleBLE::Peripheral::identifier();
     } catch (const SimpleBLE::Exception::BaseException& e) {
@@ -14,7 +14,7 @@ std::optional<std::string> SimpleBLE::Safe::Peripheral::identifier() noexcept {
     }
 }
 
-std::optional<SimpleBLE::BluetoothAddress> SimpleBLE::Safe::Peripheral::address() noexcept {
+std::optional<SimpleBLE::BluetoothAddress> SimpleBLE::Safe::Peripheral::address() const noexcept {
     try {
         return SimpleBLE::Peripheral::address();
     } catch (const SimpleBLE::Exception::BaseException& e) {
@@ -22,7 +22,7 @@ std::optional<SimpleBLE::BluetoothAddress> SimpleBLE::Safe::Peripheral::address(
     }
 }
 
-std::optional<int16_t> SimpleBLE::Safe::Peripheral::rssi() noexcept {
+std::optional<int16_t> SimpleBLE::Safe::Peripheral::rssi() const noexcept {
     try {
         return SimpleBLE::Peripheral::rssi();
     } catch (const SimpleBLE::Exception::BaseException& e) {
@@ -48,7 +48,7 @@ bool SimpleBLE::Safe::Peripheral::disconnect() noexcept {
     }
 }
 
-std::optional<bool> SimpleBLE::Safe::Peripheral::is_connected() noexcept {
+std::optional<bool> SimpleBLE::Safe::Peripheral::is_connected() const noexcept {
     try {
         return SimpleBLE::Peripheral::is_connected();
     } catch (const SimpleBLE::Exception::BaseException& e) {
@@ -56,7 +56,7 @@ std::optional<bool> SimpleBLE::Safe::Peripheral::is_connected() noexcept {
     }
 }
 
-std::optional<bool> SimpleBLE::Safe::Peripheral::is_connectable() noexcept {
+std::optional<bool> SimpleBLE::Safe::Peripheral::is_connectable() const noexcept {
     try {
         return SimpleBLE::Peripheral::is_connectable();
     } catch (const SimpleBLE::Exception::BaseException& e) {
@@ -64,7 +64,7 @@ std::optional<bool> SimpleBLE::Safe::Peripheral::is_connectable() noexcept {
     }
 }
 
-std::optional<bool> SimpleBLE::Safe::Peripheral::is_paired() noexcept {
+std::optional<bool> SimpleBLE::Safe::Peripheral::is_paired() const noexcept {
     try {
         return SimpleBLE::Peripheral::is_paired();
     } catch (const SimpleBLE::Exception::BaseException& e) {
@@ -81,7 +81,8 @@ bool SimpleBLE::Safe::Peripheral::unpair() noexcept {
     }
 }
 
-std::optional<std::map<uint16_t, SimpleBLE::ByteArray>> SimpleBLE::Safe::Peripheral::manufacturer_data() noexcept {
+std::optional<std::map<uint16_t, SimpleBLE::ByteArray>> SimpleBLE::Safe::Peripheral::manufacturer_data()
+    const noexcept {
     try {
         return SimpleBLE::Peripheral::manufacturer_data();
     } catch (const SimpleBLE::Exception::BaseException& e) {
@@ -89,7 +90,7 @@ std::optional<std::map<uint16_t, SimpleBLE::ByteArray>> SimpleBLE::Safe::Periphe
     }
 }
 
-std::optional<std::vector<SimpleBLE::BluetoothService>> SimpleBLE::Safe::Peripheral::services() noexcept {
+std::optional<std::vector<SimpleBLE::BluetoothService>> SimpleBLE::Safe::Peripheral::services() const noexcept {
     try {
         return SimpleBLE::Peripheral::services();
     } catch (const SimpleBLE::Exception::BaseException& e) {

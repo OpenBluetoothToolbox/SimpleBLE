@@ -18,9 +18,9 @@ AdapterBase::AdapterBase(std::shared_ptr<SimpleBluez::Adapter> adapter) : adapte
 
 AdapterBase::~AdapterBase() { adapter_->clear_on_device_updated(); }
 
-std::string AdapterBase::identifier() { return adapter_->identifier(); }
+std::string AdapterBase::identifier() const { return adapter_->identifier(); }
 
-BluetoothAddress AdapterBase::address() { return adapter_->address(); }
+BluetoothAddress AdapterBase::address() const { return adapter_->address(); }
 
 void AdapterBase::scan_start() {
     adapter_->discovery_filter(SimpleBluez::Adapter::DiscoveryFilter::LE);
@@ -71,9 +71,9 @@ void AdapterBase::scan_for(int timeout_ms) {
     scan_stop();
 }
 
-bool AdapterBase::scan_is_active() { return is_scanning_ && adapter_->discovering(); }
+bool AdapterBase::scan_is_active() const { return is_scanning_ && adapter_->discovering(); }
 
-std::vector<Peripheral> AdapterBase::scan_get_results() {
+std::vector<Peripheral> AdapterBase::scan_get_results() const {
     std::vector<Peripheral> peripherals;
     for (auto& [address, peripheral] : this->seen_devices_) {
         peripherals.push_back(peripheral);
@@ -81,7 +81,7 @@ std::vector<Peripheral> AdapterBase::scan_get_results() {
     return peripherals;
 }
 
-std::vector<Peripheral> AdapterBase::get_paired_peripherals() {
+std::vector<Peripheral> AdapterBase::get_paired_peripherals() const {
     std::vector<Peripheral> peripherals;
 
     auto paired_list = adapter_->device_paired_get();

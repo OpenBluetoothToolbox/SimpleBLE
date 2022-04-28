@@ -8,7 +8,7 @@
 
 using namespace SimpleBLE;
 
-AdapterBase::AdapterBase() { 
+AdapterBase::AdapterBase() {
     // Cast the Objective-C++ object using __bridge_retained, which will signal ARC to increase
     // the reference count. This means that AdapterBase will be responsible for releasing the
     // Objective-C++ object in the destructor.
@@ -34,9 +34,9 @@ std::vector<std::shared_ptr<AdapterBase> > AdapterBase::get_adapters() {
     return adapter_list;
 }
 
-std::string AdapterBase::identifier() { return "Default Adapter"; }
+std::string AdapterBase::identifier() const { return "Default Adapter"; }
 
-BluetoothAddress AdapterBase::address() { return "00:00:00:00:00:00"; }
+BluetoothAddress AdapterBase::address() const { return "00:00:00:00:00:00"; }
 
 void AdapterBase::scan_start() {
     this->peripherals_.clear();
@@ -63,12 +63,12 @@ void AdapterBase::scan_for(int timeout_ms) {
     this->scan_stop();
 }
 
-bool AdapterBase::scan_is_active() {
+bool AdapterBase::scan_is_active() const {
     AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)opaque_internal_;
     return [internal scanIsActive];
 }
 
-std::vector<Peripheral> AdapterBase::scan_get_results() {
+std::vector<Peripheral> AdapterBase::scan_get_results() const {
     std::vector<Peripheral> peripherals;
     for (auto& [opaque_peripheral, base_peripheral] : this->peripherals_) {
         PeripheralBuilder peripheral_builder(base_peripheral);
@@ -106,7 +106,7 @@ void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_
     }
 }
 
-std::vector<Peripheral> AdapterBase::get_paired_peripherals() { throw Exception::OperationNotSupported(); }
+std::vector<Peripheral> AdapterBase::get_paired_peripherals() const { throw Exception::OperationNotSupported(); }
 
 // Delegate methods passed for AdapterBaseMacOS
 

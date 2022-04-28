@@ -19,13 +19,13 @@ std::vector<Adapter> Adapter::get_adapters() {
 
 bool Adapter::initialized() const { return internal_ != nullptr; }
 
-std::string Adapter::identifier() {
+std::string Adapter::identifier() const {
     if (!initialized()) throw Exception::NotInitialized();
 
     return internal_->identifier();
 }
 
-BluetoothAddress Adapter::address() {
+BluetoothAddress Adapter::address() const {
     if (!initialized()) throw Exception::NotInitialized();
 
     return internal_->address();
@@ -49,19 +49,19 @@ void Adapter::scan_for(int timeout_ms) {
     internal_->scan_for(timeout_ms);
 }
 
-bool Adapter::scan_is_active() {
+bool Adapter::scan_is_active() const {
     if (!initialized()) throw Exception::NotInitialized();
 
     return internal_->scan_is_active();
 }
 
-std::vector<Peripheral> Adapter::scan_get_results() {
+std::vector<Peripheral> Adapter::scan_get_results() const {
     if (!initialized()) throw Exception::NotInitialized();
 
     return internal_->scan_get_results();
 }
 
-std::vector<Peripheral> Adapter::get_paired_peripherals() {
+std::vector<Peripheral> Adapter::get_paired_peripherals() const {
     if (!initialized()) throw Exception::NotInitialized();
 
     return internal_->get_paired_peripherals();
