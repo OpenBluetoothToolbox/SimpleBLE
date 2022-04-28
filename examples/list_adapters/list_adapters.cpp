@@ -2,7 +2,7 @@
 
 #include "simpleble/Adapter.h"
 
-int main(int argc, char* argv[]) {
+int main() {
     auto adapter_list = SimpleBLE::Adapter::get_adapters();
 
     if (adapter_list.size() == 0) {
@@ -13,6 +13,6 @@ int main(int argc, char* argv[]) {
     for (auto& adapter : adapter_list) {
         std::cout << "Adapter: " << adapter.identifier() << " [" << adapter.address() << "]" << std::endl;
     }
-    
+
     return 0;
 }

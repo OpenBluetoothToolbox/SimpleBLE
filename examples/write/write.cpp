@@ -8,7 +8,7 @@
 
 std::vector<SimpleBLE::Peripheral> peripherals;
 
-int main(int argc, char* argv[]) {
+int main() {
     auto adapter_list = SimpleBLE::Adapter::get_adapters();
 
     if (adapter_list.size() == 0) {
@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
     adapter.scan_for(5000);
 
     std::cout << "The following devices were found:" << std::endl;
-    for (int i = 0; i < peripherals.size(); i++) {
+    for (size_t i = 0; i < peripherals.size(); i++) {
         std::cout << "[" << i << "] " << peripherals[i].identifier() << " [" << peripherals[i].address() << "]"
                   << std::endl;
     }
@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
         }
 
         std::cout << "The following services and characteristics were found:" << std::endl;
-        for (int i = 0; i < uuids.size(); i++) {
+        for (size_t i = 0; i < uuids.size(); i++) {
             std::cout << "[" << i << "] " << uuids[i].first << " " << uuids[i].second << std::endl;
         }
 

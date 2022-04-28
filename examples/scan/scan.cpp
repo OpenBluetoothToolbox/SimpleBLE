@@ -14,7 +14,7 @@ std::string byte_array_to_string(SimpleBLE::ByteArray& bytes) {
     return oss.str();
 }
 
-int main(int argc, char* argv[]) {
+int main() {
     auto adapter_list = SimpleBLE::Adapter::get_adapters();
 
     if (adapter_list.size() == 0) {
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
 
     std::vector<SimpleBLE::Peripheral> peripherals = adapter.scan_get_results();
     std::cout << "The following devices were found:" << std::endl;
-    for (int i = 0; i < peripherals.size(); i++) {
+    for (size_t i = 0; i < peripherals.size(); i++) {
         std::string connectable_string = peripherals[i].is_connectable() ? "Connectable" : "Non-Connectable";
         std::string peripheral_string = peripherals[i].identifier() + " [" + peripherals[i].address() + "]";
 
