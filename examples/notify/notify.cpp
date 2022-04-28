@@ -22,9 +22,19 @@ int main(int argc, char* argv[]) {
         std::cout << "No adapter was found." << std::endl;
     }
 
-    // Pick the first detected adapter as the default.
-    // TODO: Allow the user to pick an adapter.
-    SimpleBLE::Adapter adapter = adapter_list[0];
+    std::cout << "Available adapters: \n";
+    int i = 0;
+    for (auto& adapter : adapter_list) {
+        std::cout << "[" << i++ << "] " << adapter.identifier() << " [" << adapter.address() << "]" << std::endl;
+    }
+
+    int adapter_selection = -1;
+    while(adapter_selection < 0 || adapter_selection > adapter_list.size() - 1) {
+        std::cout << "Please select an adapter: ";
+        std::cin >> adapter_selection;
+    }
+
+    SimpleBLE::Adapter& adapter = adapter_list[adapter_selection];
 
     adapter.set_callback_on_scan_start([]() { std::cout << "Scan started." << std::endl; });
 
