@@ -27,6 +27,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 - (MacOS) Known peripherals would not get cleared at the beginning of a scanning session.
 - (Windows) Known peripherals would not get cleared at the beginning of a scanning session.
 - Calling functions of uninitialized objects will now throw an exception instead of crashing.
+- (MacOS) Thread synchronization issues would cause certain peripheral actions to report failure.
 
 [0.3.0] - 2022-04-03
 --------------------
