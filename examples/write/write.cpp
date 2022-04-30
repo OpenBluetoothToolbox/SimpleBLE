@@ -13,6 +13,7 @@ int main() {
 
     if (adapter_list.size() == 0) {
         std::cout << "No adapter was found." << std::endl;
+        return 1;
     }
 
     std::cout << "Available adapters: \n";

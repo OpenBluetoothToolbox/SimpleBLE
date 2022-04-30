@@ -7,7 +7,7 @@ int main() {
 
     if (adapter_list.size() == 0) {
         std::cout << "No adapters found" << std::endl;
-        return 0;
+        return 1;
     }
 
     for (auto& adapter : adapter_list) {
