@@ -13,11 +13,13 @@ and ease of use. All specific operating system quirks are handled to provide
 a consistent behavior across all platforms. Each major version of the library
 will have a stable API that will be fully forwards compatible. 
 
-If you want to use SimpleDBus and need help. **Please do not hesitate to reach out!**
+If you want to use SimpleBLE and need help. **Please do not hesitate to reach out!**
 
 * Visit our `ReadTheDocs`_ page. 
 * Join our `Discord`_ server.
 * Contact me: ``kevin at dewald dot me``
+
+Are you using SimpleBLE on your own project? Reach out and I'll add a link to it below!
 
 Supported platforms
 -------------------
@@ -29,7 +31,7 @@ Windows 10+ Ubuntu 20.04+ 10.15+ (except 12.0, 12.1 and 12.2) 15.0+
 
 Vendorization
 -------------
-If you are interested in using SimpleDBus as a dependency in your project,
+If you are interested in using SimpleBLE as a dependency in your project,
 there is currently first-class support for vendorization of all 3rd-party
 dependencies. Currently, the following libraries are included as part of
 SimpleBLE:
@@ -39,7 +41,7 @@ SimpleBLE:
 * `SimpleDBus`_
 
 Please visit our **Security** page for more information on how to vendorize
-3rd-party libraries for SimpleDBus.
+3rd-party libraries for SimpleBLE.
 
 License
 -------
