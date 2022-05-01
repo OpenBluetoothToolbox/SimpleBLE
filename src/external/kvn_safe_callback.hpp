@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-#pragma once
+#ifndef KVN_SAFE_CALLBACK_HPP
+#define KVN_SAFE_CALLBACK_HPP
 
 #include <atomic>
 #include <functional>
@@ -61,3 +62,5 @@ class safe_callback<_Res(_ArgTypes...)> {
 };
 
 }  // namespace kvn
+
+#endif  // KVN_SAFE_CALLBACK_HPP

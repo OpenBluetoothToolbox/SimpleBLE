@@ -172,26 +172,30 @@ typedef struct {
         return SimpleBLE::ByteArray();
     }
 
+    CBCharacteristic* characteristic = serviceAndCharacteristic.second;
+
     @synchronized(self) {
-        CBCharacteristic* characteristic = serviceAndCharacteristic.second;
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending = YES;
         [self.peripheral readValueForCharacteristic:characteristic];
-
-        // Wait for the read to complete for up to 1 second.
-        NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
-        while (characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending &&
-               [NSDate.now compare:endDate] == NSOrderedAscending) {
-            [NSThread sleepForTimeInterval:0.01];
-        }
-
-        if (characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending) {
-            // TODO: Raise an exception.
-            NSLog(@"Characteristic %@ could not be read", characteristic.UUID);
-            return SimpleBLE::ByteArray();
-        }
-
-        return SimpleBLE::ByteArray((const char*)characteristic.value.bytes, characteristic.value.length);
     }
+
+    // Wait for the read to complete for up to 1 second.
+    NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
+    BOOL readPending = YES;
+    while (readPending && [NSDate.now compare:endDate] == NSOrderedAscending) {
+        [NSThread sleepForTimeInterval:0.01];
+        @synchronized(self) {
+            readPending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending;
+        }
+    }
+
+    if (readPending) {
+        // TODO: Raise an exception.
+        NSLog(@"Characteristic %@ could not be read", characteristic.UUID);
+        return SimpleBLE::ByteArray();
+    }
+
+    return SimpleBLE::ByteArray((const char*)characteristic.value.bytes, characteristic.value.length);
 }
 
 - (void)writeRequest:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid payload:(NSData*)payload {
@@ -201,6 +205,7 @@ typedef struct {
     if (serviceAndCharacteristic.first == nil || serviceAndCharacteristic.second == nil) {
         // TODO: Raise an exception.
         NSLog(@"Could not find service and characteristic.");
+        return;
     }
 
     // NOTE: This write is unacknowledged.
@@ -217,24 +222,28 @@ typedef struct {
     if (serviceAndCharacteristic.first == nil || serviceAndCharacteristic.second == nil) {
         // TODO: Raise an exception.
         NSLog(@"Could not find service and characteristic.");
+        return;
     }
 
+    CBCharacteristic* characteristic = serviceAndCharacteristic.second;
     @synchronized(self) {
-        CBCharacteristic* characteristic = serviceAndCharacteristic.second;
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending = YES;
         [self.peripheral writeValue:payload forCharacteristic:characteristic type:CBCharacteristicWriteWithResponse];
+    }
 
-        // Wait for the read to complete for up to 1 second.
-        NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
-        while (characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending &&
-               [NSDate.now compare:endDate] == NSOrderedAscending) {
-            [NSThread sleepForTimeInterval:0.01];
+    // Wait for the read to complete for up to 1 second.
+    NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
+    BOOL writePending = YES;
+    while (writePending && [NSDate.now compare:endDate] == NSOrderedAscending) {
+        [NSThread sleepForTimeInterval:0.01];
+        @synchronized(self) {
+            writePending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending;
         }
+    }
 
-        if (characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending) {
-            // TODO: Raise an exception.
-            NSLog(@"Characteristic %@ could not be written", characteristic.UUID);
-        }
+    if (writePending) {
+        // TODO: Raise an exception.
+        NSLog(@"Characteristic %@ could not be written", characteristic.UUID);
     }
 }
 
@@ -249,21 +258,22 @@ typedef struct {
         NSLog(@"Could not find service and characteristic.");
     }
 
+    CBCharacteristic* characteristic = serviceAndCharacteristic.second;
+
     @synchronized(self) {
-        CBCharacteristic* characteristic = serviceAndCharacteristic.second;
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback = callback;
         [self.peripheral setNotifyValue:YES forCharacteristic:characteristic];
+    }
 
-        // Wait for the update to complete for up to 1 second.
-        NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
-        while (!characteristic.isNotifying && [NSDate.now compare:endDate] == NSOrderedAscending) {
-            [NSThread sleepForTimeInterval:0.01];
-        }
+    // Wait for the update to complete for up to 1 second.
+    NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
+    while (!characteristic.isNotifying && [NSDate.now compare:endDate] == NSOrderedAscending) {
+        [NSThread sleepForTimeInterval:0.01];
+    }
 
-        if (!characteristic.isNotifying) {
-            // TODO: Raise an exception.
-            NSLog(@"Could not enable notifications for characteristic %@", characteristic.UUID);
-        }
+    if (!characteristic.isNotifying) {
+        // TODO: Raise an exception.
+        NSLog(@"Could not enable notifications for characteristic %@", characteristic.UUID);
     }
 }
 
