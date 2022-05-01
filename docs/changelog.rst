@@ -23,6 +23,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  Added support for Windows SDK 10.0.22000.0
 -  Updated libfmt to version 8.1.1. 
 -  Cleaned up dependency management for libfmt and SimpleBluez.
+-  ``SimpleBLE::Adapter::get_paired_peripherals`` will return an empty list on Windows and MacOS.
 
 **Fixed**
 
