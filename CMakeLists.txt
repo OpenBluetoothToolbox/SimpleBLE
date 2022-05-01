@@ -1,8 +1,12 @@
 # Basic CMake configuration
 cmake_minimum_required(VERSION 3.16.0)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/find")
 
 project(SimpleBLE VERSION 0.1 LANGUAGES CXX)
+
+option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
+option(SIMPLEBLUEZ_VENDORIZE "Enable vendorized SimpleBluez" ON)
 
 # Include all necessary CMake modules
 include(FetchContent)
@@ -22,13 +26,7 @@ else()
     set(STANDALONE false)
 endif()
 
-# Load default parameters passed in through the command line.
-if(NOT SIMPLEBLUEZ_GIT_REPOSITORY)
-    set(SIMPLEBLUEZ_GIT_REPOSITORY "https://github.com/OpenBluetoothToolbox/SimpleBluez.git")
-endif()
-if(NOT SIMPLEBLUEZ_GIT_TAG)
-    set(SIMPLEBLUEZ_GIT_TAG "v0.4.0")
-endif()
+find_package(fmt REQUIRED)
 
 # Configure the external header path
 set(SIMPLEBLE_USER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -55,12 +53,10 @@ set(
 
 # Detect the operating system and load the necessary dependencies
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
-    message("-- [INFO] Linux Host Detected")
+    message(STATUS "Linux Host Detected")
 
     # Append additional flags for address and thread sanitization
     if(SIMPLEBLE_SANITIZE MATCHES "Address")
-        set(SIMPLEBLUEZ_SANITIZE ${SIMPLEBLE_SANITIZE})
-
         # Append additional compile options
         list(APPEND COMPILE_OPTIONS -fsanitize=address)
         list(APPEND COMPILE_OPTIONS -fsanitize-recover=address)
@@ -70,11 +66,8 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
 
         # Append additional link options
         list(APPEND LINK_OPTIONS -fsanitize=address)
-    endif()
 
-    if(SIMPLEBLE_SANITIZE MATCHES "Thread")
-        set(SIMPLEBLUEZ_SANITIZE ${SIMPLEBLE_SANITIZE})
-
+    elseif(SIMPLEBLE_SANITIZE MATCHES "Thread")
         # Append additional compile options
         list(APPEND COMPILE_OPTIONS -fsanitize=thread)
         list(APPEND COMPILE_OPTIONS -fno-omit-frame-pointer)
@@ -83,19 +76,11 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
 
         # Append additional link options
         list(APPEND LINK_OPTIONS -fsanitize=thread)
+
     endif()
 
-    if(NOT SIMPLEBLUEZ_LOCAL_PATH)
-        FetchContent_Declare(
-            simplebluez
-            GIT_REPOSITORY ${SIMPLEBLUEZ_GIT_REPOSITORY}
-            GIT_TAG ${SIMPLEBLUEZ_GIT_TAG}
-        )
-        FetchContent_MakeAvailable(simplebluez)
-    else()
-        message("-- [INFO] Using local SimpleBluez")
-        add_subdirectory(${SIMPLEBLUEZ_LOCAL_PATH} ${CMAKE_CURRENT_BINARY_DIR}/simplebluez)
-    endif()
+    set(SIMPLEBLUEZ_SANITIZE ${SIMPLEBLE_SANITIZE})
+    find_package(simplebluez REQUIRED)
 
     set(
         EXTERNAL_LIBRARIES
@@ -116,7 +101,7 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
         ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/Bluez.cpp
     )
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-    message("-- [INFO] Windows Host Detected")
+    message(STATUS "Windows Host Detected")
     if(CMAKE_GENERATOR_PLATFORM MATCHES "^[Ww][Ii][Nn]32$")
         set(WINDOWS_TARGET_ARCH x86)
     elseif(CMAKE_GENERATOR_PLATFORM MATCHES "^[Xx]64$")
@@ -160,7 +145,7 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     )
 
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
-    message("-- [INFO] Darwin Host Detected")
+    message(STATUS "Darwin Host Detected")
     set(CMAKE_CXX_EXTENSIONS OFF)
 
     # Note to self: When dealing with memory issues/leaks, the following documentation is useful:
@@ -178,9 +163,7 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
 
         # Append additional link options
         list(APPEND PUBLIC_LINK_OPTIONS -fsanitize=address)
-    endif()
-
-    if(SIMPLEBLE_SANITIZE MATCHES "Thread")
+    elseif(SIMPLEBLE_SANITIZE MATCHES "Thread")
         # Append additional compile options
         list(APPEND COMPILE_OPTIONS -fsanitize=thread)
         list(APPEND COMPILE_OPTIONS -fno-omit-frame-pointer)
@@ -217,7 +200,7 @@ else()
     message(FATAL_ERROR "-- [ERROR] UNSUPPORTED SYSTEM: ${CMAKE_HOST_SYSTEM_NAME} ${CMAKE_SYSTEM_NAME}")
 endif()
 
-message("-- [INFO] Building SimpleBLE")
+message(STATUS "Configuring SimpleBLE")
 
 set(
     SIMPLE_BLE_ALL_INCLUDE_DIRS
