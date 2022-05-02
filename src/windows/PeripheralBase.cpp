@@ -129,7 +129,7 @@ void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID c
 
     // Validate that the operation can be performed.
     uint32_t gatt_characteristic_prop = (uint32_t)gatt_characteristic.CharacteristicProperties();
-    if ((gatt_characteristic_prop & (uint32_t)GattCharacteristicProperties::WriteWithoutResponse) == 0) {
+    if ((gatt_characteristic_prop & (uint32_t)GattCharacteristicProperties::Write) == 0) {
         throw SimpleBLE::Exception::OperationNotSupported();
     }
 
@@ -137,7 +137,7 @@ void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID c
     winrt::Windows::Storage::Streams::IBuffer buffer = bytearray_to_ibuffer(data);
 
     // Write the value.
-    auto result = async_get(gatt_characteristic.WriteValueAsync(buffer, GattWriteOption::WriteWithoutResponse));
+    auto result = async_get(gatt_characteristic.WriteValueAsync(buffer, GattWriteOption::WriteWithResponse));
     if (result != GenericAttributeProfile::GattCommunicationStatus::Success) {
         throw SimpleBLE::Exception::OperationFailed();
     }
@@ -149,7 +149,7 @@ void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID c
 
     // Validate that the operation can be performed.
     uint32_t gatt_characteristic_prop = (uint32_t)gatt_characteristic.CharacteristicProperties();
-    if ((gatt_characteristic_prop & (uint32_t)GattCharacteristicProperties::Write) == 0) {
+    if ((gatt_characteristic_prop & (uint32_t)GattCharacteristicProperties::WriteWithoutResponse) == 0) {
         throw SimpleBLE::Exception::OperationNotSupported();
     }
 
@@ -157,7 +157,7 @@ void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID c
     winrt::Windows::Storage::Streams::IBuffer buffer = bytearray_to_ibuffer(data);
 
     // Write the value.
-    auto result = async_get(gatt_characteristic.WriteValueAsync(buffer, GattWriteOption::WriteWithResponse));
+    auto result = async_get(gatt_characteristic.WriteValueAsync(buffer, GattWriteOption::WriteWithoutResponse));
     if (result != GenericAttributeProfile::GattCommunicationStatus::Success) {
         throw SimpleBLE::Exception::OperationFailed();
     }

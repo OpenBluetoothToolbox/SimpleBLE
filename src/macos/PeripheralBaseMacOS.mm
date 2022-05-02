@@ -208,24 +208,15 @@ typedef struct {
         return;
     }
 
-    // NOTE: This write is unacknowledged.
-    @synchronized(self) {
-        CBCharacteristic* characteristic = serviceAndCharacteristic.second;
-        [self.peripheral writeValue:payload forCharacteristic:characteristic type:CBCharacteristicWriteWithoutResponse];
-    }
-}
+    CBCharacteristic* characteristic = serviceAndCharacteristic.second;
 
-- (void)writeCommand:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid payload:(NSData*)payload {
-    std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
-                                                                                       characteristic_uuid:characteristic_uuid];
-
-    if (serviceAndCharacteristic.first == nil || serviceAndCharacteristic.second == nil) {
+    // Check that the characteristic supports this feature.
+    if ((characteristic.properties & CBCharacteristicPropertyWrite) == 0) {
         // TODO: Raise an exception.
-        NSLog(@"Could not find service and characteristic.");
+        NSLog(@"Characteristic does not support write with response.");
         return;
     }
 
-    CBCharacteristic* characteristic = serviceAndCharacteristic.second;
     @synchronized(self) {
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending = YES;
         [self.peripheral writeValue:payload forCharacteristic:characteristic type:CBCharacteristicWriteWithResponse];
@@ -244,6 +235,31 @@ typedef struct {
     if (writePending) {
         // TODO: Raise an exception.
         NSLog(@"Characteristic %@ could not be written", characteristic.UUID);
+    }
+}
+
+- (void)writeCommand:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid payload:(NSData*)payload {
+    std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
+                                                                                       characteristic_uuid:characteristic_uuid];
+
+    if (serviceAndCharacteristic.first == nil || serviceAndCharacteristic.second == nil) {
+        // TODO: Raise an exception.
+        NSLog(@"Could not find service and characteristic.");
+        return;
+    }
+
+    CBCharacteristic* characteristic = serviceAndCharacteristic.second;
+
+    // Check that the characteristic supports this feature.
+    if ((characteristic.properties & CBCharacteristicPropertyWriteWithoutResponse) == 0) {
+        // TODO: Raise an exception.
+        NSLog(@"Characteristic does not support write without response.");
+        return;
+    }
+
+    // NOTE: This write is unacknowledged.
+    @synchronized(self) {
+        [self.peripheral writeValue:payload forCharacteristic:characteristic type:CBCharacteristicWriteWithoutResponse];
     }
 }
 
@@ -422,6 +438,10 @@ typedef struct {
     if (error != nil) {
         NSLog(@"Error: %@\n", error);
     }
+}
+
+- (void)peripheralIsReadyToSendWriteWithoutResponse:(CBPeripheral*)peripheral {
+    NSLog(@"Peripheral ready to send: %@", peripheral);
 }
 
 @end

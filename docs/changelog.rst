@@ -21,7 +21,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 -  Updated Linux implementation to use SimpleBluez v0.4.0.
 -  Added support for Windows SDK 10.0.22000.0
--  Updated libfmt to version 8.1.1. 
+-  Updated libfmt to version 8.1.1.
 -  Cleaned up dependency management for libfmt and SimpleBluez.
 -  ``SimpleBLE::Adapter::get_paired_peripherals`` will return an empty list on Windows and MacOS.
 
@@ -31,6 +31,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 - (Windows) Known peripherals would not get cleared at the beginning of a scanning session.
 - Calling functions of uninitialized objects will now throw an exception instead of crashing.
 - (MacOS) Thread synchronization issues would cause certain peripheral actions to report failure.
+- (Windows) Behavior of ``write_request`` and ``write_command`` was flipped.
+- (MacOS) Behavior of ``write_request`` and ``write_command`` was flipped.
 
 [0.3.0] - 2022-04-03
 --------------------
