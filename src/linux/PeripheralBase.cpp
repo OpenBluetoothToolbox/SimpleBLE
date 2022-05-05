@@ -29,15 +29,6 @@ BluetoothAddress PeripheralBase::address() { return device_->address(); }
 int16_t PeripheralBase::rssi() { return device_->rssi(); }
 
 void PeripheralBase::connect() {
-    // Set the OnDisconnected callback
-    device_->set_on_disconnected([this]() {
-        this->disconnection_cv_.notify_all();
-
-        if (this->callback_on_disconnected_) {
-            this->callback_on_disconnected_();
-        }
-    });
-
     // Set the OnServicesResolved callback
     device_->set_on_services_resolved([this]() { this->connection_cv_.notify_all(); });
 
@@ -48,8 +39,22 @@ void PeripheralBase::connect() {
         }
     }
 
+    // Set the on_disconnected callback once the connection attempts are finished, thus
+    // preventing disconnection events that should not be seen by the user.
+    device_->set_on_disconnected([this]() {
+        this->disconnection_cv_.notify_all();
+
+        if (this->callback_on_disconnected_) {
+            this->callback_on_disconnected_();
+        }
+    });
+
     if (!is_connected()) {
         throw Exception::OperationFailed();
+    }
+
+    if (this->callback_on_connected_) {
+        this->callback_on_connected_();
     }
 }
 

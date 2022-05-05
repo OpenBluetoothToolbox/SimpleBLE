@@ -33,6 +33,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 - (MacOS) Thread synchronization issues would cause certain peripheral actions to report failure.
 - (Windows) Behavior of ``write_request`` and ``write_command`` was flipped.
 - (MacOS) Behavior of ``write_request`` and ``write_command`` was flipped.
+- (Linux) ``on_connected`` callback was not being called.
+- (Linux) Spurious disconnection events during connection retries have been removed.
 
 [0.3.0] - 2022-04-03
 --------------------
