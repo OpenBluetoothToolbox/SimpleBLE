@@ -35,6 +35,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 - (MacOS) Behavior of ``write_request`` and ``write_command`` was flipped.
 - (Linux) ``on_connected`` callback was not being called.
 - (Linux) Spurious disconnection events during connection retries have been removed.
+- (Linux) Existing characteristic callbacks were not being cleared on disconnection.
 
 [0.3.0] - 2022-04-03
 --------------------
