@@ -7,7 +7,7 @@ if (SIMPLEBLUEZ_VENDORIZE)
         set(SIMPLEBLUEZ_GIT_REPOSITORY "https://github.com/OpenBluetoothToolbox/SimpleBluez.git")
     endif()
     if(NOT SIMPLEBLUEZ_GIT_TAG)
-        set(SIMPLEBLUEZ_GIT_TAG "master") # TODO: Switch to the latest SimpleBluez release once done.
+        set(SIMPLEBLUEZ_GIT_TAG "debug/release") # TODO: Switch to the latest SimpleBluez release once done.
     endif()
 
     if(NOT SIMPLEBLUEZ_LOCAL_PATH)
