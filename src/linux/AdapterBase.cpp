@@ -100,6 +100,7 @@ void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start
         callback_on_scan_start_.unload();
     }
 }
+
 void AdapterBase::set_callback_on_scan_stop(std::function<void()> on_scan_stop) {
     if (on_scan_stop) {
         callback_on_scan_stop_.load(std::move(on_scan_stop));
@@ -107,6 +108,7 @@ void AdapterBase::set_callback_on_scan_stop(std::function<void()> on_scan_stop) 
         callback_on_scan_stop_.unload();
     }
 }
+
 void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) {
     if (on_scan_updated) {
         callback_on_scan_updated_.load(std::move(on_scan_updated));
@@ -114,6 +116,7 @@ void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> o
         callback_on_scan_updated_.unload();
     }
 }
+
 void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {
     if (on_scan_found) {
         callback_on_scan_found_.load(std::move(on_scan_found));

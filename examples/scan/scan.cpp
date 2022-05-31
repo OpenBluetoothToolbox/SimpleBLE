@@ -1,8 +1,8 @@
 #include <chrono>
-#include <iostream>
-#include <thread>
-#include <sstream>
 #include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <thread>
 
 #include "simpleble/Adapter.h"
 
@@ -29,7 +29,7 @@ int main() {
     }
 
     int adapter_selection = -1;
-    while(adapter_selection < 0 || adapter_selection > adapter_list.size() - 1) {
+    while (adapter_selection < 0 || adapter_selection > adapter_list.size() - 1) {
         std::cout << "Please select an adapter: ";
         std::cin >> adapter_selection;
     }
@@ -41,11 +41,13 @@ int main() {
     adapter.set_callback_on_scan_stop([]() { std::cout << "Scan stopped." << std::endl; });
 
     adapter.set_callback_on_scan_found([](SimpleBLE::Peripheral peripheral) {
-        std::cout << "Found device: " << peripheral.identifier() << " [" << peripheral.address() << "] " << peripheral.rssi() << " dBm" << std::endl;
+        std::cout << "Found device: " << peripheral.identifier() << " [" << peripheral.address() << "] "
+                  << peripheral.rssi() << " dBm" << std::endl;
     });
 
     adapter.set_callback_on_scan_updated([](SimpleBLE::Peripheral peripheral) {
-        std::cout << "Updated device: " << peripheral.identifier() << " [" << peripheral.address() << "] " << peripheral.rssi() << " dBm" << std::endl;
+        std::cout << "Updated device: " << peripheral.identifier() << " [" << peripheral.address() << "] "
+                  << peripheral.rssi() << " dBm" << std::endl;
     });
 
     // Scan for 5 seconds.
