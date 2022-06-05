@@ -24,6 +24,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  Updated libfmt to version 8.1.1.
 -  Cleaned up dependency management for libfmt and SimpleBluez.
 -  ``SimpleBLE::Adapter::get_paired_peripherals`` will return an empty list on Windows and MacOS.
+- (Linux) **(Experimental)** Exceptions thrown inside the Bluez async thread are now caught to prevent lockups.
 
 **Fixed**
 
