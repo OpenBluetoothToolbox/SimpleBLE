@@ -38,6 +38,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 - (Linux) Spurious disconnection events during connection retries have been removed.
 - (Linux) Existing characteristic callbacks were not being cleared on disconnection.
 - (Linux) Characteristics are unsubscribed on disconnection.
+- (Linux) Missing agent registration that would prevent pairing from working.
 
 [0.3.0] - 2022-04-03
 --------------------
@@ -49,7 +50,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    an operating system popup to pair the device, while on Linux all pairing
    requests will automatically be accepted, with passcodes ``abc123`` or ``123456``.
 -  Unpair command has been added, although the only working implementation
-   will be the linux one. Both Windows and MacOS require the user to manually
+   will be the Linux one. Both Windows and MacOS require the user to manually
    unpair a device from the corresponding OS settings page.
 
 **Changed**

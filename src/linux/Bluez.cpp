@@ -26,6 +26,7 @@ Bluez::~Bluez() {
 }
 
 void Bluez::async_thread_function() {
+    bluez.register_agent();
     while (async_thread_active) {
         try {
             bluez.run_async();
