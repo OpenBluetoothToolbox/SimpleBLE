@@ -5,6 +5,8 @@ using namespace SimpleBLE::Exception;
 
 NotInitialized::NotInitialized() : BaseException("Object has not been initialized.") {}
 
+NotConnected::NotConnected() : BaseException("Peripheral is not connected.") {}
+
 InvalidReference::InvalidReference() : BaseException("Underlying reference to object is invalid.") {}
 
 ServiceNotFound::ServiceNotFound(BluetoothUUID uuid) : BaseException("Service with UUID " + uuid + " not found.") {}
