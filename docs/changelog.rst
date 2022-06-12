@@ -16,6 +16,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  (Linux) ``SimpleBLE::Peripheral::is_paired`` method to check if a peripheral is paired.
 -  (Linux) ``SimpleBLE::Adapter::get_paired_peripherals`` method to list all paired peripherals.
 -  Function to validate whether an Adapter or Peripheral object is initialized.
+-  Logging hooks to capture logs from SimpleBLE and internal components.
 
 **Changed**
 
@@ -24,21 +25,21 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  Updated libfmt to version 8.1.1.
 -  Cleaned up dependency management for libfmt and SimpleBluez.
 -  ``SimpleBLE::Adapter::get_paired_peripherals`` will return an empty list on Windows and MacOS.
-- (Linux) **(Experimental)** Exceptions thrown inside the Bluez async thread are now caught to prevent lockups.
+-  (Linux) **(Experimental)** Exceptions thrown inside the Bluez async thread are now caught to prevent lockups.
 
 **Fixed**
 
-- (MacOS) Known peripherals would not get cleared at the beginning of a scanning session.
-- (Windows) Known peripherals would not get cleared at the beginning of a scanning session.
-- Calling functions of uninitialized objects will now throw an exception instead of crashing.
-- (MacOS) Thread synchronization issues would cause certain peripheral actions to report failure.
-- (Windows) Behavior of ``write_request`` and ``write_command`` was flipped.
-- (MacOS) Behavior of ``write_request`` and ``write_command`` was flipped.
-- (Linux) ``on_connected`` callback was not being called.
-- (Linux) Spurious disconnection events during connection retries have been removed.
-- (Linux) Existing characteristic callbacks were not being cleared on disconnection.
-- (Linux) Characteristics are unsubscribed on disconnection.
-- (Linux) Missing agent registration that would prevent pairing from working.
+-  (MacOS) Known peripherals would not get cleared at the beginning of a scanning session.
+-  (Windows) Known peripherals would not get cleared at the beginning of a scanning session.
+-  Calling functions of uninitialized objects will now throw an exception instead of crashing.
+-  (MacOS) Thread synchronization issues would cause certain peripheral actions to report failure.
+-  (Windows) Behavior of ``write_request`` and ``write_command`` was flipped.
+-  (MacOS) Behavior of ``write_request`` and ``write_command`` was flipped.
+-  (Linux) ``on_connected`` callback was not being called.
+-  (Linux) Spurious disconnection events during connection retries have been removed.
+-  (Linux) Existing characteristic callbacks were not being cleared on disconnection.
+-  (Linux) Characteristics are unsubscribed on disconnection.
+-  (Linux) Missing agent registration that would prevent pairing from working.
 
 [0.3.0] - 2022-04-03
 --------------------

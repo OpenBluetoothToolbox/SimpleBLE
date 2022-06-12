@@ -10,6 +10,7 @@ option(SIMPLEBLUEZ_VENDORIZE "Enable vendorized SimpleBluez" ON)
 
 # Include all necessary CMake modules
 include(FetchContent)
+find_package(fmt REQUIRED)
 
 # Detect if the project is being build within a project or standalone.
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
@@ -42,6 +43,7 @@ set(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AdapterSafe.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PeripheralSafe.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Logging.cpp
 )
 
 set(
@@ -49,6 +51,7 @@ set(
     ${CMAKE_CURRENT_SOURCE_DIR}/src_c/simpleble.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src_c/adapter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src_c/peripheral.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src_c/logging.cpp
 )
 
 # Detect the operating system and load the necessary dependencies
@@ -233,6 +236,8 @@ target_include_directories(simpleble PRIVATE ${SIMPLE_BLE_ALL_INCLUDE_DIRS})
 target_include_directories(simpleble-c-static PRIVATE ${SIMPLE_BLE_ALL_INCLUDE_DIRS})
 target_include_directories(simpleble-c PRIVATE ${SIMPLE_BLE_ALL_INCLUDE_DIRS})
 
+target_link_libraries(simpleble-static PRIVATE fmt::fmt-header-only)
+target_link_libraries(simpleble PRIVATE fmt::fmt-header-only)
 target_link_libraries(simpleble-static PUBLIC ${EXTERNAL_LIBRARIES})
 target_link_libraries(simpleble PUBLIC ${EXTERNAL_LIBRARIES})
 target_link_libraries(simpleble-c-static PUBLIC simpleble-static)
