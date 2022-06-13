@@ -39,7 +39,7 @@ typedef struct {
 }
 
 - (void*)underlying {
-    return self.peripheral;
+    return (void*)self.peripheral;
 }
 
 - (NSString*)identifier {
