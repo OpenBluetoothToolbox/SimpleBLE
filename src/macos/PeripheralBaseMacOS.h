@@ -11,7 +11,7 @@
 
 - (instancetype)init:(CBPeripheral*)peripheral centralManager:(CBCentralManager*)centralManager;
 
-- (void)underlying;
+- (void*)underlying;
 
 - (NSString*)identifier;
 - (NSString*)address;

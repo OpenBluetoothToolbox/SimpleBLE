@@ -31,7 +31,7 @@ PeripheralBase::~PeripheralBase() {
     }
 }
 
-void* PeripheralBase::underlying() const { return device_; }
+void* PeripheralBase::underlying() const { return std::reinterpret_cast<void*>(&device_); }
 
 std::string PeripheralBase::identifier() { return identifier_; }
 

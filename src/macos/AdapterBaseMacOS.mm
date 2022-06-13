@@ -33,7 +33,7 @@
     return self;
 }
 
-- (void)underlying {
+- (void*)underlying {
     return self.centralManager;
 }
 

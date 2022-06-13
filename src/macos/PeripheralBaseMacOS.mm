@@ -38,7 +38,7 @@ typedef struct {
     return self;
 }
 
-- (void)underlying {
+- (void*)underlying {
     return self.peripheral;
 }
 
