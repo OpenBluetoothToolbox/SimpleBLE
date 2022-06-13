@@ -80,7 +80,7 @@ std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
 }
 
 void* AdapterBase::underlying() const {
-    return std::reinterpret_cast<void*>(&adapter_);
+    return nullptr;
 }
 
 std::string AdapterBase::identifier() { return identifier_; }

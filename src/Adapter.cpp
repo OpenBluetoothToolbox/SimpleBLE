@@ -21,7 +21,7 @@ bool Adapter::initialized() const { return internal_ != nullptr; }
 
 void* Adapter::underlying() const {
     if (!initialized()) throw Exception::NotInitialized();
-    
+
     return internal_->underlying();
 }
 

@@ -22,9 +22,7 @@ PeripheralBase::~PeripheralBase() {
     _cleanup_characteristics();
 }
 
-void* PeripheralBase::underlying() const {
-    return device_.get();
-}
+void* PeripheralBase::underlying() const { return device_.get(); }
 
 std::string PeripheralBase::identifier() { return device_->name(); }
 
