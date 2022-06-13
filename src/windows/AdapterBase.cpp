@@ -79,6 +79,8 @@ std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
     return adapter_list;
 }
 
+void* AdapterBase::underlying() const { return nullptr; }
+
 std::string AdapterBase::identifier() { return identifier_; }
 
 BluetoothAddress AdapterBase::address() { return _mac_address_to_str(adapter_.BluetoothAddress()); }

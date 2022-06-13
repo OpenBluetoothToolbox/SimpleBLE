@@ -33,6 +33,10 @@
     return self;
 }
 
+- (void*)underlying {
+    return (__bridge void*)self.centralManager;
+}
+
 - (void)validateCentralManagerState {
     // Validate the central manager state by checking if it is powered on for up to 5 seconds.
     NSDate* endDate = [NSDate dateWithTimeInterval:5.0 sinceDate:NSDate.now];

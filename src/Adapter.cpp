@@ -19,6 +19,12 @@ std::vector<Adapter> Adapter::get_adapters() {
 
 bool Adapter::initialized() const { return internal_ != nullptr; }
 
+void* Adapter::underlying() const {
+    if (!initialized()) throw Exception::NotInitialized();
+
+    return internal_->underlying();
+}
+
 std::string Adapter::identifier() {
     if (!initialized()) throw Exception::NotInitialized();
 

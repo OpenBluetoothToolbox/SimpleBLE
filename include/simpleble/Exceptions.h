@@ -18,6 +18,11 @@ class NotInitialized : public BaseException {
     NotInitialized();
 };
 
+class NotConnected : public BaseException {
+  public:
+    NotConnected();
+};
+
 class InvalidReference : public BaseException {
   public:
     InvalidReference();

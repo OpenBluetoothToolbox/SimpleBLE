@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-[0.4.0] - 2022-XX-XX
+[0.4.0] - 2022-06-12
 --------------------
 
 **Added**
@@ -15,28 +15,33 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  Utils function to identify the current platform.
 -  (Linux) ``SimpleBLE::Peripheral::is_paired`` method to check if a peripheral is paired.
 -  (Linux) ``SimpleBLE::Adapter::get_paired_peripherals`` method to list all paired peripherals.
--  Function to validate whether an Adapter or Peripheral object is initialized.
+-  Function to validate whether an ``SimpleBLE::Adapter`` or ``SimpleBLE::Peripheral`` object is initialized.
+-  Logging hooks to capture logs from SimpleBLE and internal components.
+-  Accessor function to underlying OS objects of ``SimpleBLE::Adapter`` and ``SimpleBLE::Peripheral``.
 
 **Changed**
 
--  Updated Linux implementation to use SimpleBluez v0.4.0.
+-  Updated Linux implementation to use SimpleBluez v0.5.0.
 -  Added support for Windows SDK 10.0.22000.0
 -  Updated libfmt to version 8.1.1.
 -  Cleaned up dependency management for libfmt and SimpleBluez.
 -  ``SimpleBLE::Adapter::get_paired_peripherals`` will return an empty list on Windows and MacOS.
+-  (Linux) **(Experimental)** Exceptions thrown inside the Bluez async thread are now caught to prevent lockups.
+-  ``NotConnected`` exception will be thrown instead of ``OperationFailed`` when peripheral not connected.
 
 **Fixed**
 
-- (MacOS) Known peripherals would not get cleared at the beginning of a scanning session.
-- (Windows) Known peripherals would not get cleared at the beginning of a scanning session.
-- Calling functions of uninitialized objects will now throw an exception instead of crashing.
-- (MacOS) Thread synchronization issues would cause certain peripheral actions to report failure.
-- (Windows) Behavior of ``write_request`` and ``write_command`` was flipped.
-- (MacOS) Behavior of ``write_request`` and ``write_command`` was flipped.
-- (Linux) ``on_connected`` callback was not being called.
-- (Linux) Spurious disconnection events during connection retries have been removed.
-- (Linux) Existing characteristic callbacks were not being cleared on disconnection.
-- (Linux) Characteristics are unsubscribed on disconnection.
+-  (MacOS) Known peripherals would not get cleared at the beginning of a scanning session.
+-  (Windows) Known peripherals would not get cleared at the beginning of a scanning session.
+-  Calling functions of uninitialized objects will now throw an exception instead of crashing.
+-  (MacOS) Thread synchronization issues would cause certain peripheral actions to report failure.
+-  (Windows) Behavior of ``write_request`` and ``write_command`` was flipped.
+-  (MacOS) Behavior of ``write_request`` and ``write_command`` was flipped.
+-  (Linux) ``on_connected`` callback was not being called.
+-  (Linux) Spurious disconnection events during connection retries have been removed.
+-  (Linux) Existing characteristic callbacks were not being cleared on disconnection.
+-  (Linux) Characteristics are unsubscribed on disconnection.
+-  (Linux) Missing agent registration that would prevent pairing from working.
 
 [0.3.0] - 2022-04-03
 --------------------
@@ -48,7 +53,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    an operating system popup to pair the device, while on Linux all pairing
    requests will automatically be accepted, with passcodes ``abc123`` or ``123456``.
 -  Unpair command has been added, although the only working implementation
-   will be the linux one. Both Windows and MacOS require the user to manually
+   will be the Linux one. Both Windows and MacOS require the user to manually
    unpair a device from the corresponding OS settings page.
 
 **Changed**

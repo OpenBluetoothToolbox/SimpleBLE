@@ -18,6 +18,8 @@ AdapterBase::AdapterBase(std::shared_ptr<SimpleBluez::Adapter> adapter) : adapte
 
 AdapterBase::~AdapterBase() { adapter_->clear_on_device_updated(); }
 
+void* AdapterBase::underlying() const { return adapter_.get(); }
+
 std::string AdapterBase::identifier() { return adapter_->identifier(); }
 
 BluetoothAddress AdapterBase::address() { return adapter_->address(); }

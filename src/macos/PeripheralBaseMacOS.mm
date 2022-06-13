@@ -38,6 +38,10 @@ typedef struct {
     return self;
 }
 
+- (void*)underlying {
+    return (__bridge void*)self.peripheral;
+}
+
 - (NSString*)identifier {
     if (self.peripheral.name != nil) {
         return [self.peripheral.name copy];

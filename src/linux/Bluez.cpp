@@ -26,8 +26,13 @@ Bluez::~Bluez() {
 }
 
 void Bluez::async_thread_function() {
+    bluez.register_agent();
     while (async_thread_active) {
-        bluez.run_async();
+        try {
+            bluez.run_async();
+        } catch (...) {
+            // TODO: Handle exception
+        }
         std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
 }
