@@ -34,7 +34,7 @@
 }
 
 - (void*)underlying {
-    return (void*)self.centralManager;
+    return (__bridge void*)self.centralManager;
 }
 
 - (void)validateCentralManagerState {

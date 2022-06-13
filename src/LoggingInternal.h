@@ -1,7 +1,7 @@
 #pragma once
 
-#include "simpleble/Logging.h"
 #include <fmt/core.h>
+#include "simpleble/Logging.h"
 
 #define SIMPLEDBUS_LOG_LEVEL_NONE 0
 #define SIMPLEDBUS_LOG_LEVEL_FATAL 1
