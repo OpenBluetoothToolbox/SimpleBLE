@@ -25,6 +25,8 @@ class AdapterBase {
     AdapterBase();
     virtual ~AdapterBase();
 
+    void* underlying() const;
+
     std::string identifier();
     BluetoothAddress address();
 

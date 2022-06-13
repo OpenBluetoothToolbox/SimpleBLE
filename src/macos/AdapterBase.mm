@@ -34,6 +34,12 @@ std::vector<std::shared_ptr<AdapterBase> > AdapterBase::get_adapters() {
     return adapter_list;
 }
 
+void* AdapterBase::underlying() const {
+    AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)opaque_internal_;
+
+    return [internal underlying];
+}
+
 std::string AdapterBase::identifier() { return "Default Adapter"; }
 
 BluetoothAddress AdapterBase::address() { return "00:00:00:00:00:00"; }

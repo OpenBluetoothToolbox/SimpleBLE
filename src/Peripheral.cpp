@@ -7,6 +7,12 @@ using namespace SimpleBLE;
 
 bool Peripheral::initialized() const { return internal_ != nullptr; }
 
+void* Peripheral::underlying() const {
+    if (!initialized()) throw Exception::NotInitialized();
+
+    return internal_->underlying();
+}
+
 std::string Peripheral::identifier() {
     if (!initialized()) throw Exception::NotInitialized();
 

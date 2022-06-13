@@ -15,12 +15,13 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  Utils function to identify the current platform.
 -  (Linux) ``SimpleBLE::Peripheral::is_paired`` method to check if a peripheral is paired.
 -  (Linux) ``SimpleBLE::Adapter::get_paired_peripherals`` method to list all paired peripherals.
--  Function to validate whether an Adapter or Peripheral object is initialized.
+-  Function to validate whether an ``SimpleBLE::Adapter`` or ``SimpleBLE::Peripheral`` object is initialized.
 -  Logging hooks to capture logs from SimpleBLE and internal components.
+-  Accessor function to underlying OS objects of ``SimpleBLE::Adapter`` and ``SimpleBLE::Peripheral``.
 
 **Changed**
 
--  Updated Linux implementation to use SimpleBluez v0.4.0.
+-  Updated Linux implementation to use SimpleBluez v0.5.0.
 -  Added support for Windows SDK 10.0.22000.0
 -  Updated libfmt to version 8.1.1.
 -  Cleaned up dependency management for libfmt and SimpleBluez.

@@ -22,6 +22,8 @@ class AdapterBase {
     AdapterBase(std::shared_ptr<SimpleBluez::Adapter> adapter);
     virtual ~AdapterBase();
 
+    void* underlying() const;
+
     std::string identifier();
     BluetoothAddress address();
 

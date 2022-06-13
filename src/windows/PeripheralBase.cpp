@@ -31,6 +31,8 @@ PeripheralBase::~PeripheralBase() {
     }
 }
 
+void* PeripheralBase::underlying() const { return device_; }
+
 std::string PeripheralBase::identifier() { return identifier_; }
 
 BluetoothAddress PeripheralBase::address() { return address_; }
