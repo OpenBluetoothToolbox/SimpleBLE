@@ -25,6 +25,7 @@ add_subdirectory(cpp/connect_safe)
 add_subdirectory(cpp/read)
 add_subdirectory(cpp/write)
 add_subdirectory(cpp/notify)
+add_subdirectory(cpp/notify_multi)
 
 # C
 add_subdirectory(c/notify)
