@@ -1,9 +1,13 @@
 #include <iostream>
 #include <vector>
+#include <chrono>
+#include <thread>
 
 #include "../common/utils.hpp"
 
 #include "simpleble/SimpleBLE.h"
+
+using namespace std::chrono_literals;
 
 int main() {
     auto adapter_optional = Utils::getAdapter();
@@ -63,10 +67,13 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    // Attempt to read the characteristic.
-    SimpleBLE::ByteArray rx_data = peripheral.read(uuids[selection.value()].first, uuids[selection.value()].second);
-    std::cout << "Characteristic content is: ";
-    Utils::print_byte_array(rx_data);
+    // Attempt to read the characteristic 5 times in 5 seconds.
+    for (size_t i = 0; i < 5; i++) {
+        SimpleBLE::ByteArray rx_data = peripheral.read(uuids[selection.value()].first, uuids[selection.value()].second);
+        std::cout << "Characteristic content is: ";
+        Utils::print_byte_array(rx_data);
+        std::this_thread::sleep_for(1s);
+    }
 
     peripheral.disconnect();
 

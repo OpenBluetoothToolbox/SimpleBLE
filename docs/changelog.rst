@@ -19,7 +19,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 **Fixed**
 
--
+- (Windows) Peripheral reads are now uncached. *(Thanks piotromt!)*
 
 
 [0.4.0] - 2022-06-12

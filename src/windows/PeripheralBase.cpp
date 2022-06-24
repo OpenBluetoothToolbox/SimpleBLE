@@ -118,7 +118,7 @@ ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const
     }
 
     // Read the value.
-    auto result = async_get(gatt_characteristic.ReadValueAsync());
+    auto result = async_get(gatt_characteristic.ReadValueAsync(Devices::Bluetooth::BluetoothCacheMode::Uncached));
     if (result.Status() != GenericAttributeProfile::GattCommunicationStatus::Success) {
         throw SimpleBLE::Exception::OperationFailed();
     }
