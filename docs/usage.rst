@@ -16,7 +16,6 @@ The following list briefly describes each example provided:
 * `notify (cpp)`_ & `notify (c)`_: Enable notifications on a characteristic.
 
 
-
 Concurrency
 ~~~~~~~~~~~
 
