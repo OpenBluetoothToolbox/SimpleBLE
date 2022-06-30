@@ -52,7 +52,7 @@ int main() {
             return EXIT_FAILURE;
         }
 
-        peripherals[iter] = peripherals[selection.value()];
+        peripherals[iter] = aux_p[selection.value()];
 
         std::cout << "Connecting to " << peripherals[iter].identifier() << " [" << peripherals[iter].address() << "]" << std::endl;
         peripherals[iter].connect();
