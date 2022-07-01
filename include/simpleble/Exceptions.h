@@ -53,6 +53,12 @@ class WinRTException : public BaseException {
     WinRTException(int32_t err_code, const std::string &err_msg);
 };
 
+class CoreBluetoothException : public BaseException {
+  public:
+    CoreBluetoothException(const std::string &err_msg);
+};
+
+
 }  // namespace Exception
 
 }  // namespace SimpleBLE
