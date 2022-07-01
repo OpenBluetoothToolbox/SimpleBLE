@@ -12,6 +12,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 **Added**
 
 -  Multiple connection example.
+-  (Windows) WinRT exception handling.
 
 **Changed**
 

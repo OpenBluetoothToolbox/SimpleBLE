@@ -2,8 +2,10 @@
 
 #include <cstdint>
 #include <string>
+#include <exception>
 
 #include <simpleble/Types.h>
+#include <simpleble/Exceptions.h>
 
 #include "winrt/Windows.Foundation.h"
 #include "winrt/Windows.Storage.Streams.h"
@@ -31,7 +33,13 @@ static auto async_get(async_t const& async) {
     if (async.Status() == Foundation::AsyncStatus::Started) {
         wait_for_completed(async, TEN_SECONDS_IN_MSECS);
     }
-    return async.GetResults();
+    try {
+        return async.GetResults();
+    } catch (const winrt::hresult_error& err) {
+        throw SimpleBLE::Exception::WinRTException(err.code().value, winrt::to_string(err.message()));
+    } catch (const std::exception& err) {
+        throw SimpleBLE::Exception::BaseException(err.what());
+    }
 }
 
 }  // namespace SimpleBLE
