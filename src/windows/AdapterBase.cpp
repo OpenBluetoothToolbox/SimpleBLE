@@ -79,7 +79,7 @@ std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
     return adapter_list;
 }
 
-void* AdapterBase::underlying() const { return nullptr; }
+void* AdapterBase::underlying() const { return reinterpret_cast<void*>(const_cast<BluetoothAdapter*>(&adapter_)); }
 
 std::string AdapterBase::identifier() { return identifier_; }
 

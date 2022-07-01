@@ -1,5 +1,5 @@
-#include <simpleble/Exceptions.h>
 #include <fmt/core.h>
+#include <simpleble/Exceptions.h>
 
 using namespace SimpleBLE;
 using namespace SimpleBLE::Exception;
@@ -19,4 +19,5 @@ OperationNotSupported::OperationNotSupported() : BaseException("The requested op
 
 OperationFailed::OperationFailed() : BaseException("The requested operation has failed.") {}
 
-WinRTException::WinRTException(int32_t err_code, const std::string &err_msg) : BaseException(fmt::format("WinRT Exception. Error code {}: {}", err_code, err_msg)) {}
+WinRTException::WinRTException(int32_t err_code, const std::string& err_msg)
+    : BaseException(fmt::format("WinRT Exception. Error code {}: {}", err_code, err_msg)) {}

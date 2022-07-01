@@ -31,7 +31,7 @@ PeripheralBase::~PeripheralBase() {
     }
 }
 
-void* PeripheralBase::underlying() const { return nullptr; }
+void* PeripheralBase::underlying() const { return reinterpret_cast<void*>(const_cast<BluetoothLEDevice*>(&device_)); }
 
 std::string PeripheralBase::identifier() { return identifier_; }
 

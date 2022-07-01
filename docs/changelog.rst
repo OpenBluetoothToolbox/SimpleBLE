@@ -13,6 +13,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 -  Multiple connection example.
 -  (Windows) WinRT exception handling.
+-  (Windows) Accessor function to underlying OS objects of ``Adapter`` and ``Peripheral``.
 
 **Changed**
 
