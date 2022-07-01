@@ -17,6 +17,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 **Changed**
 
 -  Clearer layout of examples. *(Thanks Yohannfra!)*
+-  ``AdapterSafe`` and ``PeripheralSafe`` will now catch all exceptions.
 
 **Fixed**
 
@@ -28,13 +29,13 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 **Added**
 
--  Expose RSSI as a property of ``SimpleBLE::Peripheral``.
+-  Expose RSSI as a property of ``Peripheral``.
 -  Utils function to identify the current platform.
--  (Linux) ``SimpleBLE::Peripheral::is_paired`` method to check if a peripheral is paired.
--  (Linux) ``SimpleBLE::Adapter::get_paired_peripherals`` method to list all paired peripherals.
--  Function to validate whether an ``SimpleBLE::Adapter`` or ``SimpleBLE::Peripheral`` object is initialized.
+-  (Linux) ``Peripheral::is_paired`` method to check if a peripheral is paired.
+-  (Linux) ``Adapter::get_paired_peripherals`` method to list all paired peripherals.
+-  Function to validate whether an ``Adapter`` or ``Peripheral`` object is initialized.
 -  Logging hooks to capture logs from SimpleBLE and internal components.
--  Accessor function to underlying OS objects of ``SimpleBLE::Adapter`` and ``SimpleBLE::Peripheral``.
+-  Accessor function to underlying OS objects of ``Adapter`` and ``Peripheral``.
 
 **Changed**
 
@@ -42,7 +43,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  Added support for Windows SDK 10.0.22000.0
 -  Updated libfmt to version 8.1.1.
 -  Cleaned up dependency management for libfmt and SimpleBluez.
--  ``SimpleBLE::Adapter::get_paired_peripherals`` will return an empty list on Windows and MacOS.
+-  ``Adapter::get_paired_peripherals`` will return an empty list on Windows and MacOS.
 -  (Linux) **(Experimental)** Exceptions thrown inside the Bluez async thread are now caught to prevent lockups.
 -  ``NotConnected`` exception will be thrown instead of ``OperationFailed`` when peripheral not connected.
 
@@ -117,16 +118,16 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 **Added**
 
--  Safe implementation of ``SimpleBLE::Adapter`` and ``SimpleBLE::Peripheral`` classes.
+-  Safe implementation of ``Adapter`` and ``Peripheral`` classes.
 -  CppCheck and ClangFormat CI checks. *(Thanks Andrey1994!)*
 -  C-style API with examples.
--  Access to manufacturer data in the ``SimpleBLE::Peripheral`` class, for Windows and MacOS.
+-  Access to manufacturer data in the ``Peripheral`` class, for Windows and MacOS.
 
 **Fixed**
 
 -  Compilation errors that came up during development. *(Thanks fidoriel!)*
 -  WinRT buffer allocation would fail. *(Thanks PatrykSajdok!)*
--  ``SimpleBLE::Adapter`` would fail to stop scanning. *(Thanks PatrykSajdok!)*
+-  ``Adapter`` would fail to stop scanning. *(Thanks PatrykSajdok!)*
 -  Switched WinRT initialization to single-threaded.
 
 **Changed**
