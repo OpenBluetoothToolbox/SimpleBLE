@@ -71,7 +71,6 @@ class AdapterBase {
      */
     std::map<void*, std::shared_ptr<PeripheralBase> > peripherals_;
     std::map<void*, std::shared_ptr<PeripheralBase> > scanned_peripherals_;
-
 };
 
 }  // namespace SimpleBLE

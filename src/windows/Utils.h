@@ -1,11 +1,11 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
 #include <exception>
+#include <string>
 
-#include <simpleble/Types.h>
 #include <simpleble/Exceptions.h>
+#include <simpleble/Types.h>
 
 #include "winrt/Windows.Foundation.h"
 #include "winrt/Windows.Storage.Streams.h"
