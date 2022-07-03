@@ -57,14 +57,12 @@ void PeripheralBase::connect() {
             [this](const BluetoothLEDevice device, const auto args) {
                 if (device.ConnectionStatus() == BluetoothConnectionStatus::Disconnected) {
                     this->disconnection_cv_.notify_all();
-                    if (this->callback_on_disconnected_) {
-                        this->callback_on_disconnected_();
-                    }
+
+                    SAFE_CALLBACK_CALL(this->callback_on_disconnected_);
                 }
             });
-        if (this->callback_on_connected_) {
-            this->callback_on_connected_();
-        }
+
+        SAFE_CALLBACK_CALL(this->callback_on_connected_);
     }
 }
 

@@ -1,5 +1,6 @@
 #import "AdapterBase.h"
 #import "AdapterBaseMacOS.h"
+#import "CommonUtils.h"
 #import "PeripheralBase.h"
 #import "PeripheralBuilder.h"
 
@@ -50,17 +51,14 @@ void AdapterBase::scan_start() {
     AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)opaque_internal_;
     [internal scanStart];
 
-    if (callback_on_scan_start_) {
-        callback_on_scan_start_();
-    }
+    SAFE_CALLBACK_CALL(this->callback_on_scan_start_);
 }
 
 void AdapterBase::scan_stop() {
     AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)opaque_internal_;
     [internal scanStop];
-    if (callback_on_scan_stop_) {
-        callback_on_scan_stop_();
-    }
+
+    SAFE_CALLBACK_CALL(this->callback_on_scan_stop_);
 }
 
 void AdapterBase::scan_for(int timeout_ms) {
@@ -127,22 +125,16 @@ void AdapterBase::delegate_did_discover_peripheral(void* opaque_peripheral, void
     auto base_peripheral = this->peripherals_.at(opaque_peripheral);
     base_peripheral->update_advertising_data(advertising_data);
 
+    // Convert the base object into an external-facing Peripheral object
+    PeripheralBuilder peripheral_builder(base_peripheral);
+
     // Check if the device has been seen before, to forward the correct call to the user.
     if (this->scanned_peripherals_.count(opaque_peripheral) == 0) {
         // Store it in our table of seen peripherals
         this->scanned_peripherals_.insert(std::make_pair(opaque_peripheral, base_peripheral));
-
-        // Convert the base object into an external-facing Peripheral object
-        PeripheralBuilder peripheral_builder(base_peripheral);
-        if (this->callback_on_scan_found_) {
-            this->callback_on_scan_found_(peripheral_builder);
-        }
+        SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral_builder);
     } else {
-        // Convert the base object into an external-facing Peripheral object
-        PeripheralBuilder peripheral_builder(base_peripheral);
-        if (this->callback_on_scan_updated_) {
-            this->callback_on_scan_updated_(peripheral_builder);
-        }
+        SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral_builder);
     }
 }
 

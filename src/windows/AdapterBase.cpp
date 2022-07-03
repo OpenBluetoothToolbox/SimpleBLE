@@ -92,9 +92,7 @@ void AdapterBase::scan_start() {
     scan_is_active_ = true;
     scanner_.Start();
 
-    if (callback_on_scan_start_) {
-        callback_on_scan_start_();
-    }
+    SAFE_CALLBACK_CALL(this->callback_on_scan_start_);
 }
 
 void AdapterBase::scan_stop() {
@@ -163,9 +161,8 @@ void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_
 void AdapterBase::_scan_stopped_callback() {
     scan_is_active_ = false;
     scan_stop_cv_.notify_all();
-    if (callback_on_scan_stop_) {
-        callback_on_scan_stop_();
-    }
+
+    SAFE_CALLBACK_CALL(this->callback_on_scan_stop_);
 }
 
 void AdapterBase::_scan_received_callback(advertising_data_t data) {
@@ -178,9 +175,8 @@ void AdapterBase::_scan_received_callback(advertising_data_t data) {
 
         // Convert the base object into an external-facing Peripheral object
         PeripheralBuilder peripheral_builder(base_peripheral);
-        if (this->callback_on_scan_found_) {
-            this->callback_on_scan_found_(peripheral_builder);
-        }
+
+        SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral_builder);
     } else {
         // Load the existing PeripheralBase object
         std::shared_ptr<PeripheralBase> base_peripheral = this->peripherals_.at(data.mac_address);
@@ -190,8 +186,7 @@ void AdapterBase::_scan_received_callback(advertising_data_t data) {
 
         // Convert the base object into an external-facing Peripheral object
         PeripheralBuilder peripheral_builder(base_peripheral);
-        if (this->callback_on_scan_updated_) {
-            this->callback_on_scan_updated_(peripheral_builder);
-        }
+
+        SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral_builder);
     }
 }

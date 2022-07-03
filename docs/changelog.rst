@@ -25,6 +25,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 -  (Windows) Peripheral reads are now uncached. *(Thanks piotromt!)*
 -  (MacOS) Attempting to scan while connected will erase references to all existing peripherals.
+-  Made user callback invocations exception-safe.
 
 
 [0.4.0] - 2022-06-12
