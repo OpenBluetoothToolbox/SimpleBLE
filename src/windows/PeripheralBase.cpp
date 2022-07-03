@@ -2,8 +2,10 @@
 #pragma comment(lib, "windowsapp")
 
 #include "PeripheralBase.h"
-#include <simpleble/Exceptions.h>
+#include "CommonUtils.h"
 #include "Utils.h"
+
+#include <simpleble/Exceptions.h>
 
 #include "winrt/Windows.Foundation.Collections.h"
 #include "winrt/Windows.Foundation.h"

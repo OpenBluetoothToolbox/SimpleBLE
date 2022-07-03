@@ -2,6 +2,7 @@
 #pragma comment(lib, "windowsapp")
 #include "AdapterBase.h"
 
+#include "CommonUtils.h"
 #include "PeripheralBuilder.h"
 #include "Utils.h"
 
