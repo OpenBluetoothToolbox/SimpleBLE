@@ -87,7 +87,7 @@ std::string AdapterBase::identifier() { return identifier_; }
 BluetoothAddress AdapterBase::address() { return _mac_address_to_str(adapter_.BluetoothAddress()); }
 
 void AdapterBase::scan_start() {
-    this->peripherals_.clear();
+    this->seen_peripherals_.clear();
 
     scanner_.ScanningMode(Advertisement::BluetoothLEScanningMode::Active);
     scan_is_active_ = true;
@@ -118,7 +118,7 @@ bool AdapterBase::scan_is_active() { return scan_is_active_; }
 
 std::vector<Peripheral> AdapterBase::scan_get_results() {
     std::vector<Peripheral> peripherals;
-    for (auto& [address, base_peripheral] : this->peripherals_) {
+    for (auto& [address, base_peripheral] : this->seen_peripherals_) {
         PeripheralBuilder peripheral_builder(base_peripheral);
         peripherals.push_back(peripheral_builder);
     }
@@ -135,6 +135,7 @@ void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start
         callback_on_scan_start_.unload();
     }
 }
+
 void AdapterBase::set_callback_on_scan_stop(std::function<void()> on_scan_stop) {
     if (on_scan_stop) {
         callback_on_scan_stop_.load(on_scan_stop);
@@ -142,6 +143,7 @@ void AdapterBase::set_callback_on_scan_stop(std::function<void()> on_scan_stop) 
         callback_on_scan_stop_.unload();
     }
 }
+
 void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) {
     if (on_scan_updated) {
         callback_on_scan_updated_.load(on_scan_updated);
@@ -149,6 +151,7 @@ void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> o
         callback_on_scan_updated_.unload();
     }
 }
+
 void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {
     if (on_scan_found) {
         callback_on_scan_found_.load(on_scan_found);
@@ -168,26 +171,24 @@ void AdapterBase::_scan_stopped_callback() {
 
 void AdapterBase::_scan_received_callback(advertising_data_t data) {
     if (this->peripherals_.count(data.mac_address) == 0) {
-        // Create a new PeripheralBase object
-        std::shared_ptr<PeripheralBase> base_peripheral = std::make_shared<PeripheralBase>(data);
-
-        // Store it in our table of seem peripherals
+        // If the incoming peripheral has never been seen before, create and save a reference to it.
+        auto base_peripheral = std::make_shared<PeripheralBase>(data);
         this->peripherals_.insert(std::make_pair(data.mac_address, base_peripheral));
+    }
 
-        // Convert the base object into an external-facing Peripheral object
-        PeripheralBuilder peripheral_builder(base_peripheral);
+    // Update the received advertising data.
+    auto base_peripheral = this->peripherals_.at(data.mac_address);
+    base_peripheral->update_advertising_data(data);
 
+    // Convert the base object into an external-facing Peripheral object
+    PeripheralBuilder peripheral_builder(base_peripheral);
+
+    // Check if the device has been seen before, to forward the correct call to the user.
+    if (this->seen_peripherals_.count(data.mac_address) == 0) {
+        // Store it in our table of seen peripherals
+        this->seen_peripherals_.insert(std::make_pair(data.mac_address, base_peripheral));
         SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral_builder);
     } else {
-        // Load the existing PeripheralBase object
-        std::shared_ptr<PeripheralBase> base_peripheral = this->peripherals_.at(data.mac_address);
-
-        // Update the PeripheralBase object
-        base_peripheral->update_advertising_data(data);
-
-        // Convert the base object into an external-facing Peripheral object
-        PeripheralBuilder peripheral_builder(base_peripheral);
-
         SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral_builder);
     }
 }

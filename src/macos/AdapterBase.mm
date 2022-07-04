@@ -46,7 +46,7 @@ std::string AdapterBase::identifier() { return "Default Adapter"; }
 BluetoothAddress AdapterBase::address() { return "00:00:00:00:00:00"; }
 
 void AdapterBase::scan_start() {
-    this->scanned_peripherals_.clear();
+    this->seen_peripherals_.clear();
 
     AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)opaque_internal_;
     [internal scanStart];
@@ -129,9 +129,9 @@ void AdapterBase::delegate_did_discover_peripheral(void* opaque_peripheral, void
     PeripheralBuilder peripheral_builder(base_peripheral);
 
     // Check if the device has been seen before, to forward the correct call to the user.
-    if (this->scanned_peripherals_.count(opaque_peripheral) == 0) {
+    if (this->seen_peripherals_.count(opaque_peripheral) == 0) {
         // Store it in our table of seen peripherals
-        this->scanned_peripherals_.insert(std::make_pair(opaque_peripheral, base_peripheral));
+        this->seen_peripherals_.insert(std::make_pair(opaque_peripheral, base_peripheral));
         SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral_builder);
     } else {
         SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral_builder);
