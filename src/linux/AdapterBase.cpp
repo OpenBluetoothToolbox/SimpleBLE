@@ -1,5 +1,6 @@
 #include "AdapterBase.h"
 #include "Bluez.h"
+#include "CommonUtils.h"
 #include "PeripheralBase.h"
 #include "PeripheralBuilder.h"
 
@@ -37,30 +38,22 @@ void AdapterBase::scan_start() {
 
         if (this->seen_devices_.count(peripheral_builder.address()) == 0) {
             this->seen_devices_.insert(std::make_pair<>(peripheral_builder.address(), peripheral_builder));
-            if (this->callback_on_scan_found_) {
-                this->callback_on_scan_found_(peripheral_builder);
-            }
+            SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral_builder);
         } else {
-            if (this->callback_on_scan_updated_) {
-                this->callback_on_scan_updated_(peripheral_builder);
-            }
+            SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral_builder);
         }
     });
 
     // Start scanning and notify the user.
     adapter_->discovery_start();
-    if (callback_on_scan_start_) {
-        callback_on_scan_start_();
-    }
+    SAFE_CALLBACK_CALL(this->callback_on_scan_start_);
     is_scanning_ = true;
 }
 
 void AdapterBase::scan_stop() {
     adapter_->discovery_stop();
     is_scanning_ = false;
-    if (callback_on_scan_stop_) {
-        callback_on_scan_stop_();
-    }
+    SAFE_CALLBACK_CALL(this->callback_on_scan_stop_);
 
     // Important: Bluez might continue scanning if another process is also requesting
     // scanning from the adapter. The use of the is_scanning_ flag is to prevent

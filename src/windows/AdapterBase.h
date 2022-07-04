@@ -61,6 +61,7 @@ class AdapterBase {
     std::condition_variable scan_stop_cv_;
     std::mutex scan_stop_mutex_;
     std::map<BluetoothAddress, std::shared_ptr<PeripheralBase>> peripherals_;
+    std::map<BluetoothAddress, std::shared_ptr<PeripheralBase>> seen_peripherals_;
 
     void _scan_stopped_callback();
     void _scan_received_callback(advertising_data_t data);

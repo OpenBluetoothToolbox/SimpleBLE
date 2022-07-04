@@ -7,6 +7,6 @@ message("-- [INFO] Building Example")
 add_executable(example_connect_safe
     connect_safe.cpp
     ../common/utils.cpp
-    )
+)
 
 target_link_libraries(example_connect_safe simpleble-static)

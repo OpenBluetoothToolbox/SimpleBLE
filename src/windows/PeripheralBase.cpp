@@ -2,8 +2,10 @@
 #pragma comment(lib, "windowsapp")
 
 #include "PeripheralBase.h"
-#include <simpleble/Exceptions.h>
+#include "CommonUtils.h"
 #include "Utils.h"
+
+#include <simpleble/Exceptions.h>
 
 #include "winrt/Windows.Foundation.Collections.h"
 #include "winrt/Windows.Foundation.h"
@@ -31,7 +33,7 @@ PeripheralBase::~PeripheralBase() {
     }
 }
 
-void* PeripheralBase::underlying() const { return nullptr; }
+void* PeripheralBase::underlying() const { return reinterpret_cast<void*>(const_cast<BluetoothLEDevice*>(&device_)); }
 
 std::string PeripheralBase::identifier() { return identifier_; }
 
@@ -57,14 +59,12 @@ void PeripheralBase::connect() {
             [this](const BluetoothLEDevice device, const auto args) {
                 if (device.ConnectionStatus() == BluetoothConnectionStatus::Disconnected) {
                     this->disconnection_cv_.notify_all();
-                    if (this->callback_on_disconnected_) {
-                        this->callback_on_disconnected_();
-                    }
+
+                    SAFE_CALLBACK_CALL(this->callback_on_disconnected_);
                 }
             });
-        if (this->callback_on_connected_) {
-            this->callback_on_connected_();
-        }
+
+        SAFE_CALLBACK_CALL(this->callback_on_connected_);
     }
 }
 

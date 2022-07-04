@@ -1,3 +1,4 @@
+#include <fmt/core.h>
 #include <simpleble/Exceptions.h>
 
 using namespace SimpleBLE;
@@ -17,3 +18,9 @@ CharacteristicNotFound::CharacteristicNotFound(BluetoothUUID uuid)
 OperationNotSupported::OperationNotSupported() : BaseException("The requested operation is not supported.") {}
 
 OperationFailed::OperationFailed() : BaseException("The requested operation has failed.") {}
+
+WinRTException::WinRTException(int32_t err_code, const std::string& err_msg)
+    : BaseException(fmt::format("WinRT Exception. Error code {}: {}", err_code, err_msg)) {}
+
+CoreBluetoothException::CoreBluetoothException(const std::string& err_msg)
+    : BaseException(fmt::format("CoreBluetooth Exception: {}", err_msg)) {}
