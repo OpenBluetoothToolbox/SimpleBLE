@@ -31,7 +31,11 @@ class Logger {
     static Logger* get();
 
     void set_level(Level level);
+    Level get_level();
+
     void set_callback(Callback callback);
+    bool has_callback();
+
     // clang-format off
     void log(
         Level level,
