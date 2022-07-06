@@ -1,4 +1,7 @@
 #include "Bluez.h"
+
+#include "CommonUtils.h"
+
 #include <mutex>
 
 using namespace SimpleBLE;
@@ -26,13 +29,10 @@ Bluez::~Bluez() {
 }
 
 void Bluez::async_thread_function() {
-    bluez.register_agent();
+    SAFE_RUN({ bluez.register_agent(); });
+
     while (async_thread_active) {
-        try {
-            bluez.run_async();
-        } catch (...) {
-            // TODO: Handle exception
-        }
+        SAFE_RUN({ bluez.run_async(); });
         std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
 }

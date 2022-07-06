@@ -26,6 +26,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  Made user callback invocations exception-safe.
 -  Attempting to scan while connected will erase references to all existing peripherals.
 -  (Windows) Peripheral reads are now uncached. *(Thanks piotromt!)*
+-  (Linux) Failure to set agent would trigger a crash.
 
 
 [0.4.0] - 2022-06-12
