@@ -21,9 +21,19 @@ void Logger::set_level(Level level) {
     level_ = level;
 }
 
+Level Logger::get_level() {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    return level_;
+}
+
 void Logger::set_callback(Callback callback) {
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     callback_ = callback;
+}
+
+bool Logger::has_callback() {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    return callback_ != nullptr;
 }
 
 void Logger::log(Level level, const std::string& module, const std::string& file, uint32_t line,

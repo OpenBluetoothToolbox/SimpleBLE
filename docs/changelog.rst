@@ -12,6 +12,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 **Added**
 
 -  Multiple connection example.
+-  Logger level and callback can now be queried.
 -  (Windows) WinRT exception handling.
 -  (Windows) Accessor function to underlying OS objects of ``Adapter`` and ``Peripheral``.
 -  (MacOS) Failures will now throw corresponding exception.
@@ -24,9 +25,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 **Fixed**
 
 -  Made user callback invocations exception-safe.
+-  Attempting to scan while connected will erase references to all existing peripherals.
 -  (Windows) Peripheral reads are now uncached. *(Thanks piotromt!)*
--  (MacOS) Attempting to scan while connected will erase references to all existing peripherals.
--  (Windows) Attempting to scan while connected will erase references to all existing peripherals.
+-  (Linux) Failure to set agent would trigger a crash.
 
 
 [0.4.0] - 2022-06-12

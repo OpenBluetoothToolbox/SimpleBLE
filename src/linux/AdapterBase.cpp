@@ -28,16 +28,29 @@ BluetoothAddress AdapterBase::address() { return adapter_->address(); }
 void AdapterBase::scan_start() {
     adapter_->discovery_filter(SimpleBluez::Adapter::DiscoveryFilter::LE);
 
-    seen_devices_.clear();
+    seen_peripherals_.clear();
+
     adapter_->set_on_device_updated([this](std::shared_ptr<SimpleBluez::Device> device) {
         if (!this->is_scanning_) {
             return;
         }
 
-        PeripheralBuilder peripheral_builder(std::make_shared<PeripheralBase>(device, this->adapter_));
+        if (this->peripherals_.count(device->address()) == 0) {
+            // If the incoming peripheral has never been seen before, create and save a reference to it.
+            auto base_peripheral = std::make_shared<PeripheralBase>(device, this->adapter_);
+            this->peripherals_.insert(std::make_pair(device->address(), base_peripheral));
+        }
 
-        if (this->seen_devices_.count(peripheral_builder.address()) == 0) {
-            this->seen_devices_.insert(std::make_pair<>(peripheral_builder.address(), peripheral_builder));
+        // Update the received advertising data.
+        auto base_peripheral = this->peripherals_.at(device->address());
+
+        // Convert the base object into an external-facing Peripheral object
+        PeripheralBuilder peripheral_builder(base_peripheral);
+
+        // Check if the device has been seen before, to forward the correct call to the user.
+        if (this->seen_peripherals_.count(device->address()) == 0) {
+            // Store it in our table of seen peripherals
+            this->seen_peripherals_.insert(std::make_pair(device->address(), base_peripheral));
             SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral_builder);
         } else {
             SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral_builder);
@@ -70,8 +83,9 @@ bool AdapterBase::scan_is_active() { return is_scanning_ && adapter_->discoverin
 
 std::vector<Peripheral> AdapterBase::scan_get_results() {
     std::vector<Peripheral> peripherals;
-    for (auto& [address, peripheral] : this->seen_devices_) {
-        peripherals.push_back(peripheral);
+    for (auto& [address, peripheral] : this->seen_peripherals_) {
+        PeripheralBuilder peripheral_builder(peripheral);
+        peripherals.push_back(peripheral_builder);
     }
     return peripherals;
 }
