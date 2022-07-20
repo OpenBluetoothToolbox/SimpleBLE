@@ -218,6 +218,9 @@ set(
 add_library(simpleble ${SRC_SIMPLEBLE_FILES})
 add_library(simpleble-c ${SRC_SIMPLEBLE_C_FILES})
 
+add_library(simpleble::simpleble ALIAS simpleble)
+add_library(simpleble::simpleble-c ALIAS simpleble-c)
+
 set_property(TARGET simpleble PROPERTY CXX_STANDARD 17)
 set_property(TARGET simpleble-c PROPERTY CXX_STANDARD 17)
 
