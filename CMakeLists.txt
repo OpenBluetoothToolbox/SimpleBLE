@@ -89,7 +89,7 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
 
     set(
         EXTERNAL_LIBRARIES
-        simplebluez-static
+        simplebluez::simplebluez
         pthread
     )
     set(
