@@ -235,7 +235,7 @@ target_include_directories(simpleble-c PRIVATE ${SIMPLE_BLE_ALL_INCLUDE_DIRS})
 
 target_link_libraries(simpleble PRIVATE fmt::fmt-header-only)
 target_link_libraries(simpleble PUBLIC ${EXTERNAL_LIBRARIES})
-target_link_libraries(simpleble-c PUBLIC simpleble-static)
+target_link_libraries(simpleble-c PUBLIC simpleble::simpleble)
 
 # Append any compilation flags to each specific target
 

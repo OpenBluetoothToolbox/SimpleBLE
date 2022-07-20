@@ -9,4 +9,4 @@ add_executable(example_connect_safe
     ../common/utils.cpp
 )
 
-target_link_libraries(example_connect_safe simpleble-static)
+target_link_libraries(example_connect_safe simpleble::simpleble)
