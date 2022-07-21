@@ -7,7 +7,7 @@ if (SIMPLEBLUEZ_VENDORIZE)
         set(SIMPLEBLUEZ_GIT_REPOSITORY "https://github.com/OpenBluetoothToolbox/SimpleBluez.git")
     endif()
     if(NOT SIMPLEBLUEZ_GIT_TAG)
-        set(SIMPLEBLUEZ_GIT_TAG "v0.5.0")
+        set(SIMPLEBLUEZ_GIT_TAG "feature/next")
     endif()
 
     if(NOT SIMPLEBLUEZ_LOCAL_PATH)

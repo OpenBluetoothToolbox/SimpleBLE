@@ -9,4 +9,4 @@ add_executable(example_notify
     ../common/utils.cpp
 )
 
-target_link_libraries(example_notify simpleble-static)
+target_link_libraries(example_notify simpleble::simpleble)
