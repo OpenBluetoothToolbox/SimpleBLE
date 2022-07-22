@@ -30,17 +30,28 @@ endif()
 set(SIMPLEBLE_USER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Configure common source files
+
+set(
+    SIMPLEBLE_INCLUDES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/external
+)
+
 set(
     SRC_SIMPLEBLE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Adapter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Peripheral.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Exceptions.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/AdapterBuilder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/PeripheralBuilder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AdapterSafe.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PeripheralSafe.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logging.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/AdapterBuilder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/PeripheralBuilder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/ServiceBuilder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/CharacteristicBuilder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/DescriptorBuilder.cpp
 )
 
 set(
@@ -93,9 +104,8 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
         pthread
     )
     set(
-        EXTERNAL_INCLUDE_DIRS
+        PLATFORM_INCLUDE_DIRS
         ${SIMPLEBLUEZ_INCLUDES}
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/external
         ${CMAKE_CURRENT_SOURCE_DIR}/src/linux
     )
     set(
@@ -137,8 +147,7 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     endif()
 
     set(
-        EXTERNAL_INCLUDE_DIRS
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/external
+        PLATFORM_INCLUDE_DIRS
         ${CMAKE_CURRENT_SOURCE_DIR}/src/windows
     )
     set(
@@ -188,8 +197,7 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
         ObjC
     )
     set(
-        EXTERNAL_INCLUDE_DIRS
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/external
+        PLATFORM_INCLUDE_DIRS
         ${CMAKE_CURRENT_SOURCE_DIR}/src/macos
     )
     set(
@@ -208,11 +216,10 @@ endif()
 message(STATUS "Configuring SimpleBLE")
 
 set(
-    SIMPLE_BLE_ALL_INCLUDE_DIRS
-    ${SIMPLE_BLE_ALL_INCLUDE_DIRS}
+    SIMPLEBLE_ALL_INCLUDE_DIRS
     ${SIMPLEBLE_USER_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${EXTERNAL_INCLUDE_DIRS}
+    ${SIMPLEBLE_INCLUDES}
+    ${PLATFORM_INCLUDE_DIRS}
 )
 
 add_library(simpleble ${SRC_SIMPLEBLE_FILES})
@@ -230,8 +237,8 @@ set_property(TARGET simpleble-c PROPERTY POSITION_INDEPENDENT_CODE ON)
 set_property(TARGET simpleble PROPERTY WINDOWS_EXPORT_ALL_SYMBOLS ON)
 set_property(TARGET simpleble-c PROPERTY WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-target_include_directories(simpleble PRIVATE ${SIMPLE_BLE_ALL_INCLUDE_DIRS})
-target_include_directories(simpleble-c PRIVATE ${SIMPLE_BLE_ALL_INCLUDE_DIRS})
+target_include_directories(simpleble PRIVATE ${SIMPLEBLE_ALL_INCLUDE_DIRS})
+target_include_directories(simpleble-c PRIVATE ${SIMPLEBLE_ALL_INCLUDE_DIRS})
 
 target_link_libraries(simpleble PRIVATE fmt::fmt-header-only)
 target_link_libraries(simpleble PUBLIC ${EXTERNAL_LIBRARIES})
