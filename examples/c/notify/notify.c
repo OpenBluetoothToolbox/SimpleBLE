@@ -113,9 +113,9 @@ int main() {
                 break;
             }
 
-            printf("[%zu] %s %s\n", characteristic_count, service.uuid.value, service.characteristics[j].value);
+            printf("[%zu] %s %s\n", characteristic_count, service.uuid.value, service.characteristics[j].uuid.value);
             characteristic_list[characteristic_count].service = service.uuid;
-            characteristic_list[characteristic_count].characteristic = service.characteristics[j];
+            characteristic_list[characteristic_count].characteristic = service.characteristics[j].uuid;
             characteristic_count++;
         }
     }

@@ -42,11 +42,20 @@ set(
     SRC_SIMPLEBLE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Adapter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Peripheral.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Service.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Characteristic.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Descriptor.cpp
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ServiceBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CharacteristicBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/DescriptorBase.cpp
+
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Exceptions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AdapterSafe.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PeripheralSafe.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logging.cpp
+
     ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/AdapterBuilder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/PeripheralBuilder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/ServiceBuilder.cpp

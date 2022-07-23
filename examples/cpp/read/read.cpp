@@ -51,8 +51,8 @@ int main() {
     // Store all service and characteristic uuids in a vector.
     std::vector<std::pair<SimpleBLE::BluetoothUUID, SimpleBLE::BluetoothUUID>> uuids;
     for (auto service : peripheral.services()) {
-        for (auto characteristic : service.characteristics) {
-            uuids.push_back(std::make_pair(service.uuid, characteristic));
+        for (auto characteristic : service.characteristics()) {
+            uuids.push_back(std::make_pair(service.uuid(), characteristic.uuid()));
         }
     }
 

@@ -77,9 +77,9 @@ int main() {
     }
 
     for (auto service : *services) {
-        std::cout << "Service: " << service.uuid << std::endl;
-        for (auto characteristic : service.characteristics) {
-            std::cout << "  Characteristic: " << characteristic << std::endl;
+        std::cout << "Service: " << service.uuid() << std::endl;
+        for (auto characteristic : service.characteristics()) {
+            std::cout << "  Characteristic: " << characteristic.uuid() << std::endl;
         }
     }
     peripheral.disconnect();

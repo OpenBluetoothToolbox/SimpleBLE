@@ -4,9 +4,9 @@
 #include "PeripheralBase.h"
 #include "PeripheralBuilder.h"
 
+#include <climits>
 #include <cstring>
 #include <map>
-#include <climits>
 
 void simpleble_peripheral_release_handle(simpleble_peripheral_t handle) {
     if (handle == nullptr) {
@@ -143,17 +143,31 @@ simpleble_err_t simpleble_peripheral_services_get(simpleble_peripheral_t handle,
         return SIMPLEBLE_FAILURE;
     }
 
-    SimpleBLE::BluetoothService& service = peripheral_services.value()[index];
+    SimpleBLE::Service& service = peripheral_services.value()[index];
 
-    memcpy(services->uuid.value, service.uuid.c_str(), SIMPLEBLE_UUID_STR_LEN);
-    services->characteristic_count = service.characteristics.size();
+    memcpy(services->uuid.value, service.uuid().c_str(), SIMPLEBLE_UUID_STR_LEN);
+    services->characteristic_count = service.characteristics().size();
 
     if (services->characteristic_count > SIMPLEBLE_CHARACTERISTIC_MAX_COUNT) {
         services->characteristic_count = SIMPLEBLE_CHARACTERISTIC_MAX_COUNT;
     }
 
     for (size_t i = 0; i < services->characteristic_count; i++) {
-        memcpy(services->characteristics[i].value, service.characteristics[i].c_str(), SIMPLEBLE_UUID_STR_LEN);
+        SimpleBLE::Characteristic& characteristic = service.characteristics()[i];
+
+        memcpy(services->characteristics[i].uuid.value, characteristic.uuid().c_str(), SIMPLEBLE_UUID_STR_LEN);
+        services->characteristics[i].descriptor_count = characteristic.descriptors().size();
+
+        if (services->characteristics[i].descriptor_count > SIMPLEBLE_DESCRIPTOR_MAX_COUNT) {
+            services->characteristics[i].descriptor_count = SIMPLEBLE_DESCRIPTOR_MAX_COUNT;
+        }
+
+        for (size_t j = 0; j < services->characteristics[i].descriptor_count; j++) {
+            SimpleBLE::Descriptor& descriptor = characteristic.descriptors()[j];
+
+            memcpy(services->characteristics[i].descriptors[j].uuid.value, descriptor.uuid().c_str(),
+                   SIMPLEBLE_UUID_STR_LEN);
+        }
     }
 
     return SIMPLEBLE_SUCCESS;
