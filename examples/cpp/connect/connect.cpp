@@ -43,6 +43,10 @@ int main() {
         std::cout << "Service: " << service.uuid << std::endl;
         for (auto& characteristic : service.characteristics) {
             std::cout << "  Characteristic: " << characteristic << std::endl;
+            const auto descriptors = peripheral.get_descriptors(service.uuid, characteristic);
+            for (auto descriptor : descriptors) {
+                std::cout << "    Descriptor: " << descriptor << std::endl;
+            }
         }
     }
     peripheral.disconnect();

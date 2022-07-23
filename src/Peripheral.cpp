@@ -74,6 +74,13 @@ std::vector<BluetoothService> Peripheral::services() {
     return internal_->services();
 }
 
+std::vector<BluetoothUUID> Peripheral::get_descriptors(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
+    if (!initialized()) throw Exception::NotInitialized();
+    if (!is_connected()) throw Exception::NotConnected();
+
+    return internal_->get_descriptors(service, characteristic);
+}
+
 std::map<uint16_t, ByteArray> Peripheral::manufacturer_data() {
     if (!initialized()) throw Exception::NotInitialized();
 
@@ -124,6 +131,22 @@ void Peripheral::unsubscribe(BluetoothUUID const& service, BluetoothUUID const& 
     if (!is_connected()) throw Exception::NotConnected();
 
     internal_->unsubscribe(service, characteristic);
+}
+
+ByteArray Peripheral::read_value(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                 BluetoothUUID const& descriptor) {
+    if (!initialized()) throw Exception::NotInitialized();
+    if (!is_connected()) throw Exception::NotConnected();
+
+    return internal_->read_value(service, characteristic, descriptor);
+}
+
+void Peripheral::write_value(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                             BluetoothUUID const& descriptor, ByteArray const& data) {
+    if (!initialized()) throw Exception::NotInitialized();
+    if (!is_connected()) throw Exception::NotConnected();
+
+    internal_->write_value(service, characteristic, descriptor, data);
 }
 
 void Peripheral::set_callback_on_connected(std::function<void()> on_connected) {

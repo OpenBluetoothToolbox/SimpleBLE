@@ -88,6 +88,20 @@ int main() {
         printf("Service: %s\n", service.uuid.value);
         for (size_t j = 0; j < service.characteristic_count; j++) {
             printf("  Characteristic: %s\n", service.characteristics[j].value);
+            size_t descriptor_count = simpleble_peripheral_descriptor_count(peripheral,
+                                                                            service.uuid, service.characteristics[j]);
+            for (size_t k = 0; k < descriptor_count; k++) {
+                simpleble_uuid_t descriptor;
+                err_code = simpleble_peripheral_descriptor_get(peripheral,
+                                                               service.uuid, service.characteristics[j],
+                                                               k, &descriptor);
+
+                if (err_code != SIMPLEBLE_SUCCESS) {
+                    printf("Failed to get descriptor.\n");
+                    return 1;
+                }
+                printf("    Descriptor: %s\n", descriptor.value);
+            }
         }
     }
 

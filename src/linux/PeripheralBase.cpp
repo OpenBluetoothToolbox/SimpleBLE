@@ -118,6 +118,28 @@ std::vector<BluetoothService> PeripheralBase::services() {
     return service_list;
 }
 
+std::vector<BluetoothUUID> PeripheralBase::get_descriptors(BluetoothUUID const& service,
+                                                           BluetoothUUID const& characteristic) {
+    std::vector<BluetoothUUID> descriptors_list;
+    for (auto bluez_service : device_->services()) {
+        if (bluez_service->uuid() != service) {
+            continue;
+        }
+
+        for (auto bluez_characteristic : bluez_service->characteristics()) {
+            if (bluez_characteristic->uuid() != characteristic) {
+                continue;
+            }
+
+            for (auto bluez_descriptor : bluez_characteristic->descriptors()) {
+                descriptors_list.push_back(bluez_descriptor->uuid());
+            }
+        }
+    }
+
+    return descriptors_list;
+}
+
 std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() {
     std::map<uint16_t, ByteArray> manufacturer_data;
     for (auto& [manufacturer_id, value_array] : device_->manufacturer_data()) {
@@ -204,6 +226,16 @@ void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID con
     }
 }
 
+ByteArray PeripheralBase::read_value(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                     BluetoothUUID const& descriptor) {
+    return _get_descriptor(service, characteristic, descriptor)->read();
+}
+
+void PeripheralBase::write_value(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                   BluetoothUUID const& descriptor, ByteArray const& data) {
+    _get_descriptor(service, characteristic, descriptor)->write(data);
+}
+
 void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) {
     if (on_connected) {
         callback_on_connected_.load(std::move(on_connected));
@@ -235,6 +267,10 @@ void PeripheralBase::_cleanup_characteristics() {
 
             if (bluez_characteristic->notifying()) {
                 bluez_characteristic->stop_notify();
+            }
+
+            for (auto bluez_descriptor : bluez_characteristic->descriptors()) {
+                bluez_descriptor->clear_on_value_changed();
             }
         }
     }
@@ -272,5 +308,20 @@ std::shared_ptr<SimpleBluez::Characteristic> PeripheralBase::_get_characteristic
         throw Exception::ServiceNotFound(service_uuid);
     } catch (SimpleBluez::Exception::CharacteristicNotFoundException& e) {
         throw Exception::CharacteristicNotFound(characteristic_uuid);
+    }
+}
+
+std::shared_ptr<SimpleBluez::Characteristic> PeripheralBase::_get_descriptor(
+    BluetoothUUID const& service_uuid, BluetoothUUID const& characteristic_uuid,
+    BluetoothUUID const& descriptor_uuid) {
+    try {
+        return device_->get_characteristic(service_uuid, characteristic_uuid)
+                      ->get_descriptor(descriptor_uuid);
+    } catch (SimpleBluez::Exception::ServiceNotFoundException& e) {
+        throw Exception::ServiceNotFound(service_uuid);
+    } catch (SimpleBluez::Exception::CharacteristicNotFoundException& e) {
+        throw Exception::CharacteristicNotFound(characteristic_uuid);
+    } catch (SimpleBluez::Exception::DescriptorNotFoundException& e) {
+        throw Exception::DescriptorNotFound(descriptor_uuid);
     }
 }

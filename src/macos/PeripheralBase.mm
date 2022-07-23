@@ -87,6 +87,12 @@ std::vector<BluetoothService> PeripheralBase::services() {
     return [internal getServices];
 }
 
+std::vector<BluetoothUUID> PeripheralBase::get_descriptors(BluetoothUUID const& service,
+                                                           BluetoothUUID const& characteristic) {
+    PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
+    return [internal getDescriptors:service characteristic:characteristic];
+}
+
 std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() { return manufacturer_data_; }
 
 ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
@@ -142,6 +148,29 @@ void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID con
     NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
     NSString* characteristic_uuid = [NSString stringWithCString:characteristic.c_str() encoding:NSString.defaultCStringEncoding];
     [internal unsubscribe:service_uuid characteristic_uuid:characteristic_uuid];
+}
+
+ByteArray PeripheralBase::read_value(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                     BluetoothUUID const& descriptor) {
+    PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
+
+    NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
+    NSString* characteristic_uuid = [NSString stringWithCString:characteristic.c_str() encoding:NSString.defaultCStringEncoding];
+    NSString* descriptor_uuid = [NSString stringWithCString:descriptor.c_str() encoding:NSString.defaultCStringEncoding];
+
+    return [internal readValue:service_uuid characteristic_uuid:characteristic_uuid descriptor_uuid:descriptor_uuid];
+}
+
+void PeripheralBase::write_value(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                 BluetoothUUID const& descriptor, ByteArray const& data) {
+    PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
+
+    NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
+    NSString* characteristic_uuid = [NSString stringWithCString:characteristic.c_str() encoding:NSString.defaultCStringEncoding];
+    NSString* descriptor_uuid = [NSString stringWithCString:descriptor.c_str() encoding:NSString.defaultCStringEncoding];
+    NSData* payload = [NSData dataWithBytes:(void*)data.c_str() length:data.size()];
+
+    [internal writeValue:service_uuid characteristic_uuid:characteristic_uuid descriptor_uuid:descriptor_uuid payload:payload];
 }
 
 void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) {

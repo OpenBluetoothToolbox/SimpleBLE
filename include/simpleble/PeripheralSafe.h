@@ -27,6 +27,9 @@ class Peripheral : public SimpleBLE::Peripheral {
     std::optional<std::vector<BluetoothService>> services() noexcept;
     std::optional<std::map<uint16_t, ByteArray>> manufacturer_data() noexcept;
 
+    std::optional<std::vector<BluetoothUUID>> get_descriptors(BluetoothUUID const& service,
+                                                              BluetoothUUID const& characteristic) noexcept;
+
     std::optional<ByteArray> read(BluetoothUUID const& service, BluetoothUUID const& characteristic) noexcept;
     bool write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) noexcept;
     bool write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) noexcept;
@@ -35,6 +38,11 @@ class Peripheral : public SimpleBLE::Peripheral {
     bool indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                   std::function<void(ByteArray payload)> callback) noexcept;
     bool unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) noexcept;
+
+    std::optional<ByteArray> read_value(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                        BluetoothUUID const& descriptor) noexcept;
+    bool write_value(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                     BluetoothUUID const& descriptor, ByteArray const& data) noexcept;
 
     bool set_callback_on_connected(std::function<void()> on_connected) noexcept;
     bool set_callback_on_disconnected(std::function<void()> on_disconnected) noexcept;

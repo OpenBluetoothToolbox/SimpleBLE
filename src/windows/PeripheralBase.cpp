@@ -70,6 +70,7 @@ void PeripheralBase::connect() {
 
 void PeripheralBase::disconnect() {
     characteristics_map_.clear();
+    descriptors_map_.clear();
     if (device_ != nullptr) {
         device_.Close();
     }
@@ -104,6 +105,20 @@ std::vector<BluetoothService> PeripheralBase::services() {
         list_of_services.push_back(ble_service);
     }
     return list_of_services;
+}
+
+std::vector<BluetoothUUID> PeripheralBase::get_descriptors(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
+    std::vector<BluetoothUUID> list_of_descriptors;
+    const std::string key = service + "_" + characteristic;
+    for (auto& id : descriptors_map_) {
+        if (id.first != key) {
+            continue;
+        }
+        for (auto& descriptor : id.second) {
+            list_of_descriptors.push_back(descriptor.first);
+        }
+    }
+    return list_of_descriptors;
 }
 
 std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() { return manufacturer_data_; }
@@ -229,6 +244,32 @@ void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID con
     }
 }
 
+ByteArray PeripheralBase::read_value(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                     BluetoothUUID const& descriptor) {
+    GattDescriptor gatt_descriptor = _fetch_descriptor(service, characteristic, descriptor);
+
+    // Read the value.
+    auto result = async_get(gatt_descriptor.ReadValueAsync(Devices::Bluetooth::BluetoothCacheMode::Uncached));
+    if (result.Status() != GenericAttributeProfile::GattCommunicationStatus::Success) {
+        throw SimpleBLE::Exception::OperationFailed();
+    }
+    return ibuffer_to_bytearray(result.Value());
+}
+
+void PeripheralBase::write_value(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                 BluetoothUUID const& descriptor, ByteArray const& data) {
+    GattDescriptor gatt_descriptor = _fetch_descriptor(service, characteristic, descriptor);
+
+    // Convert the request data to a buffer.
+    winrt::Windows::Storage::Streams::IBuffer buffer = bytearray_to_ibuffer(data);
+
+    // Write the value.
+    auto result = async_get(gatt_descriptor.WriteValueWithResultAsync(buffer));
+    if (result.Status() != GenericAttributeProfile::GattCommunicationStatus::Success) {
+        throw SimpleBLE::Exception::OperationFailed();
+    }
+}
+
 void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) {
     if (on_connected) {
         callback_on_connected_.load(std::move(on_connected));
@@ -276,6 +317,20 @@ bool PeripheralBase::_attempt_connect() {
             // Store the underlying object pointer in a map.
             std::string characteristic_uuid = guid_to_uuid(characteristic.Uuid());
             characteristics_map_[service_uuid].emplace(characteristic_uuid, characteristic);
+
+            // Note: assumes serviceUuid + characteristicUuid is unique.
+            const std::string descriptors_key = service_uuid + "_" + characteristic_uuid;
+
+            auto descriptors_result = async_get(characteristic.GetDescriptorsAsync(BluetoothCacheMode::Uncached));
+            // Not sure if reading descriptor should be a failure or not.
+            if (descriptors_result.Status() != GattCommunicationStatus::Success) {
+                return false;
+            }
+            auto gatt_descriptors = descriptors_result.Descriptors();
+            for (GattDescriptor&& descriptor : gatt_descriptors) {
+                std::string descriptor_uuid = guid_to_uuid(descriptor.Uuid());
+                descriptors_map_[descriptors_key].emplace(descriptor_uuid, descriptor);
+            }
         }
     }
     return true;
@@ -292,4 +347,24 @@ GattCharacteristic PeripheralBase::_fetch_characteristic(const BluetoothUUID& se
     }
 
     return characteristics_map_[service_uuid].at(characteristic_uuid);
+}
+
+GattDescriptor PeripheralBase::_fetch_descriptor(const BluetoothUUID& service_uuid,
+                                                 const BluetoothUUID& characteristic_uuid,
+                                                 const BluetoothUUID& descriptor_uuid) {
+    if (characteristics_map_.count(service_uuid) == 0) {
+        throw SimpleBLE::Exception::ServiceNotFound(service_uuid);
+    }
+
+    if (characteristics_map_[service_uuid].count(characteristic_uuid) == 0) {
+        throw SimpleBLE::Exception::CharacteristicNotFound(characteristic_uuid);
+    }
+
+    const std::string key = service_uuid + "_" + characteristic_uuid;
+
+    if (descriptors_map_[key].count(descriptor_uuid) == 0) {
+        throw SimpleBLE::Exception::DescriptorNotFound(descriptor_uuid);
+    }
+
+    return descriptors_map_[key].at(descriptor_uuid);
 }
