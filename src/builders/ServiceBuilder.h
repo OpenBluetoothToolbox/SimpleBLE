@@ -1,5 +1,6 @@
 #pragma once
 
+#include <simpleble/Characteristic.h>
 #include <simpleble/Service.h>
 #include <memory>
 
@@ -15,7 +16,7 @@ namespace SimpleBLE {
  */
 class ServiceBuilder : public Service {
   public:
-    ServiceBuilder(std::shared_ptr<ServiceBase> internal);
+    ServiceBuilder(const BluetoothUUID& uuid, std::vector<Characteristic> characteristics);
     virtual ~ServiceBuilder() = default;
 };
 

@@ -2,6 +2,7 @@
 
 #include <optional>
 
+#include <simpleble/Service.h>
 #include <simpleble/Peripheral.h>
 
 namespace SimpleBLE {
@@ -24,7 +25,7 @@ class Peripheral : public SimpleBLE::Peripheral {
     std::optional<bool> is_paired() noexcept;
     bool unpair() noexcept;
 
-    std::optional<std::vector<BluetoothService>> services() noexcept;
+    std::optional<std::vector<Service>> services() noexcept;
     std::optional<std::map<uint16_t, ByteArray>> manufacturer_data() noexcept;
 
     std::optional<ByteArray> read(BluetoothUUID const& service, BluetoothUUID const& characteristic) noexcept;

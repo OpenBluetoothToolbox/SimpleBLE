@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include <simpleble/Descriptor.h>
 #include <simpleble/Exceptions.h>
 #include <simpleble/Types.h>
 
@@ -15,6 +16,7 @@ class Characteristic {
     virtual ~Characteristic() = default;
 
     BluetoothUUID uuid();
+    std::vector<Descriptor> descriptors();
 
   protected:
     std::shared_ptr<CharacteristicBase> internal_;

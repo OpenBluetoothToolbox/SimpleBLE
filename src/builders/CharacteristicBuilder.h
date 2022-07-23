@@ -1,7 +1,10 @@
 #pragma once
 
 #include <simpleble/Characteristic.h>
+#include <simpleble/Descriptor.h>
+
 #include <memory>
+#include <vector>
 
 namespace SimpleBLE {
 
@@ -15,7 +18,7 @@ namespace SimpleBLE {
  */
 class CharacteristicBuilder : public Characteristic {
   public:
-    CharacteristicBuilder(std::shared_ptr<CharacteristicBase> internal);
+    CharacteristicBuilder(const BluetoothUUID& uuid, std::vector<Descriptor> descriptors);
     virtual ~CharacteristicBuilder() = default;
 };
 

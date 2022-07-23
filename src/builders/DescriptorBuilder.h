@@ -15,7 +15,7 @@ namespace SimpleBLE {
  */
 class DescriptorBuilder : public Descriptor {
   public:
-    DescriptorBuilder(std::shared_ptr<DescriptorBase> internal);
+    DescriptorBuilder(const BluetoothUUID& uuid);
     virtual ~DescriptorBuilder() = default;
 };
 

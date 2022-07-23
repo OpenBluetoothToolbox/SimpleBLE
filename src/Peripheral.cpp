@@ -67,7 +67,7 @@ void Peripheral::unpair() {
     internal_->unpair();
 }
 
-std::vector<BluetoothService> Peripheral::services() {
+std::vector<Service> Peripheral::services() {
     if (!initialized()) throw Exception::NotInitialized();
     if (!is_connected()) throw Exception::NotConnected();
 
