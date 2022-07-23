@@ -9,6 +9,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [0.5.0] - 2022-XX-XX
 --------------------
 
+**Important:** From this version onwards, the CMake target that should be consumed
+               by downstream projects is ``simpleble::simpleble``.
+
 **Added**
 
 -  Multiple connection example.
@@ -21,6 +24,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 -  Clearer layout of examples. *(Thanks Yohannfra!)*
 -  ``AdapterSafe`` and ``PeripheralSafe`` will now catch all exceptions.
+-  Selection of build type is now based on the  ``BUILD_SHARED_LIBS`` setting.
+-  Consumable CMake target is now ``simpleble::simpleble``.
 
 **Fixed**
 
@@ -28,6 +33,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  Attempting to scan while connected will erase references to all existing peripherals.
 -  (Windows) Peripheral reads are now uncached. *(Thanks piotromt!)*
 -  (Linux) Failure to set agent would trigger a crash.
+-  CMake target ``simpleble::simpleble`` was removed in favour of ``BUILD_SHARED_LIBS``.
+-  CMake target ``simpleble::simpleble-c`` was removed in favour of ``BUILD_SHARED_LIBS``.
 
 
 [0.4.0] - 2022-06-12
