@@ -23,5 +23,5 @@ set(
 )
 
 add_executable(simpleble_test ${SRC_FILES})
-target_link_libraries(simpleble_test simpleble-static ${GTEST_LIBRARIES})
+target_link_libraries(simpleble_test simpleble::simpleble ${GTEST_LIBRARIES})
 target_include_directories(simpleble_test PRIVATE ${GTEST_INCLUDE_DIRS})

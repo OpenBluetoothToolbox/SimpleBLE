@@ -8,4 +8,4 @@ add_executable(example_list_adapters
     list_adapters.cpp
 )
 
-target_link_libraries(example_list_adapters simpleble-static)
+target_link_libraries(example_list_adapters simpleble::simpleble)

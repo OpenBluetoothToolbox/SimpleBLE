@@ -9,4 +9,4 @@ add_executable(example_scan
     ../common/utils.cpp
 )
 
-target_link_libraries(example_scan simpleble-static)
+target_link_libraries(example_scan simpleble::simpleble)
