@@ -180,7 +180,7 @@ typedef struct {
         for (CBCharacteristic* characteristic in service.characteristics) {
             // Build the list of descriptors for the characteristic.
             std::vector<SimpleBLE::Descriptor> descriptor_list;
-            for (CBDescriptor* descriptor : characteristic.descriptors) {
+            for (CBDescriptor* descriptor in characteristic.descriptors) {
                 descriptor_list.push_back(SimpleBLE::DescriptorBuilder(uuidToSimpleBLE(descriptor.UUID)));
             }
             characteristic_list.push_back(SimpleBLE::CharacteristicBuilder(uuidToSimpleBLE(characteristic.UUID), descriptor_list));
