@@ -1,4 +1,7 @@
 #import "PeripheralBaseMacOS.h"
+#import "CharacteristicBuilder.h"
+#import "DescriptorBuilder.h"
+#import "ServiceBuilder.h"
 #import "Utils.h"
 
 #import <simpleble/Exceptions.h>
@@ -170,19 +173,19 @@ typedef struct {
 }
 
 - (std::vector<SimpleBLE::Service>)getServices {
-    std::vector<Service> service_list;
+    std::vector<SimpleBLE::Service> service_list;
     for (CBService* service in self.peripheral.services) {
         // Build the list of characteristics for the service.
-        std::vector<Characteristic> characteristic_list;
+        std::vector<SimpleBLE::Characteristic> characteristic_list;
         for (CBCharacteristic* characteristic in service.characteristics) {
             // Build the list of descriptors for the characteristic.
-            std::vector<Descriptor> descriptor_list;
+            std::vector<SimpleBLE::Descriptor> descriptor_list;
             for (CBDescriptor* descriptor : characteristic.descriptors) {
-                descriptor_list.push_back(DescriptorBuilder(uuidToSimpleBLE(descriptor.UUID)));
+                descriptor_list.push_back(SimpleBLE::DescriptorBuilder(uuidToSimpleBLE(descriptor.UUID)));
             }
-            characteristic_list.push_back(CharacteristicBuilder(uuidToSimpleBLE(characteristic.UUID), descriptor_list));
+            characteristic_list.push_back(SimpleBLE::CharacteristicBuilder(uuidToSimpleBLE(characteristic.UUID), descriptor_list));
         }
-        service_list.push_back(ServiceBuilder(uuidToSimpleBLE(service.UUID), characteristic_list));
+        service_list.push_back(SimpleBLE::ServiceBuilder(uuidToSimpleBLE(service.UUID), characteristic_list));
     }
 
     return service_list;

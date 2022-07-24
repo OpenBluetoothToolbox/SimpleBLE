@@ -5,6 +5,10 @@
 #include "CommonUtils.h"
 #include "Utils.h"
 
+#include "CharacteristicBuilder.h"
+#include "DescriptorBuilder.h"
+#include "ServiceBuilder.h"
+
 #include <simpleble/Exceptions.h>
 
 #include "winrt/Windows.Foundation.Collections.h"
@@ -266,7 +270,9 @@ bool PeripheralBase::_attempt_connect() {
     auto gatt_services = services_result.Services();
     for (GattDeviceService&& service : gatt_services) {
         // For each service...
-        gatt_service_t gatt_service;
+        gatt_service_t gatt_service ={
+            .obj = service
+        };
 
         // Fetch the service UUID
         std::string service_uuid = guid_to_uuid(service.Uuid());
@@ -281,7 +287,9 @@ bool PeripheralBase::_attempt_connect() {
         auto gatt_characteristics = characteristics_result.Characteristics();
         for (GattCharacteristic&& characteristic : gatt_characteristics) {
             // For each characteristic...
-            gatt_characteristic_t gatt_characteristic;
+            gatt_characteristic_t gatt_characteristic = {
+                .obj = characteristic
+            };
 
             // Fetch the characteristic UUID
             std::string characteristic_uuid = guid_to_uuid(characteristic.Uuid());
@@ -296,30 +304,23 @@ bool PeripheralBase::_attempt_connect() {
             auto gatt_descriptors = descriptors_result.Descriptors();
             for (GattDescriptor&& descriptor : gatt_descriptors) {
                 // For each descriptor...
-                gatt_descriptor_t gatt_descriptor;
+                gatt_descriptor_t gatt_descriptor = {
+                    .obj = descriptor
+                };
 
                 // Fetch the descriptor UUID.
                 std::string descriptor_uuid = guid_to_uuid(descriptor.Uuid());
 
-                // Store the descriptor.
-                gatt_descriptor.obj = descriptor;
-
                 // Append the descriptor to the characteristic.
-                gatt_characteristic.descriptors.emplace(descriptor_uuid, gatt_descriptor);
+                gatt_characteristic.descriptors.emplace(descriptor_uuid, std::move(gatt_descriptor));
             }
 
-            // Store the characteristic.
-            gatt_characteristic.obj = characteristic;
-
             // Append the characteristic to the service.
-            gatt_service.characteristics.emplace(characteristic_uuid, gatt_characteristic);
+            gatt_service.characteristics.emplace(characteristic_uuid, std::move(gatt_characteristic));
         }
 
-        // Store the service.
-        gatt_service.obj = service;
-
         // Append the service to the map.
-        gatt_map_.emplace(service_uuid, gatt_service);
+        gatt_map_.emplace(service_uuid, std::move(gatt_service));
     }
 
     return true;
