@@ -22,12 +22,14 @@ using namespace winrt::Windows::Devices::Bluetooth::GenericAttributeProfile;
 namespace SimpleBLE {
 
 class gatt_descriptor_t {
+  public:
     gatt_descriptor_t(GattDescriptor& descriptor) { obj = descriptor; }
 
     GattDescriptor obj;
 };
 
 class gatt_characteristic_t {
+  public:
     gatt_characteristic_t(GattCharacteristic& characteristic) { obj = characteristic; }
 
     GattCharacteristic obj;
@@ -35,6 +37,7 @@ class gatt_characteristic_t {
 };
 
 class gatt_service_t {
+  public:
     gatt_service_t(GattDeviceService& service) { obj = service; }
 
     GattDeviceService obj;
