@@ -18,6 +18,20 @@
 using namespace winrt::Windows::Devices::Bluetooth;
 using namespace winrt::Windows::Devices::Bluetooth::GenericAttributeProfile;
 
+typedef struct {
+    GattDescriptor obj;
+} gatt_descriptor_t;
+
+typedef struct {
+    GattCharacteristic obj;
+    std::map<BluetoothUUID, gatt_descriptor_t> descriptors;
+} gatt_characteristic_t;
+
+typedef struct {
+    GattService obj;
+    std::map<BluetoothUUID, gatt_characteristic_t> characteristics;
+} gatt_service_t;
+
 namespace SimpleBLE {
 
 class PeripheralBase {
@@ -38,7 +52,7 @@ class PeripheralBase {
     bool is_paired();
     void unpair();
 
-    std::vector<BluetoothService> services();
+    std::vector<Service> services();
     std::map<uint16_t, ByteArray> manufacturer_data();
 
     ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic);
@@ -72,7 +86,8 @@ class PeripheralBase {
 
     std::condition_variable disconnection_cv_;
     std::mutex disconnection_mutex_;
-    std::map<BluetoothUUID, std::map<BluetoothUUID, GattCharacteristic>> characteristics_map_;
+
+    std::map<BluetoothUUID, gatt_service_t> gatt_map_;
 
     kvn::safe_callback<void()> callback_on_connected_;
     kvn::safe_callback<void()> callback_on_disconnected_;
