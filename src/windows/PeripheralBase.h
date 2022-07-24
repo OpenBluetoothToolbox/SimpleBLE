@@ -30,7 +30,7 @@ typedef struct {
 } gatt_characteristic_t;
 
 typedef struct {
-    GattService obj;
+    GattDeviceService obj;
     std::map<BluetoothUUID, gatt_characteristic_t> characteristics;
 } gatt_service_t;
 
