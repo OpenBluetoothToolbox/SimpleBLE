@@ -8,7 +8,7 @@ namespace SimpleBLE {
 
 class CharacteristicBase {
   public:
-    CharacteristicBase(const BluetoothUUID& uuid, std::vector<Descriptor> &descriptors);
+    CharacteristicBase(const BluetoothUUID& uuid, std::vector<Descriptor>& descriptors);
     virtual ~CharacteristicBase() = default;
 
     BluetoothUUID uuid();
