@@ -1,6 +1,7 @@
 #pragma once
 
 #include <simpleble/Exceptions.h>
+#include <simpleble/Service.h>
 #include <simpleble/Types.h>
 
 #include "AdapterBaseTypes.h"
