@@ -5,7 +5,7 @@
 
 using namespace SimpleBLE;
 
-CharacteristicBase::CharacteristicBase(const BluetoothUUID& uuid, std::vector<Descriptor> &descriptors)
+CharacteristicBase::CharacteristicBase(const BluetoothUUID& uuid, std::vector<Descriptor>& descriptors)
     : uuid_(uuid), descriptors_(descriptors) {}
 
 BluetoothUUID CharacteristicBase::uuid() { return uuid_; }

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <simpleble/Service.h>
 #include <simpleble/Exceptions.h>
+#include <simpleble/Service.h>
 #include <simpleble/Types.h>
 
 #include <simplebluez/Adapter.h>

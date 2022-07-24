@@ -7,7 +7,7 @@ namespace SimpleBLE {
 
 class DescriptorBase {
   public:
-    DescriptorBase(const BluetoothUUID &uuid);
+    DescriptorBase(const BluetoothUUID& uuid);
     virtual ~DescriptorBase() = default;
 
     BluetoothUUID uuid();

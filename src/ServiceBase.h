@@ -8,7 +8,7 @@ namespace SimpleBLE {
 
 class ServiceBase {
   public:
-    ServiceBase(const BluetoothUUID& uuid, std::vector<Characteristic> &characteristics);
+    ServiceBase(const BluetoothUUID& uuid, std::vector<Characteristic>& characteristics);
     virtual ~ServiceBase() = default;
 
     BluetoothUUID uuid();

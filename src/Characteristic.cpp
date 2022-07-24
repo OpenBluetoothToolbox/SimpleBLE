@@ -5,10 +5,6 @@
 
 using namespace SimpleBLE;
 
-BluetoothUUID Characteristic::uuid() {
-    return internal_->uuid();
-}
+BluetoothUUID Characteristic::uuid() { return internal_->uuid(); }
 
-std::vector<Descriptor> Characteristic::descriptors() {
-    return internal_->descriptors();
-}
+std::vector<Descriptor> Characteristic::descriptors() { return internal_->descriptors(); }

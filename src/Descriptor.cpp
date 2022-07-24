@@ -5,6 +5,4 @@
 
 using namespace SimpleBLE;
 
-BluetoothUUID Descriptor::uuid() {
-    return internal_->uuid();
-}
+BluetoothUUID Descriptor::uuid() { return internal_->uuid(); }
