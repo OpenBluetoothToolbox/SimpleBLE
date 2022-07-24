@@ -93,7 +93,7 @@ std::vector<BluetoothUUID> PeripheralBase::get_descriptors(BluetoothUUID const& 
     NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
     NSString* characteristic_uuid = [NSString stringWithCString:characteristic.c_str() encoding:NSString.defaultCStringEncoding];
 
-    return [internal getDescriptors:service_uuid characteristic:characteristic_uuid];
+    return [internal getDescriptors:service_uuid characteristic_uuid:characteristic_uuid];
 }
 
 std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() { return manufacturer_data_; }

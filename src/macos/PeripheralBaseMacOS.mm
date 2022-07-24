@@ -198,13 +198,16 @@ typedef struct {
 
     std::vector<SimpleBLE::BluetoothUUID> result;
 
+    CBUUID* service_cbuuid = [CBUUID UUIDWithString:service_uuid];
+    CBUUID* characteristic_cbuuid = [CBUUID UUIDWithString:characteristic_uuid];
+
     for (CBService* service in self.peripheral.services) {
-        if ([service.UUID isNotEqual:service_uuid]) {
+        if ([service.UUID isNotEqual:service_cbuuid]) {
             continue;
         }
         NSArray<CBCharacteristic*>* characteristics = service.characteristics;
         for (CBCharacteristic* characteristic in characteristics) {
-            if ([characteristic.UUID isNotEqual:characteristic_uuid]) {
+            if ([characteristic.UUID isNotEqual:characteristic_cbuuid]) {
                 continue;
             }
             if (characteristic && characteristic.descriptors) {
