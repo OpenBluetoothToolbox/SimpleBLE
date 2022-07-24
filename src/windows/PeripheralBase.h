@@ -18,6 +18,8 @@
 using namespace winrt::Windows::Devices::Bluetooth;
 using namespace winrt::Windows::Devices::Bluetooth::GenericAttributeProfile;
 
+namespace SimpleBLE {
+
 typedef struct {
     GattDescriptor obj;
 } gatt_descriptor_t;
@@ -31,8 +33,6 @@ typedef struct {
     GattService obj;
     std::map<BluetoothUUID, gatt_characteristic_t> characteristics;
 } gatt_service_t;
-
-namespace SimpleBLE {
 
 class PeripheralBase {
   public:
