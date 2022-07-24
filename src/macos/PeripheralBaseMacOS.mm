@@ -199,17 +199,18 @@ typedef struct {
     std::vector<SimpleBLE::BluetoothUUID> result;
 
     for (CBService* service in self.peripheral.services) {
-        if (uuidToSimpleBLE(service.UUID) != service_uuid) {
+        if ([service.UUID isNotEqual:service_uuid]) {
             continue;
         }
         NSArray<CBCharacteristic*>* characteristics = service.characteristics;
         for (CBCharacteristic* characteristic in characteristics) {
-            if (uuidToSimpleBLE(characteristic.UUID) != characteristic_uuid) {
+            if ([characteristic.UUID isNotEqual:characteristic_uuid]) {
                 continue;
             }
-            NSArray<CBDescriptor*>* descriptors = characteristic.descriptors;
-            for (CBDescriptor* descriptor in descriptor) {
-                result.push_back(uuidToSimpleBLE(descriptor.UUID));
+            if (characteristic && characteristic.descriptors) {
+                for (CBDescriptor* descriptor in descriptor) {
+                    result.push_back(uuidToSimpleBLE(descriptor.UUID));
+                }
             }
         }
     }
@@ -353,15 +354,15 @@ typedef struct {
     }
 }
 
-- (SimpleBLE::ByteArray)readValue:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid
-                                  descriptor_uuid:(NSString*)descriptor_uuid {
+- (SimpleBLE::ByteArray)readValue:(NSString*)service_uuid
+              characteristic_uuid:(NSString*)characteristic_uuid
+                  descriptor_uuid:(NSString*)descriptor_uuid {
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
 
-    CBDescriptor* descriptor = [self findDescriptor:descriptor_uuid
-                                    characteristic:characteristic];
+    CBDescriptor* descriptor = [self findDescriptor:descriptor_uuid characteristic:characteristic];
 
     @synchronized(self) {
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptors[uuidToSimpleBLE(descriptor.UUID)].readPending = YES;
@@ -374,7 +375,7 @@ typedef struct {
     while (readPending && [NSDate.now compare:endDate] == NSOrderedAscending) {
         [NSThread sleepForTimeInterval:0.01];
         @synchronized(self) {
-            readPending = 
+            readPending =
                 characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptors[uuidToSimpleBLE(descriptor.UUID)].readPending;
         }
     }
@@ -384,18 +385,21 @@ typedef struct {
         throw SimpleBLE::Exception::OperationFailed();
     }
 
-    return SimpleBLE::ByteArray((const char*)descriptor.value.bytes, descriptor.value.length);
+    const char* bytes = (const char*)[descriptor.value bytes];
+
+    return SimpleBLE::ByteArray(bytes, [descriptor.value length]);
 }
 
-- (void)writeValue:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid
-                   descriptor_uuid:(NSString*)descriptor_uuid payload:(NSData*)payload {
+- (void)writeValue:(NSString*)service_uuid
+    characteristic_uuid:(NSString*)characteristic_uuid
+        descriptor_uuid:(NSString*)descriptor_uuid
+                payload:(NSData*)payload {
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
 
-    CBDescriptor* descriptor = [self findDescriptor:descriptor_uuid
-                                    characteristic:characteristic];
+    CBDescriptor* descriptor = [self findDescriptor:descriptor_uuid characteristic:characteristic];
 
     @synchronized(self) {
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptors[uuidToSimpleBLE(descriptor.UUID)].writePending = YES;
@@ -497,7 +501,9 @@ typedef struct {
     }
 }
 
-- (void)peripheral:(CBPeripheral*)peripheral didDiscoverDescriptorsForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
+- (void)peripheral:(CBPeripheral*)peripheral
+    didDiscoverDescriptorsForCharacteristic:(CBCharacteristic*)characteristic
+                                      error:(NSError*)error {
     if (error != nil) {
         NSLog(@"Error while discovering descriptors for characteristic %@: %@\n", characteristic.UUID, error);
     }
@@ -548,7 +554,7 @@ typedef struct {
     NSLog(@"Peripheral ready to send: %@", peripheral);
 }
 
-- (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForDescriptor:(CBDescriptor *)descriptor error:(NSError *)error {
+- (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
     if (error != nil) {
         NSLog(@"Descriptor value update error: %@\n", error);
         return;

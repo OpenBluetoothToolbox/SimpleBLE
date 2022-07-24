@@ -74,7 +74,8 @@ std::vector<BluetoothService> Peripheral::services() {
     return internal_->services();
 }
 
-std::vector<BluetoothUUID> Peripheral::get_descriptors(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
+std::vector<BluetoothUUID> Peripheral::get_descriptors(BluetoothUUID const& service,
+                                                       BluetoothUUID const& characteristic) {
     if (!initialized()) throw Exception::NotInitialized();
     if (!is_connected()) throw Exception::NotConnected();
 

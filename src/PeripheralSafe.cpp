@@ -97,8 +97,8 @@ std::optional<std::vector<SimpleBLE::BluetoothService>> SimpleBLE::Safe::Periphe
     }
 }
 
-std::optional<std::vector<SimpleBLE::BluetoothUUID>> SimpleBLE::Safe::Peripheral::get_descriptors(BluetoothUUID const& service,
-                                                                                                  BluetoothUUID const& characteristic) noexcept {
+std::optional<std::vector<SimpleBLE::BluetoothUUID>> SimpleBLE::Safe::Peripheral::get_descriptors(
+    BluetoothUUID const& service, BluetoothUUID const& characteristic) noexcept {
     try {
         return SimpleBLE::Peripheral::get_descriptors(service, characteristic);
     } catch (...) {

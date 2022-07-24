@@ -20,8 +20,7 @@
 - (void)disconnect;
 - (bool)isConnected;
 - (std::vector<SimpleBLE::BluetoothService>)getServices;
-- (std::vector<SimpleBLE::BluetoothUUID>)getDescriptors:(NSString*)service_uuid
-    characteristic_uuid:(NSString*)characteristic_uuid;
+- (std::vector<SimpleBLE::BluetoothUUID>)getDescriptors:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid;
 
 - (SimpleBLE::ByteArray)read:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid;
 - (void)writeRequest:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid payload:(NSData*)payload;
@@ -33,10 +32,13 @@
     characteristic_uuid:(NSString*)characteristic_uuid
                callback:(std::function<void(SimpleBLE::ByteArray)>)callback;
 - (void)unsubscribe:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid;
-- (SimpleBLE::ByteArray)readValue:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid
-    descriptor_uuid:(NSString*)descriptor_uuid;
-- (void)writeValue:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid
-    descriptor_uuid:(NSString*)descriptor_uuid payload:(NSData*)payload;
+- (SimpleBLE::ByteArray)readValue:(NSString*)service_uuid
+              characteristic_uuid:(NSString*)characteristic_uuid
+                  descriptor_uuid:(NSString*)descriptor_uuid;
+- (void)writeValue:(NSString*)service_uuid
+    characteristic_uuid:(NSString*)characteristic_uuid
+        descriptor_uuid:(NSString*)descriptor_uuid
+                payload:(NSData*)payload;
 
 - (void)delegateDidConnect;
 - (void)delegateDidDisconnect;

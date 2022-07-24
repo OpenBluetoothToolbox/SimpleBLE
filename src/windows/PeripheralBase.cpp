@@ -107,7 +107,8 @@ std::vector<BluetoothService> PeripheralBase::services() {
     return list_of_services;
 }
 
-std::vector<BluetoothUUID> PeripheralBase::get_descriptors(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
+std::vector<BluetoothUUID> PeripheralBase::get_descriptors(BluetoothUUID const& service,
+                                                           BluetoothUUID const& characteristic) {
     std::vector<BluetoothUUID> list_of_descriptors;
     const std::string key = service + "_" + characteristic;
     for (auto& id : descriptors_map_) {

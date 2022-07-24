@@ -49,8 +49,8 @@ class PeripheralBase {
 
     ByteArray read_value(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                          BluetoothUUID const& descriptor);
-    void write_value(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                     BluetoothUUID const& descriptor, ByteArray const& data);
+    void write_value(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor,
+                     ByteArray const& data);
 
     void set_callback_on_connected(std::function<void()> on_connected);
     void set_callback_on_disconnected(std::function<void()> on_disconnected);

@@ -232,7 +232,7 @@ ByteArray PeripheralBase::read_value(BluetoothUUID const& service, BluetoothUUID
 }
 
 void PeripheralBase::write_value(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                   BluetoothUUID const& descriptor, ByteArray const& data) {
+                                 BluetoothUUID const& descriptor, ByteArray const& data) {
     _get_descriptor(service, characteristic, descriptor)->write(data);
 }
 
@@ -311,12 +311,11 @@ std::shared_ptr<SimpleBluez::Characteristic> PeripheralBase::_get_characteristic
     }
 }
 
-std::shared_ptr<SimpleBluez::Characteristic> PeripheralBase::_get_descriptor(
-    BluetoothUUID const& service_uuid, BluetoothUUID const& characteristic_uuid,
-    BluetoothUUID const& descriptor_uuid) {
+std::shared_ptr<SimpleBluez::Descriptor> PeripheralBase::_get_descriptor(BluetoothUUID const& service_uuid,
+                                                                         BluetoothUUID const& characteristic_uuid,
+                                                                         BluetoothUUID const& descriptor_uuid) {
     try {
-        return device_->get_characteristic(service_uuid, characteristic_uuid)
-                      ->get_descriptor(descriptor_uuid);
+        return device_->get_characteristic(service_uuid, characteristic_uuid)->get_descriptor(descriptor_uuid);
     } catch (SimpleBluez::Exception::ServiceNotFoundException& e) {
         throw Exception::ServiceNotFound(service_uuid);
     } catch (SimpleBluez::Exception::CharacteristicNotFoundException& e) {
