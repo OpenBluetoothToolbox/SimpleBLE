@@ -29,7 +29,7 @@ class PeripheralBase {
     bool is_paired();
     void unpair();
 
-    std::vector<BluetoothService> services();
+    std::vector<Service> services();
     std::map<uint16_t, ByteArray> manufacturer_data();
 
     ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic);

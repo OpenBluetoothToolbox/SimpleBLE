@@ -19,7 +19,7 @@
 - (void)connect;
 - (void)disconnect;
 - (bool)isConnected;
-- (std::vector<SimpleBLE::BluetoothService>)getServices;
+- (std::vector<SimpleBLE::Service>)getServices;
 
 - (SimpleBLE::ByteArray)read:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid;
 - (void)writeRequest:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid payload:(NSData*)payload;

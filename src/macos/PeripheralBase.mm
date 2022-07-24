@@ -82,7 +82,7 @@ bool PeripheralBase::is_paired() { throw Exception::OperationNotSupported(); }
 
 void PeripheralBase::unpair() { throw Exception::OperationNotSupported(); }
 
-std::vector<BluetoothService> PeripheralBase::services() {
+std::vector<Service> PeripheralBase::services() {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
     return [internal getServices];
 }

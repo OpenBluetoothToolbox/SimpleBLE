@@ -6,6 +6,12 @@
 typedef struct {
     BOOL readPending;
     BOOL writePending;
+} descriptor_extras_t;
+
+typedef struct {
+    BOOL readPending;
+    BOOL writePending;
+    std::map<std::string, descriptor_extras_t> descriptor_extras;
     std::function<void(SimpleBLE::ByteArray)> valueChangedCallback;
 } characteristic_extras_t;
 
@@ -105,11 +111,34 @@ typedef struct {
                 throw SimpleBLE::Exception::OperationFailed();
             }
 
-            // For each characteristic, create the associated extra properties.
+            // For each characteristic, create the associated extra properties and discover descriptors.
             for (CBCharacteristic* characteristic in service.characteristics) {
-                characteristic_extras_t extras;
-                extras.readPending = NO;
-                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)] = extras;
+                [self.peripheral discoverDescriptorsForCharacteristic:characteristic];
+
+                // Wait for descriptors to be discovered for up to 1 second.
+                endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
+                while (characteristic.descriptors == nil && [NSDate.now compare:endDate] == NSOrderedAscending) {
+                    [NSThread sleepForTimeInterval:0.01];
+                }
+
+                if (characteristic.descriptors == nil) {
+                    // If characteristics could not be discovered, raise an exception.
+                    NSLog(@"Descriptors could not be discovered for characteristic %@", characteristic.UUID);
+                    throw SimpleBLE::Exception::OperationFailed();
+                }
+
+                characteristic_extras_t characteristic_extra;
+                characteristic_extra.readPending = NO;
+                characteristic_extra.writePending = NO;
+
+                for (CBDescriptor* descriptor in characteristic.descriptors) {
+                    descriptor_extras_t descriptor_extra;
+                    descriptor_extra.readPending = NO;
+                    descriptor_extra.writePending = NO;
+                    characteristic_extra.descriptor_extras[uuidToSimpleBLE(descriptor.UUID)] = descriptor_extra;
+                }
+
+                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)] = characteristic_extra;
             }
         }
     }
@@ -140,27 +169,23 @@ typedef struct {
     return self.peripheral.state == CBPeripheralStateConnected;
 }
 
-- (std::vector<SimpleBLE::BluetoothService>)getServices {
-    // NOTE: We might want to return NSUUIDs in this function and convert them to
-    // strings in the PeripheralBase class.
-
-    std::vector<SimpleBLE::BluetoothService> services;
-
-    // For each service, load the UUID and the corresponding characteristics.
+- (std::vector<SimpleBLE::Service>)getServices {
+    std::vector<Service> service_list;
     for (CBService* service in self.peripheral.services) {
-        SimpleBLE::BluetoothService bluetoothService;
-        bluetoothService.uuid = uuidToSimpleBLE(service.UUID);
-
-        // Load all the characteristics for this service.
-        NSArray<CBCharacteristic*>* characteristics = service.characteristics;
-        for (CBCharacteristic* characteristic in characteristics) {
-            bluetoothService.characteristics.push_back(uuidToSimpleBLE(characteristic.UUID));
+        // Build the list of characteristics for the service.
+        std::vector<Characteristic> characteristic_list;
+        for (CBCharacteristic* characteristic in service.characteristics) {
+            // Build the list of descriptors for the characteristic.
+            std::vector<Descriptor> descriptor_list;
+            for (CBDescriptor* descriptor : characteristic.descriptors) {
+                descriptor_list.push_back(DescriptorBuilder(uuidToSimpleBLE(descriptor.UUID)));
+            }
+            characteristic_list.push_back(CharacteristicBuilder(uuidToSimpleBLE(characteristic.UUID), descriptor_list));
         }
-
-        services.push_back(bluetoothService);
+        service_list.push_back(ServiceBuilder(uuidToSimpleBLE(service.UUID), characteristic_list));
     }
 
-    return services;
+    return service_list;
 }
 
 - (SimpleBLE::ByteArray)read:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid {
