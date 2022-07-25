@@ -21,26 +21,17 @@ using namespace winrt::Windows::Devices::Bluetooth::GenericAttributeProfile;
 
 namespace SimpleBLE {
 
-class gatt_descriptor_t {
-  public:
-    gatt_descriptor_t(GattDescriptor& descriptor) { obj = descriptor; }
-
-    GattDescriptor obj;
+struct gatt_descriptor_t {
+    GattDescriptor obj = nullptr;
 };
 
-class gatt_characteristic_t {
-  public:
-    gatt_characteristic_t(GattCharacteristic& characteristic) { obj = characteristic; }
-
-    GattCharacteristic obj;
+struct gatt_characteristic_t {
+    GattCharacteristic obj = nullptr;
     std::map<BluetoothUUID, gatt_descriptor_t> descriptors;
 };
 
-class gatt_service_t {
-  public:
-    gatt_service_t(GattDeviceService& service) { obj = service; }
-
-    GattDeviceService obj;
+struct gatt_service_t {
+    GattDeviceService obj = nullptr;
     std::map<BluetoothUUID, gatt_characteristic_t> characteristics;
 };
 

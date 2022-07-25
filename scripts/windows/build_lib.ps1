@@ -29,7 +29,7 @@ New-Item -ItemType Directory -Force -Path "$BUILD_PATH" | Out-Null
 
 # Run CMake to create our build files.
 cmake -S "$PROJECT_ROOT" -B "$BUILD_PATH" -A $WINDOWS_ARCH -DCMAKE_SYSTEM_VERSION="10.0.22000.0"
-cmake --build "$BUILD_PATH" --config $TARGET
+cmake --build "$BUILD_PATH" --config $TARGET --parallel 7
 
 #Copy all generated files to the bin folder for consistency and remove the output folder.
 Copy-item -Force -Recurse "$BUILD_PATH\bin\$TARGET\*" -Destination "$BUILD_PATH\bin\"

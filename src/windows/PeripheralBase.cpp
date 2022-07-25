@@ -270,7 +270,8 @@ bool PeripheralBase::_attempt_connect() {
     auto gatt_services = services_result.Services();
     for (GattDeviceService&& service : gatt_services) {
         // For each service...
-        gatt_service_t gatt_service(service);
+        gatt_service_t gatt_service;
+        gatt_service.obj = service;
 
         // Fetch the service UUID
         std::string service_uuid = guid_to_uuid(service.Uuid());
@@ -285,7 +286,8 @@ bool PeripheralBase::_attempt_connect() {
         auto gatt_characteristics = characteristics_result.Characteristics();
         for (GattCharacteristic&& characteristic : gatt_characteristics) {
             // For each characteristic...
-            gatt_characteristic_t gatt_characteristic(characteristic);
+            gatt_characteristic_t gatt_characteristic;
+            gatt_characteristic.obj = characteristic;
 
             // Fetch the characteristic UUID
             std::string characteristic_uuid = guid_to_uuid(characteristic.Uuid());
@@ -300,7 +302,8 @@ bool PeripheralBase::_attempt_connect() {
             auto gatt_descriptors = descriptors_result.Descriptors();
             for (GattDescriptor&& descriptor : gatt_descriptors) {
                 // For each descriptor...
-                gatt_descriptor_t gatt_descriptor(descriptor);
+                gatt_descriptor_t gatt_descriptor;
+                gatt_descriptor.obj = descriptor;
 
                 // Fetch the descriptor UUID.
                 std::string descriptor_uuid = guid_to_uuid(descriptor.Uuid());
