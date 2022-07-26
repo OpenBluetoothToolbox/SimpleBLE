@@ -338,7 +338,7 @@ typedef struct {
     CBDescriptor* descriptor = [self findDescriptor:descriptor_uuid characteristic:characteristic];
 
     @synchronized(self) {
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptors[uuidToSimpleBLE(descriptor.UUID)].readPending = YES;
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].readPending = YES;
         [self.peripheral readValueForDescriptor:descriptor];
     }
 
@@ -349,7 +349,7 @@ typedef struct {
         [NSThread sleepForTimeInterval:0.01];
         @synchronized(self) {
             readPending =
-                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptors[uuidToSimpleBLE(descriptor.UUID)].readPending;
+                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].readPending;
         }
     }
 
@@ -375,7 +375,7 @@ typedef struct {
     CBDescriptor* descriptor = [self findDescriptor:descriptor_uuid characteristic:characteristic];
 
     @synchronized(self) {
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptors[uuidToSimpleBLE(descriptor.UUID)].writePending = YES;
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].writePending = YES;
         [self.peripheral writeValue:payload forDescriptor:descriptor];
     }
 
@@ -386,7 +386,7 @@ typedef struct {
         [NSThread sleepForTimeInterval:0.01];
         @synchronized(self) {
             writePending =
-                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptors[uuidToSimpleBLE(descriptor.UUID)].writePending;
+                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].writePending;
         }
     }
 
@@ -538,8 +538,8 @@ typedef struct {
 
     @synchronized(self) {
         // If the descriptor still had a pending read, clear the flag and return
-        if (characteristic_extras_[characteristic_uuid].descriptors[descriptor_uuid].readPending) {
-            characteristic_extras_[characteristic_uuid].descriptors[descriptor_uuid].readPending = NO;
+        if (characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].readPending) {
+            characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].readPending = NO;
             return;
         }
     }
@@ -555,8 +555,8 @@ typedef struct {
     std::string descriptor_uuid = uuidToSimpleBLE(descriptor.UUID);
 
     @synchronized(self) {
-        characteristic_extras_[characteristic_uuid].descriptors[descriptor_uuid].writePending = NO;
+        characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].writePending = NO;
     }
-}
+}-
 
 @end

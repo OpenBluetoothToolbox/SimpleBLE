@@ -104,7 +104,7 @@ class PeripheralBase {
 
     GattDescriptor PeripheralBase::_fetch_descriptor(const BluetoothUUID& service_uuid,
                                                      const BluetoothUUID& characteristic_uuid,
-                                                     const BluetoothUUID& descriptor_uuid)
+                                                     const BluetoothUUID& descriptor_uuid);
 };
 
 }  // namespace SimpleBLE
