@@ -2,8 +2,8 @@
 
 #include <optional>
 
-#include <simpleble/Service.h>
 #include <simpleble/Peripheral.h>
+#include <simpleble/Service.h>
 
 namespace SimpleBLE {
 
@@ -28,14 +28,17 @@ class Peripheral : public SimpleBLE::Peripheral {
     std::optional<std::vector<Service>> services() noexcept;
     std::optional<std::map<uint16_t, ByteArray>> manufacturer_data() noexcept;
 
+    // clang-format off
     std::optional<ByteArray> read(BluetoothUUID const& service, BluetoothUUID const& characteristic) noexcept;
     bool write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) noexcept;
     bool write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) noexcept;
-    bool notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                std::function<void(ByteArray payload)> callback) noexcept;
-    bool indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                  std::function<void(ByteArray payload)> callback) noexcept;
+    bool notify(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback) noexcept;
+    bool indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback) noexcept;
     bool unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) noexcept;
+
+    std::optional<ByteArray> read(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor) noexcept;
+    bool write(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor, ByteArray const& data) noexcept;
+    // clang-format on
 
     bool set_callback_on_connected(std::function<void()> on_connected) noexcept;
     bool set_callback_on_disconnected(std::function<void()> on_disconnected) noexcept;

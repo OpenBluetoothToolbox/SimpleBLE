@@ -15,6 +15,9 @@ ServiceNotFound::ServiceNotFound(BluetoothUUID uuid) : BaseException("Service wi
 CharacteristicNotFound::CharacteristicNotFound(BluetoothUUID uuid)
     : BaseException("Characteristic with UUID " + uuid + " not found") {}
 
+DescriptorNotFound::DescriptorNotFound(BluetoothUUID uuid)
+    : BaseException("Descriptor with UUID " + uuid + " not found") {}
+
 OperationNotSupported::OperationNotSupported() : BaseException("The requested operation is not supported.") {}
 
 OperationFailed::OperationFailed() : BaseException("The requested operation has failed.") {}
