@@ -56,14 +56,17 @@ class PeripheralBase {
     std::vector<Service> services();
     std::map<uint16_t, ByteArray> manufacturer_data();
 
+    // clang-format off
     ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic);
     void write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data);
     void write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data);
-    void notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                std::function<void(ByteArray payload)> callback);
-    void indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                  std::function<void(ByteArray payload)> callback);
+    void notify(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback);
+    void indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback);
     void unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic);
+
+    ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor);
+    void write(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor, ByteArray const& data);
+    // clang-format on
 
     void set_callback_on_connected(std::function<void()> on_connected);
     void set_callback_on_disconnected(std::function<void()> on_disconnected);
@@ -98,6 +101,10 @@ class PeripheralBase {
     bool _attempt_connect();
     GattCharacteristic _fetch_characteristic(const BluetoothUUID& service_uuid,
                                              const BluetoothUUID& characteristic_uuid);
+
+    GattDescriptor PeripheralBase::_fetch_descriptor(const BluetoothUUID& service_uuid,
+                                                     const BluetoothUUID& characteristic_uuid,
+                                                     const BluetoothUUID& descriptor_uuid)
 };
 
 }  // namespace SimpleBLE

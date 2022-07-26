@@ -32,6 +32,14 @@
                callback:(std::function<void(SimpleBLE::ByteArray)>)callback;
 - (void)unsubscribe:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid;
 
+- (SimpleBLE::ByteArray)read:(NSString*)service_uuid
+              characteristic_uuid:(NSString*)characteristic_uuid
+                  descriptor_uuid:(NSString*)descriptor_uuid;
+- (void)write:(NSString*)service_uuid
+    characteristic_uuid:(NSString*)characteristic_uuid
+        descriptor_uuid:(NSString*)descriptor_uuid
+                payload:(NSData*)payload;
+
 - (void)delegateDidConnect;
 - (void)delegateDidDisconnect;
 

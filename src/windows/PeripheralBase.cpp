@@ -239,6 +239,32 @@ void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID con
     }
 }
 
+ByteArray PeripheralBase::read_value(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                     BluetoothUUID const& descriptor) {
+    GattDescriptor gatt_descriptor = _fetch_descriptor(service, characteristic, descriptor);
+
+    // Read the value.
+    auto result = async_get(gatt_descriptor.ReadValueAsync(Devices::Bluetooth::BluetoothCacheMode::Uncached));
+    if (result.Status() != GenericAttributeProfile::GattCommunicationStatus::Success) {
+        throw SimpleBLE::Exception::OperationFailed();
+    }
+    return ibuffer_to_bytearray(result.Value());
+}
+
+void PeripheralBase::write_value(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                 BluetoothUUID const& descriptor, ByteArray const& data) {
+    GattDescriptor gatt_descriptor = _fetch_descriptor(service, characteristic, descriptor);
+
+    // Convert the request data to a buffer.
+    winrt::Windows::Storage::Streams::IBuffer buffer = bytearray_to_ibuffer(data);
+
+    // Write the value.
+    auto result = async_get(gatt_descriptor.WriteValueWithResultAsync(buffer));
+    if (result.Status() != GenericAttributeProfile::GattCommunicationStatus::Success) {
+        throw SimpleBLE::Exception::OperationFailed();
+    }
+}
+
 void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) {
     if (on_connected) {
         callback_on_connected_.load(std::move(on_connected));
@@ -334,4 +360,22 @@ GattCharacteristic PeripheralBase::_fetch_characteristic(const BluetoothUUID& se
     }
 
     return gatt_map_[service_uuid].characteristics.at(characteristic_uuid).obj;
+}
+
+GattDescriptor PeripheralBase::_fetch_descriptor(const BluetoothUUID& service_uuid,
+                                                 const BluetoothUUID& characteristic_uuid,
+                                                 const BluetoothUUID& descriptor_uuid) {
+    if (gatt_map_.count(service_uuid) == 0) {
+        throw SimpleBLE::Exception::ServiceNotFound(service_uuid);
+    }
+
+    if (gatt_map_[service_uuid].characteristics.count(characteristic_uuid) == 0) {
+        throw SimpleBLE::Exception::CharacteristicNotFound(characteristic_uuid);
+    }
+
+    if (gatt_map_[service_uuid].characteristics[characteristic_uuid].descriptors.count(descriptor_uuid) == 0) {
+        throw SimpleBLE::Exception::DescriptorNotFound(descriptor_uuid);
+    }
+
+    return gatt_map_[service_uuid].characteristics[characteristic_uuid].descriptors.at(descriptor_uuid).obj;
 }
