@@ -557,6 +557,6 @@ typedef struct {
     @synchronized(self) {
         characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].writePending = NO;
     }
-}-
+}
 
 @end

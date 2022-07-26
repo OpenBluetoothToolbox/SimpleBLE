@@ -240,7 +240,7 @@ void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID con
 }
 
 ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                     BluetoothUUID const& descriptor) {
+                               BluetoothUUID const& descriptor) {
     GattDescriptor gatt_descriptor = _fetch_descriptor(service, characteristic, descriptor);
 
     // Read the value.
@@ -252,7 +252,7 @@ ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const
 }
 
 void PeripheralBase::write(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                 BluetoothUUID const& descriptor, ByteArray const& data) {
+                           BluetoothUUID const& descriptor, ByteArray const& data) {
     GattDescriptor gatt_descriptor = _fetch_descriptor(service, characteristic, descriptor);
 
     // Convert the request data to a buffer.
