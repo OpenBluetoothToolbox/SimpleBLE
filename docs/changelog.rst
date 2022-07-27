@@ -16,7 +16,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 -  Multiple connection example.
 -  Logger level and callback can now be queried.
--  Characteristics can now list their descriptors.
+-  Characteristics can now list their descriptors. *(Thanks Symbitic!)*
+-  Peripherals can now read and write characteristic descriptors. *(Thanks Symbitic!)*
 -  (Windows) WinRT exception handling.
 -  (Windows) Accessor function to underlying OS objects of ``Adapter`` and ``Peripheral``.
 -  (MacOS) Failures will now throw corresponding exception.
@@ -28,7 +29,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  Selection of build type is now based on the  ``BUILD_SHARED_LIBS`` setting.
 -  Consumable CMake target is now ``simpleble::simpleble``.
 -  **API CHANGE**: ``BluetoothService`` class was replaced by the ``Service`` class, with
-   a new implementation for characteristics and descriptors.
+   a new implementation for enumerating characteristics and descriptors.
 
 **Fixed**
 

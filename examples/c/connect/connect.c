@@ -88,6 +88,9 @@ int main() {
         printf("Service: %s\n", service.uuid.value);
         for (size_t j = 0; j < service.characteristic_count; j++) {
             printf("  Characteristic: %s\n", service.characteristics[j].uuid.value);
+            for (size_t k = 0; k < service.characteristics[j].descriptor_count; k++) {
+                printf("    Descriptor: %s\n", service.characteristics[j].descriptors[k].uuid.value);
+            }
         }
     }
 
