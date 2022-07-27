@@ -202,12 +202,12 @@ typedef struct {
     CBUUID* characteristic_cbuuid = [CBUUID UUIDWithString:characteristic_uuid];
 
     for (CBService* service in self.peripheral.services) {
-        if ([service.UUID isNotEqual:service_cbuuid]) {
+        if (!([service.UUID isEqual:service_cbuuid])) {
             continue;
         }
         NSArray<CBCharacteristic*>* characteristics = service.characteristics;
         for (CBCharacteristic* characteristic in characteristics) {
-            if ([characteristic.UUID isNotEqual:characteristic_cbuuid]) {
+            if (!([characteristic.UUID isEqual:characteristic_cbuuid])) {
                 continue;
             }
             if (characteristic && characteristic.descriptors) {
