@@ -1,5 +1,9 @@
 #include "PeripheralBase.h"
 
+#include "CharacteristicBuilder.h"
+#include "DescriptorBuilder.h"
+#include "ServiceBuilder.h"
+
 #include <simpleble/Exceptions.h>
 #include <simplebluez/Exceptions.h>
 #include <algorithm>
@@ -87,32 +91,36 @@ void PeripheralBase::unpair() {
     }
 }
 
-std::vector<BluetoothService> PeripheralBase::services() {
+std::vector<Service> PeripheralBase::services() {
     bool is_battery_service_available = false;
 
-    std::vector<BluetoothService> service_list;
+    std::vector<Service> service_list;
     for (auto bluez_service : device_->services()) {
-        BluetoothService service;
-        service.uuid = bluez_service->uuid();
-
         // Check if the service is the battery service.
-        if (service.uuid == BATTERY_SERVICE_UUID) {
+        if (bluez_service->uuid() == BATTERY_SERVICE_UUID) {
             is_battery_service_available = true;
         }
 
+        // Build the list of characteristics for the service.
+        std::vector<Characteristic> characteristic_list;
         for (auto bluez_characteristic : bluez_service->characteristics()) {
-            service.characteristics.push_back(bluez_characteristic->uuid());
+            // Build the list of descriptors for the characteristic.
+            std::vector<Descriptor> descriptor_list;
+            for (auto bluez_descriptor : bluez_characteristic->descriptors()) {
+                descriptor_list.push_back(DescriptorBuilder(bluez_descriptor->uuid()));
+            }
+
+            characteristic_list.push_back(CharacteristicBuilder(bluez_characteristic->uuid(), descriptor_list));
         }
-        service_list.push_back(service);
+
+        service_list.push_back(ServiceBuilder(bluez_service->uuid(), characteristic_list));
     }
 
     // If the battery service is not available, and the device has the appropriate interface, add it.
     if (!is_battery_service_available && device_->has_battery_interface()) {
         // Emulate the battery service through the Battery1 interface.
-        BluetoothService service;
-        service.uuid = BATTERY_SERVICE_UUID;
-        service.characteristics.push_back(BATTERY_CHARACTERISTIC_UUID);
-        service_list.push_back(service);
+        service_list.push_back(
+            ServiceBuilder(BATTERY_SERVICE_UUID, {CharacteristicBuilder(BATTERY_CHARACTERISTIC_UUID, {})}));
     }
 
     return service_list;
@@ -204,6 +212,16 @@ void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID con
     }
 }
 
+ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                               BluetoothUUID const& descriptor) {
+    return _get_descriptor(service, characteristic, descriptor)->read();
+}
+
+void PeripheralBase::write(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                           BluetoothUUID const& descriptor, ByteArray const& data) {
+    _get_descriptor(service, characteristic, descriptor)->write(data);
+}
+
 void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) {
     if (on_connected) {
         callback_on_connected_.load(std::move(on_connected));
@@ -272,5 +290,15 @@ std::shared_ptr<SimpleBluez::Characteristic> PeripheralBase::_get_characteristic
         throw Exception::ServiceNotFound(service_uuid);
     } catch (SimpleBluez::Exception::CharacteristicNotFoundException& e) {
         throw Exception::CharacteristicNotFound(characteristic_uuid);
+    }
+}
+
+std::shared_ptr<SimpleBluez::Descriptor> PeripheralBase::_get_descriptor(BluetoothUUID const& service_uuid,
+                                                                         BluetoothUUID const& characteristic_uuid,
+                                                                         BluetoothUUID const& descriptor_uuid) {
+    try {
+        return device_->get_characteristic(service_uuid, characteristic_uuid)->get_descriptor(descriptor_uuid);
+    } catch (SimpleBluez::Exception::DescriptorNotFoundException& e) {
+        throw Exception::DescriptorNotFound(descriptor_uuid);
     }
 }

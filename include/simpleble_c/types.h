@@ -4,6 +4,7 @@
 
 #define SIMPLEBLE_UUID_STR_LEN 37  // 36 characters + null terminator
 #define SIMPLEBLE_CHARACTERISTIC_MAX_COUNT 16
+#define SIMPLEBLE_DESCRIPTOR_MAX_COUNT 16
 
 // TODO: Add proper error codes.
 typedef enum {
@@ -17,8 +18,18 @@ typedef struct {
 
 typedef struct {
     simpleble_uuid_t uuid;
+} simpleble_descriptor_t;
+
+typedef struct {
+    simpleble_uuid_t uuid;
+    size_t descriptor_count;
+    simpleble_descriptor_t descriptors[SIMPLEBLE_DESCRIPTOR_MAX_COUNT];
+} simpleble_characteristic_t;
+
+typedef struct {
+    simpleble_uuid_t uuid;
     size_t characteristic_count;
-    simpleble_uuid_t characteristics[SIMPLEBLE_CHARACTERISTIC_MAX_COUNT];
+    simpleble_characteristic_t characteristics[SIMPLEBLE_CHARACTERISTIC_MAX_COUNT];
 } simpleble_service_t;
 
 typedef struct {
@@ -29,7 +40,6 @@ typedef struct {
 
 typedef void* simpleble_adapter_t;
 typedef void* simpleble_peripheral_t;
-typedef void* simpleble_characteristic_t;
 
 typedef enum {
     SIMPLEBLE_OS_WINDOWS = 0,

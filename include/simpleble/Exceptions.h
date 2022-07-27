@@ -38,6 +38,11 @@ class CharacteristicNotFound : public BaseException {
     CharacteristicNotFound(BluetoothUUID uuid);
 };
 
+class DescriptorNotFound : public BaseException {
+  public:
+    DescriptorNotFound(BluetoothUUID uuid);
+};
+
 class OperationNotSupported : public BaseException {
   public:
     OperationNotSupported();

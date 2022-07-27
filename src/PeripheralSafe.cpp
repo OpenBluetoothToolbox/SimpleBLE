@@ -89,7 +89,7 @@ std::optional<std::map<uint16_t, SimpleBLE::ByteArray>> SimpleBLE::Safe::Periphe
     }
 }
 
-std::optional<std::vector<SimpleBLE::BluetoothService>> SimpleBLE::Safe::Peripheral::services() noexcept {
+std::optional<std::vector<SimpleBLE::Service>> SimpleBLE::Safe::Peripheral::services() noexcept {
     try {
         return SimpleBLE::Peripheral::services();
     } catch (...) {
@@ -150,6 +150,26 @@ bool SimpleBLE::Safe::Peripheral::unsubscribe(BluetoothUUID const& service,
                                               BluetoothUUID const& characteristic) noexcept {
     try {
         SimpleBLE::Peripheral::unsubscribe(service, characteristic);
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
+std::optional<SimpleBLE::ByteArray> SimpleBLE::Safe::Peripheral::read(BluetoothUUID const& service,
+                                                                      BluetoothUUID const& characteristic,
+                                                                      BluetoothUUID const& descriptor) noexcept {
+    try {
+        return SimpleBLE::Peripheral::read(service, characteristic, descriptor);
+    } catch (...) {
+        return std::nullopt;
+    }
+}
+
+bool SimpleBLE::Safe::Peripheral::write(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                        BluetoothUUID const& descriptor, ByteArray const& data) noexcept {
+    try {
+        SimpleBLE::Peripheral::write(service, characteristic, descriptor, data);
         return true;
     } catch (...) {
         return false;
