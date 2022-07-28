@@ -12,6 +12,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 **Important:** From this version onwards, the CMake target that should be consumed
                by downstream projects is ``simpleble::simpleble``.
 
+**Important:** This version includes a breaking API change in the enumeration of
+               services and characteristics.
+
 **Added**
 
 -  Multiple connection example.
@@ -28,18 +31,18 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  ``AdapterSafe`` and ``PeripheralSafe`` will now catch all exceptions.
 -  Selection of build type is now based on the  ``BUILD_SHARED_LIBS`` setting.
 -  Consumable CMake target is now ``simpleble::simpleble``.
--  **API CHANGE**: ``BluetoothService`` class was replaced by the ``Service`` class, with
-   a new implementation for enumerating characteristics and descriptors.
+-  **API CHANGE**: ``BluetoothService`` class was replaced by the ``Service`` class.
 
 **Fixed**
 
 -  Made user callback invocations exception-safe.
 -  Attempting to scan while connected will erase references to all existing peripherals.
--  (Windows) Peripheral reads are now uncached. *(Thanks piotromt!)*
--  (Linux) Failure to set agent would trigger a crash.
 -  CMake target ``simpleble::simpleble`` was removed in favour of ``BUILD_SHARED_LIBS``.
 -  CMake target ``simpleble::simpleble-c`` was removed in favour of ``BUILD_SHARED_LIBS``.
+-  (Windows) Peripheral reads are now uncached. *(Thanks piotromt!)*
+-  (Linux) Failure to set agent would trigger a crash.
 -  (Linux) Spurious disconnection events during connection retries have been fully removed.
+-  (Linux) Exceptions thrown during the deletion phase of a peripheral would not be captured.
 
 
 [0.4.0] - 2022-06-12

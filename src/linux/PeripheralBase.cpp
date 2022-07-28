@@ -24,7 +24,13 @@ PeripheralBase::PeripheralBase(std::shared_ptr<SimpleBluez::Device> device,
 PeripheralBase::~PeripheralBase() {
     device_->clear_on_disconnected();
     device_->clear_on_services_resolved();
-    _cleanup_characteristics();
+
+    try {
+        _cleanup_characteristics();
+    } catch (...) {
+        // It's possible during the cleanup process that the Bluez device has already
+        // been removed, which could cause calls to cleanup methods to throw.
+    }
 }
 
 void* PeripheralBase::underlying() const { return device_.get(); }
@@ -241,7 +247,8 @@ void PeripheralBase::set_callback_on_disconnected(std::function<void()> on_disco
 // Private methods
 
 void PeripheralBase::_cleanup_characteristics() {
-    // Get rid of all the callbacks to ensure that no invalid objects are being called.
+    // Clear all callbacks first to ensure that a failure during `stop_notify`
+    // does not leave any dangling callbacks.
 
     if (device_->has_battery_interface()) {
         device_->clear_on_battery_percentage_changed();
@@ -250,7 +257,12 @@ void PeripheralBase::_cleanup_characteristics() {
     for (auto bluez_service : device_->services()) {
         for (auto bluez_characteristic : bluez_service->characteristics()) {
             bluez_characteristic->clear_on_value_changed();
+        }
+    }
 
+    // Stop notifying all characteristics.
+    for (auto bluez_service : device_->services()) {
+        for (auto bluez_characteristic : bluez_service->characteristics()) {
             if (bluez_characteristic->notifying()) {
                 bluez_characteristic->stop_notify();
             }
