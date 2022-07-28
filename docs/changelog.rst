@@ -39,6 +39,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  (Linux) Failure to set agent would trigger a crash.
 -  CMake target ``simpleble::simpleble`` was removed in favour of ``BUILD_SHARED_LIBS``.
 -  CMake target ``simpleble::simpleble-c`` was removed in favour of ``BUILD_SHARED_LIBS``.
+-  (Linux) Spurious disconnection events during connection retries have been fully removed.
 
 
 [0.4.0] - 2022-06-12

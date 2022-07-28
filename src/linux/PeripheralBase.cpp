@@ -36,7 +36,7 @@ BluetoothAddress PeripheralBase::address() { return device_->address(); }
 int16_t PeripheralBase::rssi() { return device_->rssi(); }
 
 void PeripheralBase::connect() {
-    // Set the OnServicesResolved callback
+    device_->clear_on_disconnected();
     device_->set_on_services_resolved([this]() { this->connection_cv_.notify_all(); });
 
     // Attempt to connect to the device.
