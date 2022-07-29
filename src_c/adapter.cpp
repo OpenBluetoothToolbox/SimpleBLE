@@ -61,6 +61,21 @@ simpleble_err_t simpleble_adapter_scan_start(simpleble_adapter_t handle) {
     return adapter->scan_start() ? SIMPLEBLE_SUCCESS : SIMPLEBLE_FAILURE;
 }
 
+simpleble_err_t simpleble_adapter_scan_start_with_services(simpleble_adapter_t handle, simpleble_uuid_t* services,
+                                                           size_t services_length) {
+    if (handle == nullptr || services == nullptr) {
+        return SIMPLEBLE_FAILURE;
+    }
+
+    std::vector<SimpleBLE::BluetoothUUID> serviceUuids(services_length);
+    for (size_t i = 0; i < services_length; i++) {
+        serviceUuids.push_back(SimpleBLE::BluetoothUUID(services[i].value));
+    }
+
+    SimpleBLE::Safe::Adapter* adapter = (SimpleBLE::Safe::Adapter*)handle;
+    return adapter->scan_start_with_services(serviceUuids) ? SIMPLEBLE_SUCCESS : SIMPLEBLE_FAILURE;
+}
+
 simpleble_err_t simpleble_adapter_scan_stop(simpleble_adapter_t handle) {
     if (handle == nullptr) {
         return SIMPLEBLE_FAILURE;
@@ -89,6 +104,21 @@ simpleble_err_t simpleble_adapter_scan_for(simpleble_adapter_t handle, int timeo
 
     SimpleBLE::Safe::Adapter* adapter = (SimpleBLE::Safe::Adapter*)handle;
     return adapter->scan_for(timeout_ms) ? SIMPLEBLE_SUCCESS : SIMPLEBLE_FAILURE;
+}
+
+simpleble_err_t simpleble_adapter_scan_for_with_services(simpleble_adapter_t handle, int timeout_ms,
+                                                         simpleble_uuid_t* services, size_t services_length) {
+    if (handle == nullptr || services == nullptr) {
+        return SIMPLEBLE_FAILURE;
+    }
+
+    std::vector<SimpleBLE::BluetoothUUID> serviceUuids(services_length);
+    for (size_t i = 0; i < services_length; i++) {
+        serviceUuids.push_back(SimpleBLE::BluetoothUUID(services[i].value));
+    }
+
+    SimpleBLE::Safe::Adapter* adapter = (SimpleBLE::Safe::Adapter*)handle;
+    return adapter->scan_for_with_services(timeout_ms, serviceUuids) ? SIMPLEBLE_SUCCESS : SIMPLEBLE_FAILURE;
 }
 
 size_t simpleble_adapter_scan_get_results_count(simpleble_adapter_t handle) {

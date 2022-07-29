@@ -13,6 +13,7 @@
 #include "winrt/Windows.Foundation.h"
 #include "winrt/base.h"
 
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 
@@ -35,6 +36,26 @@ AdapterBase::AdapterBase(std::string device_id)
 
     scanner_received_token_ = scanner_.Received(
         [this](const auto& w, const Advertisement::BluetoothLEAdvertisementReceivedEventArgs args) {
+            if (this->serviceUuids_.size() > 0) {
+                bool found = false;
+                auto guids = args.Advertisement().ServiceUuids();
+                for (const auto& guid : guids) {
+                    const std::string uuid = guid_to_uuid(guid);
+                    for (const auto& service : this->serviceUuids) {
+                        if (uuid == service) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        break;
+                    }
+                }
+                if (!found) {
+                    return;
+                }
+            }
+
             advertising_data_t data;
             data.mac_address = _mac_address_to_str(args.BluetoothAddress());
             data.identifier = winrt::to_string(args.Advertisement().LocalName());
@@ -89,6 +110,20 @@ BluetoothAddress AdapterBase::address() { return _mac_address_to_str(adapter_.Bl
 void AdapterBase::scan_start() {
     this->seen_peripherals_.clear();
 
+    this->serviceUuids_.empty();
+
+    scanner_.ScanningMode(Advertisement::BluetoothLEScanningMode::Active);
+    scan_is_active_ = true;
+    scanner_.Start();
+
+    SAFE_CALLBACK_CALL(this->callback_on_scan_start_);
+}
+
+void AdapterBase::scan_start_with_services(std::vector<BluetoothUUID> service_uuids) {
+    this->seen_peripherals_.clear();
+
+    this->serviceUuids_ = std::move(service_uuids);
+
     scanner_.ScanningMode(Advertisement::BluetoothLEScanningMode::Active);
     scan_is_active_ = true;
     scanner_.Start();
@@ -110,6 +145,12 @@ void AdapterBase::scan_stop() {
 
 void AdapterBase::scan_for(int timeout_ms) {
     scan_start();
+    std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
+    scan_stop();
+}
+
+void AdapterBase::scan_for_with_services(int timeout_ms, std::vector<BluetoothUUID> service_uuids) {
+    scan_start_with_services(service_uuids);
     std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
     scan_stop();
 }

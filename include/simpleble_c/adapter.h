@@ -68,6 +68,17 @@ simpleble_err_t simpleble_adapter_scan_start(simpleble_adapter_t handle);
  * @brief
  *
  * @param handle
+ * @param services
+ * @param services_length
+ * @return simpleble_err_t
+ */
+simpleble_err_t simpleble_adapter_scan_start_with_services(simpleble_adapter_t handle, simpleble_uuid_t* services,
+                                                           size_t services_length);
+
+/**
+ * @brief
+ *
+ * @param handle
  * @return simpleble_err_t
  */
 simpleble_err_t simpleble_adapter_scan_stop(simpleble_adapter_t handle);
@@ -94,6 +105,18 @@ simpleble_err_t simpleble_adapter_scan_for(simpleble_adapter_t handle, int timeo
  * @brief
  *
  * @param handle
+ * @param timeout_ms
+ * @param services
+ * @param services_length
+ * @return simpleble_err_t
+ */
+simpleble_err_t simpleble_adapter_scan_for_with_services(simpleble_adapter_t handle, int timeout_ms,
+                                                         simpleble_uuid_t* services, size_t services_length);
+
+/**
+ * @brief
+ *
+ * @param handle
  * @return size_t
  */
 size_t simpleble_adapter_scan_get_results_count(simpleble_adapter_t handle);
@@ -109,7 +132,6 @@ size_t simpleble_adapter_scan_get_results_count(simpleble_adapter_t handle);
  * @return simpleble_peripheral_t
  */
 simpleble_peripheral_t simpleble_adapter_scan_get_results_handle(simpleble_adapter_t handle, size_t index);
-
 
 /**
  * @brief

@@ -59,6 +59,18 @@
     }
 }
 
+- (void)scanStartWithServices:(NSArray<NSString*>*)serviceUUIDs {
+    [self validateCentralManagerState];
+    NSMutableArray* services = [NSMutableArray arrayWithCapacity:[serviceUUIDs count]];
+    [serviceUUIDs enumerateObjectsUsingBlock:^(id obj, NSUInteger i, BOOL* b) {
+      [services addObject:[CBUUID UUIDWithString:obj]];
+    }];
+    [self.centralManager scanForPeripheralsWithServices:services options:@{CBCentralManagerScanOptionAllowDuplicatesKey : @YES}];
+    if (!self.centralManager.isScanning) {
+        throw SimpleBLE::Exception::CoreBluetoothException("Adapter scanning failed to start");
+    }
+}
+
 - (void)scanStop {
     [self.centralManager stopScan];
 }

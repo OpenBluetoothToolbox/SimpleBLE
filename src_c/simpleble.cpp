@@ -2,6 +2,4 @@
 
 #include <cstdlib>
 
-void simpleble_free(void* handle) {
-    free(handle);    
-}
+void simpleble_free(void* handle) { free(handle); }

@@ -16,8 +16,10 @@ class Adapter : public SimpleBLE::Adapter {
     std::optional<BluetoothAddress> address() noexcept;
 
     bool scan_start() noexcept;
+    bool scan_start_with_services(std::vector<BluetoothUUID> service_uuids) noexcept;
     bool scan_stop() noexcept;
     bool scan_for(int timeout_ms) noexcept;
+    bool scan_for_with_services(int timeout_ms, std::vector<BluetoothUUID> service_uuids) noexcept;
     std::optional<bool> scan_is_active() noexcept;
     std::optional<std::vector<SimpleBLE::Safe::Peripheral>> scan_get_results() noexcept;
 

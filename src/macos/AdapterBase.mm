@@ -54,6 +54,22 @@ void AdapterBase::scan_start() {
     SAFE_CALLBACK_CALL(this->callback_on_scan_start_);
 }
 
+void AdapterBase::scan_start_with_services(std::vector<BluetoothUUID> service_uuids) {
+    this->seen_peripherals_.clear();
+
+    NSMutableArray* serviceUuids = [NSMutableArray arrayWithCapacity:service_uuids.Length()];
+    for (size_t i = 0; i < service_uuids.Length(); i++) {
+        std::string uuid_str = service_uuids[i];
+        NSString* uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
+        [serviceUuids addObject:uuid];
+    }
+
+    AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)opaque_internal_;
+    [internal scanStartWithServices:serviceUuids];
+
+    SAFE_CALLBACK_CALL(this->callback_on_scan_start_);
+}
+
 void AdapterBase::scan_stop() {
     AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)opaque_internal_;
     [internal scanStop];
@@ -63,6 +79,12 @@ void AdapterBase::scan_stop() {
 
 void AdapterBase::scan_for(int timeout_ms) {
     this->scan_start();
+    std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
+    this->scan_stop();
+}
+
+void AdapterBase::scan_for_with_services(int timeout_ms, std::vector<BluetoothUUID> service_uuids) {
+    this->scan_start_with_services(service_uuids);
     std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
     this->scan_stop();
 }

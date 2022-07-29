@@ -13,6 +13,7 @@
 - (void*)underlying;
 
 - (void)scanStart;
+- (void)scanStartWithServices:(NSArray<NSString*>*)serviceUUIDs;
 
 - (void)scanStop;
 

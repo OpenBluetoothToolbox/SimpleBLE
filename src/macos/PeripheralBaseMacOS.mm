@@ -348,8 +348,9 @@ typedef struct {
     while (readPending && [NSDate.now compare:endDate] == NSOrderedAscending) {
         [NSThread sleepForTimeInterval:0.01];
         @synchronized(self) {
-            readPending =
-                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].readPending;
+            readPending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)]
+                              .descriptor_extras[uuidToSimpleBLE(descriptor.UUID)]
+                              .readPending;
         }
     }
 
@@ -385,8 +386,9 @@ typedef struct {
     while (writePending && [NSDate.now compare:endDate] == NSOrderedAscending) {
         [NSThread sleepForTimeInterval:0.01];
         @synchronized(self) {
-            writePending =
-                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].writePending;
+            writePending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)]
+                               .descriptor_extras[uuidToSimpleBLE(descriptor.UUID)]
+                               .writePending;
         }
     }
 

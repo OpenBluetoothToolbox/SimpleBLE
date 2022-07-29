@@ -28,8 +28,10 @@ class AdapterBase {
     BluetoothAddress address();
 
     void scan_start();
+    void scan_start_with_services(std::vector<BluetoothUUID> service_uuids);
     void scan_stop();
     void scan_for(int timeout_ms);
+    void scan_for_with_services(int timeout_ms, std::vector<BluetoothUUID> service_uuids);
     bool scan_is_active();
     std::vector<Peripheral> scan_get_results();
 
@@ -43,6 +45,8 @@ class AdapterBase {
     static std::vector<std::shared_ptr<AdapterBase>> get_adapters();
 
   private:
+    void scan_start_();
+
     std::shared_ptr<SimpleBluez::Adapter> adapter_;
 
     std::atomic_bool is_scanning_;

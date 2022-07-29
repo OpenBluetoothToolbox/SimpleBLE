@@ -35,8 +35,10 @@ class AdapterBase {
     BluetoothAddress address();
 
     void scan_start();
+    void scan_start_with_services(std::vector<BluetoothUUID> service_uuids);
     void scan_stop();
     void scan_for(int timeout_ms);
+    void scan_for_with_services(int timeout_ms, std::vector<BluetoothUUID> service_uuids);
     bool scan_is_active();
     std::vector<Peripheral> scan_get_results();
 
@@ -52,6 +54,7 @@ class AdapterBase {
   private:
     BluetoothAdapter adapter_;
     std::string identifier_;
+    std::vector<BluetoothUUID> serviceUuids_;
 
     struct Advertisement::BluetoothLEAdvertisementWatcher scanner_;
     winrt::event_token scanner_received_token_;

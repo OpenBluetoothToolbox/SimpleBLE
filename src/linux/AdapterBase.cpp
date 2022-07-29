@@ -26,8 +26,21 @@ std::string AdapterBase::identifier() { return adapter_->identifier(); }
 BluetoothAddress AdapterBase::address() { return adapter_->address(); }
 
 void AdapterBase::scan_start() {
-    adapter_->discovery_filter(SimpleBluez::Adapter::DiscoveryFilter::LE);
+    SimpleBluez::Adapter::DiscoveryFilter filter;
+    filter.Transport = SimpleBluez::Adapter::DiscoveryFilterTransport::LE;
+    adapter->discovery_filter(filter);
+    scan_start_();
+}
 
+void AdapterBase::scan_start_with_services(std::vector<BluetoothUUID> service_uuids) {
+    SimpleBluez::Adapter::DiscoveryFilter filter;
+    filter.UUIDs = service_uuids;
+    filter.Transport = SimpleBluez::Adapter::DiscoveryFilterTransport::LE;
+    adapter->discovery_filter(filter);
+    scan_start_();
+}
+
+void AdapterBase::scan_start_() {
     seen_peripherals_.clear();
 
     adapter_->set_on_device_updated([this](std::shared_ptr<SimpleBluez::Device> device) {
@@ -75,6 +88,12 @@ void AdapterBase::scan_stop() {
 
 void AdapterBase::scan_for(int timeout_ms) {
     scan_start();
+    std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
+    scan_stop();
+}
+
+void AdapterBase::scan_for_with_services(int timeout_ms, std::vector<BluetoothUUID> service_uuids) {
+    scan_start_with_services(service_uuids);
     std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
     scan_stop();
 }

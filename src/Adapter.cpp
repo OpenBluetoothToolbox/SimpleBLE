@@ -43,6 +43,12 @@ void Adapter::scan_start() {
     internal_->scan_start();
 }
 
+void Adapter::scan_start_with_services(std::vector<BluetoothUUID> service_uuids) {
+    if (!initialized()) throw Exception::NotInitialized();
+
+    internal_->scan_start_with_services(service_uuids);
+}
+
 void Adapter::scan_stop() {
     if (!initialized()) throw Exception::NotInitialized();
 
@@ -53,6 +59,12 @@ void Adapter::scan_for(int timeout_ms) {
     if (!initialized()) throw Exception::NotInitialized();
 
     internal_->scan_for(timeout_ms);
+}
+
+void Adapter::scan_for_with_services(int timeout_ms, std::vector<BluetoothUUID> service_uuids) {
+    if (!initialized()) throw Exception::NotInitialized();
+
+    internal_->scan_for_with_services(timeout_ms, service_uuids);
 }
 
 bool Adapter::scan_is_active() {
