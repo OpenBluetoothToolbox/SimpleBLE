@@ -1,7 +1,10 @@
 # Basic CMake configuration
-cmake_minimum_required(VERSION 3.16.0)
+cmake_minimum_required(VERSION 3.16)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/find")
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 project(SimpleBLE VERSION 0.1 LANGUAGES CXX)
 
@@ -249,6 +252,9 @@ set_property(TARGET simpleble-c PROPERTY WINDOWS_EXPORT_ALL_SYMBOLS ON)
 target_include_directories(simpleble PRIVATE ${SIMPLEBLE_ALL_INCLUDE_DIRS})
 target_include_directories(simpleble-c PRIVATE ${SIMPLEBLE_ALL_INCLUDE_DIRS})
 
+target_include_directories(simpleble INTERFACE ${SIMPLEBLE_USER_INCLUDE_DIR})
+target_include_directories(simpleble-c INTERFACE ${SIMPLEBLE_USER_INCLUDE_DIR})
+
 target_link_libraries(simpleble PRIVATE fmt::fmt-header-only)
 target_link_libraries(simpleble PUBLIC ${EXTERNAL_LIBRARIES})
 target_link_libraries(simpleble-c PUBLIC simpleble::simpleble)
@@ -274,8 +280,3 @@ foreach(OPTION ${PUBLIC_LINK_OPTIONS})
     target_link_options(simpleble PUBLIC ${OPTION})
     target_link_options(simpleble-c PUBLIC ${OPTION})
 endforeach()
-
-# Export the variables needed by the parent project
-if(NOT ${STANDALONE})
-    set(SIMPLEBLE_INCLUDES ${SIMPLEBLE_USER_INCLUDE_DIR} PARENT_SCOPE)
-endif()

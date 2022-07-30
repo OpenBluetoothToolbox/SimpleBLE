@@ -39,6 +39,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  Attempting to scan while connected will erase references to all existing peripherals.
 -  CMake target ``simpleble::simpleble`` was removed in favour of ``BUILD_SHARED_LIBS``.
 -  CMake target ``simpleble::simpleble-c`` was removed in favour of ``BUILD_SHARED_LIBS``.
+-  Using the correct CMake functionality to export headers for all targets.
 -  (Windows) Peripheral reads are now uncached. *(Thanks piotromt!)*
 -  (Linux) Failure to set agent would trigger a crash.
 -  (Linux) Spurious disconnection events during connection retries have been fully removed.
