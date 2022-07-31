@@ -73,9 +73,10 @@ int main() {
         return 1;
     }
 
-    printf("Successfully connected, listing services.");
 
     size_t services_count = simpleble_peripheral_services_count(peripheral);
+    printf("Successfully connected, listing %zu services.\n", services_count);
+
     for (size_t i = 0; i < services_count; i++) {
         simpleble_service_t service;
         err_code = simpleble_peripheral_services_get(peripheral, i, &service);
@@ -85,9 +86,10 @@ int main() {
             return 1;
         }
 
-        printf("Service: %s\n", service.uuid.value);
+        printf("Service: %s - (%zu characteristics)\n", service.uuid.value, service.characteristic_count);
         for (size_t j = 0; j < service.characteristic_count; j++) {
-            printf("  Characteristic: %s\n", service.characteristics[j].uuid.value);
+            printf("  Characteristic: %s - (%zu descriptors)\n", service.characteristics[j].uuid.value,
+                   service.characteristics[j].descriptor_count);
             for (size_t k = 0; k < service.characteristics[j].descriptor_count; k++) {
                 printf("    Descriptor: %s\n", service.characteristics[j].descriptors[k].uuid.value);
             }

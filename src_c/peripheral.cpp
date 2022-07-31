@@ -133,6 +133,8 @@ simpleble_err_t simpleble_peripheral_services_get(simpleble_peripheral_t handle,
         return SIMPLEBLE_FAILURE;
     }
 
+    memset(services, 0, sizeof(simpleble_service_t));
+
     SimpleBLE::Safe::Peripheral* peripheral = (SimpleBLE::Safe::Peripheral*)handle;
     auto peripheral_services = peripheral->services();
     if (!peripheral_services.has_value()) {
@@ -143,7 +145,7 @@ simpleble_err_t simpleble_peripheral_services_get(simpleble_peripheral_t handle,
         return SIMPLEBLE_FAILURE;
     }
 
-    SimpleBLE::Service& service = peripheral_services.value()[index];
+    SimpleBLE::Service service = peripheral_services.value()[index];
 
     memcpy(services->uuid.value, service.uuid().c_str(), SIMPLEBLE_UUID_STR_LEN);
     services->characteristic_count = service.characteristics().size();
@@ -153,7 +155,7 @@ simpleble_err_t simpleble_peripheral_services_get(simpleble_peripheral_t handle,
     }
 
     for (size_t i = 0; i < services->characteristic_count; i++) {
-        SimpleBLE::Characteristic& characteristic = service.characteristics()[i];
+        SimpleBLE::Characteristic characteristic = service.characteristics()[i];
 
         memcpy(services->characteristics[i].uuid.value, characteristic.uuid().c_str(), SIMPLEBLE_UUID_STR_LEN);
         services->characteristics[i].descriptor_count = characteristic.descriptors().size();
@@ -163,7 +165,7 @@ simpleble_err_t simpleble_peripheral_services_get(simpleble_peripheral_t handle,
         }
 
         for (size_t j = 0; j < services->characteristics[i].descriptor_count; j++) {
-            SimpleBLE::Descriptor& descriptor = characteristic.descriptors()[j];
+            SimpleBLE::Descriptor descriptor = characteristic.descriptors()[j];
 
             memcpy(services->characteristics[i].descriptors[j].uuid.value, descriptor.uuid().c_str(),
                    SIMPLEBLE_UUID_STR_LEN);

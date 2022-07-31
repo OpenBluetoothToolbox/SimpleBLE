@@ -46,7 +46,7 @@ int main() {
             std::cout << "  Characteristic: " << characteristic.uuid() << std::endl;
 
             for (auto& descriptor : characteristic.descriptors()) {
-                std::cout << "  Descriptor: " << descriptor.uuid() << std::endl;
+                std::cout << "    Descriptor: " << descriptor.uuid() << std::endl;
             }
         }
     }
