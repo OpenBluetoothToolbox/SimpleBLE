@@ -244,7 +244,7 @@ simpleble_err_t simpleble_peripheral_read_descriptor(simpleble_peripheral_t hand
  */
 simpleble_err_t simpleble_peripheral_write_descriptor(simpleble_peripheral_t handle, simpleble_uuid_t service,
                                                       simpleble_uuid_t characteristic, simpleble_uuid_t descriptor,
-                                                      uint8_t* data, size_t data_length);
+                                                      const uint8_t* data, size_t data_length);
 
 /**
  * @brief
