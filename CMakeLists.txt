@@ -3,9 +3,6 @@ cmake_minimum_required(VERSION 3.16)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/find")
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 project(SimpleBLE VERSION 0.1 LANGUAGES CXX)
 
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
