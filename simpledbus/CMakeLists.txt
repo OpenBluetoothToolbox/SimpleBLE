@@ -1,7 +1,10 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.20)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/find)
+# Run prelude script to set up environment
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
+
+#set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+#list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/find)
 
 project(
     simpledbus
@@ -12,18 +15,6 @@ project(
 )
 
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
-
-# Detect if the project is being build within a project or standalone.
-if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    set(STANDALONE true)
-
-    # Configure the build path
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-else()
-    set(STANDALONE false)
-endif()
 
 find_package(fmt REQUIRED)
 find_package(DBus1 REQUIRED)
@@ -148,10 +139,10 @@ install(
     DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/simpledbus/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpledbus)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/simpledbus.pc.in
-            ${CMAKE_CURRENT_BINARY_DIR}/simpledbus.pc @ONLY)
+# configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/simpledbus.pc.in
+#             ${CMAKE_CURRENT_BINARY_DIR}/simpledbus.pc @ONLY)
 
-install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/simpledbus.pc
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+# install(
+#     FILES ${CMAKE_CURRENT_BINARY_DIR}/simpledbus.pc
+#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
