@@ -31,7 +31,7 @@ jobs:
       run: |
         mkdir %GITHUB_WORKSPACE%\build_test
         cd %GITHUB_WORKSPACE%\build_test
-        cmake -G "Visual Studio 16 2019" -DCMAKE_SYSTEM_VERSION=10.0.22000.0 -DGTEST_ROOT=%GITHUB_WORKSPACE%\googletest\install -S %GITHUB_WORKSPACE%/simpleble
+        cmake -G "Visual Studio 16 2019" -DCMAKE_SYSTEM_VERSION=10.0.22000.0 -DGTEST_ROOT=%GITHUB_WORKSPACE%\googletest\install -S %GITHUB_WORKSPACE%/simpleble/test
         cmake --build . --config Release --parallel 4
         cd Release
         .\simpleble_test.exe
@@ -66,7 +66,7 @@ jobs:
       run: |
         mkdir $GITHUB_WORKSPACE/build_test
         cd $GITHUB_WORKSPACE/build_test
-        cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_BUILD_TYPE=Release -DGTEST_ROOT=$GITHUB_WORKSPACE/googletest/install -S $GITHUB_WORKSPACE/simpleble
+        cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_BUILD_TYPE=Release -DGTEST_ROOT=$GITHUB_WORKSPACE/googletest/install -S $GITHUB_WORKSPACE/simpleble/test
         cmake --build . --config Release --parallel 4
         ./simpleble_test
 
@@ -90,7 +90,7 @@ jobs:
       run: |
         sudo -H apt-get update -y
         sudo -H apt-get install -y dbus libdbus-1-dev python3-dev
-        sudo -H pip3 install -r $GITHUB_WORKSPACE/test/requirements.txt
+        sudo -H pip3 install -r $GITHUB_WORKSPACE/simpledbus/test/requirements.txt
     - name: Start DBus
       run: |
         echo "DBUS_SESSION_BUS_ADDRESS=$(dbus-daemon --config-file=/usr/share/dbus-1/session.conf --print-address --fork | cut -d, -f1)" >> $GITHUB_ENV
