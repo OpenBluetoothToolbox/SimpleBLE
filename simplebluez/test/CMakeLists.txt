@@ -1,8 +1,9 @@
-cmake_minimum_required(VERSION 3.16)
-project(simplebluez_test)
+cmake_minimum_required(VERSION 3.20)
 
-# Nice hack to automatically ignore the build directory
-file(WRITE ${CMAKE_BINARY_DIR}/.gitignore "*")
+# Run prelude script to set up environment
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/prelude.cmake)
+
+project(simplebluez_test)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)

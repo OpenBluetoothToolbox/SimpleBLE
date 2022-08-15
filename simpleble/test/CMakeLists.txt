@@ -1,16 +1,15 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.20)
+
+# Run prelude script to set up environment
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/prelude.cmake)
+
 project(simpleble_test)
-
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-# Nice hack to automatically ignore the build directory
-file(WRITE ${CMAKE_BINARY_DIR}/.gitignore "*")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Include SimpleBluez
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/.. ${CMAKE_BINARY_DIR}/simpleble)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../simpleble ${CMAKE_BINARY_DIR}/simpleble)
 
 find_package(GTest REQUIRED)
 

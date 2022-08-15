@@ -31,17 +31,14 @@ jobs:
       run: |
         mkdir %GITHUB_WORKSPACE%\build_test
         cd %GITHUB_WORKSPACE%\build_test
-        cmake -G "Visual Studio 16 2019" -DCMAKE_SYSTEM_VERSION=10.0.22000.0 -DGTEST_ROOT=%GITHUB_WORKSPACE%\googletest\install ../test
+        cmake -G "Visual Studio 16 2019" -DCMAKE_SYSTEM_VERSION=10.0.22000.0 -DGTEST_ROOT=%GITHUB_WORKSPACE%\googletest\install -S %GITHUB_WORKSPACE%/simpleble
         cmake --build . --config Release --parallel 4
-      shell: cmd
-    - name: Run tests
-      run: |
-        cd %GITHUB_WORKSPACE%\build_test\Release
+        cd Release
         .\simpleble_test.exe
       shell: cmd
 
   # ------------------------------------------------------------
-  
+
   test-macos:
     runs-on: ${{ matrix.os }}
 
@@ -55,9 +52,9 @@ jobs:
     - name: Clone Repository
       uses: actions/checkout@v2
     - name: Setup Cmake
-      uses: jwlawson/actions-setup-cmake@v1.4
+      uses: jwlawson/actions-setup-cmake@v1.12
       with:
-        cmake-version: '3.16.x'
+        cmake-version: '3.20.x'
     - name: Clone and build GTest
       run: |
         git clone https://github.com/google/googletest
@@ -69,11 +66,8 @@ jobs:
       run: |
         mkdir $GITHUB_WORKSPACE/build_test
         cd $GITHUB_WORKSPACE/build_test
-        cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release -DGTEST_ROOT=$GITHUB_WORKSPACE/googletest/install ../test
+        cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_BUILD_TYPE=Release -DGTEST_ROOT=$GITHUB_WORKSPACE/googletest/install -S $GITHUB_WORKSPACE/simpleble
         cmake --build . --config Release --parallel 4
-    - name: Run tests
-      run: |
-        cd $GITHUB_WORKSPACE/build_test
         ./simpleble_test
 
   # ------------------------------------------------------------
@@ -91,15 +85,19 @@ jobs:
     - name: Clone Repository
       uses: actions/checkout@v2
     - name: Install Dependencies
+      env:
+          DEBIAN_FRONTEND: noninteractive
       run: |
         sudo -H apt-get update -y
-        sudo -H apt-get install -y libdbus-1-dev
-      env:
-        DEBIAN_FRONTEND: noninteractive
+        sudo -H apt-get install -y dbus libdbus-1-dev python3-dev
+        sudo -H pip3 install -r $GITHUB_WORKSPACE/test/requirements.txt
+    - name: Start DBus
+      run: |
+        echo "DBUS_SESSION_BUS_ADDRESS=$(dbus-daemon --config-file=/usr/share/dbus-1/session.conf --print-address --fork | cut -d, -f1)" >> $GITHUB_ENV
     - name: Setup Cmake
-      uses: jwlawson/actions-setup-cmake@v1.4
+      uses: jwlawson/actions-setup-cmake@v1.12
       with:
-        cmake-version: '3.16.x'
+        cmake-version: '3.20.x'
     - name: Clone and build GTest
       run: |
         git clone https://github.com/google/googletest
@@ -107,13 +105,65 @@ jobs:
         cmake . -B build
         cmake --build ./build --config Release --parallel 4
         cmake --install ./build --prefix ./install
-    - name:  Compile Tests for Ubuntu
+    - name: SimpleBLE Unit Tests
       run: |
-        mkdir $GITHUB_WORKSPACE/build_test
-        cd $GITHUB_WORKSPACE/build_test
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release -DGTEST_ROOT=$GITHUB_WORKSPACE/googletest/install ../test
+        mkdir $GITHUB_WORKSPACE/build_unit_simpleble
+        cd $GITHUB_WORKSPACE/build_unit_simpleble
+        cmake -DCMAKE_BUILD_TYPE=Release -DGTEST_ROOT=$GITHUB_WORKSPACE/googletest/install -S $GITHUB_WORKSPACE/simpleble/test
         cmake --build . --config Release --parallel 4
-    - name: Run tests
-      run: |
-        cd $GITHUB_WORKSPACE/build_test
         ./simpleble_test
+
+    - name: SimpleBluez Unit Tests
+      run: |
+        mkdir $GITHUB_WORKSPACE/build_unit_simplebluez
+        cd $GITHUB_WORKSPACE/build_unit_simplebluez
+        cmake -DCMAKE_BUILD_TYPE=Release -DGTEST_ROOT=$GITHUB_WORKSPACE/googletest/install -S $GITHUB_WORKSPACE/simplebluez/test
+        make -j4
+        ./simplebluez_test
+    - name: SimpleBluez Unit Tests with Address Sanitizer
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/build_asan_simplebluez
+        cd $GITHUB_WORKSPACE/build_asan_simplebluez
+        cmake -DCMAKE_BUILD_TYPE=Debug -DSIMPLEBLUEZ_SANITIZE=Address -DGTEST_ROOT=$GITHUB_WORKSPACE/googletest/install -S $GITHUB_WORKSPACE/simplebluez/test
+        make -j4
+        PYTHONMALLOC=malloc ./simplebluez_test
+        cp "$(ls asan_log.txt.* | head -1)" asan_log.txt || true
+        (test ! -f asan_log.txt && echo "No ASAN log found") || (cat asan_log.txt && exit 1)
+    - name: SimpleBluez Unit Tests with Thread Sanitizer
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/build_tsan_simplebluez
+        cd $GITHUB_WORKSPACE/build_tsan_simplebluez
+        cmake -DCMAKE_BUILD_TYPE=Debug -DSIMPLEBLUEZ_SANITIZE=Thread -DGTEST_ROOT=$GITHUB_WORKSPACE/googletest/install -S $GITHUB_WORKSPACE/simplebluez/test
+        make -j4
+        ./simplebluez_test
+        cp "$(ls tsan_log.txt.* | head -1)" tsan_log.txt || true
+        (test ! -f tsan_log.txt && echo "No TSAN log found") || (cat tsan_log.txt && exit 1)
+
+    - name: SimpleDBus Unit Tests with Coverage
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/build_unit_simpledbus
+        cd $GITHUB_WORKSPACE/build_unit_simpledbus
+        cmake -DCMAKE_BUILD_TYPE=Release -DSIMPLEDBUS_COVERAGE=On -DGTEST_ROOT=$GITHUB_WORKSPACE/googletest/install -S $GITHUB_WORKSPACE/simpledbus/test
+        make simpledbus_test_coverage -j4
+    - name: Code Coverage Push
+      uses: codecov/codecov-action@v1
+      with:
+        files: ${{github.workspace}}/build_unit_simpledbus/cov.xml
+    - name: SimpleDBus Unit Tests with Address Sanitizer
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/build_asan_simpledbus
+        cd $GITHUB_WORKSPACE/build_asan_simpledbus
+        cmake -DCMAKE_BUILD_TYPE=Debug -DSIMPLEDBUS_SANITIZE=Address -DGTEST_ROOT=$GITHUB_WORKSPACE/googletest/install -S $GITHUB_WORKSPACE/simpledbus/test
+        make -j4
+        PYTHONMALLOC=malloc ./simpledbus_test
+        cp "$(ls asan_log.txt.* | head -1)" asan_log.txt || true
+        (test ! -f asan_log.txt && echo "No ASAN log found") || (cat asan_log.txt && exit 1)
+    - name: SimpleDBus Unit Tests with Thread Sanitizer
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/build_tsan_simpledbus
+        cd $GITHUB_WORKSPACE/build_tsan_simpledbus
+        cmake -DCMAKE_BUILD_TYPE=Debug -DSIMPLEDBUS_SANITIZE=Thread -DGTEST_ROOT=$GITHUB_WORKSPACE/googletest/install -S $GITHUB_WORKSPACE/simpledbus/test
+        make -j4
+        ./simpledbus_test
+        cp "$(ls tsan_log.txt.* | head -1)" tsan_log.txt || true
+        (test ! -f tsan_log.txt && echo "No TSAN log found") || (cat tsan_log.txt && exit 1)

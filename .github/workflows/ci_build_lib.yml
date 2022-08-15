@@ -1,4 +1,4 @@
-name: CI Build
+name: CI Build Libs
 
 on: [push, pull_request]
 
@@ -64,20 +64,20 @@ jobs:
     - name: Clone Repository
       uses: actions/checkout@v2
     - name: Setup Cmake
-      uses: jwlawson/actions-setup-cmake@v1.4
+      uses: jwlawson/actions-setup-cmake@v1.12
       with:
         cmake-version: '3.20.x'
     - name: Compile SimpleBLE for MacOS arm64
       run: |
         mkdir $GITHUB_WORKSPACE/build_arm64
         cd $GITHUB_WORKSPACE/build_arm64
-        cmake -DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
+        cmake -DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
         cmake --build . --config Release --parallel 4
     - name: Compile SimpleBLE for MacOS x86
       run: |
         mkdir $GITHUB_WORKSPACE/build_x86
         cd $GITHUB_WORKSPACE/build_x86
-        cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
+        cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
         cmake --build . --config Release --parallel 4
 
   # ------------------------------------------------------------
@@ -101,24 +101,24 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
     - name: Setup Cmake
-      uses: jwlawson/actions-setup-cmake@v1.4
+      uses: jwlawson/actions-setup-cmake@v1.12
       with:
         cmake-version: '3.20.x'
     - name:  Compile SimpleBLE for Ubuntu
       run: |
         mkdir $GITHUB_WORKSPACE/build
         cd $GITHUB_WORKSPACE/build
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
+        cmake -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
         cmake --build . --config Release --parallel 4
     - name:  Compile SimpleBluez for Ubuntu
       run: |
         mkdir $GITHUB_WORKSPACE/build_simplebluez
         cd $GITHUB_WORKSPACE/build_simplebluez
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simplebluez
+        cmake -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simplebluez
         cmake --build . --config Release --parallel 4
     - name:  Compile SimpleBLE for Ubuntu
       run: |
         mkdir $GITHUB_WORKSPACE/build_simpledbus
         cd $GITHUB_WORKSPACE/build_simpledbus
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpledbus
+        cmake -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpledbus
         cmake --build . --config Release --parallel 4

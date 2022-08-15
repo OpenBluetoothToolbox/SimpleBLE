@@ -78,32 +78,32 @@ jobs:
     - name: Clone Repository
       uses: actions/checkout@v2
     - name: Setup Cmake
-      uses: jwlawson/actions-setup-cmake@v1.4
+      uses: jwlawson/actions-setup-cmake@v1.12
       with:
-        cmake-version: '3.16.x'
+        cmake-version: '3.20.x'
     - name: Compile Lib for MacOS arm64
       run: |
         mkdir $GITHUB_WORKSPACE/build_arm64
         cd $GITHUB_WORKSPACE/build_arm64
-        cmake -DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release ..
+        cmake -DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_BUILD_TYPE=Release ..
         cmake --build . --config Release --parallel 4
     - name: Compile Examples for MacOS arm64
       run: |
         mkdir $GITHUB_WORKSPACE/build_examples_arm64
         cd $GITHUB_WORKSPACE/build_examples_arm64
-        cmake -DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release ../examples
+        cmake -DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_BUILD_TYPE=Release ../examples
         cmake --build . --config Release --parallel 4
     - name: Compile Lib for MacOS x86
       run: |
         mkdir $GITHUB_WORKSPACE/build_x86
         cd $GITHUB_WORKSPACE/build_x86
-        cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release ..
+        cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_BUILD_TYPE=Release ..
         cmake --build . --config Release --parallel 4
     - name: Compile Examples for MacOS x86
       run: |
         mkdir $GITHUB_WORKSPACE/build_examples_x86
         cd $GITHUB_WORKSPACE/build_examples_x86
-        cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release ../examples
+        cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_BUILD_TYPE=Release ../examples
         cmake --build . --config Release --parallel 4
 
   # ------------------------------------------------------------
@@ -127,30 +127,30 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
     - name: Setup Cmake
-      uses: jwlawson/actions-setup-cmake@v1.4
+      uses: jwlawson/actions-setup-cmake@v1.12
       with:
-        cmake-version: '3.16.x'
+        cmake-version: '3.20.x'
     - name:  Compile Lib for Ubuntu
       run: |
         mkdir $GITHUB_WORKSPACE/build
         cd $GITHUB_WORKSPACE/build
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release ..
+        cmake -DCMAKE_BUILD_TYPE=Release ..
         cmake --build . --config Release --parallel 4
     - name:  Compile Examples for Ubuntu
       run: |
         mkdir $GITHUB_WORKSPACE/build_examples
         cd $GITHUB_WORKSPACE/build_examples
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release ../examples
+        cmake -DCMAKE_BUILD_TYPE=Release ../examples
         cmake --build . --config Release --parallel 4
     - name:  Compile ASAN for Ubuntu
       run: |
         mkdir $GITHUB_WORKSPACE/build_asan
         cd $GITHUB_WORKSPACE/build_asan
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release -DSIMPLEBLE_SANITIZE=Address ..
+        cmake -DCMAKE_BUILD_TYPE=Release -DSIMPLEBLE_SANITIZE=Address ..
         cmake --build . --config Release --parallel 4
     - name:  Compile TSAN for Ubuntu
       run: |
         mkdir $GITHUB_WORKSPACE/build_tsan
         cd $GITHUB_WORKSPACE/build_tsan
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/installed -DCMAKE_BUILD_TYPE=Release -DSIMPLEBLE_SANITIZE=Thread ..
+        cmake -DCMAKE_BUILD_TYPE=Release -DSIMPLEBLE_SANITIZE=Thread ..
         cmake --build . --config Release --parallel 4

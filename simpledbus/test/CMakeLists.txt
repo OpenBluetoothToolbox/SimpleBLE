@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 3.16)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+cmake_minimum_required(VERSION 3.20)
+
+# Run prelude script to set up environment
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/prelude.cmake)
 
 project(simpledbus_test)
 
