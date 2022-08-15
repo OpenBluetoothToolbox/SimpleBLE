@@ -87,7 +87,7 @@ target_include_directories(simpleble-c INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/inc
 # Configure linked libraries
 target_link_libraries(simpleble PRIVATE fmt::fmt-header-only)
 target_link_libraries(simpleble-c PRIVATE fmt::fmt-header-only)
-target_link_libraries(simpleble-c PUBLIC simpleble::simpleble)
+target_link_libraries(simpleble-c PRIVATE simpleble::simpleble)
 
 append_sanitize_options("${SIMPLEBLE_SANITIZE}")
 
@@ -110,6 +110,7 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
         PRIVATE
         ${SIMPLEBLUEZ_INCLUDE}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/linux)
+    target_include_directories(simpleble-c PRIVATE ${SIMPLEBLUEZ_INCLUDE})
     target_sources(simpleble
         PUBLIC
         ${SIMPLEDBUS_SRC}
