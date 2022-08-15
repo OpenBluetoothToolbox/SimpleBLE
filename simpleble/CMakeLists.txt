@@ -110,7 +110,7 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
         PRIVATE
         ${SIMPLEBLUEZ_INCLUDE}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/linux)
-    target_include_directories(simpleble-c PRIVATE ${SIMPLEBLUEZ_INCLUDE})
+    # target_include_directories(simpleble-c PRIVATE ${SIMPLEBLUEZ_INCLUDE})
     target_sources(simpleble
         PUBLIC
         ${SIMPLEDBUS_SRC}
