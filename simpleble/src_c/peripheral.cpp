@@ -1,8 +1,6 @@
 #include <simpleble_c/peripheral.h>
 
 #include <simpleble/PeripheralSafe.h>
-#include "PeripheralBase.h"
-#include "PeripheralBuilder.h"
 
 #include <climits>
 #include <cstring>

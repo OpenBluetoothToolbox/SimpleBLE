@@ -22,7 +22,7 @@ fi
 # Compile!
 mkdir -p $BUILD_PATH
 cd $BUILD_PATH
-cmake -DCMAKE_BUILD_TYPE=Release -H$PROJECT_ROOT
+cmake -DCMAKE_BUILD_TYPE=Release -H$PROJECT_ROOT #-DSIMPLEBLUEZ_SANITIZE="Address"
 cmake --build . -j7
 
 mkdir -p $INSTALL_PATH

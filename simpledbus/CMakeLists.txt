@@ -3,9 +3,6 @@ cmake_minimum_required(VERSION 3.20)
 # Run prelude script to set up environment
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
 
-#set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-#list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/find)
-
 project(
     simpledbus
     VERSION 2.3.0 # Make sure this matches the version in the changelog.
@@ -17,18 +14,32 @@ project(
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
 
 find_package(fmt REQUIRED)
-find_package(DBus1 REQUIRED)
+if(NOT DEFINED DBus1_FOUND)
+    find_package(DBus1 REQUIRED)
+endif()
 
-# Load default parameters passed in through the command line.
+# Load all variables that would eventually need to be exposed to downstream projects
 if(NOT SIMPLEDBUS_LOG_LEVEL)
     set(SIMPLEDBUS_LOG_LEVEL "FATAL")
 endif()
 
-# OUTPUTS
-message(STATUS "Configuring SimpleDBus")
-file(GLOB_RECURSE SRC_SIMPLEDBUS_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+set(SIMPLEDBUS_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_library(simpledbus ${SRC_SIMPLEDBUS_FILES})
+set(SIMPLEDBUS_SRC
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/advanced/Interface.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/advanced/Proxy.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/base/Connection.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/base/Exceptions.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/base/Holder.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/base/Logging.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/base/Message.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/base/Path.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/ObjectManager.cpp")
+
+
+# Configure the build targets
+
+add_library(simpledbus ${SIMPLEDBUS_SRC})
 add_library(simpledbus::simpledbus ALIAS simpledbus)
 
 set_target_properties(
@@ -40,40 +51,21 @@ set_target_properties(
     VERSION "${PROJECT_VERSION}"
     SOVERSION "${PROJECT_VERSION_MAJOR}"
     EXPORT_NAME simpledbus
+
     OUTPUT_NAME simpledbus
 )
 
-target_compile_definitions(simpledbus PRIVATE SIMPLEDBUS_LOG_LEVEL=${SIMPLEDBUS_LOG_LEVEL})
-target_compile_options(simpledbus PRIVATE -Wfatal-errors -Wpedantic -O3 -Og)
+list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEDBUS_LOG_LEVEL=${SIMPLEDBUS_LOG_LEVEL})
 
-target_link_libraries(simpledbus PUBLIC ${DBus1_LIBRARIES})
-target_link_libraries(simpledbus PRIVATE $<BUILD_INTERFACE:fmt::fmt-header-only>)
+target_link_libraries(simpledbus
+    PUBLIC ${DBus1_LIBRARIES}
+    PRIVATE fmt::fmt-header-only)
 
-target_include_directories(simpledbus PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(simpledbus INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+target_include_directories(simpledbus
+    PRIVATE ${SIMPLEDBUS_INCLUDE}
+    INTERFACE ${SIMPLEDBUS_INCLUDE})
 
-set_property(TARGET simpledbus APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${DBus1_INCLUDE_DIRS})
-
-# Append additional flags for address and thread sanitization
-if(SIMPLEDBUS_SANITIZE MATCHES "Address")
-    message(STATUS "Appending address sanitization flags")
-    set(SANITIZE_ADDRESS_COMPILE_OPTIONS -fsanitize=address -fsanitize-recover=address -fno-omit-frame-pointer -fno-common -g)
-    set(SANITIZE_ADDRESS_LINK_OPTIONS -fsanitize=address)
-
-    target_compile_options(simpledbus PUBLIC ${SANITIZE_ADDRESS_COMPILE_OPTIONS})
-    target_link_libraries(simpledbus PUBLIC ${SANITIZE_ADDRESS_LINK_OPTIONS})
-endif()
-
-if(SIMPLEDBUS_SANITIZE MATCHES "Thread")
-    message(STATUS "Appending thread sanitization flags")
-    set(SANITIZE_THREAD_COMPILE_OPTIONS -fsanitize=thread -fno-omit-frame-pointer -fno-common -g)
-    set(SANITIZE_THREAD_LINK_OPTIONS -fsanitize=thread)
-
-    target_compile_options(simpledbus PUBLIC ${SANITIZE_THREAD_COMPILE_OPTIONS})
-    target_link_libraries(simpledbus PUBLIC ${SANITIZE_THREAD_LINK_OPTIONS})
-endif()
+append_sanitize_options("${SIMPLEDBUS_SANITIZE}")
 
 if(SIMPLEDBUS_COVERAGE MATCHES "On")
     message(STATUS "Appending coverage flags")
@@ -83,66 +75,16 @@ if(SIMPLEDBUS_COVERAGE MATCHES "On")
     target_link_libraries(simpledbus PUBLIC gcov)
 endif()
 
-# include(CMakePackageConfigHelpers)
-include(GNUInstallDirs)
+apply_build_options(simpledbus
+    "${PRIVATE_COMPILE_DEFINITIONS}"
+    "${PRIVATE_COMPILE_OPTIONS}"
+    "${PRIVATE_LINK_OPTIONS}"
+    "${PUBLIC_LINK_OPTIONS}")
 
-# write_basic_package_version_file(
-#     "simpledbusConfigVersion.cmake"
-#     COMPATIBILITY SameMajorVersion
-# )
+# Export important variable for downstream projects
 
-# install(
-#     TARGETS simpledbus
-#     EXPORT simpledbusTargets
-#     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-#     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-# )
-
-
-# install(
-#     FILES cmake/install-config.cmake
-#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/simpledbus
-#     RENAME "simpledbusConfig.cmake"
-# )
-
-# install(
-#     FILES "${PROJECT_BINARY_DIR}/simpledbusConfigVersion.cmake"
-#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/simpledbus
-# )
-
-# install(
-#     EXPORT simpledbusTargets
-#     NAMESPACE simpledbus::
-#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/simpledbus
-# )
-
-# install(
-#     DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/simpledbus/
-#     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpledbus)
-
-
-install(
-    TARGETS simpledbus
-    EXPORT simpledbus-config
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-
-install(
-    EXPORT simpledbus-config
-    NAMESPACE simpledbus::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/simpledbus)
-
-install(
-    DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/simpledbus/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpledbus)
-
-# configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/simpledbus.pc.in
-#             ${CMAKE_CURRENT_BINARY_DIR}/simpledbus.pc @ONLY)
-
-# install(
-#     FILES ${CMAKE_CURRENT_BINARY_DIR}/simpledbus.pc
-#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-
+if(NOT STANDALONE)
+    set(SIMPLEDBUS_LOG_LEVEL ${SIMPLEDBUS_LOG_LEVEL} PARENT_SCOPE)
+    set(SIMPLEDBUS_INCLUDE ${SIMPLEDBUS_INCLUDE} PARENT_SCOPE)
+    set(SIMPLEDBUS_SRC ${SIMPLEDBUS_SRC} PARENT_SCOPE)
+endif()

@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.20)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/find")
+# Run prelude script to set up environment
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
 
 project(
     simplebluez
@@ -12,35 +12,57 @@ project(
 )
 
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
-option(SIMPLEDBUS_VENDORIZE "Enable vendorized SimpleDBus" ON)
 
-# Detect if the project is being build within a project or standalone.
-if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    set(STANDALONE true)
-
-    # Configure the build path
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-    # Nice hack to automatically ignore the build directory
-    file(WRITE ${CMAKE_BINARY_DIR}/.gitignore "*")
-else()
-    set(STANDALONE false)
+find_package(fmt REQUIRED)
+if(NOT DEFINED DBus1_FOUND)
+    find_package(DBus1 REQUIRED)
 endif()
 
-set(SIMPLEDBUS_SANITIZE ${SIMPLEBLUEZ_SANITIZE})
-find_package(simpledbus REQUIRED)
-find_package(fmt REQUIRED)
+if(NOT DEFINED SIMPLEDBUS_SANITIZE AND DEFINED SIMPLEBLUEZ_SANITIZE)
+    set(SIMPLEDBUS_SANITIZE ${SIMPLEBLUEZ_SANITIZE})
+endif()
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus ${CMAKE_CURRENT_BINARY_DIR}/simpledbus)
+
+# Load all variables that would eventually need to be exposed to downstream projects
+if(NOT SIMPLEDBUS_LOG_LEVEL)
+    set(SIMPLEDBUS_LOG_LEVEL "FATAL")
+endif()
 
 if(NOT SIMPLEBLUEZ_LOG_LEVEL)
     set(SIMPLEBLUEZ_LOG_LEVEL "FATAL")
 endif()
 
-message(STATUS "Configuring SimpleBluez")
-file(GLOB_RECURSE SRC_simplebluez_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+set(SIMPLEBLUEZ_INCLUDE
+    ${SIMPLEDBUS_INCLUDE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_library(simplebluez ${SRC_simplebluez_FILES})
+set(SIMPLEBLUEZ_SRC
+    ${SIMPLEDBUS_SRC}
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/ProxyOrg.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Logging.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Agent.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Device.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Characteristic.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Exceptions.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/ProxyOrgBluez.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Service.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Adapter.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Bluez.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Descriptor.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Adapter1.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Agent1.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattDescriptor1.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattCharacteristic1.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattService1.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Device1.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Battery1.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/AgentManager1.cpp")
+
+
+# Configure the build targets
+
+add_library(simplebluez ${SIMPLEBLUEZ_SRC})
 add_library(simplebluez::simplebluez ALIAS simplebluez)
 
 set_target_properties(
@@ -55,67 +77,30 @@ set_target_properties(
     OUTPUT_NAME simplebluez
 )
 
-target_compile_definitions(simplebluez PRIVATE SIMPLEBLUEZ_LOG_LEVEL=${SIMPLEBLUEZ_LOG_LEVEL})
-target_compile_options(simplebluez PRIVATE -Wfatal-errors -Wpedantic -O3 -Og)
+list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEDBUS_LOG_LEVEL=${SIMPLEDBUS_LOG_LEVEL})
+list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLUEZ_LOG_LEVEL=${SIMPLEBLUEZ_LOG_LEVEL})
 
-target_link_libraries(simplebluez PRIVATE $<BUILD_INTERFACE:simpledbus::simpledbus> pthread)
-target_link_libraries(simplebluez PRIVATE $<BUILD_INTERFACE:fmt::fmt-header-only>)
+target_link_libraries(simplebluez
+    PUBLIC ${DBus1_LIBRARIES} pthread
+    PRIVATE fmt::fmt-header-only)
 
-target_include_directories(simplebluez PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(simplebluez INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+target_include_directories(simplebluez
+    PRIVATE ${SIMPLEBLUEZ_INCLUDE}
+    INTERFACE ${SIMPLEBLUEZ_INCLUDE})
 
-# Append additional flags for address and thread sanitization
-if(SIMPLEBLUEZ_SANITIZE MATCHES "Address")
-    message(STATUS "Appending address sanitization flags")
-    set(SANITIZE_ADDRESS_COMPILE_OPTIONS -fsanitize=address -fsanitize-recover=address -fno-omit-frame-pointer -fno-common -g)
-    set(SANITIZE_ADDRESS_LINK_OPTIONS -fsanitize=address)
+append_sanitize_options("${SIMPLEBLUEZ_SANITIZE}")
 
-    target_compile_options(simplebluez PUBLIC ${SANITIZE_ADDRESS_COMPILE_OPTIONS})
-    target_link_libraries(simplebluez PUBLIC ${SANITIZE_ADDRESS_LINK_OPTIONS})
-endif()
+apply_build_options(simplebluez
+    "${PRIVATE_COMPILE_DEFINITIONS}"
+    "${PRIVATE_COMPILE_OPTIONS}"
+    "${PRIVATE_LINK_OPTIONS}"
+    "${PUBLIC_LINK_OPTIONS}")
 
-if(SIMPLEBLUEZ_SANITIZE MATCHES "Thread")
-    message(STATUS "Appending thread sanitization flags")
-    set(SANITIZE_THREAD_COMPILE_OPTIONS -fsanitize=thread -fno-omit-frame-pointer -fno-common -g)
-    set(SANITIZE_THREAD_LINK_OPTIONS -fsanitize=thread)
+# Export important variable for downstream projects
 
-    target_compile_options(simplebluez PUBLIC ${SANITIZE_THREAD_COMPILE_OPTIONS})
-    target_link_libraries(simplebluez PUBLIC ${SANITIZE_THREAD_LINK_OPTIONS})
-endif()
-
-
-if(STANDALONE)
-    message(STATUS "Generating install interface for SimpleBluez")
-
-    if (SIMPLEDBUS_VENDORIZE)
-        set(SIMPLEDBUS_TARGET simpledbus)
-    endif()
-
-    include(GNUInstallDirs)
-
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/simplebluez.pc.in
-                ${CMAKE_CURRENT_BINARY_DIR}/simplebluez.pc @ONLY)
-
-    install(
-        TARGETS simplebluez ${SIMPLEDBUS_TARGET}
-        EXPORT simplebluez-config
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-
-    install(
-        EXPORT simplebluez-config
-        NAMESPACE simplebluez::
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/simplebluez)
-
-    install(
-        DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/simplebluez/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simplebluez)
-
-    install(
-        FILES ${CMAKE_CURRENT_BINARY_DIR}/simplebluez.pc
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-
+if(NOT STANDALONE)
+    set(SIMPLEDBUS_LOG_LEVEL ${SIMPLEDBUS_LOG_LEVEL} PARENT_SCOPE)
+    set(SIMPLEBLUEZ_LOG_LEVEL ${SIMPLEBLUEZ_LOG_LEVEL} PARENT_SCOPE)
+    set(SIMPLEBLUEZ_INCLUDE ${SIMPLEBLUEZ_INCLUDE} PARENT_SCOPE)
+    set(SIMPLEBLUEZ_SRC ${SIMPLEBLUEZ_SRC} PARENT_SCOPE)
 endif()
