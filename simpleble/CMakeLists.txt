@@ -108,8 +108,7 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(simpleble PUBLIC ${DBus1_LIBRARIES} pthread)
     target_include_directories(simpleble
         PRIVATE
-        ${SIMPLEDBUS_INCLUDES}
-        ${SIMPLEBLUEZ_INCLUDES}
+        ${SIMPLEBLUEZ_INCLUDE}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/linux)
     target_sources(simpleble
         PUBLIC
