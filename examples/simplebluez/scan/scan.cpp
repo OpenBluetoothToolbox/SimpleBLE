@@ -1,8 +1,8 @@
 #include <simplebluez/Bluez.h>
 
-#include <cstdlib>
 #include <atomic>
 #include <chrono>
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <thread>

@@ -1,7 +1,7 @@
 #include <simplebluez/Bluez.h>
 
-#include <cstdlib>
 #include <chrono>
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <thread>

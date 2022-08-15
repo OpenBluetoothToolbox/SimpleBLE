@@ -1,9 +1,9 @@
+#include <atomic>
+#include <chrono>
 #include <iomanip>
 #include <iostream>
-#include <vector>
-#include <atomic>
 #include <thread>
-#include <chrono>
+#include <vector>
 
 #include "../common/utils.hpp"
 
@@ -12,8 +12,7 @@
 using namespace std::chrono_literals;
 
 int main() {
-
-    std::vector<SimpleBLE::Peripheral> aux_p; // Helper vector to hold scan results.
+    std::vector<SimpleBLE::Peripheral> aux_p;  // Helper vector to hold scan results.
 
     // Fetch the adapter object that will be used for this test.
     auto adapter_optional = Utils::getAdapter();
@@ -43,8 +42,7 @@ int main() {
 
         std::cout << "The following devices were found:" << std::endl;
         for (size_t i = 0; i < aux_p.size(); i++) {
-            std::cout << "[" << i << "] " << aux_p[i].identifier() << " [" << aux_p[i].address() << "]"
-                    << std::endl;
+            std::cout << "[" << i << "] " << aux_p[i].identifier() << " [" << aux_p[i].address() << "]" << std::endl;
         }
 
         auto selection = Utils::getUserInputInt("Please select a device to connect to", aux_p.size() - 1);
@@ -54,7 +52,8 @@ int main() {
 
         peripherals[iter] = aux_p[selection.value()];
 
-        std::cout << "Connecting to " << peripherals[iter].identifier() << " [" << peripherals[iter].address() << "]" << std::endl;
+        std::cout << "Connecting to " << peripherals[iter].identifier() << " [" << peripherals[iter].address() << "]"
+                  << std::endl;
         peripherals[iter].connect();
 
         std::cout << "Successfully connected, printing services and characteristics.." << std::endl;
@@ -79,14 +78,13 @@ int main() {
         }
 
         // Subscribe to the characteristic.
-        peripherals[iter].notify(uuids[selection.value()].first, uuids[selection.value()].second, [&, iter](SimpleBLE::ByteArray bytes) {
-            if (print_allowed) {
-                std::cout << "Peripheral " << iter << " received: ";
-                Utils::print_byte_array(bytes);
-            }
-        });
-
-
+        peripherals[iter].notify(uuids[selection.value()].first, uuids[selection.value()].second,
+                                 [&, iter](SimpleBLE::ByteArray bytes) {
+                                     if (print_allowed) {
+                                         std::cout << "Peripheral " << iter << " received: ";
+                                         Utils::print_byte_array(bytes);
+                                     }
+                                 });
     }
 
     // Once both devices are connected and streaming, enable printing for 5 seconds, then disconnect from both.

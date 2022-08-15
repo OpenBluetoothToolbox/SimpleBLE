@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #ifdef _WIN32
-#define SLEEP_SEC(x) _sleep(x*1000)
+#define SLEEP_SEC(x) _sleep(x * 1000)
 #else
 #include <unistd.h>
 #define SLEEP_SEC(x) sleep(x)

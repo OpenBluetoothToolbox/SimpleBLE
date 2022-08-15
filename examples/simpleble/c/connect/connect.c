@@ -73,7 +73,6 @@ int main() {
         return 1;
     }
 
-
     size_t services_count = simpleble_peripheral_services_count(peripheral);
     printf("Successfully connected, listing %zu services.\n", services_count);
 

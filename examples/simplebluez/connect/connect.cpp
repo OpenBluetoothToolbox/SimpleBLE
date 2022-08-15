@@ -1,9 +1,9 @@
 #include <simplebluez/Bluez.h>
 #include <simplebluez/Exceptions.h>
 
-#include <cstdlib>
 #include <atomic>
 #include <chrono>
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <thread>
