@@ -15,7 +15,6 @@ using BluetoothUUID = std::string;
 // and pointers to uint8_t.
 using ByteArray = std::string;
 
-
 struct BluetoothService {
     BluetoothUUID uuid;
     std::vector<BluetoothUUID> characteristics;

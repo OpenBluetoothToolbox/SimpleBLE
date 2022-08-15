@@ -97,7 +97,7 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo -H apt-get update -y
-        sudo -H apt-get install -y SimpleBLEdbus-1-dev
+        sudo -H apt-get install -y dbus-1-dev
       env:
         DEBIAN_FRONTEND: noninteractive
     - name: Setup Cmake

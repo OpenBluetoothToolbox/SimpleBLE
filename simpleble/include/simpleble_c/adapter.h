@@ -110,7 +110,6 @@ size_t simpleble_adapter_scan_get_results_count(simpleble_adapter_t handle);
  */
 simpleble_peripheral_t simpleble_adapter_scan_get_results_handle(simpleble_adapter_t handle, size_t index);
 
-
 /**
  * @brief
  *

@@ -3,9 +3,9 @@
 #include <memory>
 #include <vector>
 
-#include "simpleble/Characteristic.h"
 #include <simpleble/Exceptions.h>
 #include <simpleble/Types.h>
+#include "simpleble/Characteristic.h"
 
 namespace SimpleBLE {
 

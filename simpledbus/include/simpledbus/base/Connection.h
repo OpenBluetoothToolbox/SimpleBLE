@@ -1,8 +1,8 @@
 #pragma once
 
 #include <dbus/dbus.h>
-#include "Message.h"
 #include <mutex>
+#include "Message.h"
 
 namespace SimpleDBus {
 

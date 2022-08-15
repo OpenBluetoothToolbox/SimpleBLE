@@ -21,7 +21,7 @@ class Agent : public SimpleDBus::Proxy {
     // ----- PROPERTIES -----
     std::string capabilities() const;
     void set_capabilities(Capabilities capabilities);
-    
+
     // ----- METHODS -----
     void set_on_request_pin_code(std::function<std::string()> callback);
     void clear_on_request_pin_code();

@@ -55,14 +55,13 @@ class OperationFailed : public BaseException {
 
 class WinRTException : public BaseException {
   public:
-    WinRTException(int32_t err_code, const std::string &err_msg);
+    WinRTException(int32_t err_code, const std::string& err_msg);
 };
 
 class CoreBluetoothException : public BaseException {
   public:
-    CoreBluetoothException(const std::string &err_msg);
+    CoreBluetoothException(const std::string& err_msg);
 };
-
 
 }  // namespace Exception
 

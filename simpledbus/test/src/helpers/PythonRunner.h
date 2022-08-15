@@ -20,5 +20,5 @@ class PythonRunner {
     std::filesystem::path _import_path;
     std::string _script_path;
     std::thread* _async_thread;
-    void _async_thread_function(); 
+    void _async_thread_function();
 };
