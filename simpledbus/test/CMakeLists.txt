@@ -27,10 +27,10 @@ set(
 
 add_executable(simpledbus_test ${SRC_FILES})
 target_link_libraries(simpledbus_test simpledbus::simpledbus ${GTEST_LIBRARIES} ${Python3_LIBRARIES} pthread)
-target_include_directories(simpledbus_test PRIVATE ${GTEST_INCLUDE_DIRS} ${Python3_INCLUDE_DIRS})
+target_include_directories(simpledbus_test PRIVATE ${GTEST_INCLUDE_DIRS} ${Python3_INCLUDE_DIRS} ${SIMPLEDBUS_INCLUDES})
 
 add_custom_command (TARGET simpledbus_test POST_BUILD
-  COMMAND "${CMAKE_COMMAND}" -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/python/ ${CMAKE_BINARY_DIR}
+  COMMAND "${CMAKE_COMMAND}" -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/python/ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 )
 
 if(SIMPLEDBUS_COVERAGE MATCHES "On")
