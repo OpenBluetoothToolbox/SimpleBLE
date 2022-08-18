@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.21)
 
 # Run prelude script to set up environment
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
@@ -83,7 +83,7 @@ apply_build_options(simpledbus
 
 # Export important variable for downstream projects
 
-if(NOT STANDALONE)
+if(NOT PROJECT_IS_TOP_LEVEL)
     set(SIMPLEDBUS_LOG_LEVEL ${SIMPLEDBUS_LOG_LEVEL} PARENT_SCOPE)
     set(SIMPLEDBUS_INCLUDE ${SIMPLEDBUS_INCLUDE} PARENT_SCOPE)
     set(SIMPLEDBUS_SRC ${SIMPLEDBUS_SRC} PARENT_SCOPE)

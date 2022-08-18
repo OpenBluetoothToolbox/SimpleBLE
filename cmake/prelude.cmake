@@ -3,9 +3,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/find)
 
 # Detect if the project is being build within a project or standalone.
-if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    set(STANDALONE true)
-
+if(PROJECT_IS_TOP_LEVEL)
     # Configure the build path
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -13,8 +11,6 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
 
     # Nice hack to automatically ignore the build directory
     file(WRITE ${CMAKE_BINARY_DIR}/.gitignore "*")
-else()
-    set(STANDALONE false)
 endif()
 
 if(CMAKE_GENERATOR_PLATFORM MATCHES "^[Ww][Ii][Nn]32$")

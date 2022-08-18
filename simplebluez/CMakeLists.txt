@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.21)
 
 # Run prelude script to set up environment
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
@@ -98,7 +98,7 @@ apply_build_options(simplebluez
 
 # Export important variable for downstream projects
 
-if(NOT STANDALONE)
+if(NOT PROJECT_IS_TOP_LEVEL)
     set(SIMPLEDBUS_LOG_LEVEL ${SIMPLEDBUS_LOG_LEVEL} PARENT_SCOPE)
     set(SIMPLEBLUEZ_LOG_LEVEL ${SIMPLEBLUEZ_LOG_LEVEL} PARENT_SCOPE)
     set(SIMPLEBLUEZ_INCLUDE ${SIMPLEBLUEZ_INCLUDE} PARENT_SCOPE)

@@ -2,3 +2,4 @@
 *.binlog
 .DS_Store
 docs/_build
+/build_*

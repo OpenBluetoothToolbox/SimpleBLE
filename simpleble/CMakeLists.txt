@@ -1,7 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
-
-# Run prelude script to set up environment
-include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
+cmake_minimum_required(VERSION 3.21)
 
 project(
     simpleble
@@ -10,6 +7,9 @@ project(
     HOMEPAGE_URL "https://github.com/OpenBluetoothToolbox/SimpleBLE"
     LANGUAGES CXX
 )
+
+# Run prelude script to set up environment
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
 
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
 find_package(fmt REQUIRED)
@@ -95,29 +95,64 @@ append_sanitize_options("${SIMPLEBLE_SANITIZE}")
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     message(STATUS "Linux Host Detected")
 
-    if(NOT DEFINED DBus1_FOUND)
-        find_package(DBus1 REQUIRED)
+    find_package(DBus1 REQUIRED)
+
+    if(NOT SIMPLEDBUS_LOG_LEVEL)
+        set(SIMPLEDBUS_LOG_LEVEL "FATAL")
     endif()
 
-    if(NOT DEFINED SIMPLEBLUEZ_SANITIZE AND DEFINED SIMPLEBLE_SANITIZE)
-        set(SIMPLEBLUEZ_SANITIZE ${SIMPLEBLE_SANITIZE})
+    if(NOT SIMPLEBLUEZ_LOG_LEVEL)
+        set(SIMPLEBLUEZ_LOG_LEVEL "FATAL")
     endif()
 
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez ${CMAKE_CURRENT_BINARY_DIR}/simplebluez)
-
-    target_link_libraries(simpleble PUBLIC ${DBus1_LIBRARIES} pthread)
-    target_include_directories(simpleble
-        PRIVATE
-        ${SIMPLEBLUEZ_INCLUDE}
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/linux)
-    target_include_directories(simpleble-c PRIVATE ${SIMPLEBLUEZ_INCLUDE})
-    target_sources(simpleble
-        PUBLIC
-        ${SIMPLEDBUS_SRC}
-        ${SIMPLEBLUEZ_SRC}
+    target_sources(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/AdapterBase.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/PeripheralBase.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/Bluez.cpp)
+
+    target_sources(simpleble PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/ProxyOrg.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/Logging.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/Agent.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/Device.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/Characteristic.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/Exceptions.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/ProxyOrgBluez.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/Service.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/Adapter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/Bluez.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/Descriptor.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/interfaces/Adapter1.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/interfaces/Agent1.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/interfaces/GattDescriptor1.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/interfaces/GattCharacteristic1.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/interfaces/GattService1.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/interfaces/Device1.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/interfaces/Battery1.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/interfaces/AgentManager1.cpp
+    )
+
+    target_sources(simpleble PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/advanced/Interface.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/advanced/Proxy.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Connection.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Exceptions.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Holder.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Logging.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Message.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Path.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/interfaces/ObjectManager.cpp
+    )
+
+    target_link_libraries(simpleble PUBLIC ${DBus1_LIBRARIES} pthread)
+    target_include_directories(simpleble PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/linux)
+    # target_include_directories(simpleble-c PRIVATE
+    #     ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
+    #     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include)
+
 
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     message(STATUS "Windows Host Detected")
@@ -140,8 +175,7 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     list(APPEND PRIVATE_COMPILE_OPTIONS "/W1")
 
     target_include_directories(simpleble PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/windows)
-    target_sources(simpleble
-        PUBLIC
+    target_sources(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/AdapterBase.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/PeripheralBase.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/Utils.cpp)
@@ -154,8 +188,7 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
 
     target_link_libraries(simpleble PUBLIC "-framework Foundation" "-framework CoreBluetooth" ObjC)
     target_include_directories(simpleble PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/macos)
-    target_sources(simpleble
-        PUBLIC
+    target_sources(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/Utils.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/AdapterBase.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/AdapterBaseMacOS.mm
@@ -177,6 +210,20 @@ apply_build_options(simpleble-c
     "${PRIVATE_COMPILE_OPTIONS}"
     "${PRIVATE_LINK_OPTIONS}"
     "${PUBLIC_LINK_OPTIONS}")
+
+# Build tests if requested
+
+if(SIMPLEBLE_TEST)
+    message(STATUS "Building Tests")
+    find_package(GTest REQUIRED)
+
+    add_executable(simpleble_test
+        ${CMAKE_CURRENT_SOURCE_DIR}/test/src/main.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/test/src/test_utils.cpp
+    )
+    target_link_libraries(simpleble_test PRIVATE simpleble::simpleble ${GTEST_LIBRARIES})
+    target_include_directories(simpleble_test PRIVATE ${GTEST_INCLUDE_DIRS})
+endif()
 
 # Provide installation interface
 
