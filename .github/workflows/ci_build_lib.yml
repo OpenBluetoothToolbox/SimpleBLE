@@ -22,31 +22,23 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.2
     - name: Compile SimpleBLE for Windows x86 - Windows SDK 10.0.19041.0
       run: |
-        mkdir %GITHUB_WORKSPACE%\build32_19041
-        cd %GITHUB_WORKSPACE%\build32_19041
-        cmake -G "Visual Studio 16 2019" -A Win32 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -S %GITHUB_WORKSPACE%/simpleble
-        cmake --build . --config Release --parallel 4
+        cmake -B %GITHUB_WORKSPACE%\build32_19041 -G "Visual Studio 16 2019" -A Win32 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -S %GITHUB_WORKSPACE%/simpleble
+        cmake --build %GITHUB_WORKSPACE%\build32_19041 --config Release --parallel 4
       shell: cmd
     - name: Compile SimpleBLE for Windows x64 - Windows SDK 10.0.19041.0
       run: |
-        mkdir %GITHUB_WORKSPACE%\build64_19041
-        cd %GITHUB_WORKSPACE%\build64_19041
-        cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION=10.0.19401.0 -S %GITHUB_WORKSPACE%/simpleble
-        cmake --build . --config Release --parallel 4
+        cmake -B %GITHUB_WORKSPACE%\build64_19041 -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION=10.0.19401.0 -S %GITHUB_WORKSPACE%/simpleble
+        cmake --build %GITHUB_WORKSPACE%\build64_19041 --config Release --parallel 4
       shell: cmd
     - name: Compile SimpleBLE for Windows x86
       run: |
-        mkdir %GITHUB_WORKSPACE%\build32
-        cd %GITHUB_WORKSPACE%\build32
-        cmake -G "Visual Studio 16 2019" -A Win32 -DCMAKE_SYSTEM_VERSION=10.0.22000.0 -S %GITHUB_WORKSPACE%/simpleble
-        cmake --build . --config Release --parallel 4
+        cmake -B %GITHUB_WORKSPACE%\build32 -G "Visual Studio 16 2019" -A Win32 -DCMAKE_SYSTEM_VERSION=10.0.22000.0 -S %GITHUB_WORKSPACE%/simpleble
+        cmake --build %GITHUB_WORKSPACE%\build32 --config Release --parallel 4
       shell: cmd
     - name: Compile SimpleBLE for Windows x64
       run: |
-        mkdir %GITHUB_WORKSPACE%\build64
-        cd %GITHUB_WORKSPACE%\build64
-        cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION=10.0.22000.0 -S %GITHUB_WORKSPACE%/simpleble
-        cmake --build . --config Release --parallel 4
+        cmake -B cd %GITHUB_WORKSPACE%\build64 -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION=10.0.22000.0 -S %GITHUB_WORKSPACE%/simpleble
+        cmake --build cd %GITHUB_WORKSPACE%\build64 --config Release --parallel 4
       shell: cmd
 
   # ------------------------------------------------------------
@@ -69,16 +61,12 @@ jobs:
         cmake-version: '3.21.x'
     - name: Compile SimpleBLE for MacOS arm64
       run: |
-        mkdir $GITHUB_WORKSPACE/build_arm64
-        cd $GITHUB_WORKSPACE/build_arm64
-        cmake -DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
-        cmake --build . --config Release --parallel 4
+        cmake -B $GITHUB_WORKSPACE/build_arm64 -DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
+        cmake --build $GITHUB_WORKSPACE/build_arm64 --config Release --parallel 4
     - name: Compile SimpleBLE for MacOS x86
       run: |
-        mkdir $GITHUB_WORKSPACE/build_x86
-        cd $GITHUB_WORKSPACE/build_x86
-        cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
-        cmake --build . --config Release --parallel 4
+        cmake -B $GITHUB_WORKSPACE/build_x86 -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
+        cmake --build $GITHUB_WORKSPACE/build_x86 --config Release --parallel 4
 
   # ------------------------------------------------------------
 
@@ -106,20 +94,13 @@ jobs:
         cmake-version: '3.21.x'
     - name:  Compile SimpleBLE for Ubuntu
       run: |
-        mkdir $GITHUB_WORKSPACE/build_simpleble
-        cd $GITHUB_WORKSPACE/build_simpleble
-        cmake -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
-        make VERBOSE=1
-      # cmake --build . --config Release --parallel 4
+        cmake -B $GITHUB_WORKSPACE/build_simpleble -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
+        cmake --build $GITHUB_WORKSPACE/build_simpleble --config Release --parallel 4
     - name:  Compile SimpleBluez for Ubuntu
       run: |
-        mkdir $GITHUB_WORKSPACE/build_simplebluez
-        cd $GITHUB_WORKSPACE/build_simplebluez
-        cmake -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simplebluez
-        cmake --build . --config Release --parallel 4
+        cmake -B $GITHUB_WORKSPACE/build_simplebluez -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simplebluez
+        cmake --build $GITHUB_WORKSPACE/build_simplebluez --config Release --parallel 4
     - name:  Compile SimpleDBus for Ubuntu
       run: |
-        mkdir $GITHUB_WORKSPACE/build_simpledbus
-        cd $GITHUB_WORKSPACE/build_simpledbus
-        cmake -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpledbus
-        cmake --build . --config Release --parallel 4
+        cmake -B cd $GITHUB_WORKSPACE/build_simpledbus -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpledbus
+        cmake --build $GITHUB_WORKSPACE/build_simpledbus --config Release --parallel 4

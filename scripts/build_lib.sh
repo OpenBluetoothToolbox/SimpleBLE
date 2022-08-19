@@ -27,23 +27,37 @@ PARAMS=""
 while (( "$#" )); do
   case "$1" in
     -c|--clean)
-      FLAG_CLEAN=0
-      shift
-      ;;
+        FLAG_CLEAN=0
+        shift
+        ;;
     -t|--test)
-      FLAG_TEST=0
-      shift
-      ;;
+        FLAG_TEST=0
+        shift
+        ;;
+    -sa|--sanitize_address)
+        FLAG_SANITIZE_ADDRESS=0
+        shift
+        ;;
+    -st|--sanitize_thread)
+        FLAG_SANITIZE_THREAD=0
+        shift
+        ;;
     -*|--*=) # unsupported flags
-      echo "Error: Unsupported flag $1" >&2
-      exit 1
-      ;;
+        echo "Error: Unsupported flag $1" >&2
+        exit 1
+        ;;
     *) # preserve positional arguments
-      PARAMS="$PARAMS $1"
-      shift
-      ;;
+        PARAMS="$PARAMS $1"
+        shift
+        ;;
   esac
 done
+
+# Don't allow sanitize flags to coexist
+if [ ! -z "$FLAG_SANITIZE_ADDRESS" ] && [ ! -z "$FLAG_SANITIZE_THREAD" ]; then
+    echo "Error: Cannot use both --sanitize_address and --sanitize_thread" >&2
+    exit 1
+fi
 
 # Set positional arguments in their proper place
 eval set -- "$PARAMS"
@@ -55,6 +69,9 @@ if [ -z "$1" ]; then
 fi
 LIB_NAME=$1
 
+# Extract extra build arguments from the positional arguments
+EXTRA_BUILD_ARGS=${@:2}
+
 PROJECT_ROOT=$(realpath $(dirname `realpath $0`)/..)
 SOURCE_PATH=$PROJECT_ROOT/$LIB_NAME
 BUILD_PATH=$PROJECT_ROOT/build_$LIB_NAME
@@ -62,6 +79,17 @@ BUILD_PATH=$PROJECT_ROOT/build_$LIB_NAME
 # If FLAG_TEST is set, build the library with the test argument
 if [[ ! -z "$FLAG_TEST" ]]; then
     BUILD_TEST_ARG="-D${LIB_NAME^^}_TEST=ON"
+
+    # If FLAG_SANITIZE_ADDRESS is set, build the library with the sanitize address argument
+    if [[ ! -z "$FLAG_SANITIZE_ADDRESS" ]]; then
+        BUILD_SANITIZE_ADDRESS_ARG="-D${LIB_NAME^^}_SANITIZE=Address"
+    fi
+
+    # If FLAG_SANITIZE_THREAD is set, build the library with the sanitize thread argument
+    if [[ ! -z "$FLAG_SANITIZE_THREAD" ]]; then
+        BUILD_SANITIZE_THREAD_ARG="-D${LIB_NAME^^}_SANITIZE=Thread"
+    fi
+
 fi
 
 # If FLAG_CLEAN is set, clean the build directory
@@ -69,7 +97,7 @@ if [[ ! -z "$FLAG_CLEAN" ]]; then
     rm -rf $BUILD_PATH
 fi
 
-cmake -H$SOURCE_PATH -B $BUILD_PATH $BUILD_TEST_ARG
+cmake -H$SOURCE_PATH -B $BUILD_PATH $BUILD_TEST_ARG $BUILD_SANITIZE_ADDRESS_ARG $BUILD_SANITIZE_THREAD_ARG $EXTRA_BUILD_ARGS
 cmake --build $BUILD_PATH -j7
 
 

@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
 
-# Run prelude script to set up environment
-include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
-
 project(
     simplebluez
     VERSION 0.6.0 # Make sure this matches the version in the changelog.
@@ -11,18 +8,17 @@ project(
     LANGUAGES CXX
 )
 
+# Run prelude script to set up environment
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
+
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
 
 find_package(fmt REQUIRED)
-if(NOT DEFINED DBus1_FOUND)
-    find_package(DBus1 REQUIRED)
-endif()
+find_package(DBus1 REQUIRED)
 
 if(NOT DEFINED SIMPLEDBUS_SANITIZE AND DEFINED SIMPLEBLUEZ_SANITIZE)
     set(SIMPLEDBUS_SANITIZE ${SIMPLEBLUEZ_SANITIZE})
 endif()
-
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus ${CMAKE_CURRENT_BINARY_DIR}/simpledbus)
 
 # Load all variables that would eventually need to be exposed to downstream projects
 if(NOT SIMPLEDBUS_LOG_LEVEL)
@@ -34,31 +30,39 @@ if(NOT SIMPLEBLUEZ_LOG_LEVEL)
 endif()
 
 set(SIMPLEBLUEZ_INCLUDE
-    ${SIMPLEDBUS_INCLUDE}
-    ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include)
 
 set(SIMPLEBLUEZ_SRC
-    ${SIMPLEDBUS_SRC}
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/ProxyOrg.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/Logging.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/Agent.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/Device.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/Characteristic.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/Exceptions.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/ProxyOrgBluez.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/Service.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/Adapter.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/Bluez.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/Descriptor.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Adapter1.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Agent1.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattDescriptor1.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattCharacteristic1.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattService1.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Device1.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Battery1.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/AgentManager1.cpp")
-
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ProxyOrg.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Logging.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Agent.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Device.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Characteristic.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Exceptions.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ProxyOrgBluez.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Service.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Adapter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Bluez.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Descriptor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Adapter1.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Agent1.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattDescriptor1.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattCharacteristic1.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattService1.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Device1.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Battery1.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/AgentManager1.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/advanced/Interface.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/advanced/Proxy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Connection.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Exceptions.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Holder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Logging.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Message.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Path.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/interfaces/ObjectManager.cpp
+)
 
 # Configure the build targets
 
@@ -96,11 +100,17 @@ apply_build_options(simplebluez
     "${PRIVATE_LINK_OPTIONS}"
     "${PUBLIC_LINK_OPTIONS}")
 
-# Export important variable for downstream projects
+if(SIMPLEBLUEZ_TEST)
+    find_package(Python3 COMPONENTS Development REQUIRED)
+    find_package(GTest REQUIRED)
 
-if(NOT PROJECT_IS_TOP_LEVEL)
-    set(SIMPLEDBUS_LOG_LEVEL ${SIMPLEDBUS_LOG_LEVEL} PARENT_SCOPE)
-    set(SIMPLEBLUEZ_LOG_LEVEL ${SIMPLEBLUEZ_LOG_LEVEL} PARENT_SCOPE)
-    set(SIMPLEBLUEZ_INCLUDE ${SIMPLEBLUEZ_INCLUDE} PARENT_SCOPE)
-    set(SIMPLEBLUEZ_SRC ${SIMPLEBLUEZ_SRC} PARENT_SCOPE)
+    add_executable(simplebluez_test
+        ${CMAKE_CURRENT_SOURCE_DIR}/test/src/main.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/test/src/helpers/PythonRunner.cpp)
+    target_link_libraries(simplebluez_test PRIVATE simplebluez::simplebluez ${GTEST_LIBRARIES} ${Python3_LIBRARIES} pthread)
+    target_include_directories(simplebluez_test PRIVATE ${GTEST_INCLUDE_DIRS} ${Python3_INCLUDE_DIRS})
+
+    add_custom_command (TARGET simplebluez_test POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/test/python/ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+    )
 endif()

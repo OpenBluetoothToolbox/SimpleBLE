@@ -15,6 +15,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 **Important:** This version includes a breaking API change in the enumeration of
                services and characteristics.
 
+**Important:** This version has brought in the files from SimpleBluez and SimpleDBus
+               into the repository as subpackages.
+
 **Added**
 
 -  Multiple connection example.
@@ -32,6 +35,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  Selection of build type is now based on the  ``BUILD_SHARED_LIBS`` setting.
 -  Consumable CMake target is now ``simpleble::simpleble``.
 -  **API CHANGE**: ``BluetoothService`` class was replaced by the ``Service`` class.
+-  Updated CMake minimum version to 3.21
 
 **Fixed**
 

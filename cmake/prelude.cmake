@@ -51,8 +51,6 @@ endmacro()
 macro(append_sanitize_options MODIFIER)
 
     if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
-        message(STATUS "Applying sanitize option: ${MODIFIER} for ${CMAKE_HOST_SYSTEM_NAME}")
-
         # Note to self: When dealing with memory issues/leaks on Darwin, the following documentation is useful:
         # - https://clang.llvm.org/docs/AutomaticReferenceCounting.html
         # - https://developer.apple.com/library/archive/documentation/Performance/Conceptual/ManagingMemory/Articles/FindingLeaks.html
