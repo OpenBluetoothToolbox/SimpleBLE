@@ -46,8 +46,8 @@ jobs:
         cmake-version: '3.21.x'
     - name: Compile Examples for MacOS
       run: |
-        cmake -B $GITHUB_WORKSPACE\build_simpleble_examples -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/examples/simpleble
-        cmake --build $GITHUB_WORKSPACE\build_simpleble_examples --config Release --parallel 4
+        cmake -B $GITHUB_WORKSPACE/build_simpleble_examples -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/examples/simpleble
+        cmake --build $GITHUB_WORKSPACE/build_simpleble_examples --config Release --parallel 4
 
   # ------------------------------------------------------------
 
@@ -75,13 +75,13 @@ jobs:
         cmake-version: '3.21.x'
     - name:  Compile SimpleBLE Examples for Ubuntu
       run: |
-        cmake -B $GITHUB_WORKSPACE\build_simpleble_examples -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/examples/simpleble
-        cmake --build $GITHUB_WORKSPACE\build_simpleble_examples --config Release --parallel 4
+        cmake -B $GITHUB_WORKSPACE/build_simpleble_examples -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/examples/simpleble
+        cmake --build $GITHUB_WORKSPACE/build_simpleble_examples --config Release --parallel 4
     - name:  Compile SimpleBluez Examples for Ubuntu
       run: |
-        cmake -B $GITHUB_WORKSPACE\build_simplebluez_examples -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/examples/simplebluez
-        cmake --build $GITHUB_WORKSPACE\build_simplebluez_examples --config Release --parallel 4
+        cmake -B $GITHUB_WORKSPACE/build_simplebluez_examples -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/examples/simplebluez
+        cmake --build $GITHUB_WORKSPACE/build_simplebluez_examples --config Release --parallel 4
     - name:  Compile SimpleDBus Examples for Ubuntu
       run: |
-        cmake -B $GITHUB_WORKSPACE\build_simpledbus_examples -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/examples/simpledbus
-        cmake --build $GITHUB_WORKSPACE\build_simpledbus_examples --config Release --parallel 4
+        cmake -B $GITHUB_WORKSPACE/build_simpledbus_examples -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/examples/simpledbus
+        cmake --build $GITHUB_WORKSPACE/build_simpledbus_examples --config Release --parallel 4

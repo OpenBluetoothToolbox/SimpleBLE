@@ -4,20 +4,16 @@ project(simpleble_examples)
 
 # Run prelude script to set up environment
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/prelude.cmake)
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-# Nice hack to automatically ignore the build directory
-file(WRITE ${CMAKE_BINARY_DIR}/.gitignore "*")
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Include SimpleBLE
-# Build artifacts in a separate folder
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../simpleble ${CMAKE_BINARY_DIR}/simpleble)
+option(SIMPLEBLE_LOCAL "Use local SimpleBLE" ON)
+
+if (SIMPLEBLE_LOCAL)
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../simpleble ${CMAKE_BINARY_DIR}/simpleble)
+else()
+    find_package(simpleble CONFIG REQUIRED)
+endif()
 
 # C++
 add_subdirectory(cpp/list_adapters)
