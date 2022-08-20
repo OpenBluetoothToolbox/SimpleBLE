@@ -41,7 +41,7 @@ AdapterBase::AdapterBase(std::string device_id)
                 auto guids = args.Advertisement().ServiceUuids();
                 for (const auto& guid : guids) {
                     const std::string uuid = guid_to_uuid(guid);
-                    for (const auto& service : this->serviceUuids) {
+                    for (const auto& service : this->serviceUuids_) {
                         if (uuid == service) {
                             found = true;
                             break;

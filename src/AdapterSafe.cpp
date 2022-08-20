@@ -29,7 +29,7 @@ bool SimpleBLE::Safe::Adapter::scan_start() noexcept {
 
 bool SimpleBLE::Safe::Adapter::scan_start_with_services(std::vector<BluetoothUUID> service_uuids) noexcept {
     try {
-        SimpleBLE::Adapter::scan_start();
+        SimpleBLE::Adapter::scan_start_with_services(service_uuids);
         return true;
     } catch (...) {
         return false;
@@ -54,9 +54,9 @@ bool SimpleBLE::Safe::Adapter::scan_for(int timeout_ms) noexcept {
     }
 }
 
-bool SimpleBLE::Safe::Adapter::scan_for_with_services(int timeout_ms) noexcept {
+bool SimpleBLE::Safe::Adapter::scan_for_with_services(int timeout_ms, std::vector<BluetoothUUID> service_uuids) noexcept {
     try {
-        SimpleBLE::Adapter::scan_for_with_services(timeout_ms, std::vector<BluetoothUUID> service_uuids);
+        SimpleBLE::Adapter::scan_for_with_services(timeout_ms, service_uuids);
         return true;
     } catch (...) {
         return false;
