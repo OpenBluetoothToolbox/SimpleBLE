@@ -28,7 +28,7 @@ for Windows.
 Linux Requirements
 ~~~~~~~~~~~~~~~~~~
 
-The Linux implementation of SimpleBLE is built upon `SimpleDBus`_, which 
+The Linux implementation of SimpleBLE is built upon `SimpleDBus`_, which
 in turn requires `libdbus`_.
 
 - ``libdbus-1-dev`` - On Ubuntu: ``sudo apt-get install libdbus-1-dev``
@@ -41,11 +41,37 @@ macOS Requirements
 
 -  `Xcode Command Line Tools`_
 
-In-source builds
-~~~~~~~~~~~~~~~~
+Standalone build from source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Building the library from source is possible by cloning the repository
-and linking to it on your ``CMakeLists.txt`` file.
+::
+
+   cd <path-to-simpleble>
+   mkdir build && cd build
+   cmake ..
+   make -j
+   sudo make install # Not available yet.
+
+Build as part of another project
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want to add SimpleBLE to your project without any external
+dependencies, just clone the repository and link to it on your
+``CMakeLists.txt`` file.
+
+::
+
+   add_subdirectory(<path-to-simpleble> ${CMAKE_BINARY_DIR}/simpleble)
+
+Build examples
+~~~~~~~~~~~~~~
+
+::
+
+   cd <path-to-simpleble>
+   mkdir build && cd build
+   cmake ../examples
+   make -j
 
 Tests
 -----

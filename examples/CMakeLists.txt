@@ -15,7 +15,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Include SimpleBLE
 # Build artifacts in a separate folder
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/.. ${CMAKE_BINARY_DIR}/simpleble)
-include_directories(${SIMPLEBLE_INCLUDES})
 
 # C++
 add_subdirectory(cpp/list_adapters)

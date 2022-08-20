@@ -11,8 +11,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Include SimpleBluez
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/.. ${CMAKE_BINARY_DIR}/simpleble)
-include_directories(${SIMPLEBLE_INCLUDES})
-include_directories(${SIMPLEBLE_C_INCLUDES})
 
 find_package(GTest REQUIRED)
 
