@@ -31,8 +31,7 @@ jobs:
       run: |
         cmake -B %GITHUB_WORKSPACE%\build_test -G "Visual Studio 16 2019" -DCMAKE_SYSTEM_VERSION=10.0.22000.0 -DGTEST_ROOT=%GITHUB_WORKSPACE%\googletest\install -S %GITHUB_WORKSPACE%/simpleble -DSIMPLEBLE_TEST=ON
         cmake --build %GITHUB_WORKSPACE%\build_test --config Release --parallel 4
-        cd Release
-        %GITHUB_WORKSPACE%\build_test\bin\simpleble_test.exe
+        %GITHUB_WORKSPACE%\build_test\bin\Release\simpleble_test.exe
       shell: cmd
 
   # ------------------------------------------------------------

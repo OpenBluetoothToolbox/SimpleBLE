@@ -224,6 +224,14 @@ if(SIMPLEBLE_TEST)
         ${CMAKE_CURRENT_SOURCE_DIR}/test/src/main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/test/src/test_utils.cpp
     )
+
+    set_target_properties(simpleble_test PROPERTIES
+        CXX_VISIBILITY_PRESET hidden
+        VISIBILITY_INLINES_HIDDEN YES
+        CXX_STANDARD 17
+        POSITION_INDEPENDENT_CODE ON
+        WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
     target_link_libraries(simpleble_test PRIVATE simpleble::simpleble ${GTEST_LIBRARIES})
     target_include_directories(simpleble_test PRIVATE ${GTEST_INCLUDE_DIRS})
 endif()

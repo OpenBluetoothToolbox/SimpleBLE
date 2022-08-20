@@ -107,6 +107,14 @@ if(SIMPLEBLUEZ_TEST)
     add_executable(simplebluez_test
         ${CMAKE_CURRENT_SOURCE_DIR}/test/src/main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/test/src/helpers/PythonRunner.cpp)
+
+    set_target_properties(simplebluez_test PROPERTIES
+        CXX_VISIBILITY_PRESET hidden
+        VISIBILITY_INLINES_HIDDEN YES
+        CXX_STANDARD 17
+        POSITION_INDEPENDENT_CODE ON
+        WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
     target_link_libraries(simplebluez_test PRIVATE simplebluez::simplebluez ${GTEST_LIBRARIES} ${Python3_LIBRARIES} pthread)
     target_include_directories(simplebluez_test PRIVATE ${GTEST_INCLUDE_DIRS} ${Python3_INCLUDE_DIRS})
 
