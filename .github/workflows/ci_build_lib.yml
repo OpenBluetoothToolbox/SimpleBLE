@@ -37,8 +37,8 @@ jobs:
       shell: cmd
     - name: Compile SimpleBLE for Windows x64
       run: |
-        cmake -B cd %GITHUB_WORKSPACE%\build64 -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION=10.0.22000.0 -S %GITHUB_WORKSPACE%/simpleble
-        cmake --build cd %GITHUB_WORKSPACE%\build64 --config Release --parallel 4
+        cmake -B %GITHUB_WORKSPACE%\build64 -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION=10.0.22000.0 -S %GITHUB_WORKSPACE%/simpleble
+        cmake --build %GITHUB_WORKSPACE%\build64 --config Release --parallel 4
       shell: cmd
 
   # ------------------------------------------------------------
@@ -102,5 +102,5 @@ jobs:
         cmake --build $GITHUB_WORKSPACE/build_simplebluez --config Release --parallel 4
     - name:  Compile SimpleDBus for Ubuntu
       run: |
-        cmake -B cd $GITHUB_WORKSPACE/build_simpledbus -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpledbus
+        cmake -B $GITHUB_WORKSPACE/build_simpledbus -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpledbus
         cmake --build $GITHUB_WORKSPACE/build_simpledbus --config Release --parallel 4

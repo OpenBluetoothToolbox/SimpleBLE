@@ -34,6 +34,10 @@ while (( "$#" )); do
         FLAG_TEST=0
         shift
         ;;
+    -e|--examples)
+        FLAG_EXAMPLE=0
+        shift
+        ;;
     -sa|--sanitize_address)
         FLAG_SANITIZE_ADDRESS=0
         shift
@@ -100,5 +104,19 @@ fi
 cmake -H$SOURCE_PATH -B $BUILD_PATH $BUILD_TEST_ARG $BUILD_SANITIZE_ADDRESS_ARG $BUILD_SANITIZE_THREAD_ARG $EXTRA_BUILD_ARGS
 cmake --build $BUILD_PATH -j7
 
+# # If FLAG_LOCAL is set, make a local installation of the library
+# if [[ ! -z "$FLAG_LOCAL" ]]; then
+#     INSTALL_PATH=$BUILD_PATH/install
+#     BUILD_SEARCH_PATH=$INSTALL_PATH
+#     cmake --install $BUILD_PATH --prefix "${INSTALL_PATH}"
+# fi
 
-INSTALL_PATH=$BUILD_PATH/install
+if [[ ! -z "$FLAG_EXAMPLE" ]]; then
+    EXAMPLE_SOURCE_PATH=$PROJECT_ROOT/examples/$LIB_NAME
+    EXAMPLE_BUILD_PATH=$PROJECT_ROOT/build_"$LIB_NAME"_examples
+
+    cmake -H$EXAMPLE_SOURCE_PATH -B $EXAMPLE_BUILD_PATH
+    cmake --build $EXAMPLE_BUILD_PATH -j7
+fi
+
+

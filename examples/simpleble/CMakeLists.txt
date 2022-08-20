@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(SimpleBLE_Examples)
+project(simpleble_examples)
+
+# Run prelude script to set up environment
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/prelude.cmake)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -14,7 +17,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Include SimpleBLE
 # Build artifacts in a separate folder
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/.. ${CMAKE_BINARY_DIR}/simpleble)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../simpleble ${CMAKE_BINARY_DIR}/simpleble)
 
 # C++
 add_subdirectory(cpp/list_adapters)
