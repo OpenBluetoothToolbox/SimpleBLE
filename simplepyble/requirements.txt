@@ -1,2 +1,4 @@
 twine
-cibuildwheel==2.3.1
+cmake-build-extension
+pybind11
+cibuildwheel==2.9

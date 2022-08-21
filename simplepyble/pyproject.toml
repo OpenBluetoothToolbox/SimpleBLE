@@ -1,6 +1,7 @@
 [build-system]
 requires = [
-    "setuptools>=42",
+    "cmake-build-extension",
+    "setuptools",
     "wheel",
     "ninja",
     "cmake>=3.21",

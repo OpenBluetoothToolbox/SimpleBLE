@@ -27,6 +27,7 @@ The ultimate fully-fledged cross-platform library and bindings for Bluetooth Low
    :caption: SimplePyBLE
 
    simplepyble/usage
+   simplepyble/changelog
 
 .. toctree::
    :maxdepth: 2
