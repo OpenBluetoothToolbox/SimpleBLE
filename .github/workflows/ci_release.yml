@@ -28,7 +28,7 @@ jobs:
           cache: "pip"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r simplepyble/requirements.txt
 
       - name: Build wheel
         uses: pypa/cibuildwheel@v2.3.1
