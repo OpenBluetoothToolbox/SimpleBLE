@@ -11,11 +11,14 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 **Added**
 
--
+-  Definition for ``SimpleBLE::Characteristic``.
+-  Definition for ``SimpleBLE::Descriptor``.
+-  Access to the SimpleBLE API to manipulate descriptors.
 
 **Changed**
 
 -  Updated native implementation to SimpleBLE v0.5.0.
+-  Replaced ``BluetoothService`` definition with ``SimpleBLE::Service``.
 
 
 [0.0.5] - 2022-06-12

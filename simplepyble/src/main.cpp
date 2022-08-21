@@ -7,11 +7,17 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(simplepyble, m) {
-    m.attr("__version__") = "0.0.5";
+    m.attr("__version__") = "0.0.6";
 
-    py::class_<SimpleBLE::BluetoothService>(m, "BluetoothService")
-        .def_readonly("uuid", &SimpleBLE::BluetoothService::uuid)
-        .def_readonly("characteristics", &SimpleBLE::BluetoothService::characteristics);
+    py::class_<SimpleBLE::Service>(m, "Service")
+        .def("uuid", &SimpleBLE::Service::uuid)
+        .def("characteristics", &SimpleBLE::Service::characteristics);
+
+    py::class_<SimpleBLE::Characteristic>(m, "Characteristic")
+        .def("uuid", &SimpleBLE::Characteristic::uuid)
+        .def("descriptors", &SimpleBLE::Characteristic::descriptors);
+
+    py::class_<SimpleBLE::Descriptor>(m, "Descriptor").def("uuid", &SimpleBLE::Descriptor::uuid);
 
     // TODO: Add __str__ and __repr__ methods to Peripheral class
     py::class_<SimpleBLE::Peripheral>(m, "Peripheral")
@@ -51,6 +57,14 @@ PYBIND11_MODULE(simplepyble, m) {
                  p.indicate(service, characteristic, [cb](SimpleBLE::ByteArray payload) { cb(py::bytes(payload)); });
              })
         .def("unsubscribe", &SimpleBLE::Peripheral::unsubscribe)
+
+        .def("descriptor_read",
+             [](SimpleBLE::Peripheral& p, std::string const& service, std::string const& characteristic,
+                std::string const& descriptor) { return py::bytes(p.read(service, characteristic, descriptor)); })
+        .def("descriptor_write", [](SimpleBLE::Peripheral& p, std::string service, std::string characteristic,
+                                    std::string const& descriptor,
+                                    py::bytes payload) { p.write(service, characteristic, descriptor, payload); })
+
         .def("set_callback_on_connected", &SimpleBLE::Peripheral::set_callback_on_connected, py::keep_alive<1, 2>())
         .def("set_callback_on_disconnected", &SimpleBLE::Peripheral::set_callback_on_disconnected,
              py::keep_alive<1, 2>());
