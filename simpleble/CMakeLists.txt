@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.21)
 
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15) # Needs to be defined before project() is called
+if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
+endif()
 
 project(
     simpleble
