@@ -13,4 +13,6 @@ target_link_libraries(simplepyble PRIVATE simpleble::simpleble)
 set_target_properties(
     simplepyble PROPERTIES
     CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED YES
+    CXX_EXTENSIONS NO
 )
