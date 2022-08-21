@@ -169,20 +169,22 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 
     set(WINVERSION_CODE 0x0A00) # Selected Windows 10 based on https://docs.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt
 
-    # Add all the special definitions that need to be added for the program to properly compile on windows.
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+        # Add all the special definitions for Visual Studio C++
 
-    # /D_WIN32_WINNT -> Specifies the minimum version of Windows that the application is compatible with.
-    list(APPEND PRIVATE_COMPILE_DEFINITIONS "/D_WIN32_WINNT=${WINVERSION_CODE}")
-    # /D_USE_MATH_DEFINES -> Specifies that the math.h header file should be included.
-    list(APPEND PRIVATE_COMPILE_DEFINITIONS "/D_USE_MATH_DEFINES")
+        # /D_WIN32_WINNT -> Specifies the minimum version of Windows that the application is compatible with.
+        list(APPEND PRIVATE_COMPILE_DEFINITIONS "/D_WIN32_WINNT=${WINVERSION_CODE}")
+        # /D_USE_MATH_DEFINES -> Specifies that the math.h header file should be included.
+        list(APPEND PRIVATE_COMPILE_DEFINITIONS "/D_USE_MATH_DEFINES")
 
-    # /Gd -> Use __cdecl as the default calling convention. https://docs.microsoft.com/en-us/cpp/cpp/cdecl
-    list(APPEND PRIVATE_COMPILE_OPTIONS "/Gd")
-    # /WX -> Treats all warnings as errors.
-    list(APPEND PRIVATE_COMPILE_OPTIONS "/WX")
-    # /W1 -> Use the lowest level of warnings, as there are some unsafe functions that MSVC doesn't like.
-    # TODO: This should be removed once the warnings are fixed.
-    list(APPEND PRIVATE_COMPILE_OPTIONS "/W1")
+        # /Gd -> Use __cdecl as the default calling convention. https://docs.microsoft.com/en-us/cpp/cpp/cdecl
+        list(APPEND PRIVATE_COMPILE_OPTIONS "/Gd")
+        # /WX -> Treats all warnings as errors.
+        list(APPEND PRIVATE_COMPILE_OPTIONS "/WX")
+        # /W1 -> Use the lowest level of warnings, as there are some unsafe functions that MSVC doesn't like.
+        # TODO: This should be removed once the warnings are fixed.
+        list(APPEND PRIVATE_COMPILE_OPTIONS "/W1")
+    endif()
 
     target_include_directories(simpleble PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/windows)
     target_sources(simpleble PRIVATE
