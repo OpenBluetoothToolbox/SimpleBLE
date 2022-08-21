@@ -2,6 +2,7 @@ name: PyPI Test Release
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   build_wheels:
@@ -34,9 +35,9 @@ jobs:
         uses: pypa/cibuildwheel@v2.3.1
         env:
           CIBW_BEFORE_ALL_LINUX: "yum update -y && yum group install -y \"Development Tools\" && yum install -y dbus-devel"
-          CIBW_ARCHS_LINUX: x86_64 i686 aarch64
-          CIBW_ARCHS_MACOS: x86_64 universal2 arm64
-          CIBW_ARCHS_WINDOWS: AMD64 x86
+          CIBW_ARCHS_LINUX: x86_64
+          CIBW_ARCHS_MACOS: arm64
+          CIBW_ARCHS_WINDOWS: AMD64
           CIBW_SKIP: "*musllinux_* pp*"
 
       - name: Upload wheels
