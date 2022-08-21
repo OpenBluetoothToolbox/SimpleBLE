@@ -5,8 +5,12 @@ project(simplepyble)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
 
 find_package(pybind11 REQUIRED)
-
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../simpleble ${CMAKE_BINARY_DIR}/simpleble)
 
 pybind11_add_module(simplepyble src/main.cpp)
 target_link_libraries(simplepyble PRIVATE simpleble::simpleble)
+
+set_target_properties(
+    simpledbus PROPERTIES
+    CXX_STANDARD 17
+)
