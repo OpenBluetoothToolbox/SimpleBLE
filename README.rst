@@ -5,7 +5,7 @@ The ultimate fully-fledged cross-platform library and bindings for Bluetooth Low
 
 |Latest Documentation Status|
 
-.. include:: docs/overview.rst
+.. include:: overview.rst
 
 .. |Latest Documentation Status| image:: https://readthedocs.org/projects/simpleble/badge?version=latest
    :target: http://simpleble.readthedocs.org/en/latest

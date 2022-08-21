@@ -1,20 +1,19 @@
 .. include:: ../README.rst
-.. include:: overview.rst
+... include:: overview.rst
 
 .. toctree::
    :maxdepth: 1
    :caption: General
 
    overview
+   extras
 
 .. toctree::
    :maxdepth: 2
    :caption: SimpleBLE
 
    simpleble/usage
-   simpleble/architecture
-   simpleble/installation
-   simpleble/security
+   simpleble/api
    simpleble/changelog
 
 .. toctree::
@@ -28,8 +27,7 @@
    :caption: SimpleBluez
 
    simplebluez/usage
-   simplebluez/installation
-   simplebluez/security
+   simplebluez/api
    simplebluez/changelog
 
 .. toctree::

@@ -1,6 +1,6 @@
-================
-SimpleDBus Usage
-================
+=====
+Usage
+=====
 
 SimpleDBus should work on any Linux environment supporting DBus. To install
 the necessary dependencies on Debian-based systems, use the following command: ::
@@ -8,8 +8,8 @@ the necessary dependencies on Debian-based systems, use the following command: :
   sudo apt install libdbus-1-dev
 
 
-Building the Library (Source)
-=============================
+Building and Installing the Library (Source)
+============================================
 
 The included CMake build script can be used to build SimpleDBus.
 CMake is freely available for download from https://www.cmake.org/download/. ::
@@ -18,17 +18,11 @@ CMake is freely available for download from https://www.cmake.org/download/. ::
    mkdir build && cd build
    cmake .. -DSIMPLEDBUS_LOG_LEVEL=[VERBOSE|DEBUG|INFO|WARNING|ERROR|FATAL]
    cmake --build . -j7
+   sudo cmake --install .
 
 To build a shared library set the ``BUILD_SHARED_LIBS`` CMake variable to ``TRUE`` ::
 
   cmake -DBUILD_SHARED_LIBS=TRUE ...
-
-
-Installing the Library
-======================
-
-After building the library you can install it by running :command:`sudo make install`.
-
 
 Usage with CMake (Installed)
 ============================
@@ -83,7 +77,7 @@ within CMake as you'd normally do ::
    find_package(simpledbus REQUIRED)
    target_link_libraries(<your-target> simpledbus::simpledbus)
 
-One key security feature of SimpleBLE is that it allows the user to specify
+One key security feature of SimpleDBus is that it allows the user to specify
 the URLs and tags of all internal dependencies, thus allowing compilation
 from internal or secure sources without the risk of those getting compromised.
 
@@ -101,31 +95,15 @@ the following CMake options available:
   - ``LIBFMT_LOCAL_PATH``: The local path to use for fmtlib. *(Default: None)*
 
 
-Generate Documentation
-======================
-
-To build documentation for SimpleDBus, you first need to install Sphynx,
-using the following commands: ::
-
-   sudo apt install python3-sphinx
-   pip3 install sphinx_rtd_theme
-
-Once all dependencies have been installed, HTML documentation can be built
-by calling the following commands: ::
-
-   cd <path-to-simpledbus>/docs
-   make html
-
-
 Build Examples
 ==============
 
 Use the following instructions to build the provided SimpleDBus examples: ::
 
-   cd <path-to-simpledbus>
+   cd <path-to-repository>
    mkdir build && cd build
-   cmake -DSIMPLEDBUS_LOCAL=ON ../examples
-   make -j7
+   cmake -DSIMPLEDBUS_LOCAL=ON ../examples/simpledbus
+   cmake --build . -j7
 
 
 =======
@@ -145,21 +123,10 @@ Unit Tests
 To run the unit tests, run the following command: ::
 
    cd <path-to-simpledbus>
-   mkdir build_test && cd build_test
-   cmake -DCMAKE_BUILD_TYPE=Debug ../test
-   make -j7
-   ./simpledbus_test
-
-
-Coverage Tests
-==============
-
-To run coverage tests, run the following command: ::
-
-   cd <path-to-simpledbus>
-   mkdir build_coverage && cd build_coverage
-   cmake -DCMAKE_BUILD_TYPE=Debug -DSIMPLEDBUS_COVERAGE=ON ../test
-   make -j7 simpledbus_test_coverage
+   mkdir build && cd build
+   cmake .. -DCMAKE_BUILD_TYPE=Debug -DSIMPLEDBUS_TEST=ON
+   cmake --build . -j7
+   ./bin/simpledbus_test
 
 
 Address Sanitizer Tests
@@ -168,10 +135,10 @@ Address Sanitizer Tests
 To run the address sanitizer tests, run the following command: ::
 
    cd <path-to-simpledbus>
-   mkdir build_asan && cd build_asan
-   cmake -DCMAKE_BUILD_TYPE=Debug -DSIMPLEDBUS_SANITIZE=Address ../test
-   make -j7
-   PYTHONMALLOC=malloc ./simpledbus_test
+   mkdir build && cd build
+   cmake .. -DCMAKE_BUILD_TYPE=Debug -DSIMPLEDBUS_SANITIZE=Address -DSIMPLEDBUS_TEST=ON
+   cmake --build . -j7
+   PYTHONMALLOC=malloc ./bin/simpledbus_test
 
 It's important for PYTHONMALLOC to be set to malloc, otherwise the tests will
 fail due to Python's memory allocator from triggering false positives.
@@ -183,10 +150,10 @@ Thread Sanitizer Tests
 To run the thread sanitizer tests, run the following command: ::
 
    cd <path-to-simpledbus>
-   mkdir build_tsan && cd build_tsan
-   cmake -DCMAKE_BUILD_TYPE=Debug -DSIMPLEDBUS_SANITIZE=Thread ../test
-   make -j7
-   ./simpledbus_test
+   mkdir build && cd build
+   cmake .. -DCMAKE_BUILD_TYPE=Debug -DSIMPLEDBUS_SANITIZE=Thread -DSIMPLEDBUS_TEST=ON
+   cmake --build . -j7
+    ./bin/simpledbus_test
 
 
 .. Links
