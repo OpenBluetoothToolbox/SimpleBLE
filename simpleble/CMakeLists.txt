@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15) # Needs to be defined before project() is called
+
 project(
     simpleble
     VERSION 0.5.0 # Make sure this matches the version in the changelog.
@@ -189,7 +191,8 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     message(STATUS "Darwin Host Detected")
-    set(CMAKE_CXX_EXTENSIONS OFF)
+
+
 
     list(APPEND PRIVATE_COMPILE_OPTIONS -fobjc-arc)
 

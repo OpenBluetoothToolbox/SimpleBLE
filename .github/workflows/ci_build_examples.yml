@@ -46,7 +46,7 @@ jobs:
         cmake-version: '3.21.x'
     - name: Compile Examples for MacOS
       run: |
-        cmake -B $GITHUB_WORKSPACE/build_simpleble_examples -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/examples/simpleble
+        cmake -B $GITHUB_WORKSPACE/build_simpleble_examples -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/examples/simpleble
         cmake --build $GITHUB_WORKSPACE/build_simpleble_examples --config Release --parallel 4
 
   # ------------------------------------------------------------
