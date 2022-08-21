@@ -11,6 +11,6 @@ pybind11_add_module(simplepyble src/main.cpp)
 target_link_libraries(simplepyble PRIVATE simpleble::simpleble)
 
 set_target_properties(
-    simpledbus PROPERTIES
+    simplepyble PROPERTIES
     CXX_STANDARD 17
 )
