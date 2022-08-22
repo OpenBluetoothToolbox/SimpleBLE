@@ -1,5 +1,6 @@
 import cmake_build_extension
 import pathlib
+import sys
 import setuptools
 
 
@@ -23,6 +24,7 @@ setuptools.setup(
             name="simplepyble",
             cmake_depends_on=["pybind11"],
             disable_editable=True,
+            cmake_configure_options=['-G','Visual Studio 16 2019'] if sys.platform=='win32' else []
         )
     ],
     cmdclass={
