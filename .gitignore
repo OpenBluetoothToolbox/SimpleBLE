@@ -6,3 +6,4 @@ docs/_build
 
 __pycache__
 *.egg-info
+wheelhouse

@@ -146,13 +146,21 @@ class BuildExtension(build_ext):
         ext_dir = Path(self.get_ext_fullpath(ext.name)).parent.absolute()
         cmake_install_prefix = ext_dir / ext.install_prefix
 
+        # Initialize the CMake configuration arguments
+        configure_args = []
+
+        # Select the appropriate generator and accompanying settings
+        if ext.cmake_generator is not None:
+            configure_args += [f"-G \"{ext.cmake_generator}\""]
+
+        if ext.cmake_generator == "Ninja":
+            # Fix #26: https://github.com/diegoferigo/cmake-build-extension/issues/26
+            configure_args += [f"-DCMAKE_MAKE_PROGRAM={shutil.which('ninja')}"]
+
         # CMake configure arguments
         configure_args = [
-            "-GNinja",
             f"-DCMAKE_BUILD_TYPE={ext.cmake_build_type}",
             f"-DCMAKE_INSTALL_PREFIX:PATH={cmake_install_prefix}",
-            # Fix #26: https://github.com/diegoferigo/cmake-build-extension/issues/26
-            f"-DCMAKE_MAKE_PROGRAM={shutil.which('ninja')}",
         ]
 
         # Extend the configure arguments with those passed from the extension

@@ -15,8 +15,6 @@ long_description = "hello"
 
 cmake_options = []
 if sys.platform == "win32":
-    # cmake_options.append("-G Visual Studio 16 2019")
-    # cmake_options.append("-DCMAKE_GENERATOR=\"Visual Studio 16 2019\"")
     cmake_options.append("-DCMAKE_SYSTEM_VERSION=10.0.19041.0")
 elif sys.platform.startswith("darwin"):
     cmake_options.append("-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15")
@@ -36,7 +34,8 @@ setuptools.setup(
             name="simplepyble",
             cmake_depends_on=["pybind11"],
             disable_editable=True,
-            cmake_configure_options=cmake_options
+            cmake_configure_options=cmake_options,
+            cmake_generator="Visual Studio 16 2019" if sys.platform == "win32" else "Ninja",
         )
     ],
     cmdclass={

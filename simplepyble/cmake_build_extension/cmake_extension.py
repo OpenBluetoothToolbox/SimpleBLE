@@ -35,6 +35,7 @@ class CMakeExtension(Extension):
         cmake_component: str = None,
         cmake_depends_on: List[str] = (),
         expose_binaries: List[str] = (),
+        cmake_generator: str = "Ninja",
     ):
 
         super().__init__(name=name, sources=[])
@@ -54,3 +55,4 @@ class CMakeExtension(Extension):
         self.cmake_configure_options = cmake_configure_options
         self.cmake_component = cmake_component
         self.expose_binaries = expose_binaries
+        self.cmake_generator = cmake_generator
