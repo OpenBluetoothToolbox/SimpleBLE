@@ -6,8 +6,9 @@
     [string]$arch = "x64" # x86, x64
 )
 
-[string]$PROJECT_ROOT = Resolve-Path $($PSScriptRoot + "\..\..")
-[string]$BUILD_PATH = $PROJECT_ROOT + "\build"
+[string]$PROJECT_ROOT = Resolve-Path $($PSScriptRoot + "\..")
+[string]$SOURCE_PATH = $PROJECT_ROOT + "\simpleble"
+[string]$BUILD_PATH = $PROJECT_ROOT + "\build_simpleble"
 [string]$TARGET = "Release"
 
 # Validate the received architecture
@@ -28,7 +29,7 @@ if ($clean) {
 New-Item -ItemType Directory -Force -Path "$BUILD_PATH" | Out-Null
 
 # Run CMake to create our build files.
-cmake -S "$PROJECT_ROOT" -B "$BUILD_PATH" -A $WINDOWS_ARCH -DCMAKE_SYSTEM_VERSION="10.0.22000.0"
+cmake -S "$SOURCE_PATH" -B "$BUILD_PATH" -DCMAKE_SYSTEM_VERSION="10.0.22000.0"
 cmake --build "$BUILD_PATH" --config $TARGET --parallel 7
 
 #Copy all generated files to the bin folder for consistency and remove the output folder.

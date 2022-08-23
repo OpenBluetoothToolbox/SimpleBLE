@@ -3,3 +3,6 @@
 .DS_Store
 docs/_build
 /build_*
+
+__pycache__
+*.egg-info

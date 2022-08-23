@@ -1,8 +1,12 @@
-import cmake_build_extension
+import os
 import pathlib
 import sys
 import setuptools
 
+new_path = os.path.join(os.path.dirname(os.path.realpath(__file__)))
+sys.path.insert(0, new_path)
+
+import cmake_build_extension
 
 # Get the long description from the README file
 here = pathlib.Path(__file__).parent.resolve()
@@ -11,7 +15,8 @@ long_description = "hello"
 
 cmake_options = []
 if sys.platform == "win32":
-    cmake_options.append("-GVisual Studio 16 2019")
+    # cmake_options.append("-G Visual Studio 16 2019")
+    # cmake_options.append("-DCMAKE_GENERATOR=\"Visual Studio 16 2019\"")
     cmake_options.append("-DCMAKE_SYSTEM_VERSION=10.0.19041.0")
 elif sys.platform.startswith("darwin"):
     cmake_options.append("-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15")
