@@ -19,3 +19,8 @@ set_target_properties(
     simplepyble PROPERTIES
     CXX_STANDARD 17
 )
+
+install(
+    TARGETS simplepyble
+    LIBRARY DESTINATION "./" # Library needs to be installed at the provided path on CMAKE_INSTALL_PREFIX
+)
