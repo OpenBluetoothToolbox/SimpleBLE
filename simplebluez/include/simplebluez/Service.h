@@ -2,8 +2,8 @@
 
 #include <simpledbus/advanced/Proxy.h>
 
-#include <simplebluez/Export.h>
 #include <simplebluez/Characteristic.h>
+#include <simplebluez/Export.h>
 #include <simplebluez/interfaces/GattService1.h>
 
 namespace SimpleBluez {

@@ -2,9 +2,9 @@
 
 #include <simpledbus/advanced/Proxy.h>
 
-#include <simplebluez/Export.h>
 #include <simplebluez/Adapter.h>
 #include <simplebluez/Agent.h>
+#include <simplebluez/Export.h>
 
 #include <simplebluez/interfaces/AgentManager1.h>
 

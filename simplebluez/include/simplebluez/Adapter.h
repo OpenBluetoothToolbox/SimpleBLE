@@ -2,8 +2,8 @@
 
 #include <simpledbus/advanced/Proxy.h>
 
-#include <simplebluez/Export.h>
 #include <simplebluez/Device.h>
+#include <simplebluez/Export.h>
 #include <simplebluez/interfaces/Adapter1.h>
 
 #include <functional>

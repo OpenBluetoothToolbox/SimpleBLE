@@ -109,7 +109,8 @@ SIMPLEBLE_C_EXPORT size_t simpleble_adapter_scan_get_results_count(simpleble_ada
  * @param index
  * @return simpleble_peripheral_t
  */
-SIMPLEBLE_C_EXPORT simpleble_peripheral_t simpleble_adapter_scan_get_results_handle(simpleble_adapter_t handle, size_t index);
+SIMPLEBLE_C_EXPORT simpleble_peripheral_t simpleble_adapter_scan_get_results_handle(simpleble_adapter_t handle,
+                                                                                    size_t index);
 
 /**
  * @brief
@@ -129,7 +130,8 @@ SIMPLEBLE_C_EXPORT size_t simpleble_adapter_get_paired_peripherals_count(simpleb
  * @param index
  * @return simpleble_peripheral_t
  */
-SIMPLEBLE_C_EXPORT simpleble_peripheral_t simpleble_adapter_get_paired_peripherals_handle(simpleble_adapter_t handle, size_t index);
+SIMPLEBLE_C_EXPORT simpleble_peripheral_t simpleble_adapter_get_paired_peripherals_handle(simpleble_adapter_t handle,
+                                                                                          size_t index);
 
 /**
  * @brief

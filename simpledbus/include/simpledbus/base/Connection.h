@@ -1,7 +1,7 @@
 #pragma once
 
-#include <simpledbus/Export.h>
 #include <dbus/dbus.h>
+#include <simpledbus/Export.h>
 #include <mutex>
 #include "Message.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <simpleble_c/export.h>
 #include <simpleble_c/adapter.h>
+#include <simpleble_c/export.h>
 #include <simpleble_c/peripheral.h>
 
 #ifdef __cplusplus

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <simpledbus/Export.h>
 #include <fmt/core.h>
+#include <simpledbus/Export.h>
 #include <cstdint>
 #include <string>
 

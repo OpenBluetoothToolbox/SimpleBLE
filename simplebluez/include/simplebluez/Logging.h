@@ -1,9 +1,9 @@
 #pragma once
 
 #include <fmt/core.h>
+#include <simplebluez/Export.h>
 #include <cstdint>
 #include <string>
-#include <simplebluez/Export.h>
 
 namespace SimpleBluez {
 

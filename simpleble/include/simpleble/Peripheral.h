@@ -7,8 +7,8 @@
 #include <string>
 #include <vector>
 
-#include <simpleble/Export.h>
 #include <simpleble/Exceptions.h>
+#include <simpleble/Export.h>
 #include <simpleble/Service.h>
 #include <simpleble/Types.h>
 

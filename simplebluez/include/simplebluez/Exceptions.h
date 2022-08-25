@@ -3,8 +3,8 @@
 #include <stdexcept>
 #include <string>
 
-#include <simpledbus/base/Exceptions.h>
 #include <simplebluez/Export.h>
+#include <simpledbus/base/Exceptions.h>
 
 namespace SimpleBluez {
 

@@ -3,8 +3,8 @@
 #include <memory>
 #include <vector>
 
-#include <simpleble/Export.h>
 #include <simpleble/Exceptions.h>
+#include <simpleble/Export.h>
 #include <simpleble/Types.h>
 #include "simpleble/Characteristic.h"
 

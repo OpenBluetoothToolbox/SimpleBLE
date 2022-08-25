@@ -1,8 +1,8 @@
 #pragma once
 
+#include <simpleble/Export.h>
 #include <stdexcept>
 #include <string>
-#include <simpleble/Export.h>
 #include "Types.h"
 
 namespace SimpleBLE {

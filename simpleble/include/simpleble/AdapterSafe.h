@@ -1,7 +1,7 @@
 #pragma once
 
-#include <simpleble/Export.h>
 #include <simpleble/Adapter.h>
+#include <simpleble/Export.h>
 #include <simpleble/PeripheralSafe.h>
 
 namespace SimpleBLE {

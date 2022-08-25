@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdint.h>
 #include <simpleble_c/export.h>
+#include <stdint.h>
 
 typedef enum {
     SIMPLEBLE_LOG_LEVEL_NONE = 0,

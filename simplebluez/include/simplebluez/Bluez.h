@@ -3,9 +3,9 @@
 #include <simpledbus/advanced/Proxy.h>
 #include <simpledbus/interfaces/ObjectManager.h>
 
-#include <simplebluez/Export.h>
 #include <simplebluez/Adapter.h>
 #include <simplebluez/Agent.h>
+#include <simplebluez/Export.h>
 
 #include <vector>
 

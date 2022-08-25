@@ -2,8 +2,8 @@
 
 #include <simpledbus/advanced/Proxy.h>
 
-#include <simplebluez/Export.h>
 #include <simplebluez/Descriptor.h>
+#include <simplebluez/Export.h>
 #include <simplebluez/Types.h>
 #include <simplebluez/interfaces/GattCharacteristic1.h>
 

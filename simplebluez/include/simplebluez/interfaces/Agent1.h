@@ -1,8 +1,8 @@
 #pragma once
 
+#include <simplebluez/Export.h>
 #include <simpledbus/advanced/Interface.h>
 #include <simpledbus/external/kvn_safe_callback.hpp>
-#include <simplebluez/Export.h>
 
 #include <cstdint>
 #include <string>

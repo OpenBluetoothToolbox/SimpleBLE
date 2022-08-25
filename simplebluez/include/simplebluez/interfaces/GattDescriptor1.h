@@ -3,8 +3,8 @@
 #include <simpledbus/advanced/Interface.h>
 #include <simpledbus/external/kvn_safe_callback.hpp>
 
-#include <simplebluez/Types.h>
 #include <simplebluez/Export.h>
+#include <simplebluez/Types.h>
 
 #include <string>
 

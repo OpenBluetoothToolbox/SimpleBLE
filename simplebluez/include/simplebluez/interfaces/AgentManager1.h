@@ -1,7 +1,7 @@
 #pragma once
 
-#include <simpledbus/advanced/Interface.h>
 #include <simplebluez/Export.h>
+#include <simpledbus/advanced/Interface.h>
 
 #include <string>
 

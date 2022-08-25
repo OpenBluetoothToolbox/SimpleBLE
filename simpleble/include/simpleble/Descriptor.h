@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include <simpleble/Export.h>
 #include <simpleble/Exceptions.h>
+#include <simpleble/Export.h>
 #include <simpleble/Types.h>
 
 namespace SimpleBLE {

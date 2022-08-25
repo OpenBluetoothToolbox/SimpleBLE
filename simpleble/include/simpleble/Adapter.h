@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include <simpleble/Export.h>
 #include <simpleble/Exceptions.h>
+#include <simpleble/Export.h>
 #include <simpleble/Peripheral.h>
 #include <simpleble/Types.h>
 
