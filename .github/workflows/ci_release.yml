@@ -38,7 +38,9 @@ jobs:
           CIBW_ARCHS_MACOS: x86_64 universal2 arm64
           CIBW_ARCHS_WINDOWS: AMD64 x86
           CIBW_SKIP: "*musllinux_* pp*"
-
+        with:
+            package-dir: simplepyble
+            
       - name: Upload wheels
         uses: actions/upload-artifact@v1
         with:

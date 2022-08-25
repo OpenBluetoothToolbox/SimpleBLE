@@ -1,8 +1,6 @@
 name: PyPI Test Release
 
-on:
-  workflow_dispatch:
-  push:
+on: [push, pull_request]
 
 jobs:
   build_wheels:

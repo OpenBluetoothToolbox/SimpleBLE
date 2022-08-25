@@ -6,6 +6,8 @@ set(CMAKE_CXX_EXTENSIONS NO)
 
 project(simplepyble)
 
+message(STATUS "CMAKE_CURRENT_LIST_DIR: ${CMAKE_CURRENT_LIST_DIR}")
+
 # Run prelude script to set up environment
 include(${CMAKE_CURRENT_LIST_DIR}/../cmake/prelude.cmake)
 

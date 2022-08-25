@@ -1,17 +1,16 @@
-import os
 import pathlib
 import sys
 import setuptools
 
-new_path = os.path.join(os.path.dirname(os.path.realpath(__file__)))
-sys.path.insert(0, new_path)
+here = pathlib.Path(__file__).parent.resolve()
 
+# Include our vendorized copy of cmake-build-extension, at least until
+# https://github.com/diegoferigo/cmake-build-extension/pull/35 is merged.
+sys.path.insert(0, here)
 import cmake_build_extension
 
 # Get the long description from the README file
-here = pathlib.Path(__file__).parent.resolve()
-# long_description = (here / "README.md").read_text(encoding="utf-8")
-long_description = "hello"
+long_description = (here / "README.rst").read_text(encoding="utf-8")
 
 cmake_options = []
 if sys.platform == "win32":
@@ -28,12 +27,13 @@ setuptools.setup(
     author_email="kevin@dewald.me",
     description="The ultimate fully-fledged cross-platform BLE library, designed for simplicity and ease of use.",
     long_description=long_description,
-    long_description_content_type='text/markdown',
+    long_description_content_type='text/x-rst',
     ext_modules=[
         cmake_build_extension.CMakeExtension(
             name="simplepyble",
-            cmake_depends_on=["pybind11"],
             disable_editable=True,
+            source_dir=here,
+            cmake_depends_on=["pybind11"],
             cmake_configure_options=cmake_options,
             cmake_generator="Visual Studio 16 2019" if sys.platform == "win32" else "Ninja",
         )
