@@ -2,13 +2,14 @@
 
 #include <simpledbus/advanced/Interface.h>
 #include <simpledbus/external/kvn_safe_callback.hpp>
+#include <simplebluez/Export.h>
 
 #include <cstdint>
 #include <string>
 
 namespace SimpleBluez {
 
-class Agent1 : public SimpleDBus::Interface {
+class SIMPLEBLUEZ_EXPORT Agent1 : public SimpleDBus::Interface {
   public:
     Agent1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path);
     virtual ~Agent1() = default;

@@ -4,10 +4,11 @@
 
 #include <simplebluez/Adapter.h>
 #include <simplebluez/Agent.h>
+#include <simplebluez/Export.h>
 
 namespace SimpleBluez {
 
-class ProxyOrg : public SimpleDBus::Proxy {
+class SIMPLEBLUEZ_EXPORT ProxyOrg : public SimpleDBus::Proxy {
   public:
     ProxyOrg(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~ProxyOrg() = default;

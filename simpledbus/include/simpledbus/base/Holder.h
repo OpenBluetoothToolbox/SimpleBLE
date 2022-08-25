@@ -1,5 +1,6 @@
 #pragma once
 
+#include <simpledbus/Export.h>
 #include <any>
 #include <cstdint>
 #include <map>
@@ -10,7 +11,7 @@ namespace SimpleDBus {
 
 class Holder;
 
-class Holder {
+class SIMPLEDBUS_EXPORT Holder {
   public:
     Holder();
     ~Holder();

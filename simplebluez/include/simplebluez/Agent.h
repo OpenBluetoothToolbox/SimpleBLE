@@ -1,11 +1,12 @@
 #pragma once
 
+#include <simplebluez/Export.h>
 #include <simplebluez/interfaces/Agent1.h>
 #include <simpledbus/advanced/Proxy.h>
 
 namespace SimpleBluez {
 
-class Agent : public SimpleDBus::Proxy {
+class SIMPLEBLUEZ_EXPORT Agent : public SimpleDBus::Proxy {
   public:
     typedef enum {
         DisplayOnly,

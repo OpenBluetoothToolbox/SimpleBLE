@@ -1,12 +1,13 @@
 #pragma once
 
 #include <simpledbus/advanced/Interface.h>
+#include <simplebluez/Export.h>
 
 #include <string>
 
 namespace SimpleBluez {
 
-class AgentManager1 : public SimpleDBus::Interface {
+class SIMPLEBLUEZ_EXPORT AgentManager1 : public SimpleDBus::Interface {
   public:
     AgentManager1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path);
     virtual ~AgentManager1() = default;

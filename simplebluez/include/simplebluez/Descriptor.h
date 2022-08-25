@@ -3,13 +3,14 @@
 #include <simpledbus/advanced/Proxy.h>
 
 #include <simplebluez/Types.h>
+#include <simplebluez/Export.h>
 #include <simplebluez/interfaces/GattDescriptor1.h>
 
 #include <cstdlib>
 
 namespace SimpleBluez {
 
-class Descriptor : public SimpleDBus::Proxy {
+class SIMPLEBLUEZ_EXPORT Descriptor : public SimpleDBus::Proxy {
   public:
     Descriptor(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~Descriptor();

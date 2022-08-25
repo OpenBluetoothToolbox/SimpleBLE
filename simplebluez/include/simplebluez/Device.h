@@ -2,6 +2,7 @@
 
 #include <simpledbus/advanced/Proxy.h>
 
+#include <simplebluez/Export.h>
 #include <simplebluez/Characteristic.h>
 #include <simplebluez/Service.h>
 #include <simplebluez/interfaces/Battery1.h>
@@ -9,7 +10,7 @@
 
 namespace SimpleBluez {
 
-class Device : public SimpleDBus::Proxy {
+class SIMPLEBLUEZ_EXPORT Device : public SimpleDBus::Proxy {
   public:
     Device(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~Device();

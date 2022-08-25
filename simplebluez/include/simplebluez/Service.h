@@ -2,12 +2,13 @@
 
 #include <simpledbus/advanced/Proxy.h>
 
+#include <simplebluez/Export.h>
 #include <simplebluez/Characteristic.h>
 #include <simplebluez/interfaces/GattService1.h>
 
 namespace SimpleBluez {
 
-class Service : public SimpleDBus::Proxy {
+class SIMPLEBLUEZ_EXPORT Service : public SimpleDBus::Proxy {
   public:
     Service(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~Service() = default;

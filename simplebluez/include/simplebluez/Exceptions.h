@@ -4,14 +4,15 @@
 #include <string>
 
 #include <simpledbus/base/Exceptions.h>
+#include <simplebluez/Export.h>
 
 namespace SimpleBluez {
 
 namespace Exception {
 
-class BaseException : public std::exception {};
+class SIMPLEBLUEZ_EXPORT BaseException : public std::exception {};
 
-class ServiceNotFoundException : public BaseException {
+class SIMPLEBLUEZ_EXPORT ServiceNotFoundException : public BaseException {
   public:
     ServiceNotFoundException(const std::string& service);
     const char* what() const noexcept override;
@@ -20,7 +21,7 @@ class ServiceNotFoundException : public BaseException {
     std::string _message;
 };
 
-class CharacteristicNotFoundException : public BaseException {
+class SIMPLEBLUEZ_EXPORT CharacteristicNotFoundException : public BaseException {
   public:
     CharacteristicNotFoundException(const std::string& characteristic);
     const char* what() const noexcept override;
@@ -29,7 +30,7 @@ class CharacteristicNotFoundException : public BaseException {
     std::string _message;
 };
 
-class DescriptorNotFoundException : public BaseException {
+class SIMPLEBLUEZ_EXPORT DescriptorNotFoundException : public BaseException {
   public:
     DescriptorNotFoundException(const std::string& descriptor);
     const char* what() const noexcept override;

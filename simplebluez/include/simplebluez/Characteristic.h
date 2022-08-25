@@ -2,6 +2,7 @@
 
 #include <simpledbus/advanced/Proxy.h>
 
+#include <simplebluez/Export.h>
 #include <simplebluez/Descriptor.h>
 #include <simplebluez/Types.h>
 #include <simplebluez/interfaces/GattCharacteristic1.h>
@@ -10,7 +11,7 @@
 
 namespace SimpleBluez {
 
-class Characteristic : public SimpleDBus::Proxy {
+class SIMPLEBLUEZ_EXPORT Characteristic : public SimpleDBus::Proxy {
   public:
     Characteristic(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~Characteristic();

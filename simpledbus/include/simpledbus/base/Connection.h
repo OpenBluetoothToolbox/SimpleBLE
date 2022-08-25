@@ -1,5 +1,6 @@
 #pragma once
 
+#include <simpledbus/Export.h>
 #include <dbus/dbus.h>
 #include <mutex>
 #include "Message.h"
@@ -8,7 +9,7 @@ namespace SimpleDBus {
 
 class Message;
 
-class Connection {
+class SIMPLEDBUS_EXPORT Connection {
   public:
     Connection(::DBusBusType dbus_bus_type);
     ~Connection();

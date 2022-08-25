@@ -2,6 +2,7 @@
 
 #include <optional>
 
+#include <simpleble/Export.h>
 #include <simpleble/Peripheral.h>
 #include <simpleble/Service.h>
 
@@ -9,7 +10,7 @@ namespace SimpleBLE {
 
 namespace Safe {
 
-class Peripheral : public SimpleBLE::Peripheral {
+class SIMPLEBLE_EXPORT Peripheral : public SimpleBLE::Peripheral {
   public:
     Peripheral(SimpleBLE::Peripheral& peripheral);
     virtual ~Peripheral() = default;

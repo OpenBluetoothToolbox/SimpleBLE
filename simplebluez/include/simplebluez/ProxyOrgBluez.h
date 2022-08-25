@@ -2,6 +2,7 @@
 
 #include <simpledbus/advanced/Proxy.h>
 
+#include <simplebluez/Export.h>
 #include <simplebluez/Adapter.h>
 #include <simplebluez/Agent.h>
 
@@ -9,7 +10,7 @@
 
 namespace SimpleBluez {
 
-class ProxyOrgBluez : public SimpleDBus::Proxy {
+class SIMPLEBLUEZ_EXPORT ProxyOrgBluez : public SimpleDBus::Proxy {
   public:
     ProxyOrgBluez(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~ProxyOrgBluez() = default;

@@ -3,6 +3,7 @@
 #include <simpledbus/advanced/Proxy.h>
 #include <simpledbus/interfaces/ObjectManager.h>
 
+#include <simplebluez/Export.h>
 #include <simplebluez/Adapter.h>
 #include <simplebluez/Agent.h>
 
@@ -10,7 +11,7 @@
 
 namespace SimpleBluez {
 
-class Bluez : public SimpleDBus::Proxy {
+class SIMPLEBLUEZ_EXPORT Bluez : public SimpleDBus::Proxy {
   public:
     Bluez();
     virtual ~Bluez();

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <simpledbus/Export.h>
 #include <simpledbus/advanced/Interface.h>
 #include <simpledbus/external/kvn_safe_callback.hpp>
 
@@ -9,7 +10,7 @@
 
 namespace SimpleDBus {
 
-class Proxy {
+class SIMPLEDBUS_EXPORT Proxy {
   public:
     Proxy(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~Proxy();

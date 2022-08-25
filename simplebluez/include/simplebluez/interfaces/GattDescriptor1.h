@@ -4,12 +4,13 @@
 #include <simpledbus/external/kvn_safe_callback.hpp>
 
 #include <simplebluez/Types.h>
+#include <simplebluez/Export.h>
 
 #include <string>
 
 namespace SimpleBluez {
 
-class GattDescriptor1 : public SimpleDBus::Interface {
+class SIMPLEBLUEZ_EXPORT GattDescriptor1 : public SimpleDBus::Interface {
   public:
     GattDescriptor1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path);
     virtual ~GattDescriptor1();

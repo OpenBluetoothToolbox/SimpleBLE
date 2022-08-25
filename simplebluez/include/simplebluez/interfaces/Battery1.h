@@ -2,12 +2,13 @@
 
 #include <simpledbus/advanced/Interface.h>
 #include <simpledbus/external/kvn_safe_callback.hpp>
+#include <simplebluez/Export.h>
 
 #include <string>
 
 namespace SimpleBluez {
 
-class Battery1 : public SimpleDBus::Interface {
+class SIMPLEBLUEZ_EXPORT Battery1 : public SimpleDBus::Interface {
   public:
     Battery1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path);
     virtual ~Battery1();

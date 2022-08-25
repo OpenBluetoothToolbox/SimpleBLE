@@ -15,13 +15,18 @@ project(
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
 
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
+option(BUILD_SIMPLEBLE_SHARED "Build as a shared library" OFF)
+option(BUILD_SIMPLEBLE_C_SHARED "Build SimpleBLE-C as a shared library" OFF)
+
 find_package(fmt REQUIRED)
 
-set(SIMPLEBLE_PRIVATE_INCLUDES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/external)
+if(BUILD_SIMPLEBLE_SHARED)
+    set(_LIBTYPE "SHARED")
+endif()
+
+if(BUILD_SIMPLEBLE_C_SHARED)
+    set(_CLIBTYPE "SHARED")
+endif()
 
 set(SIMPLEBLE_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Adapter.cpp
@@ -53,8 +58,8 @@ set(SIMPLEBLE_C_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src_c/logging.cpp)
 
 # Define targets
-add_library(simpleble ${SIMPLEBLE_SRC})
-add_library(simpleble-c ${SIMPLEBLE_C_SRC})
+add_library(simpleble ${_LIBTYPE} ${SIMPLEBLE_SRC})
+add_library(simpleble-c ${_CLIBTYPE} ${SIMPLEBLE_C_SRC})
 
 add_library(simpleble::simpleble ALIAS simpleble)
 add_library(simpleble::simpleble-c ALIAS simpleble-c)
@@ -85,11 +90,26 @@ set_target_properties(simpleble-c PROPERTIES
     EXPORT_NAME simpleble-c
     OUTPUT_NAME simpleble-c)
 
-# Configure include directories
-target_include_directories(simpleble PRIVATE ${SIMPLEBLE_PRIVATE_INCLUDES})
-target_include_directories(simpleble-c PRIVATE ${SIMPLEBLE_PRIVATE_INCLUDES})
-target_include_directories(simpleble INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(simpleble-c INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(simpleble
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/builders>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/external>
+    PUBLIC
+        $<INSTALL_INTERFACE:include>
+)
+target_include_directories(simpleble-c
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/builders>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/external>
+    PUBLIC
+        $<INSTALL_INTERFACE:include>
+)
 
 # Configure linked libraries
 target_link_libraries(simpleble PRIVATE fmt::fmt-header-only)
@@ -159,9 +179,6 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
         ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
         ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include
         ${CMAKE_CURRENT_SOURCE_DIR}/src/linux)
-    # target_include_directories(simpleble-c PRIVATE
-    #     ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
-    #     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include)
 
 
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
@@ -195,8 +212,6 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     message(STATUS "Darwin Host Detected")
 
-
-
     list(APPEND PRIVATE_COMPILE_OPTIONS -fobjc-arc)
 
     target_link_libraries(simpleble PUBLIC "-framework Foundation" "-framework CoreBluetooth" ObjC)
@@ -224,7 +239,18 @@ apply_build_options(simpleble-c
     "${PRIVATE_LINK_OPTIONS}"
     "${PUBLIC_LINK_OPTIONS}")
 
-# Build tests if requested
+get_property(SIMPLEBLE_TYPE TARGET simpleble PROPERTY TYPE)
+if(NOT ${SIMPLEBLE_TYPE} STREQUAL "STATIC_LIBRARY")
+    target_compile_definitions(simpleble PUBLIC SIMPLEBLE_SHARED)
+endif()
+
+get_property(SIMPLEBLE_C_TYPE TARGET simpleble-c PROPERTY TYPE)
+if(NOT ${SIMPLEBLE_C_TYPE} STREQUAL "STATIC_LIBRARY")
+    target_compile_definitions(simpleble-c PUBLIC SIMPLEBLE_C_SHARED)
+endif()
+
+target_compile_definitions(simpleble PRIVATE SIMPLEBLE_BUILD)
+target_compile_definitions(simpleble-c PRIVATE SIMPLEBLE_C_BUILD)
 
 if(SIMPLEBLE_TEST)
     message(STATUS "Building Tests")
@@ -246,29 +272,19 @@ if(SIMPLEBLE_TEST)
     target_include_directories(simpleble_test PRIVATE ${GTEST_INCLUDE_DIRS})
 endif()
 
-# Provide installation interface
-
-#     include(GNUInstallDirs)
-
-#     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/simplebluez.pc.in
-#                 ${CMAKE_CURRENT_BINARY_DIR}/simplebluez.pc @ONLY)
-
-#     install(
-#         TARGETS simplebluez ${SIMPLEDBUS_TARGET}
-#         EXPORT simplebluez-config
-#         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-
-#     install(
-#         EXPORT simplebluez-config
-#         NAMESPACE simplebluez::
-#         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/simplebluez)
-
-#     install(
-#         DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/simplebluez/
-#         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simplebluez)
-
-#     install(
-#         FILES ${CMAKE_CURRENT_BINARY_DIR}/simplebluez.pc
-#         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+install_target(simpleble
+    VERSION ${PROJECT_VERSION}
+    EXPORT simpleble
+    NAMESPACE simpleble
+    CMAKE_INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/simpleble-config.cmake.in
+    CMAKE_OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/simpleble-config.cmake
+)
+install_target(simpleble-c
+    VERSION ${PROJECT_VERSION}
+    EXPORT simpleble-c
+    NAMESPACE simpleble
+    CMAKE_INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/simpleble-c-config.cmake.in
+    CMAKE_OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/simpleble-c-config.cmake
+)
+install(DIRECTORY include/ TYPE INCLUDE
+    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")

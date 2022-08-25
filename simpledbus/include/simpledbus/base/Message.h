@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include <simpledbus/Export.h>
 #include "Connection.h"
 #include "Holder.h"
 
@@ -15,7 +16,7 @@ namespace SimpleDBus {
 class Connection;
 class Interface;
 
-class Message {
+class SIMPLEDBUS_EXPORT Message {
   public:
     typedef enum {
         INVALID = DBUS_MESSAGE_TYPE_INVALID,

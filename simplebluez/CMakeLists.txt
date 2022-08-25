@@ -12,12 +12,17 @@ project(
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
 
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
+option(BUILD_SIMPLEBLUEZ_SHARED "Build as a shared library" OFF)
 
 find_package(fmt REQUIRED)
 find_package(DBus1 REQUIRED)
 
 if(NOT DEFINED SIMPLEDBUS_SANITIZE AND DEFINED SIMPLEBLUEZ_SANITIZE)
     set(SIMPLEDBUS_SANITIZE ${SIMPLEBLUEZ_SANITIZE})
+endif()
+
+if(BUILD_SIMPLEBLUEZ_SHARED)
+    set(_LIBTYPE "SHARED")
 endif()
 
 # Load all variables that would eventually need to be exposed to downstream projects
@@ -28,10 +33,6 @@ endif()
 if(NOT SIMPLEBLUEZ_LOG_LEVEL)
     set(SIMPLEBLUEZ_LOG_LEVEL "FATAL")
 endif()
-
-set(SIMPLEBLUEZ_INCLUDE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include)
 
 set(SIMPLEBLUEZ_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ProxyOrg.cpp
@@ -66,7 +67,7 @@ set(SIMPLEBLUEZ_SRC
 
 # Configure the build targets
 
-add_library(simplebluez ${SIMPLEBLUEZ_SRC})
+add_library(simplebluez ${_LIBTYPE} ${SIMPLEBLUEZ_SRC})
 add_library(simplebluez::simplebluez ALIAS simplebluez)
 
 set_target_properties(
@@ -83,14 +84,25 @@ set_target_properties(
 
 list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEDBUS_LOG_LEVEL=${SIMPLEDBUS_LOG_LEVEL})
 list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLUEZ_LOG_LEVEL=${SIMPLEBLUEZ_LOG_LEVEL})
+list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLUEZ_BUILD)
+
+get_property(SIMPLEBLUEZ_TYPE TARGET simplebluez PROPERTY TYPE)
+if(NOT ${SIMPLEBLUEZ_TYPE} STREQUAL "STATIC_LIBRARY")
+    target_compile_definitions(simplebluez PUBLIC SIMPLEBLUEZ_SHARED)
+endif()
 
 target_link_libraries(simplebluez
     PUBLIC ${DBus1_LIBRARIES} pthread
     PRIVATE fmt::fmt-header-only)
 
 target_include_directories(simplebluez
-    PRIVATE ${SIMPLEBLUEZ_INCLUDE}
-    INTERFACE ${SIMPLEBLUEZ_INCLUDE})
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include>
+    PUBLIC
+        $<INSTALL_INTERFACE:include>
+)
 
 append_sanitize_options("${SIMPLEBLUEZ_SANITIZE}")
 
@@ -122,3 +134,13 @@ if(SIMPLEBLUEZ_TEST)
         COMMAND "${CMAKE_COMMAND}" -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/test/python/ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     )
 endif()
+
+install_target(simplebluez
+    VERSION ${PROJECT_VERSION}
+    EXPORT simplebluez
+    NAMESPACE simplebluez
+    CMAKE_INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/simplebluez-config.cmake.in
+    CMAKE_OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/simplebluez-config.cmake
+)
+install(DIRECTORY include/ TYPE INCLUDE
+    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")

@@ -4,12 +4,13 @@
 #include <simpledbus/external/kvn_safe_callback.hpp>
 
 #include <simplebluez/Types.h>
+#include <simplebluez/Export.h>
 
 #include <string>
 
 namespace SimpleBluez {
 
-class GattCharacteristic1 : public SimpleDBus::Interface {
+class SIMPLEBLUEZ_EXPORT GattCharacteristic1 : public SimpleDBus::Interface {
   public:
     typedef enum { REQUEST = 0, COMMAND } WriteType;
 

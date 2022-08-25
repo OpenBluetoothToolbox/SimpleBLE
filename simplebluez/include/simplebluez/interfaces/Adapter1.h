@@ -1,12 +1,13 @@
 #pragma once
 
 #include <simpledbus/advanced/Interface.h>
+#include <simplebluez/Export.h>
 
 #include <string>
 
 namespace SimpleBluez {
 
-class Adapter1 : public SimpleDBus::Interface {
+class SIMPLEBLUEZ_EXPORT Adapter1 : public SimpleDBus::Interface {
   public:
     typedef enum { AUTO, BREDR, LE } DiscoveryFilter;
 

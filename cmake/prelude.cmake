@@ -2,6 +2,10 @@
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/find)
 
+include(GNUInstallDirs)
+include(InstallRequiredSystemLibraries)
+include(CMakePackageConfigHelpers)
+
 # Detect if the project is being build within a project or standalone.
 if(PROJECT_IS_TOP_LEVEL)
     # Configure the build path
@@ -46,6 +50,35 @@ macro(apply_build_options
         target_link_options(${TARGET} PUBLIC ${OPTION})
     endforeach()
 
+endmacro()
+
+macro(install_target tgt)
+    set(bools)
+    set(single EXPORT NAMESPACE VERSION CMAKE_INPUT_FILE CMAKE_OUTPUT_FILE)
+    set(multi)
+
+    cmake_parse_arguments(_SBLE "${bools}" "${single}" "${multi}" ${ARGN})
+
+    configure_package_config_file(${_SBLE_CMAKE_INPUT_FILE} ${_SBLE_CMAKE_OUTPUT_FILE}
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${_SBLE_EXPORT})
+    write_basic_package_version_file("${_SBLE_EXPORT}-config-version.cmake"
+        VERSION ${_SBLE_VERSION}
+        COMPATIBILITY SameMajorVersion)
+
+    install(TARGETS ${tgt} fmt-header-only
+        EXPORT ${_SBLE_EXPORT}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+    install(EXPORT ${_SBLE_EXPORT}
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${_SBLE_EXPORT}
+        NAMESPACE ${_SBLE_NAMESPACE}
+        FILE "${_SBLE_EXPORT}-targets.cmake"
+    )
+    install(FILES ${_SBLE_CMAKE_OUTPUT_FILE}
+        ${CMAKE_CURRENT_BINARY_DIR}/${_SBLE_EXPORT}-config-version.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${_SBLE_EXPORT})
 endmacro()
 
 macro(append_sanitize_options MODIFIER)

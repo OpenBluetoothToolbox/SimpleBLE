@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include <simpleble/Export.h>
 #include <simpleble/Descriptor.h>
 #include <simpleble/Exceptions.h>
 #include <simpleble/Types.h>
@@ -10,7 +11,7 @@ namespace SimpleBLE {
 
 class CharacteristicBase;
 
-class Characteristic {
+class SIMPLEBLE_EXPORT Characteristic {
   public:
     Characteristic() = default;
     virtual ~Characteristic() = default;

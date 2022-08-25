@@ -1,11 +1,12 @@
 #pragma once
 
+#include <simpledbus/Export.h>
 #include <string>
 #include <vector>
 
 namespace SimpleDBus {
 
-class Path {
+class SIMPLEDBUS_EXPORT Path {
   public:
     static size_t count_elements(const std::string& path);
     static std::string fetch_elements(const std::string& path, size_t count);

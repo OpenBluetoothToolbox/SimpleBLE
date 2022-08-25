@@ -5,6 +5,8 @@
 #include <mutex>
 #include <string>
 
+#include <simpleble/Export.h>
+
 namespace SimpleBLE {
 
 namespace Logging {
@@ -26,7 +28,7 @@ enum Level : int {
 using Callback = std::function<void(Level, const std::string&, const std::string&, uint32_t, const std::string&, const std::string&)>;
 // clang-format on
 
-class Logger {
+class SIMPLEBLE_EXPORT Logger {
   public:
     static Logger* get();
 

@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include <simpleble/Export.h>
 #include <simpleble/Exceptions.h>
 #include <simpleble/Peripheral.h>
 #include <simpleble/Types.h>
@@ -13,7 +14,7 @@ namespace SimpleBLE {
 
 class AdapterBase;
 
-class Adapter {
+class SIMPLEBLE_EXPORT Adapter {
   public:
     Adapter() = default;
     virtual ~Adapter() = default;

@@ -2,6 +2,7 @@
 
 #include <simpledbus/advanced/Proxy.h>
 
+#include <simplebluez/Export.h>
 #include <simplebluez/Device.h>
 #include <simplebluez/interfaces/Adapter1.h>
 
@@ -9,7 +10,7 @@
 
 namespace SimpleBluez {
 
-class Adapter : public SimpleDBus::Proxy {
+class SIMPLEBLUEZ_EXPORT Adapter : public SimpleDBus::Proxy {
   public:
     typedef Adapter1::DiscoveryFilter DiscoveryFilter;
 

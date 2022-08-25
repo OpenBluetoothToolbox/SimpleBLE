@@ -12,6 +12,7 @@ project(
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
 
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
+option(BUILD_SIMPLEDBUS_SHARED "Build as a shared library" OFF)
 
 find_package(fmt REQUIRED)
 find_package(DBus1 REQUIRED)
@@ -21,7 +22,9 @@ if(NOT SIMPLEDBUS_LOG_LEVEL)
     set(SIMPLEDBUS_LOG_LEVEL "FATAL")
 endif()
 
-set(SIMPLEDBUS_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+if(BUILD_SIMPLEDBUS_SHARED)
+    set(_LIBTYPE "SHARED")
+endif()
 
 set(SIMPLEDBUS_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/advanced/Interface.cpp
@@ -36,7 +39,7 @@ set(SIMPLEDBUS_SRC
 
 # Configure the build targets
 
-add_library(simpledbus ${SIMPLEDBUS_SRC})
+add_library(simpledbus ${_LIBTYPE} ${SIMPLEDBUS_SRC})
 add_library(simpledbus::simpledbus ALIAS simpledbus)
 
 set_target_properties(
@@ -52,14 +55,24 @@ set_target_properties(
 )
 
 list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEDBUS_LOG_LEVEL=${SIMPLEDBUS_LOG_LEVEL})
+list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEDBUS_BUILD)
+
+get_property(SIMPLEDBUS_TYPE TARGET simpledbus PROPERTY TYPE)
+if(NOT ${SIMPLEDBUS_TYPE} STREQUAL "STATIC_LIBRARY")
+    target_compile_definitions(simpledbus PUBLIC SIMPLEDBUS_SHARED)
+endif()
 
 target_link_libraries(simpledbus
     PUBLIC ${DBus1_LIBRARIES}
     PRIVATE fmt::fmt-header-only)
 
 target_include_directories(simpledbus
-    PRIVATE ${SIMPLEDBUS_INCLUDE}
-    INTERFACE ${SIMPLEDBUS_INCLUDE})
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PUBLIC
+        $<INSTALL_INTERFACE:include>
+)
 
 append_sanitize_options("${SIMPLEDBUS_SANITIZE}")
 
@@ -96,3 +109,13 @@ if(SIMPLEDBUS_TEST)
         COMMAND "${CMAKE_COMMAND}" -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/test/python/ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     )
 endif()
+
+install_target(simpledbus
+    VERSION ${PROJECT_VERSION}
+    EXPORT simpledbus
+    NAMESPACE simpledbus
+    CMAKE_INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/simpledbus-config.cmake.in
+    CMAKE_OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/simpledbus-config.cmake
+)
+install(DIRECTORY include/ TYPE INCLUDE
+    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")

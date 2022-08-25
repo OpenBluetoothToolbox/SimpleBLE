@@ -1,5 +1,6 @@
 #pragma once
 
+#include <simpledbus/Export.h>
 #include <simpledbus/base/Connection.h>
 
 #include <atomic>
@@ -10,7 +11,7 @@
 
 namespace SimpleDBus {
 
-class Interface {
+class SIMPLEDBUS_EXPORT Interface {
   public:
     Interface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
               const std::string& interface_name);
