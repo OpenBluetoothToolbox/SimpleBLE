@@ -67,5 +67,5 @@ external creators, are licensed under the terms of the `MIT Licence`_.
 .. |Latest Documentation Status| image:: https://readthedocs.org/projects/simpleble/badge?version=latest
    :target: http://simpleble.readthedocs.org/en/latest
 
-.. |PyPI Licence| image::https://img.shields.io/pypi/l/simplepyble
+.. |PyPI Licence| image:: https://img.shields.io/pypi/l/simplepyble
 

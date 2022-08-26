@@ -48,6 +48,9 @@ jobs:
           name: simpleble-wheels
           path: wheelhouse
 
+      - name: Check Packages
+        run: twine check wheelhouse/*.whl
+
       - name: Publish packages
         run: twine upload --repository testpypi --skip-existing wheelhouse/*.whl --verbose
         env:
