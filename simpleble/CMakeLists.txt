@@ -17,6 +17,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
 option(BUILD_SIMPLEBLE_SHARED "Build as a shared library" OFF)
 option(BUILD_SIMPLEBLE_C_SHARED "Build SimpleBLE-C as a shared library" OFF)
+option(NO_SONAME "Build as a plugin" OFF)
 
 find_package(fmt REQUIRED)
 
@@ -247,6 +248,11 @@ endif()
 get_property(SIMPLEBLE_C_TYPE TARGET simpleble-c PROPERTY TYPE)
 if(NOT ${SIMPLEBLE_C_TYPE} STREQUAL "STATIC_LIBRARY")
     target_compile_definitions(simpleble-c PUBLIC SIMPLEBLE_C_SHARED)
+endif()
+
+if(NO_SONAME)
+    set_target_properties(simpleble PROPERTIES NO_SONAME ON)
+    set_target_properties(simpleble-c PROPERTIES NO_SONAME ON)
 endif()
 
 target_compile_definitions(simpleble PRIVATE SIMPLEBLE_BUILD)
