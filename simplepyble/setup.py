@@ -6,7 +6,7 @@ here = pathlib.Path(__file__).parent.resolve()
 
 # Include our vendorized copy of cmake-build-extension, at least until
 # https://github.com/diegoferigo/cmake-build-extension/pull/35 is merged.
-sys.path.insert(0, here)
+sys.path.insert(0, str(here))
 import cmake_build_extension
 
 # Get the long description from the README file
