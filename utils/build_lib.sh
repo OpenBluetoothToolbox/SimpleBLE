@@ -79,6 +79,7 @@ EXTRA_BUILD_ARGS=${@:2}
 PROJECT_ROOT=$(realpath $(dirname `realpath $0`)/..)
 SOURCE_PATH=$PROJECT_ROOT/$LIB_NAME
 BUILD_PATH=$PROJECT_ROOT/build_$LIB_NAME
+INSTALL_PATH=$BUILD_PATH/install
 
 # If FLAG_TEST is set, build the library with the test argument
 if [[ ! -z "$FLAG_TEST" ]]; then
@@ -103,6 +104,7 @@ fi
 
 cmake -H$SOURCE_PATH -B $BUILD_PATH $BUILD_TEST_ARG $BUILD_SANITIZE_ADDRESS_ARG $BUILD_SANITIZE_THREAD_ARG $EXTRA_BUILD_ARGS
 cmake --build $BUILD_PATH -j7
+cmake --install $BUILD_PATH --prefix "${INSTALL_PATH}"
 
 # # If FLAG_LOCAL is set, make a local installation of the library
 # if [[ ! -z "$FLAG_LOCAL" ]]; then

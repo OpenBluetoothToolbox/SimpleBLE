@@ -53,13 +53,13 @@ set_target_properties(
 
 list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEDBUS_LOG_LEVEL=${SIMPLEDBUS_LOG_LEVEL})
 
-target_link_libraries(simpledbus
-    PUBLIC ${DBus1_LIBRARIES}
-    PRIVATE fmt::fmt-header-only)
+target_link_libraries(simpledbus PUBLIC ${DBus1_LIBRARIES})
+target_link_libraries(simpledbus PRIVATE $<BUILD_INTERFACE:fmt::fmt-header-only>)
 
-target_include_directories(simpledbus
-    PRIVATE ${SIMPLEDBUS_INCLUDE}
-    INTERFACE ${SIMPLEDBUS_INCLUDE})
+target_include_directories(simpledbus PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(simpledbus INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 append_sanitize_options("${SIMPLEDBUS_SANITIZE}")
 
@@ -68,6 +68,32 @@ apply_build_options(simpledbus
     "${PRIVATE_COMPILE_OPTIONS}"
     "${PRIVATE_LINK_OPTIONS}"
     "${PUBLIC_LINK_OPTIONS}")
+
+include(GNUInstallDirs)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/simpledbus.pc.in
+            ${CMAKE_CURRENT_BINARY_DIR}/simpledbus.pc @ONLY)
+
+install(
+    TARGETS simpledbus
+    EXPORT simpledbus-config
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+install(
+    EXPORT simpledbus-config
+    NAMESPACE simpledbus::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/simpledbus)
+
+install(
+    DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/simpledbus/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpledbus)
+
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/simpledbus.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
 
 if(SIMPLEDBUS_TEST)
     find_package(Python3 COMPONENTS Development REQUIRED)
