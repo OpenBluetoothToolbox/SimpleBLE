@@ -1,0 +1,3 @@
+twine
+pybind11
+cibuildwheel==2.9
