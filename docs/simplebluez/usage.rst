@@ -24,6 +24,7 @@ To build a shared library set the ``BUILD_SHARED_LIBS`` CMake variable to ``TRUE
 
   cmake -DBUILD_SHARED_LIBS=TRUE ...
 
+
 Usage with CMake (Installed)
 ============================
 
@@ -140,7 +141,7 @@ To run the address sanitizer tests, run the following command: ::
    cmake --build . -j7
    PYTHONMALLOC=malloc ./bin/simplebluez_test
 
-It's important for PYTHONMALLOC to be set to malloc, otherwise the tests will
+It's important for ``PYTHONMALLOC`` to be set to ``malloc``, otherwise the tests will
 fail due to Python's memory allocator from triggering false positives.
 
 
@@ -159,4 +160,5 @@ To run the thread sanitizer tests, run the following command: ::
 .. Links
 
 .. _cmake-init-fetchcontent: https://github.com/friendlyanon/cmake-init-fetchcontent
+
 .. _fmtlib: https://github.com/fmtlib/fmt

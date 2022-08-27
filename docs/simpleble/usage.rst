@@ -2,14 +2,17 @@
 Usage
 =====
 
-SimpleBLE should work on any Linux environment supporting DBus. To install
-the necessary dependencies on Debian-based systems, use the following command: ::
-
-  sudo apt install libdbus-1-dev
+SimpleBLE works on Windows, Linux, MacOS and iOS. Please follow the instructions below
+to build and run SimpleBLE in your specific environment.
 
 
 Building and Installing the Library (Source)
 ============================================
+
+When building SimpleBLE from source on Linux, you will need to install the
+following dependencies: ::
+
+  sudo apt install libdbus-1-dev
 
 The included CMake build script can be used to build SimpleBLE.
 CMake is freely available for download from https://www.cmake.org/download/. ::
@@ -23,6 +26,7 @@ CMake is freely available for download from https://www.cmake.org/download/. ::
 To build a shared library set the ``BUILD_SHARED_LIBS`` CMake variable to ``TRUE`` ::
 
   cmake -DBUILD_SHARED_LIBS=TRUE ...
+
 
 Usage with CMake (Installed)
 ============================
@@ -140,7 +144,7 @@ To run the address sanitizer tests, run the following command: ::
    cmake --build . -j7
    PYTHONMALLOC=malloc ./bin/simpleble_test
 
-It's important for PYTHONMALLOC to be set to malloc, otherwise the tests will
+It's important for ``PYTHONMALLOC`` to be set to ``malloc``, otherwise the tests will
 fail due to Python's memory allocator from triggering false positives.
 
 
@@ -159,4 +163,5 @@ To run the thread sanitizer tests, run the following command: ::
 .. Links
 
 .. _cmake-init-fetchcontent: https://github.com/friendlyanon/cmake-init-fetchcontent
+
 .. _fmtlib: https://github.com/fmtlib/fmt

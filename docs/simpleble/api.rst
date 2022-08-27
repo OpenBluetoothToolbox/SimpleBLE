@@ -5,7 +5,7 @@ API Reference
 Examples
 ========
 
-To learn how to use SimpleBBLE, please refer to the `examples`_ provided
+To learn how to use SimpleBLE, please refer to the `examples`_ provided
 in the repository. Those examples named with a ``_c`` suffix are using
 the C-wrapped version of the library and those examples with a ``_safe``
 suffix use the _noexcept_ version of the library.
@@ -113,21 +113,3 @@ Coding & Naming Conventions
 .. _notify (cpp): https://github.com/OpenBluetoothToolbox/SimpleBLE/blob/main/examples/simpleble/cpp/notify/notify.cpp
 
 .. _notify (c): https://github.com/OpenBluetoothToolbox/SimpleBLE/blob/main/examples/simpleble/c/notify/notify.c
-
-
-=================
-SimpleBLE Usage
-=================
-
-Usage
-=====
-
-To learn how to use SimpleBLE, please refer to the `examples`_ provided
-in the repository.
-
-
-
-
-
-
-

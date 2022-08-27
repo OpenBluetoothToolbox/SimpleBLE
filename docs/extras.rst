@@ -16,7 +16,7 @@ by calling the following commands: ::
 
 
 =================
-Release Checklist
+Release checklist
 =================
 
 Before releasing a new version of the project, the following steps should be

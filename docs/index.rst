@@ -7,6 +7,9 @@ The ultimate fully-fledged cross-platform library and bindings for Bluetooth Low
 
 .. include:: overview.rst
 
+Table of Contents
+=================
+
 .. toctree::
    :maxdepth: 1
    :caption: General
@@ -27,6 +30,7 @@ The ultimate fully-fledged cross-platform library and bindings for Bluetooth Low
    :caption: SimplePyBLE
 
    simplepyble/usage
+   simplepyble/api
    simplepyble/changelog
 
 .. toctree::
