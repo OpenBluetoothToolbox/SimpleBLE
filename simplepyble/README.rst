@@ -8,7 +8,7 @@ The ultimate fully-fledged cross-platform bindings for Bluetooth Low Energy (BLE
 Overview
 --------
 
-SimplePyBLE provides Python bindings for `SimpleBLE_`, a fully cross-platform BLE
+SimplePyBLE provides Python bindings for `SimpleBLE`_, a fully cross-platform BLE
 library written in C++. It is designed for simplicity and ease of use with a
 licencing scheme chosen to be friendly towards commercial use.
 
@@ -56,7 +56,7 @@ external creators, are licensed under the terms of the `MIT Licence`_.
 
 .. _SimpleBLE: https://github.com/OpenBluetoothToolbox/SimpleBLE/
 
-.. _code examples: https://github.com/OpenBluetoothToolbox/SimpleBLE/tree/main/examples
+.. _code examples: https://github.com/OpenBluetoothToolbox/SimpleBLE/tree/main/examples/simplepyble
 
 .. _MIT Licence: https://github.com/OpenBluetoothToolbox/SimpleBLE/blob/main/LICENCE.md
 
