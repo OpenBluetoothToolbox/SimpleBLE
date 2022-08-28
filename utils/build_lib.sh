@@ -116,12 +116,12 @@ cmake --install $BUILD_PATH --prefix "${INSTALL_PATH}"
 
 # If FLAG_LOCAL is set, we want to build examples out of source files instead of the installed library
 if [[ ! -z "$FLAG_LOCAL" ]]; then
-    BUILD_EXAMPLE_ARG="-D${LIB_NAME^^}_LOCAL=ON"
+    BUILD_EXAMPLE_ARGS="-D${LIB_NAME^^}_LOCAL=ON"
 else
-    BUILD_EXAMPLE_ARG="-D${LIB_NAME^^}_LOCAL=OFF"
+    BUILD_EXAMPLE_ARGS="-D${LIB_NAME^^}_LOCAL=OFF -D${LIB_NAME}_ROOT=$INSTALL_PATH"
 fi
 
 if [[ ! -z "$FLAG_EXAMPLE" ]]; then
-    cmake -H$EXAMPLE_SOURCE_PATH -B $EXAMPLE_BUILD_PATH $BUILD_EXAMPLE_ARG -D${LIB_NAME}_ROOT=$INSTALL_PATH
+    cmake -H$EXAMPLE_SOURCE_PATH -B $EXAMPLE_BUILD_PATH $BUILD_EXAMPLE_ARGS
     cmake --build $EXAMPLE_BUILD_PATH -j7
 fi

@@ -89,7 +89,8 @@ target_link_libraries(simplebluez PRIVATE $<BUILD_INTERFACE:fmt::fmt-header-only
 
 target_include_directories(simplebluez PRIVATE ${SIMPLEBLUEZ_INCLUDE})
 target_include_directories(simplebluez INTERFACE
-    $<BUILD_INTERFACE:${SIMPLEBLUEZ_INCLUDE}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     $<INSTALL_INTERFACE:${DBus1_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:${DBus1_ARCH_INCLUDE_DIR}>)
