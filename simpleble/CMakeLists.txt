@@ -237,7 +237,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/simpleble.pc.in
             ${CMAKE_CURRENT_BINARY_DIR}/simpleble.pc @ONLY)
 
 install(
-    TARGETS simpleble ${SIMPLEDBUS_TARGET}
+    TARGETS simpleble simpleble-c
     EXPORT simpleble-config
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -251,6 +251,10 @@ install(
 install(
     DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/simpleble/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpleble)
+
+install(
+    DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/simpleble_c/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpleble_c)
 
 install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/simpleble.pc

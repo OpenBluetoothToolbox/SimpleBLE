@@ -90,7 +90,9 @@ target_link_libraries(simplebluez PRIVATE $<BUILD_INTERFACE:fmt::fmt-header-only
 target_include_directories(simplebluez PRIVATE ${SIMPLEBLUEZ_INCLUDE})
 target_include_directories(simplebluez INTERFACE
     $<BUILD_INTERFACE:${SIMPLEBLUEZ_INCLUDE}>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    $<INSTALL_INTERFACE:${DBus1_INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:${DBus1_ARCH_INCLUDE_DIR}>)
 
 append_sanitize_options("${SIMPLEBLUEZ_SANITIZE}")
 

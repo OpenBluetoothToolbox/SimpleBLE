@@ -38,6 +38,10 @@ while (( "$#" )); do
         FLAG_EXAMPLE=0
         shift
         ;;
+    -l|--local)
+        FLAG_LOCAL=0
+        shift
+        ;;
     -sa|--sanitize_address)
         FLAG_SANITIZE_ADDRESS=0
         shift
@@ -81,6 +85,9 @@ SOURCE_PATH=$PROJECT_ROOT/$LIB_NAME
 BUILD_PATH=$PROJECT_ROOT/build_$LIB_NAME
 INSTALL_PATH=$BUILD_PATH/install
 
+EXAMPLE_BUILD_PATH=$PROJECT_ROOT/build_"$LIB_NAME"_examples
+EXAMPLE_SOURCE_PATH=$PROJECT_ROOT/examples/$LIB_NAME
+
 # If FLAG_TEST is set, build the library with the test argument
 if [[ ! -z "$FLAG_TEST" ]]; then
     BUILD_TEST_ARG="-D${LIB_NAME^^}_TEST=ON"
@@ -100,25 +107,21 @@ fi
 # If FLAG_CLEAN is set, clean the build directory
 if [[ ! -z "$FLAG_CLEAN" ]]; then
     rm -rf $BUILD_PATH
+    rm -rf $EXAMPLE_BUILD_PATH
 fi
 
 cmake -H$SOURCE_PATH -B $BUILD_PATH $BUILD_TEST_ARG $BUILD_SANITIZE_ADDRESS_ARG $BUILD_SANITIZE_THREAD_ARG $EXTRA_BUILD_ARGS
 cmake --build $BUILD_PATH -j7
 cmake --install $BUILD_PATH --prefix "${INSTALL_PATH}"
 
-# # If FLAG_LOCAL is set, make a local installation of the library
-# if [[ ! -z "$FLAG_LOCAL" ]]; then
-#     INSTALL_PATH=$BUILD_PATH/install
-#     BUILD_SEARCH_PATH=$INSTALL_PATH
-#     cmake --install $BUILD_PATH --prefix "${INSTALL_PATH}"
-# fi
-
-if [[ ! -z "$FLAG_EXAMPLE" ]]; then
-    EXAMPLE_SOURCE_PATH=$PROJECT_ROOT/examples/$LIB_NAME
-    EXAMPLE_BUILD_PATH=$PROJECT_ROOT/build_"$LIB_NAME"_examples
-
-    cmake -H$EXAMPLE_SOURCE_PATH -B $EXAMPLE_BUILD_PATH
-    cmake --build $EXAMPLE_BUILD_PATH -j7
+# If FLAG_LOCAL is set, we want to build examples out of source files instead of the installed library
+if [[ ! -z "$FLAG_LOCAL" ]]; then
+    BUILD_EXAMPLE_ARG="-D${LIB_NAME^^}_LOCAL=ON"
+else
+    BUILD_EXAMPLE_ARG="-D${LIB_NAME^^}_LOCAL=OFF"
 fi
 
-
+if [[ ! -z "$FLAG_EXAMPLE" ]]; then
+    cmake -H$EXAMPLE_SOURCE_PATH -B $EXAMPLE_BUILD_PATH $BUILD_EXAMPLE_ARG -D${LIB_NAME}_ROOT=$INSTALL_PATH
+    cmake --build $EXAMPLE_BUILD_PATH -j7
+fi
