@@ -88,12 +88,17 @@ set_target_properties(simpleble-c PROPERTIES
 # Configure include directories
 target_include_directories(simpleble PRIVATE ${SIMPLEBLE_PRIVATE_INCLUDES})
 target_include_directories(simpleble-c PRIVATE ${SIMPLEBLE_PRIVATE_INCLUDES})
-target_include_directories(simpleble INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(simpleble-c INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+target_include_directories(simpleble INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+target_include_directories(simpleble-c INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 # Configure linked libraries
-target_link_libraries(simpleble PRIVATE fmt::fmt-header-only)
-target_link_libraries(simpleble-c PRIVATE fmt::fmt-header-only)
+target_link_libraries(simpleble PRIVATE $<BUILD_INTERFACE:fmt::fmt-header-only>)
+target_link_libraries(simpleble-c PRIVATE $<BUILD_INTERFACE:fmt::fmt-header-only>)
 target_link_libraries(simpleble-c PRIVATE simpleble::simpleble)
 
 append_sanitize_options("${SIMPLEBLE_SANITIZE}")
@@ -154,7 +159,9 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
         ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/interfaces/ObjectManager.cpp
     )
 
-    target_link_libraries(simpleble PUBLIC ${DBus1_LIBRARIES} pthread)
+    target_link_libraries(simpleble PUBLIC pthread)
+    target_link_libraries(simpleble PRIVATE ${DBus1_LIBRARIES})
+
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
         ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include
@@ -224,7 +231,30 @@ apply_build_options(simpleble-c
     "${PRIVATE_LINK_OPTIONS}"
     "${PUBLIC_LINK_OPTIONS}")
 
-# Build tests if requested
+include(GNUInstallDirs)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/simpleble.pc.in
+            ${CMAKE_CURRENT_BINARY_DIR}/simpleble.pc @ONLY)
+
+install(
+    TARGETS simpleble ${SIMPLEDBUS_TARGET}
+    EXPORT simpleble-config
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+install(
+    EXPORT simpleble-config
+    NAMESPACE simpleble::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/simpleble)
+
+install(
+    DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/simpleble/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpleble)
+
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/simpleble.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 if(SIMPLEBLE_TEST)
     message(STATUS "Building Tests")
@@ -245,30 +275,3 @@ if(SIMPLEBLE_TEST)
     target_link_libraries(simpleble_test PRIVATE simpleble::simpleble ${GTEST_LIBRARIES})
     target_include_directories(simpleble_test PRIVATE ${GTEST_INCLUDE_DIRS})
 endif()
-
-# Provide installation interface
-
-#     include(GNUInstallDirs)
-
-#     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/simplebluez.pc.in
-#                 ${CMAKE_CURRENT_BINARY_DIR}/simplebluez.pc @ONLY)
-
-#     install(
-#         TARGETS simplebluez ${SIMPLEDBUS_TARGET}
-#         EXPORT simplebluez-config
-#         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-
-#     install(
-#         EXPORT simplebluez-config
-#         NAMESPACE simplebluez::
-#         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/simplebluez)
-
-#     install(
-#         DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/simplebluez/
-#         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simplebluez)
-
-#     install(
-#         FILES ${CMAKE_CURRENT_BINARY_DIR}/simplebluez.pc
-#         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)

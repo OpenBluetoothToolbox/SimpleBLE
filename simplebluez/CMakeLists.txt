@@ -84,13 +84,13 @@ set_target_properties(
 list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEDBUS_LOG_LEVEL=${SIMPLEDBUS_LOG_LEVEL})
 list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLUEZ_LOG_LEVEL=${SIMPLEBLUEZ_LOG_LEVEL})
 
-target_link_libraries(simplebluez
-    PUBLIC ${DBus1_LIBRARIES} pthread
-    PRIVATE fmt::fmt-header-only)
+target_link_libraries(simplebluez PUBLIC ${DBus1_LIBRARIES})
+target_link_libraries(simplebluez PRIVATE $<BUILD_INTERFACE:fmt::fmt-header-only>)
 
-target_include_directories(simplebluez
-    PRIVATE ${SIMPLEBLUEZ_INCLUDE}
-    INTERFACE ${SIMPLEBLUEZ_INCLUDE})
+target_include_directories(simplebluez PRIVATE ${SIMPLEBLUEZ_INCLUDE})
+target_include_directories(simplebluez INTERFACE
+    $<BUILD_INTERFACE:${SIMPLEBLUEZ_INCLUDE}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 append_sanitize_options("${SIMPLEBLUEZ_SANITIZE}")
 
@@ -99,6 +99,35 @@ apply_build_options(simplebluez
     "${PRIVATE_COMPILE_OPTIONS}"
     "${PRIVATE_LINK_OPTIONS}"
     "${PUBLIC_LINK_OPTIONS}")
+
+include(GNUInstallDirs)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/simplebluez.pc.in
+            ${CMAKE_CURRENT_BINARY_DIR}/simplebluez.pc @ONLY)
+
+install(
+    TARGETS simplebluez
+    EXPORT simplebluez-config
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+install(
+    EXPORT simplebluez-config
+    NAMESPACE simplebluez::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/simplebluez)
+
+install(
+    DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/simplebluez/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simplebluez)
+
+install(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include/simpledbus/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpledbus)
+
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/simplebluez.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 if(SIMPLEBLUEZ_TEST)
     find_package(Python3 COMPONENTS Development REQUIRED)
