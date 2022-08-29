@@ -4,4 +4,4 @@ project(EXAMPLE_CONNECT)
 
 message("-- [INFO] Building Example")
 add_executable(example_connect connect.cpp)
-target_link_libraries(example_connect simplebluez::simplebluez)
+target_link_libraries(example_connect simplebluez::simplebluez pthread)

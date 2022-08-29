@@ -1,4 +1,4 @@
-#include <simpledbus/base/Logging.h>
+#include "Logging.h"
 #include <simpledbus/external/logfwd.hpp>
 
 #ifndef SIMPLEBLUEZ_LOG_LEVEL

@@ -1,8 +1,9 @@
 #include <simpledbus/base/Connection.h>
 #include <simpledbus/base/Exceptions.h>
-#include <simpledbus/base/Logging.h>
 #include <chrono>
 #include <thread>
+
+#include "Logging.h"
 
 using namespace SimpleDBus;
 

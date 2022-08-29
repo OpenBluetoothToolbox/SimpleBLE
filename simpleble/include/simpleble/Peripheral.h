@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include <simpleble/export.h>
+
 #include <simpleble/Exceptions.h>
 #include <simpleble/Service.h>
 #include <simpleble/Types.h>
@@ -15,7 +17,7 @@ namespace SimpleBLE {
 
 class PeripheralBase;
 
-class Peripheral {
+class SIMPLEBLE_EXPORT Peripheral {
   public:
     Peripheral() = default;
     virtual ~Peripheral() = default;

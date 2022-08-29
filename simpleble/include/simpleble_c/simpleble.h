@@ -1,5 +1,6 @@
 #pragma once
 
+#include <simpleble/export.h>
 #include <simpleble_c/adapter.h>
 #include <simpleble_c/peripheral.h>
 

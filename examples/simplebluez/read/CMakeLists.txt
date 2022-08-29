@@ -4,4 +4,4 @@ project(EXAMPLE_READ)
 
 message("-- [INFO] Building Example")
 add_executable(example_read read.cpp)
-target_link_libraries(example_read simplebluez::simplebluez)
+target_link_libraries(example_read simplebluez::simplebluez pthread)

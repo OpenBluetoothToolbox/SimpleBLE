@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include <simpleble/export.h>
+
 typedef enum {
     SIMPLEBLE_LOG_LEVEL_NONE = 0,
     SIMPLEBLE_LOG_LEVEL_FATAL,
@@ -27,8 +29,8 @@ typedef void (*simpleble_log_callback_t)(
 extern "C" {
 #endif
 
-void simpleble_logging_set_level(simpleble_log_level_t level);
-void simpleble_logging_set_callback(simpleble_log_callback_t callback);
+void SIMPLEBLE_EXPORT simpleble_logging_set_level(simpleble_log_level_t level);
+void SIMPLEBLE_EXPORT simpleble_logging_set_callback(simpleble_log_callback_t callback);
 
 #ifdef __cplusplus
 }

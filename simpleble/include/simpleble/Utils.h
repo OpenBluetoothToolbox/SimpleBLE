@@ -1,9 +1,11 @@
 #pragma once
 
+#include <simpleble/export.h>
+
 #include <simpleble/Types.h>
 
 namespace SimpleBLE {
 
-OperatingSystem get_operating_system();
+OperatingSystem SIMPLEBLE_EXPORT get_operating_system();
 
 }  // namespace SimpleBLE
