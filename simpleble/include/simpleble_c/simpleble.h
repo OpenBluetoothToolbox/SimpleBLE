@@ -2,6 +2,7 @@
 
 #include <simpleble_c/adapter.h>
 #include <simpleble_c/peripheral.h>
+#include <simpleble/export.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <simpleble/export.h>
+
 #include <simpleble_c/types.h>
 
 #ifdef __cplusplus

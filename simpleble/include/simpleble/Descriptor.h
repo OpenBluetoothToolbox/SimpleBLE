@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <simpleble/export.h>
+
 #include <simpleble/Exceptions.h>
 #include <simpleble/Types.h>
 
@@ -9,7 +11,7 @@ namespace SimpleBLE {
 
 class DescriptorBase;
 
-class Descriptor {
+class SIMPLEBLE_EXPORT Descriptor {
   public:
     Descriptor() = default;
     virtual ~Descriptor() = default;

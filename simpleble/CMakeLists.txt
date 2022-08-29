@@ -14,6 +14,9 @@ project(
 # Run prelude script to set up environment
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
 
+include(GenerateExportHeader)
+include(GNUInstallDirs)
+
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
 find_package(fmt REQUIRED)
 
@@ -73,7 +76,7 @@ set_target_properties(simpleble PROPERTIES
     OUTPUT_NAME simpleble)
 
 set_target_properties(simpleble-c PROPERTIES
-    CXX_VISIBILITY_PRESET hidden
+    C_VISIBILITY_PRESET hidden
     VISIBILITY_INLINES_HIDDEN YES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED YES
@@ -85,6 +88,12 @@ set_target_properties(simpleble-c PROPERTIES
     EXPORT_NAME simpleble-c
     OUTPUT_NAME simpleble-c)
 
+generate_export_header(
+    simpleble
+    BASE_NAME simpleble
+    EXPORT_FILE_NAME export/simpleble/export.h
+)
+
 # Configure include directories
 target_include_directories(simpleble PRIVATE ${SIMPLEBLE_PRIVATE_INCLUDES})
 target_include_directories(simpleble-c PRIVATE ${SIMPLEBLE_PRIVATE_INCLUDES})
@@ -95,6 +104,12 @@ target_include_directories(simpleble INTERFACE
 target_include_directories(simpleble-c INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
+target_include_directories(simpleble SYSTEM PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/export>)
+
+target_include_directories(simpleble-c SYSTEM PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/export>)
 
 # Configure linked libraries
 target_link_libraries(simpleble PRIVATE $<BUILD_INTERFACE:fmt::fmt-header-only>)
@@ -170,6 +185,7 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     #     ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
     #     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include)
 
+    set_property(TARGET simpleble-c PROPERTY INSTALL_RPATH $ORIGIN)
 
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     message(STATUS "Windows Host Detected")
@@ -202,8 +218,6 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     message(STATUS "Darwin Host Detected")
 
-
-
     list(APPEND PRIVATE_COMPILE_OPTIONS -fobjc-arc)
 
     target_link_libraries(simpleble PUBLIC "-framework Foundation" "-framework CoreBluetooth" ObjC)
@@ -214,6 +228,8 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
         ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/AdapterBaseMacOS.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/PeripheralBase.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/PeripheralBaseMacOS.mm)
+
+    set_property(TARGET simpleble-c PROPERTY INSTALL_RPATH @loader_path)
 
 else()
     message(FATAL_ERROR "-- [ERROR] UNSUPPORTED SYSTEM: ${CMAKE_HOST_SYSTEM_NAME} ${CMAKE_SYSTEM_NAME}")
@@ -230,8 +246,6 @@ apply_build_options(simpleble-c
     "${PRIVATE_COMPILE_OPTIONS}"
     "${PRIVATE_LINK_OPTIONS}"
     "${PUBLIC_LINK_OPTIONS}")
-
-include(GNUInstallDirs)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/simpleble.pc.in
             ${CMAKE_CURRENT_BINARY_DIR}/simpleble.pc @ONLY)
@@ -250,6 +264,10 @@ install(
 
 install(
     DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/simpleble/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpleble)
+
+install(
+    DIRECTORY ${PROJECT_BINARY_DIR}/export/simpleble/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpleble)
 
 install(

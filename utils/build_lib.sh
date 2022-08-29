@@ -30,6 +30,10 @@ while (( "$#" )); do
         FLAG_CLEAN=0
         shift
         ;;
+    -s|--shared)
+        FLAG_SHARED=0
+        shift
+        ;;
     -t|--test)
         FLAG_TEST=0
         shift
@@ -104,13 +108,17 @@ if [[ ! -z "$FLAG_TEST" ]]; then
 
 fi
 
+if [[ ! -z "$FLAG_SHARED" ]]; then
+    BUILD_SHARED_ARG="-DBUILD_SHARED_LIBS=ON"
+fi
+
 # If FLAG_CLEAN is set, clean the build directory
 if [[ ! -z "$FLAG_CLEAN" ]]; then
     rm -rf $BUILD_PATH
     rm -rf $EXAMPLE_BUILD_PATH
 fi
 
-cmake -H$SOURCE_PATH -B $BUILD_PATH $BUILD_TEST_ARG $BUILD_SANITIZE_ADDRESS_ARG $BUILD_SANITIZE_THREAD_ARG $EXTRA_BUILD_ARGS
+cmake -H$SOURCE_PATH -B $BUILD_PATH $BUILD_TEST_ARG $BUILD_SANITIZE_ADDRESS_ARG $BUILD_SANITIZE_THREAD_ARG $BUILD_SHARED_ARG $EXTRA_BUILD_ARGS
 cmake --build $BUILD_PATH -j7
 cmake --install $BUILD_PATH --prefix "${INSTALL_PATH}"
 
@@ -122,6 +130,6 @@ else
 fi
 
 if [[ ! -z "$FLAG_EXAMPLE" ]]; then
-    cmake -H$EXAMPLE_SOURCE_PATH -B $EXAMPLE_BUILD_PATH $BUILD_EXAMPLE_ARGS
+    cmake -H$EXAMPLE_SOURCE_PATH -B $EXAMPLE_BUILD_PATH $BUILD_EXAMPLE_ARGS $BUILD_SHARED_ARG
     cmake --build $EXAMPLE_BUILD_PATH -j7
 fi
