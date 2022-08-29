@@ -21,6 +21,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 **Added**
 
 -  Multiple connection example.
+-  Installation interface.
 -  Logger level and callback can now be queried.
 -  Characteristics can now list their descriptors. *(Thanks Symbitic!)*
 -  Peripherals can now read and write characteristic descriptors. *(Thanks Symbitic!)*
@@ -36,6 +37,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  Consumable CMake target is now ``simpleble::simpleble``.
 -  **API CHANGE**: ``BluetoothService`` class was replaced by the ``Service`` class.
 -  Updated CMake minimum version to 3.21
+-  Symbols are now hidden by default.
 
 **Fixed**
 
