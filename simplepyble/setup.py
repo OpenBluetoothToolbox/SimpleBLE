@@ -22,7 +22,7 @@ elif sys.platform.startswith("darwin"):
 # logic and declaration, and simpler if you include description/version in a file.
 setuptools.setup(
     name="simplepyble",
-    version="0.0.6.dev0",  # ! Ensure it matches the intended release version!
+    version="0.0.6.dev1",  # ! Ensure it matches the intended release version!
     author="Kevin Dewald",
     author_email="kevin@dewald.me",
     url="https://github.com/OpenBluetoothToolbox/SimpleBLE",
