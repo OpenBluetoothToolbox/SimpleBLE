@@ -17,12 +17,13 @@ if sys.platform == "win32":
     cmake_options.append("-DCMAKE_SYSTEM_VERSION=10.0.19041.0")
 elif sys.platform.startswith("darwin"):
     cmake_options.append("-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15")
+cmake_options.append(f"-DPYTHON_EXECUTABLE={sys.executable}")
 
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
 setuptools.setup(
     name="simplepyble",
-    version="0.0.6.dev1",  # ! Ensure it matches the intended release version!
+    version="0.0.6.dev2",  # ! Ensure it matches the intended release version!
     author="Kevin Dewald",
     author_email="kevin@dewald.me",
     url="https://github.com/OpenBluetoothToolbox/SimpleBLE",

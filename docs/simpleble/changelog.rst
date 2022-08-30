@@ -37,7 +37,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  Consumable CMake target is now ``simpleble::simpleble``.
 -  **API CHANGE**: ``BluetoothService`` class was replaced by the ``Service`` class.
 -  Updated CMake minimum version to 3.21
--  Symbols are now hidden by default.
+-  Symbols are now hidden by default and use proper export mechanics.
 
 **Fixed**
 
