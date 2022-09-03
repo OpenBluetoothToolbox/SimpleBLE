@@ -37,7 +37,7 @@ setuptools.setup(
             source_dir=here,
             cmake_depends_on=["pybind11"],
             cmake_configure_options=cmake_options,
-            cmake_generator=None if sys.platform == "win32" else "Ninja",
+            cmake_generator=None,
         )
     ],
     cmdclass={
