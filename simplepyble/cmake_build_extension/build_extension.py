@@ -53,37 +53,16 @@ class BuildExtension(build_ext):
         # It overrides the content of the cmake_component option of CMakeExtension.
         self.component = None
 
-        # Initialize the 'no-cmake-extension' custom option.
-        # It allows disabling one or more CMakeExtension from the command line.
-        self.no_cmake_extension = None
-
     def finalize_options(self):
 
         # Parse the custom CMake options and store them in a new attribute
         defines = [] if self.define is None else self.define.split(";")
         self.cmake_defines = [f"-D{define}" for define in defines]
 
-        # Parse the disabled CMakeExtension modules and store them in a new attribute
-        self.no_cmake_extensions = (
-            []
-            if self.no_cmake_extension is None
-            else self.no_cmake_extension.split(";")
-        )
-
         # Call base class
         build_ext.finalize_options(self)
 
     def run(self) -> None:
-        """
-        Process all the registered extensions executing only the CMakeExtension objects.
-        """
-
-        # Filter the CMakeExtension objects
-        cmake_extensions = [e for e in self.extensions if isinstance(e, CMakeExtension)]
-
-        if len(cmake_extensions) == 0:
-            raise ValueError("No CMakeExtension objects found")
-
         # Check that CMake is installed
         if shutil.which("cmake") is None:
             raise RuntimeError("Required command 'cmake' not found")
@@ -92,25 +71,20 @@ class BuildExtension(build_ext):
         if shutil.which("ninja") is None:
             raise RuntimeError("Required command 'ninja' not found")
 
-        for ext in cmake_extensions:
-
-            # Disable the extension if specified in the command line
-            if (
-                ext.name in self.no_cmake_extensions
-                or "all" in self.no_cmake_extensions
-            ):
-                continue
-
-            # Disable all extensions if this env variable is present
-            disabled_set = {"0", "false", "off", "no"}
-            env_var_name = "CMAKE_BUILD_EXTENSION_ENABLED"
-            if (
-                env_var_name in os.environ
-                and os.environ[env_var_name].lower() in disabled_set
-            ):
-                continue
-
+        for ext in self.extensions:
             self.build_extension(ext)
+
+    def __get_msvc_arch(self) -> str:
+        if self.plat_name == "win32":
+            return "Win32"
+        elif self.plat_name == "win-amd64":
+            return "x64"
+        elif self.plat_name == "win-arm32":
+            return "ARM"
+        elif self.plat_name == "win-arm64":
+            return "ARM64"
+        else:
+            raise RuntimeError(f"Unsupported platform: {platform}")
 
     def build_extension(self, ext: CMakeExtension) -> None:
         """
@@ -153,12 +127,12 @@ class BuildExtension(build_ext):
         if ext.cmake_generator is not None:
             configure_args += [f"-G \"{ext.cmake_generator}\""]
 
-        if ext.cmake_generator == "Ninja":
-            # Fix #26: https://github.com/diegoferigo/cmake-build-extension/issues/26
-            configure_args += [f"-DCMAKE_MAKE_PROGRAM={shutil.which('ninja')}"]
+            if ext.cmake_generator == "Ninja":
+                # Fix #26: https://github.com/diegoferigo/cmake-build-extension/issues/26
+                configure_args += [f"-DCMAKE_MAKE_PROGRAM={shutil.which('ninja')}"]
 
         # CMake configure arguments
-        configure_args = [
+        configure_args += [
             f"-DCMAKE_BUILD_TYPE={ext.cmake_build_type}",
             f"-DCMAKE_INSTALL_PREFIX:PATH={cmake_install_prefix}",
         ]
@@ -171,7 +145,7 @@ class BuildExtension(build_ext):
 
         if platform.system() == "Windows":
 
-            configure_args += []
+            configure_args += [f"-A {self.__get_msvc_arch()}"]
 
         elif platform.system() in {"Linux", "Darwin"}:
 
@@ -225,18 +199,16 @@ class BuildExtension(build_ext):
         print("")
         print("==> Configuring:")
         print(f"$ {' '.join(configure_command)}")
+        subprocess.check_call(configure_command)
         print("")
         print("==> Building:")
         print(f"$ {' '.join(build_command)}")
+        subprocess.check_call(build_command)
         print("")
         print("==> Installing:")
         print(f"$ {' '.join(install_command)}")
-        print("")
-
-        # Call CMake
-        subprocess.check_call(configure_command)
-        subprocess.check_call(build_command)
         subprocess.check_call(install_command)
+        print("")
 
         # Write content to the top-level __init__.py
         if ext.write_top_level_init is not None:
