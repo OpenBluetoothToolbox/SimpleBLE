@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/local/bin/bash
 
 # Some portions of this file where inspired from:
 #   https://medium.com/@Drew_Stokes/bash-argument-parsing-54f3b81a6a8f
@@ -126,7 +126,7 @@ cmake --install $BUILD_PATH --prefix "${INSTALL_PATH}"
 if [[ ! -z "$FLAG_LOCAL" ]]; then
     BUILD_EXAMPLE_ARGS="-D${LIB_NAME^^}_LOCAL=ON"
 else
-    BUILD_EXAMPLE_ARGS="-D${LIB_NAME^^}_LOCAL=OFF -D${LIB_NAME}_ROOT=$INSTALL_PATH"
+    BUILD_EXAMPLE_ARGS="-D${LIB_NAME^^}_LOCAL=OFF -D${LIB_NAME}_ROOT=${INSTALL_PATH}"
 fi
 
 if [[ ! -z "$FLAG_EXAMPLE" ]]; then

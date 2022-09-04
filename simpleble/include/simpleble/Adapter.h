@@ -39,6 +39,7 @@ class SIMPLEBLE_EXPORT Adapter {
 
     std::vector<Peripheral> get_paired_peripherals();
 
+    static bool bluetooth_enabled();
     static std::vector<Adapter> get_adapters();
 
   protected:

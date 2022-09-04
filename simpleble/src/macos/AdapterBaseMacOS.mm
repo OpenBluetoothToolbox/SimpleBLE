@@ -1,6 +1,7 @@
 #import "AdapterBaseMacOS.h"
 
 #import <fmt/core.h>
+#import "LoggingInternal.h"
 #import <simpleble/Exceptions.h>
 
 @interface AdapterBaseMacOS () {
@@ -18,6 +19,11 @@
 
 @implementation AdapterBaseMacOS
 
++ (bool) isBluetoothEnabled {
+    CBCentralManager* centralManager = [[CBCentralManager alloc] init];
+    return CBCentralManager.authorization == CBManagerAuthorizationAllowedAlways && centralManager.state == CBManagerStatePoweredOn;
+}
+
 - (instancetype)init:(SimpleBLE::AdapterBase*)adapter {
     self = [super init];
     if (self) {
@@ -26,11 +32,6 @@
         // TODO: Review dispatch_queue attributes to see if there's a better way to handle this.
         _centralManagerQueue = dispatch_queue_create("AdapterBaseMacOS.centralManagerQueue", DISPATCH_QUEUE_SERIAL);
         _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:_centralManagerQueue options:nil];
-
-        // Validate authorization state of the central manager.
-        if (CBCentralManager.authorization != CBManagerAuthorizationAllowedAlways) {
-            throw SimpleBLE::Exception::CoreBluetoothException("Application does not have Bluetooth authorization");
-        }
     }
     return self;
 }
@@ -52,14 +53,20 @@
 }
 
 - (void)scanStart {
-    [self validateCentralManagerState];
-    [self.centralManager scanForPeripheralsWithServices:nil options:@{CBCentralManagerScanOptionAllowDuplicatesKey : @YES}];
-    if (!self.centralManager.isScanning) {
-        throw SimpleBLE::Exception::CoreBluetoothException("Adapter scanning failed to start");
+    if (![AdapterBaseMacOS isBluetoothEnabled]) {
+        SIMPLEBLE_LOG_WARN(fmt::format("Bluetooth is not enabled [{}]", self.centralManager.state));
+        return;
     }
+
+    [self.centralManager scanForPeripheralsWithServices:nil options:@{CBCentralManagerScanOptionAllowDuplicatesKey : @YES}];
 }
 
 - (void)scanStop {
+    if (![AdapterBaseMacOS isBluetoothEnabled]) {
+        SIMPLEBLE_LOG_WARN(fmt::format("Bluetooth is not enabled [{}]", self.centralManager.state));
+        return;
+    }
+
     [self.centralManager stopScan];
 }
 

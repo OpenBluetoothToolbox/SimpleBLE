@@ -6,6 +6,7 @@
 
 #include <chrono>
 #include <thread>
+#include <fmt/core.h>
 
 using namespace SimpleBLE;
 
@@ -22,6 +23,10 @@ AdapterBase::~AdapterBase() {
     // NOTE: This is equivalent to calling [opaque_internal_ release] in Objective-C++.
     AdapterBaseMacOS* internal = (__bridge_transfer AdapterBaseMacOS*)opaque_internal_;
     internal = nil;
+}
+
+bool AdapterBase::bluetooth_enabled() {
+    return [AdapterBaseMacOS isBluetoothEnabled];
 }
 
 std::vector<std::shared_ptr<AdapterBase> > AdapterBase::get_adapters() {

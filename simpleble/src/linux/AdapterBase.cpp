@@ -15,6 +15,10 @@ std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
     return adapter_list;
 }
 
+bool AdapterBase::bluetooth_enabled() {
+    return true; // TODO: Implement
+}
+
 AdapterBase::AdapterBase(std::shared_ptr<SimpleBluez::Adapter> adapter) : adapter_(adapter) {}
 
 AdapterBase::~AdapterBase() { adapter_->clear_on_device_updated(); }

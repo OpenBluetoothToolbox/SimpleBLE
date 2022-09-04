@@ -65,6 +65,10 @@ AdapterBase::~AdapterBase() {
     }
 }
 
+bool AdapterBase::bluetooth_enabled() {
+    return true; // TODO: Implement
+}
+
 std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
     initialize_winrt();
 
