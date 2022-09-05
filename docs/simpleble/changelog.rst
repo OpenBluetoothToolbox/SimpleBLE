@@ -38,6 +38,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  **API CHANGE**: ``BluetoothService`` class was replaced by the ``Service`` class.
 -  Updated CMake minimum version to 3.21
 -  Symbols are now hidden by default and use proper export mechanics.
+-  Logger will print to std::out by default.
+-  (MacOS) Stop throwing exceptions if Bluetooth not enabled. Print warning and no-op instead.
 
 **Fixed**
 
