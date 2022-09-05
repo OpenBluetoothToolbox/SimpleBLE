@@ -71,6 +71,7 @@ PYBIND11_MODULE(simplepyble, m) {
 
     // TODO: Add __str__ and __repr__ methods to Adapter class
     py::class_<SimpleBLE::Adapter>(m, "Adapter")
+        .def("bluetooth_enabled", &SimpleBLE::Adapter::bluetooth_enabled)
         .def("get_adapters", &SimpleBLE::Adapter::get_adapters)
         .def("initialized", &SimpleBLE::Adapter::initialized)
         .def("identifier", &SimpleBLE::Adapter::identifier)

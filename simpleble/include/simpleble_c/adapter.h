@@ -15,6 +15,13 @@ extern "C" {
 /**
  * @brief
  *
+ * @return bool
+ */
+bool SIMPLEBLE_EXPORT simpleble_adapter_is_bluetooth_enabled(void);
+
+/**
+ * @brief
+ *
  * @return size_t
  */
 size_t SIMPLEBLE_EXPORT simpleble_adapter_get_count(void);
