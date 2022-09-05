@@ -17,9 +17,7 @@ std::vector<Adapter> Adapter::get_adapters() {
     return available_adapters;
 }
 
-bool Adapter::bluetooth_enabled() {
-    return AdapterBase::bluetooth_enabled();
-}
+bool Adapter::bluetooth_enabled() { return AdapterBase::bluetooth_enabled(); }
 
 bool Adapter::initialized() const { return internal_ != nullptr; }
 

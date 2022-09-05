@@ -15,7 +15,6 @@ Logger* Logger::get() {
 Logger::Logger() {
     set_callback([](Level level, const std::string& module, const std::string& file, uint32_t line,
                     const std::string& function, const std::string& message) {
-
         std::string level_string;
         switch (level) {
             case Level::VERBOSE:
