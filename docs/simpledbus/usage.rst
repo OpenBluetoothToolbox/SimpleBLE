@@ -66,8 +66,10 @@ and specifying the location from where SimpleDBus should be consumed from. ::
    if(NOT simpledbus_POPULATED)
        FetchContent_Populate(simpledbus)
        list(APPEND CMAKE_MODULE_PATH "${simpledbus_SOURCE_DIR}/cmake/find")
-       add_subdirectory("${simpledbus_SOURCE_DIR}" "${simpledbus_BINARY_DIR}")
+       add_subdirectory("${simpledbus_SOURCE_DIR}/simpledbus" "${simpledbus_BINARY_DIR}")
    endif()
+
+   set(simpledbus_FOUND 1)
 
 You can put this code inside ``Findsimpledbus.cmake`` and add it to your CMake
 module path, as depicted in `cmake-init-fetchcontent`_.

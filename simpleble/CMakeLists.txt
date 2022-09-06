@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
 
-# TODO: There has to be a better way to do this
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
-
 project(
     simpleble
     VERSION 0.5.0 # Make sure this matches the version in the changelog.

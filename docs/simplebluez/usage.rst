@@ -66,8 +66,10 @@ and specifying the location from where SimpleBluez should be consumed from. ::
    if(NOT simplebluez_POPULATED)
        FetchContent_Populate(simplebluez)
        list(APPEND CMAKE_MODULE_PATH "${simplebluez_SOURCE_DIR}/cmake/find")
-       add_subdirectory("${simplebluez_SOURCE_DIR}" "${simplebluez_BINARY_DIR}")
+       add_subdirectory("${simplebluez_SOURCE_DIR}/simplebluez" "${simplebluez_BINARY_DIR}")
    endif()
+
+   set(simplebluez_FOUND 1)
 
 You can put this code inside ``Findsimplebluez.cmake`` and add it to your CMake
 module path, as depicted in `cmake-init-fetchcontent`_.
