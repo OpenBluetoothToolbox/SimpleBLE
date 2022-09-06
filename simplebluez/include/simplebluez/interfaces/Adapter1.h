@@ -23,12 +23,10 @@ class Adapter1 : public SimpleDBus::Interface {
 
     // ----- PROPERTIES -----
     bool Discovering(bool refresh = true);
+    bool Powered(bool refresh = true);
     std::string Address();
 
   protected:
-    bool _discovering;
-    std::string _address;
-
     void property_changed(std::string option_name) override;
 };
 

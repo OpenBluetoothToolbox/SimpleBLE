@@ -16,7 +16,17 @@ std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
 }
 
 bool AdapterBase::bluetooth_enabled() {
-    return true;  // TODO: Implement
+    bool enabled = false;
+
+    auto internal_adapters = Bluez::get()->bluez.get_adapters();
+    for (auto& adapter : internal_adapters) {
+        if (adapter->powered()) {
+            enabled = true;
+            break;
+        }
+    }
+
+    return enabled;
 }
 
 AdapterBase::AdapterBase(std::shared_ptr<SimpleBluez::Adapter> adapter) : adapter_(adapter) {}
