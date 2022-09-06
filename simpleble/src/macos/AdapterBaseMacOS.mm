@@ -53,20 +53,10 @@
 }
 
 - (void)scanStart {
-    if (![AdapterBaseMacOS isBluetoothEnabled]) {
-        SIMPLEBLE_LOG_WARN(fmt::format("Bluetooth is not enabled [{}]", self.centralManager.state));
-        return;
-    }
-
     [self.centralManager scanForPeripheralsWithServices:nil options:@{CBCentralManagerScanOptionAllowDuplicatesKey : @YES}];
 }
 
 - (void)scanStop {
-    if (![AdapterBaseMacOS isBluetoothEnabled]) {
-        SIMPLEBLE_LOG_WARN(fmt::format("Bluetooth is not enabled [{}]", self.centralManager.state));
-        return;
-    }
-
     [self.centralManager stopScan];
 }
 

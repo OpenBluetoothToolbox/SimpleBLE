@@ -3,6 +3,8 @@
 #include "simpleble/Adapter.h"
 
 int main() {
+    std::cout << "Bluetooth enabled: " << SimpleBLE::Adapter::bluetooth_enabled() << std::endl;
+
     auto adapter_list = SimpleBLE::Adapter::get_adapters();
 
     if (adapter_list.empty()) {

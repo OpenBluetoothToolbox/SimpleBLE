@@ -17,6 +17,12 @@
 namespace SimpleBLE {
 
 void initialize_winrt() {
+    static bool initialized = false;
+
+    if (initialized) {
+        return;
+    }
+
     // Attempt to initialize the WinRT backend if not already set.
     int32_t cotype, qualifier;
     WINRT_IMPL_CoGetApartmentType(&cotype, &qualifier);
