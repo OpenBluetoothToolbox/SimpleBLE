@@ -6,6 +6,7 @@
 
 #include <chrono>
 #include <thread>
+#include <fmt/core.h>
 
 using namespace SimpleBLE;
 
@@ -22,6 +23,10 @@ AdapterBase::~AdapterBase() {
     // NOTE: This is equivalent to calling [opaque_internal_ release] in Objective-C++.
     AdapterBaseMacOS* internal = (__bridge_transfer AdapterBaseMacOS*)opaque_internal_;
     internal = nil;
+}
+
+bool AdapterBase::bluetooth_enabled() {
+    return [AdapterBaseMacOS isBluetoothEnabled];
 }
 
 std::vector<std::shared_ptr<AdapterBase> > AdapterBase::get_adapters() {
@@ -48,6 +53,11 @@ BluetoothAddress AdapterBase::address() { return "00:00:00:00:00:00"; }
 void AdapterBase::scan_start() {
     this->seen_peripherals_.clear();
 
+    if (!bluetooth_enabled()) {
+        SIMPLEBLE_LOG_WARN(fmt::format("Bluetooth is not enabled."));
+        return;
+    }
+
     AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)opaque_internal_;
     [internal scanStart];
 
@@ -55,6 +65,11 @@ void AdapterBase::scan_start() {
 }
 
 void AdapterBase::scan_stop() {
+    if (!bluetooth_enabled()) {
+        SIMPLEBLE_LOG_WARN(fmt::format("Bluetooth is not enabled."));
+        return;
+    }
+
     AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)opaque_internal_;
     [internal scanStop];
 
@@ -62,6 +77,11 @@ void AdapterBase::scan_stop() {
 }
 
 void AdapterBase::scan_for(int timeout_ms) {
+    if (!bluetooth_enabled()) {
+        SIMPLEBLE_LOG_WARN(fmt::format("Bluetooth is not enabled."));
+        return;
+    }
+
     this->scan_start();
     std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
     this->scan_stop();

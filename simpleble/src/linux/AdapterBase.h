@@ -40,6 +40,7 @@ class AdapterBase {
 
     std::vector<Peripheral> get_paired_peripherals();
 
+    static bool bluetooth_enabled();
     static std::vector<std::shared_ptr<AdapterBase>> get_adapters();
 
   private:

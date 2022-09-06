@@ -25,6 +25,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  Logger level and callback can now be queried.
 -  Characteristics can now list their descriptors. *(Thanks Symbitic!)*
 -  Peripherals can now read and write characteristic descriptors. *(Thanks Symbitic!)*
+-  Adapter object can now be queried to see if Bluetooth is enabled.
 -  (Windows) WinRT exception handling.
 -  (Windows) Accessor function to underlying OS objects of ``Adapter`` and ``Peripheral``.
 -  (MacOS) Failures will now throw corresponding exception.
@@ -38,6 +39,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  **API CHANGE**: ``BluetoothService`` class was replaced by the ``Service`` class.
 -  Updated CMake minimum version to 3.21
 -  Symbols are now hidden by default and use proper export mechanics.
+-  Logger will print to std::out by default.
+-  (MacOS) Stop throwing exceptions if Bluetooth not enabled. Print warning and no-op instead.
 
 **Fixed**
 

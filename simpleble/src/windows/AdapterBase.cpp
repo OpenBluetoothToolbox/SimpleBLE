@@ -65,6 +65,29 @@ AdapterBase::~AdapterBase() {
     }
 }
 
+bool AdapterBase::bluetooth_enabled() {
+    initialize_winrt();
+
+    bool enabled = false;
+    auto radio_collection = async_get(Radio::GetRadiosAsync());
+    for (uint32_t i = 0; i < radio_collection.Size(); i++) {
+        auto radio = radio_collection.GetAt(i);
+
+        // Skip non-bluetooth radios
+        if (radio.Kind() != RadioKind::Bluetooth) {
+            continue;
+        }
+
+        // Assume that bluetooth is enabled if any of the radios are enabled
+        if (radio.State() == RadioState::On) {
+            enabled = true;
+            break;
+        }
+    }
+
+    return enabled;
+}
+
 std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
     initialize_winrt();
 
@@ -89,6 +112,11 @@ BluetoothAddress AdapterBase::address() { return _mac_address_to_str(adapter_.Bl
 void AdapterBase::scan_start() {
     this->seen_peripherals_.clear();
 
+    if (!bluetooth_enabled()) {
+        SIMPLEBLE_LOG_WARN(fmt::format("Bluetooth is not enabled."));
+        return;
+    }
+
     scanner_.ScanningMode(Advertisement::BluetoothLEScanningMode::Active);
     scan_is_active_ = true;
     scanner_.Start();
@@ -97,6 +125,11 @@ void AdapterBase::scan_start() {
 }
 
 void AdapterBase::scan_stop() {
+    if (!bluetooth_enabled()) {
+        SIMPLEBLE_LOG_WARN(fmt::format("Bluetooth is not enabled."));
+        return;
+    }
+
     scanner_.Stop();
 
     std::unique_lock<std::mutex> lock(scan_stop_mutex_);
@@ -109,6 +142,11 @@ void AdapterBase::scan_stop() {
 }
 
 void AdapterBase::scan_for(int timeout_ms) {
+    if (!bluetooth_enabled()) {
+        SIMPLEBLE_LOG_WARN(fmt::format("Bluetooth is not enabled."));
+        return;
+    }
+
     scan_start();
     std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
     scan_stop();

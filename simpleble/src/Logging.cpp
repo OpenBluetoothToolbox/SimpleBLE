@@ -12,7 +12,36 @@ Logger* Logger::get() {
     return &instance;
 }
 
-Logger::Logger() {}
+Logger::Logger() {
+    set_callback([](Level level, const std::string& module, const std::string& file, uint32_t line,
+                    const std::string& function, const std::string& message) {
+        std::string level_string;
+        switch (level) {
+            case Level::VERBOSE:
+                level_string = "VERBOSE";
+                break;
+            case Level::DEBUG:
+                level_string = "DEBUG";
+                break;
+            case Level::INFO:
+                level_string = "INFO";
+                break;
+            case Level::WARN:
+                level_string = "WARNING";
+                break;
+            case Level::ERROR:
+                level_string = "ERROR";
+                break;
+            case Level::FATAL:
+                level_string = "FATAL";
+                break;
+            case Level::NONE:
+                return;
+        }
+
+        fmt::print("{} [{}] {}:{} {} - {}\n", level_string, module, file, line, function, message);
+    });
+}
 
 Logger::~Logger() {}
 

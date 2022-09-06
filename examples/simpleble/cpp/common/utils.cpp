@@ -29,6 +29,11 @@ std::optional<std::size_t> Utils::getUserInputInt(const std::string& line, std::
 }
 
 std::optional<SimpleBLE::Adapter> Utils::getAdapter() {
+    if (!SimpleBLE::Adapter::bluetooth_enabled()) {
+        std::cout << "Bluetooth is not enabled!" << std::endl;
+        return {};
+    }
+
     auto adapter_list = SimpleBLE::Adapter::get_adapters();
 
     // no adapter found

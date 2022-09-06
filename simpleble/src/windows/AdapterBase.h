@@ -21,6 +21,7 @@
 
 using namespace winrt::Windows;
 using namespace winrt::Windows::Devices::Bluetooth;
+using namespace winrt::Windows::Devices::Radios;
 
 namespace SimpleBLE {
 
@@ -47,6 +48,7 @@ class AdapterBase {
 
     std::vector<Peripheral> get_paired_peripherals();
 
+    static bool bluetooth_enabled();
     static std::vector<std::shared_ptr<AdapterBase>> get_adapters();
 
   private:

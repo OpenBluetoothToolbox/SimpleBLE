@@ -64,6 +64,15 @@ bool Adapter1::Discovering(bool refresh) {
     return _properties["Discovering"].get_boolean();
 }
 
+bool Adapter1::Powered(bool refresh) {
+    if (refresh) {
+        property_refresh("Powered");
+    }
+
+    std::scoped_lock lock(_property_update_mutex);
+    return _properties["Powered"].get_boolean();
+}
+
 std::string Adapter1::Address() {
     std::scoped_lock lock(_property_update_mutex);
     return _properties["Address"].get_string();

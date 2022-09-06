@@ -15,6 +15,20 @@ std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
     return adapter_list;
 }
 
+bool AdapterBase::bluetooth_enabled() {
+    bool enabled = false;
+
+    auto internal_adapters = Bluez::get()->bluez.get_adapters();
+    for (auto& adapter : internal_adapters) {
+        if (adapter->powered()) {
+            enabled = true;
+            break;
+        }
+    }
+
+    return enabled;
+}
+
 AdapterBase::AdapterBase(std::shared_ptr<SimpleBluez::Adapter> adapter) : adapter_(adapter) {}
 
 AdapterBase::~AdapterBase() { adapter_->clear_on_device_updated(); }
@@ -26,10 +40,14 @@ std::string AdapterBase::identifier() { return adapter_->identifier(); }
 BluetoothAddress AdapterBase::address() { return adapter_->address(); }
 
 void AdapterBase::scan_start() {
-    adapter_->discovery_filter(SimpleBluez::Adapter::DiscoveryFilter::LE);
-
     seen_peripherals_.clear();
 
+    if (!bluetooth_enabled()) {
+        SIMPLEBLE_LOG_WARN(fmt::format("Bluetooth is not enabled."));
+        return;
+    }
+
+    adapter_->discovery_filter(SimpleBluez::Adapter::DiscoveryFilter::LE);
     adapter_->set_on_device_updated([this](std::shared_ptr<SimpleBluez::Device> device) {
         if (!this->is_scanning_) {
             return;
@@ -64,6 +82,11 @@ void AdapterBase::scan_start() {
 }
 
 void AdapterBase::scan_stop() {
+    if (!bluetooth_enabled()) {
+        SIMPLEBLE_LOG_WARN(fmt::format("Bluetooth is not enabled."));
+        return;
+    }
+
     adapter_->discovery_stop();
     is_scanning_ = false;
     SAFE_CALLBACK_CALL(this->callback_on_scan_stop_);
@@ -74,6 +97,11 @@ void AdapterBase::scan_stop() {
 }
 
 void AdapterBase::scan_for(int timeout_ms) {
+    if (!bluetooth_enabled()) {
+        SIMPLEBLE_LOG_WARN(fmt::format("Bluetooth is not enabled."));
+        return;
+    }
+
     scan_start();
     std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
     scan_stop();
