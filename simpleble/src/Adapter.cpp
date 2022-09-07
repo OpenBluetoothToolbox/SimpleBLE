@@ -2,6 +2,7 @@
 
 #include "AdapterBase.h"
 #include "AdapterBuilder.h"
+#include "LoggingInternal.h"
 
 using namespace SimpleBLE;
 
@@ -17,7 +18,7 @@ std::vector<Adapter> Adapter::get_adapters() {
     return available_adapters;
 }
 
-bool Adapter::bluetooth_enabled() {
+bool Adapter::bluetooth_enabled() noexcept {
     try {
         return AdapterBase::bluetooth_enabled();
     } catch (const std::exception& e) {
