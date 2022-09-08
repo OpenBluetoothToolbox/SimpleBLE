@@ -19,9 +19,8 @@
 
 @implementation AdapterBaseMacOS
 
-+ (bool) isBluetoothEnabled {
-    CBCentralManager* centralManager = [[CBCentralManager alloc] init];
-    return CBCentralManager.authorization == CBManagerAuthorizationAllowedAlways && centralManager.state == CBManagerStatePoweredOn;
+- (bool) isBluetoothEnabled {
+    return CBCentralManager.authorization == CBManagerAuthorizationAllowedAlways && _centralManager.state == CBManagerStatePoweredOn;
 }
 
 - (instancetype)init:(SimpleBLE::AdapterBase*)adapter {
@@ -32,6 +31,12 @@
         // TODO: Review dispatch_queue attributes to see if there's a better way to handle this.
         _centralManagerQueue = dispatch_queue_create("AdapterBaseMacOS.centralManagerQueue", DISPATCH_QUEUE_SERIAL);
         _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:_centralManagerQueue options:nil];
+
+        // Wait for the central manager state to be updated for up to 5 seconds.
+        NSDate* endDate = [NSDate dateWithTimeInterval:5.0 sinceDate:NSDate.now];
+        while (_centralManager.state == CBManagerStateUnknown && [NSDate.now compare:endDate] == NSOrderedAscending) {
+            [NSThread sleepForTimeInterval:0.01];
+        }
     }
     return self;
 }

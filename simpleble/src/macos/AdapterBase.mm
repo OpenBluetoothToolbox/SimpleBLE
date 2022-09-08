@@ -26,7 +26,13 @@ AdapterBase::~AdapterBase() {
 }
 
 bool AdapterBase::bluetooth_enabled() {
-    return [AdapterBaseMacOS isBluetoothEnabled];
+    // Because CBCentralManager requires an instance of an object to properly operate,
+    // we'll fabricate a local AdapterBase object and query it's internal AdapterBaseMacOS
+    // to see if Bluetooth is enabled.
+    // TODO: Find a better alternative for this.
+    AdapterBase adapter;
+    AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)adapter.opaque_internal_;
+    return [internal isBluetoothEnabled];
 }
 
 std::vector<std::shared_ptr<AdapterBase> > AdapterBase::get_adapters() {

@@ -8,7 +8,7 @@
 
 @interface AdapterBaseMacOS : NSObject<CBCentralManagerDelegate>
 
-+ (bool)isBluetoothEnabled;
+- (bool)isBluetoothEnabled;
 
 - (instancetype)init:(SimpleBLE::AdapterBase*)adapter;
 
