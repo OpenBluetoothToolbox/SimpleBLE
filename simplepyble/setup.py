@@ -23,7 +23,7 @@ cmake_options.append(f"-DPYTHON_EXECUTABLE={sys.executable}")
 # logic and declaration, and simpler if you include description/version in a file.
 setuptools.setup(
     name="simplepyble",
-    version="0.0.6.dev3",  # ! Ensure it matches the intended release version!
+    version="0.0.6.dev4",  # ! Ensure it matches the intended release version!
     author="Kevin Dewald",
     author_email="kevin@dewald.me",
     url="https://github.com/OpenBluetoothToolbox/SimpleBLE",
