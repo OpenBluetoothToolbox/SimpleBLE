@@ -41,6 +41,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  Symbols are now hidden by default and use proper export mechanics.
 -  Logger will print to std::out by default.
 -  (MacOS) Stop throwing exceptions if Bluetooth not enabled. Print warning and no-op instead.
+-  (Linux) Default scanning behavior switched to all devices.
 
 **Fixed**
 
