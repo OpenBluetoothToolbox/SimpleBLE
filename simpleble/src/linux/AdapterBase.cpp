@@ -47,7 +47,6 @@ void AdapterBase::scan_start() {
         return;
     }
 
-    adapter_->discovery_filter(SimpleBluez::Adapter::DiscoveryFilter::LE);
     adapter_->set_on_device_updated([this](std::shared_ptr<SimpleBluez::Device> device) {
         if (!this->is_scanning_) {
             return;

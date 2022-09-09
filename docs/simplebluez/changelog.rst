@@ -15,6 +15,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 **Added**
 
 -  Support for characteristic descriptors. *(Thanks Symbitic!)*
+-  Full support for all discovery filters. *(Thanks Symbitic!)*
 
 **Changed**
 

@@ -57,7 +57,9 @@ int main(int argc, char* argv[]) {
     auto adapter = adapters[selection];
     std::cout << "Scanning " << adapter->identifier() << " [" << adapter->address() << "]" << std::endl;
 
-    adapter->discovery_filter(SimpleBluez::Adapter::DiscoveryFilter::LE);
+    SimpleBluez::Adapter::DiscoveryFilter filter;
+    filter.Transport = SimpleBluez::Adapter::DiscoveryFilter::TransportType::LE;
+    adapter->discovery_filter(filter);
 
     adapter->set_on_device_updated([](std::shared_ptr<SimpleBluez::Device> device) {
         if (device->name() == "") {
