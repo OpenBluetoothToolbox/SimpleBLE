@@ -54,6 +54,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  (Linux) Failure to set agent would trigger a crash.
 -  (Linux) Spurious disconnection events during connection retries have been fully removed.
 -  (Linux) Exceptions thrown during the deletion phase of a peripheral would not be captured.
+-  (Linux) Characteristic cleanup function has been made exception-safe.
 
 
 [0.4.0] - 2022-06-12

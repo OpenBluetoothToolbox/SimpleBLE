@@ -8,6 +8,7 @@
 #include <simplebluez/Exceptions.h>
 #include <algorithm>
 #include "CommonUtils.h"
+#include "LoggingInternal.h"
 
 #include "Bluez.h"
 
@@ -24,13 +25,7 @@ PeripheralBase::PeripheralBase(std::shared_ptr<SimpleBluez::Device> device,
 PeripheralBase::~PeripheralBase() {
     device_->clear_on_disconnected();
     device_->clear_on_services_resolved();
-
-    try {
-        _cleanup_characteristics();
-    } catch (...) {
-        // It's possible during the cleanup process that the Bluez device has already
-        // been removed, which could cause calls to cleanup methods to throw.
-    }
+    _cleanup_characteristics();
 }
 
 void* PeripheralBase::underlying() const { return device_.get(); }
@@ -246,27 +241,42 @@ void PeripheralBase::set_callback_on_disconnected(std::function<void()> on_disco
 
 // Private methods
 
-void PeripheralBase::_cleanup_characteristics() {
-    // Clear all callbacks first to ensure that a failure during `stop_notify`
-    // does not leave any dangling callbacks.
-
-    if (device_->has_battery_interface()) {
-        device_->clear_on_battery_percentage_changed();
-    }
-
-    for (auto bluez_service : device_->services()) {
-        for (auto bluez_characteristic : bluez_service->characteristics()) {
-            bluez_characteristic->clear_on_value_changed();
+void PeripheralBase::_cleanup_characteristics() noexcept {
+    // As this method can be called in multiple stages of a disconnection or object
+    // destruction, the entire execution of this method is wrapped in a try-catch
+    // block to prevent any exceptions from being thrown, as these will most certainly
+    // crash the user application.
+    try {
+        // Clear all callbacks first to ensure that a failure during `stop_notify`
+        // does not leave any dangling callbacks.
+        if (device_->has_battery_interface()) {
+            device_->clear_on_battery_percentage_changed();
         }
-    }
 
-    // Stop notifying all characteristics.
-    for (auto bluez_service : device_->services()) {
-        for (auto bluez_characteristic : bluez_service->characteristics()) {
-            if (bluez_characteristic->notifying()) {
-                bluez_characteristic->stop_notify();
+        for (auto bluez_service : device_->services()) {
+            for (auto bluez_characteristic : bluez_service->characteristics()) {
+                bluez_characteristic->clear_on_value_changed();
             }
         }
+
+        // Stop notifying all characteristics.
+        for (auto bluez_service : device_->services()) {
+            for (auto bluez_characteristic : bluez_service->characteristics()) {
+                try {
+                    if (bluez_characteristic->notifying()) {
+                        bluez_characteristic->stop_notify();
+                    }
+                } catch (std::exception const& e) {
+                    SIMPLEBLE_LOG_WARN(fmt::format("Exception during characteristic cleanup: {}", e.what()));
+                }
+            }
+        }
+    } catch (std::exception const& e) {
+        SIMPLEBLE_LOG_WARN(fmt::format("Exception during characteristic cleanup: {}", e.what()));
+    } catch (...) {
+        // It's possible during the cleanup process that the Bluez device has already
+        // been removed, which could cause calls to cleanup methods to throw.
+        SIMPLEBLE_LOG_WARN("Unknown exception during characteristic cleanup");
     }
 }
 

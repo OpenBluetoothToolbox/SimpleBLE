@@ -69,7 +69,7 @@ class PeripheralBase {
 
     bool _attempt_connect();
     bool _attempt_disconnect();
-    void _cleanup_characteristics();
+    void _cleanup_characteristics() noexcept;
 
     std::shared_ptr<SimpleBluez::Characteristic> _get_characteristic(BluetoothUUID const& service_uuid,
                                                                      BluetoothUUID const& characteristic_uuid);
