@@ -39,6 +39,13 @@ Windows     Linux         MacOS                               iOS
 Windows 10+ Ubuntu 20.04+ 10.15+ (except 12.0, 12.1 and 12.2) 15.0+
 =========== ============= =================================== =====
 
+Projects using SimpleBLE
+------------------------
+Don't forget to check out the following projects using SimpleBLE:
+
+* `GDSimpleBLE`_
+* `BrainFlow`_
+
 Contributing
 ------------
 Pull requests are welcome. For major changes, please open an issue first to discuss
@@ -62,3 +69,8 @@ external creators, are licensed under the terms of the `MIT Licence`_.
 
 .. |Latest Documentation Status| image:: https://readthedocs.org/projects/simpleble/badge?version=latest
    :target: http://simpleble.readthedocs.org/en/latest
+
+.. Other projects using SimpleBLE
+
+.. _GDSimpleBLE: https://github.com/jferdelyi/GDSimpleBLE
+.. _BrainFlow: https://github.com/brainflow-dev/brainflow
