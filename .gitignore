@@ -2,6 +2,7 @@
 *.binlog
 .DS_Store
 docs/_build
+docs/_doxygen
 /build_*
 
 __pycache__

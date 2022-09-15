@@ -29,6 +29,7 @@ SimpleBLE / SimpleBluez / SimpleDBus
 #. Review/update the version number in the following files:
 
    - ``<project>/CMakeLists.txt``
+   - ``<project>/docs/Doxyfile``
 
 #. Commit the changes to the repository.
 
