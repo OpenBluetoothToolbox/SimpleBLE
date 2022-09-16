@@ -23,6 +23,7 @@ Table of Contents
    :caption: SimpleBLE
 
    simpleble/usage
+   simpleble/tutorial
    simpleble/api
 
 .. toctree::
