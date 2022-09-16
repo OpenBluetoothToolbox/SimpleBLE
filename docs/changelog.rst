@@ -29,6 +29,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  (Windows) WinRT exception handling.
 -  (Windows) Accessor function to underlying OS objects of ``Adapter`` and ``Peripheral``.
 -  (MacOS) Failures will now throw corresponding exception.
+-  (SimpleBluez) Support for characteristic descriptors. *(Thanks Symbitic!)*
+-  (SimpleBluez) Full support for all discovery filters. *(Thanks Symbitic!)*
 
 **Changed**
 
@@ -55,6 +57,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  (Linux) Spurious disconnection events during connection retries have been fully removed.
 -  (Linux) Exceptions thrown during the deletion phase of a peripheral would not be captured.
 -  (Linux) Characteristic cleanup function has been made exception-safe.
+-  (SimpleBluez) Accessing the ``Paired`` property of ``Device1`` would only use the cached value.
 
 
 [0.4.0] - 2022-06-12
@@ -69,6 +72,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  Function to validate whether an ``Adapter`` or ``Peripheral`` object is initialized.
 -  Logging hooks to capture logs from SimpleBLE and internal components.
 -  Accessor function to underlying OS objects of ``Adapter`` and ``Peripheral``.
+-  (Python) Python's Global Interpreter Lock (GIL) will be released during ``Peripheral.connect()``.
+-  (Python) Keep-alive policies for function objects passed into SimplePyBLE.
 
 **Changed**
 
@@ -126,6 +131,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  (Linux) Returned characteristic value would be empty or outdated. *(Thanks ptenbrock!)*
 -  (MacOS) Fixed a bunch of memory leaks and enabled automatic reference counting.
 -  (MacOS) Fixed race condition.
+-  (Python) ``write_request`` and ``write_command`` functions would accept strings instead of bytes as payloads. *(Thanks kaedenbrinkman!)*
 
 **Changed**
 
