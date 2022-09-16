@@ -12,9 +12,6 @@
 @property(strong) dispatch_queue_t centralManagerQueue;
 @property(strong) CBCentralManager* centralManager;
 
-// Private methods
-- (void)validateCentralManagerState;
-
 @end
 
 @implementation AdapterBaseMacOS
@@ -43,18 +40,6 @@
 
 - (void*)underlying {
     return (__bridge void*)self.centralManager;
-}
-
-- (void)validateCentralManagerState {
-    // Validate the central manager state by checking if it is powered on for up to 5 seconds.
-    NSDate* endDate = [NSDate dateWithTimeInterval:5.0 sinceDate:NSDate.now];
-    while (self.centralManager.state != CBManagerStatePoweredOn && [NSDate.now compare:endDate] == NSOrderedAscending) {
-        [NSThread sleepForTimeInterval:0.01];
-    }
-
-    if (self.centralManager.state != CBManagerStatePoweredOn) {
-        throw SimpleBLE::Exception::CoreBluetoothException(fmt::format("Bluetooth is not enabled [{}]", self.centralManager.state));
-    }
 }
 
 - (void)scanStart {
