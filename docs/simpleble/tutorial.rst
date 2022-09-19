@@ -4,6 +4,21 @@ Tutorial
 
 More coming soon, I swear. :P
 
+Getting Started
+===============
+
+Your first step towards using SimpleBLE is to download and install the library
+following the instructions in the `usage <usage.html>`_ page. Once you have
+installed the library, you need to understand a few basic concepts about how
+SimpleBLE is organized.
+
+In SimpleBLE, everything revolves around two main object types: An ``Adapter``
+representing a physical Bluetooth adapter, and a ``Peripheral`` representing the
+Bluetooth device you are communicating with.
+
+Your entry point to any interaction is the ``Adapter::get_adapters`` function,
+which returns a list of all available Bluetooth adapters.
+
 Examples
 ========
 
