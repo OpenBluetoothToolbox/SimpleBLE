@@ -9,14 +9,10 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [0.5.0] - 2022-XX-XX
 --------------------
 
-**Important:** From this version onwards, the CMake target that should be consumed
-               by downstream projects is ``simpleble::simpleble``.
-
-**Important:** This version includes a breaking API change in the enumeration of
-               services and characteristics.
-
-**Important:** This version has brought in the files from SimpleBluez and SimpleDBus
-               into the repository as subpackages.
+**Important:**
+ -  From this version onwards, the CMake target that should be consumed by downstream projects is ``simpleble::simpleble``.
+ -  This version includes a breaking API change in the enumeration of services and characteristics.
+ -  This version has brought in the files from SimpleBluez and SimpleDBus into the repository as subpackages.
 
 **Added**
 
