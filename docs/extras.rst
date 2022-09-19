@@ -24,6 +24,7 @@ performed:
 #. Review/update the version number in the following files:
 
    - ``<project>/CMakeLists.txt``
+   - ``<project>/docs/Doxyfile``
    - ``simplepyble/setup.py``
    - ``simplepyble/src/main.cpp``
 
@@ -40,6 +41,7 @@ performed:
 #. Advance the version number in the following files:
 
    - ``<project>/CMakeLists.txt``
+   - ``<project>/docs/Doxyfile``
    - ``docs/changelog.rst``
    - ``simplepyble/setup.py``
    - ``simplepyble/src/main.cpp``

@@ -6,6 +6,9 @@ The following notes provide an overview of the architecture of some of
 the higher-level classes in the library, as to facilitate their
 understanding.
 
+.. .. autodoxygenindex::
+..    :project: simpleble
+
 Concurrency
 -----------
 
@@ -59,4 +62,3 @@ Layers and their responsibilities
       allowing access to private methods during the build process.
 
 .. Links
-
