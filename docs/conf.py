@@ -56,4 +56,3 @@ html_static_path = ['_static']
 
 # -- Extension configuration -------------------------------------------------
 breathe_projects = { 'simpleble': '_doxygen/xml' }
-breathe_default_project = "simpleble"
