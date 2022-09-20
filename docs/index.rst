@@ -15,6 +15,7 @@ Table of Contents
    :caption: General
 
    overview
+   changelog
    extras
 
 .. toctree::
@@ -22,8 +23,9 @@ Table of Contents
    :caption: SimpleBLE
 
    simpleble/usage
+   simpleble/tutorial
    simpleble/api
-   simpleble/changelog
+   simpleble/faq
 
 .. toctree::
    :maxdepth: 2
@@ -31,7 +33,6 @@ Table of Contents
 
    simplepyble/usage
    simplepyble/api
-   simplepyble/changelog
 
 .. toctree::
    :maxdepth: 2
@@ -39,7 +40,6 @@ Table of Contents
 
    simplebluez/usage
    simplebluez/api
-   simplebluez/changelog
 
 .. toctree::
    :maxdepth: 2
@@ -47,7 +47,6 @@ Table of Contents
 
    simpledbus/usage
    simpledbus/api
-   simpledbus/changelog
 
 Indices and tables
 ==================
