@@ -25,6 +25,7 @@ Table of Contents
    simpleble/usage
    simpleble/tutorial
    simpleble/api
+   simpleble/faq
 
 .. toctree::
    :maxdepth: 2

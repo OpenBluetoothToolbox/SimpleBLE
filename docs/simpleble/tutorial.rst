@@ -2,9 +2,9 @@
 Tutorial
 ========
 
-More coming soon, I swear. :P
+In this page you'll find all the information you need to get up and running with SimpleBLE.
 
-Getting Started
+Getting started
 ===============
 
 Your first step towards using SimpleBLE is to download and install the library
@@ -12,15 +12,35 @@ following the instructions in the `usage <usage.html>`_ page. Once you have
 installed the library, you need to understand a few basic concepts about how
 SimpleBLE is organized.
 
-In SimpleBLE, everything revolves around two main object types: An ``Adapter``
-representing a physical Bluetooth adapter, and a ``Peripheral`` representing the
-Bluetooth device you are communicating with.
+To access all classes provided by SimpleBLE, you can go the easy route and
+include everything with just one single header file::
 
-Your entry point to any interaction is the ``Adapter::get_adapters`` function,
-which returns a list of all available Bluetooth adapters.
+   #include <simpleble/SimpleBLE.h>
 
-Examples
-========
+In SimpleBLE, everything revolves around two main object types: A :cpp:class:`SimpleBLE::Adapter`
+representing a physical Bluetooth adapter, and a :cpp:class:`SimpleBLE::Peripheral` representing the
+Bluetooth device you are communicating with. If you wish to be more specific and
+only consume what you need, you have the following list of headers available.
+Take into account that each header file will automatically include the ones
+underneath in the list. ::
+
+   #include <simpleble/Adapter.h>
+   #include <simpleble/Peripheral.h>
+   #include <simpleble/Service.h>
+   #include <simpleble/Characteristic.h>
+   #include <simpleble/Descriptor.h>
+
+One you have the correct header files included, you have two functions that should
+act as a starting point for every program. The first one is :cpp:func:`SimpleBLE::Adapter::bluetooth_enabled()`,
+which will let you know if Bluetooth is enabled and permissions have been given
+to the running app. The second one is :cpp:func:`SimpleBLE::Adapter::get_adapters()`, which
+will provide a list of all available adapters that can be used.
+
+.. note::
+   **More coming soon, I swear. :P**
+
+Learn by example
+================
 
 To learn how to use SimpleBLE, please refer to the `examples`_ provided
 in the repository. Those examples named with a ``_c`` suffix are using
@@ -37,7 +57,7 @@ The following list briefly describes each example provided:
 * `notify (cpp)`_ & `notify (c)`_: Enable notifications on a characteristic.
 
 Concurrency
------------
+===========
 
 When designing your application using SimpleBLE, concurrency is a key
 aspect that needs to be taken into account. This is because internally
@@ -50,7 +70,7 @@ This can have an important effect when using SimpleBLE with UI
 applications, such as WxWidgets or Unity.
 
 Layers and their responsibilities
----------------------------------
+=================================
 
 -  External layer
 

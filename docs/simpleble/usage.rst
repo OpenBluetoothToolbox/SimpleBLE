@@ -112,7 +112,6 @@ Use the following instructions to build the provided SimpleBLE examples: ::
    cmake --build . -j7
 
 
-=======
 Testing
 =======
 
@@ -124,7 +123,7 @@ required: ::
 
 
 Unit Tests
-==========
+----------
 
 To run the unit tests, run the following command: ::
 
@@ -136,7 +135,7 @@ To run the unit tests, run the following command: ::
 
 
 Address Sanitizer Tests
-=======================
+-----------------------
 
 To run the address sanitizer tests, run the following command: ::
 
@@ -151,7 +150,7 @@ fail due to Python's memory allocator from triggering false positives.
 
 
 Thread Sanitizer Tests
-=======================
+----------------------
 
 To run the thread sanitizer tests, run the following command: ::
 
