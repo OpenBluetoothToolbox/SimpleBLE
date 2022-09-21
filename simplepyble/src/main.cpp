@@ -7,7 +7,7 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(simplepyble, m) {
-    m.attr("__version__") = "0.0.6";
+    m.attr("__version__") = SIMPLEPYBLE_VERSION;
 
     py::class_<SimpleBLE::Service>(m, "Service")
         .def("uuid", &SimpleBLE::Service::uuid)

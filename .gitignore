@@ -5,6 +5,8 @@ docs/_build
 docs/_doxygen
 /build_*
 
+simplepyble/build
+
 __pycache__
 *.egg-info
 wheelhouse

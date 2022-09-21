@@ -1,15 +1,17 @@
 cmake_minimum_required(VERSION 3.21)
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
+
 project(
     simplebluez
-    VERSION 0.6.0 # Make sure this matches the version in the changelog.
+    VERSION ${SIMPLEBLE_VERSION}
     DESCRIPTION "A simple C++ wrapper around Bluez with a commercially-friendly licence."
     HOMEPAGE_URL "https://github.com/OpenBluetoothToolbox/SimpleBluez"
     LANGUAGES CXX
 )
 
 # Run prelude script to set up environment
-include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/epilogue.cmake)
 
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
 

@@ -2,12 +2,18 @@ import pathlib
 import sys
 import setuptools
 
+root = pathlib.Path(__file__).parent.parent.resolve()
 here = pathlib.Path(__file__).parent.resolve()
 
 # Include our vendorized copy of cmake-build-extension, at least until
 # https://github.com/diegoferigo/cmake-build-extension/pull/35 is merged.
 sys.path.insert(0, str(here))
 import cmake_build_extension
+
+# Generate the version string
+# TODO: Make the dev portion smarter by looking at tags.
+version_str = (root / "VERSION").read_text(encoding="utf-8").strip()
+version_str += ".dev0" # ! Ensure it matches the intended release version!
 
 # Get the long description from the README file
 long_description = (here / "README.rst").read_text(encoding="utf-8")
@@ -18,12 +24,13 @@ if sys.platform == "win32":
 elif sys.platform.startswith("darwin"):
     cmake_options.append("-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15")
 cmake_options.append(f"-DPYTHON_EXECUTABLE={sys.executable}")
+cmake_options.append(f"-DSIMPLEPYBLE_VERSION={version_str}")
 
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
 setuptools.setup(
     name="simplepyble",
-    version="0.0.6.dev4",  # ! Ensure it matches the intended release version!
+    version=version_str,
     author="Kevin Dewald",
     author_email="kevin@dewald.me",
     url="https://github.com/OpenBluetoothToolbox/SimpleBLE",
