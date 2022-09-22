@@ -14,7 +14,7 @@ extern "C" {
  *
  * @param handle
  */
-void simpleble_free(void* handle);
+SIMPLEBLE_EXPORT void simpleble_free(void* handle);
 
 #ifdef __cplusplus
 }
