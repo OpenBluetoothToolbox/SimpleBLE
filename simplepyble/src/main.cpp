@@ -2,24 +2,54 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "simpleble/Adapter.h"
+#include "simpleble/SimpleBLE.h"
+
+/**
+ * Useful links for documentation while I figure this one out.
+ * https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
+ * https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html
+ * https://www.sphinx-doc.org/en/master/usage/extensions/autosummary.html
+ */
 
 namespace py = pybind11;
 
 PYBIND11_MODULE(simplepyble, m) {
     m.attr("__version__") = SIMPLEPYBLE_VERSION;
 
-    py::class_<SimpleBLE::Service>(m, "Service")
-        .def("uuid", &SimpleBLE::Service::uuid)
-        .def("characteristics", &SimpleBLE::Service::characteristics);
+    m.doc() = R"pbdoc(
+        SimpleBLE Python Bindings
+        -------------------------
 
+        .. currentmodule:: simplepyble
+        .. autosummary::
+           :toctree: _build
+
+            get_operating_system
+
+            Descriptor
+
+    )pbdoc";
+
+
+    m.def("get_operating_system", &SimpleBLE::get_operating_system, R"pbdoc(
+        Returns the currently-running operating system.
+    )pbdoc");
+
+    // TODO: Add __str__ and __repr__ methods
+    py::class_<SimpleBLE::Descriptor>(m, "Descriptor")
+        .def("uuid", &SimpleBLE::Descriptor::uuid);
+
+    // TODO: Add __str__ and __repr__ methods
     py::class_<SimpleBLE::Characteristic>(m, "Characteristic")
         .def("uuid", &SimpleBLE::Characteristic::uuid)
         .def("descriptors", &SimpleBLE::Characteristic::descriptors);
 
-    py::class_<SimpleBLE::Descriptor>(m, "Descriptor").def("uuid", &SimpleBLE::Descriptor::uuid);
+    // TODO: Add __str__ and __repr__ methods
+    py::class_<SimpleBLE::Service>(m, "Service")
+        .def("uuid", &SimpleBLE::Service::uuid)
+        .def("characteristics", &SimpleBLE::Service::characteristics);
 
-    // TODO: Add __str__ and __repr__ methods to Peripheral class
+    // TODO: Add __str__ and __repr__ methods
     py::class_<SimpleBLE::Peripheral>(m, "Peripheral")
         .def("initialized", &SimpleBLE::Peripheral::initialized)
         .def("identifier", &SimpleBLE::Peripheral::identifier)
@@ -69,7 +99,7 @@ PYBIND11_MODULE(simplepyble, m) {
         .def("set_callback_on_disconnected", &SimpleBLE::Peripheral::set_callback_on_disconnected,
              py::keep_alive<1, 2>());
 
-    // TODO: Add __str__ and __repr__ methods to Adapter class
+    // TODO: Add __str__ and __repr__ methods
     py::class_<SimpleBLE::Adapter>(m, "Adapter")
         .def("bluetooth_enabled", &SimpleBLE::Adapter::bluetooth_enabled)
         .def("get_adapters", &SimpleBLE::Adapter::get_adapters)

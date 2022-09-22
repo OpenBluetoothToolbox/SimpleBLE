@@ -1,10 +1,10 @@
 .vscode
 *.binlog
 .DS_Store
-docs/_build
-docs/_doxygen
-/build_*
+_build
+_doxygen
 
+/build_*
 simplepyble/build
 
 __pycache__

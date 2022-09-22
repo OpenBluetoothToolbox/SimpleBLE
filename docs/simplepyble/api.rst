@@ -2,6 +2,8 @@
 API Reference
 =============
 
+.. automodule:: simplepyble
+
 Examples
 ========
 
@@ -32,4 +34,3 @@ The following list briefly describes each example provided:
 .. _write: https://github.com/OpenBluetoothToolbox/SimpleBLE/tree/main/examples/simplepyble/write.py
 
 .. _notify: https://github.com/OpenBluetoothToolbox/SimpleBLE/tree/main/examples/simplepyble/notify.py
-

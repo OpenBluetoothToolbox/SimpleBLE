@@ -2,8 +2,8 @@ import pathlib
 import sys
 import setuptools
 
-root = pathlib.Path(__file__).parent.parent.resolve()
 here = pathlib.Path(__file__).parent.resolve()
+root = here.parent.resolve()
 
 # Include our vendorized copy of cmake-build-extension, at least until
 # https://github.com/diegoferigo/cmake-build-extension/pull/35 is merged.
