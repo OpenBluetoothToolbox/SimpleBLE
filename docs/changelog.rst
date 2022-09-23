@@ -48,6 +48,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 -  CMake target ``simpleble::simpleble`` was removed in favour of ``BUILD_SHARED_LIBS``.
 -  CMake target ``simpleble::simpleble-c`` was removed in favour of ``BUILD_SHARED_LIBS``.
 -  Using the correct CMake functionality to export headers for all targets.
+-  Corrected maximum length of manufacturer data on the C-api to 27 bytes. *(Thanks DrSegatron!)*
 -  (Windows) Peripheral reads are now uncached. *(Thanks piotromt!)*
 -  (Linux) Failure to set agent would trigger a crash.
 -  (Linux) Spurious disconnection events during connection retries have been fully removed.
