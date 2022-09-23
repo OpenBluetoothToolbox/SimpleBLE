@@ -103,8 +103,8 @@ static void adapter_on_scan_updated(simpleble_adapter_t adapter, simpleble_perip
 
     printf("Adapter %s updated device: %s [%s]\n", adapter_identifier, peripheral_identifier, peripheral_address);
 
-    // Let's not forget to release the associated handle.
     // Let's not forget to release the associated handles and memory
+    simpleble_peripheral_release_handle(peripheral);
     simpleble_free(peripheral_address);
     simpleble_free(peripheral_identifier);
 }
