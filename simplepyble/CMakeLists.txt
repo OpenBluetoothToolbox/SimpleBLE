@@ -13,7 +13,16 @@ include(${CMAKE_CURRENT_LIST_DIR}/../cmake/epilogue.cmake)
 find_package(pybind11 REQUIRED)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../simpleble ${CMAKE_BINARY_DIR}/simpleble)
 
-pybind11_add_module(simplepyble src/main.cpp)
+pybind11_add_module(
+    simplepyble
+    src/main.cpp
+    src/wrap_adapter.cpp
+    src/wrap_peripheral.cpp
+    src/wrap_service.cpp
+    src/wrap_characteristic.cpp
+    src/wrap_descriptor.cpp
+)
+
 target_link_libraries(simplepyble PRIVATE simpleble::simpleble)
 target_compile_definitions(simplepyble PRIVATE "-DSIMPLEPYBLE_VERSION=\"${SIMPLEPYBLE_VERSION}\"")
 
