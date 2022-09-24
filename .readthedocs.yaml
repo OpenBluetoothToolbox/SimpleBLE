@@ -18,6 +18,7 @@ build:
       - echo "Command run at 'post_create_environment' step"
     pre_install:
       - echo "Command run at 'pre_install' step"
+      - pip install breathe
     post_install:
       - echo "Command run at 'post_install' step"
     pre_build:
