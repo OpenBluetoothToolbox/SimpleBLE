@@ -2,7 +2,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "simpleble/SimpleBLE.h"
+#include "simpleble/Characteristic.h"
 
 namespace py = pybind11;
 

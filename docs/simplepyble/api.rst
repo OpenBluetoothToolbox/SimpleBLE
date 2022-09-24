@@ -2,7 +2,27 @@
 API Reference
 =============
 
-.. automodule:: simplepyble
+.. .. automodule:: simplepyble
+.. autoclass:: simplepyble.Adapter
+   :members:
+   :undoc-members:
+
+.. autoclass:: simplepyble.Peripheral
+   :members:
+   :undoc-members:
+
+.. autoclass:: simplepyble.Service
+   :members:
+   :undoc-members:
+
+.. autoclass:: simplepyble.Characteristic
+   :members:
+   :undoc-members:
+
+.. autoclass:: simplepyble.Descriptor
+   :members:
+   :undoc-members:
+
 
 Examples
 ========

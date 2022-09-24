@@ -22,19 +22,18 @@ void wrap_adapter(py::module& m);
 PYBIND11_MODULE(simplepyble, m) {
     m.attr("__version__") = SIMPLEPYBLE_VERSION;
 
-    m.doc() = R"pbdoc(
-        SimpleBLE Python Bindings
-        -------------------------
+    // m.doc() = R"pbdoc(
+    //     ====================
+    //     Python API Reference
+    //     ====================
 
-        .. currentmodule:: simplepyble
-        .. autosummary::
-           :toctree: _build
+    //     .. currentmodule:: simplepyble
+    //     .. autosummary::
+    //        :toctree: _build
 
-            get_operating_system
+    //         get_operating_system
 
-            Descriptor
-
-    )pbdoc";
+    // )pbdoc";
 
     m.def("get_operating_system", &SimpleBLE::get_operating_system, R"pbdoc(
         Returns the currently-running operating system.
