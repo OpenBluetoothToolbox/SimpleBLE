@@ -3,8 +3,8 @@ build:
   os: "ubuntu-22.04"
   apt_packages:
     - libdbus-1-dev
-  # tools:
-  #   python: "3.10"
+  tools:
+    python: "3.9"
   jobs:
     post_checkout:
       - echo "Command run at 'post_checkout' step"
