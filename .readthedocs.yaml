@@ -8,7 +8,7 @@ build:
       - echo "Command run at 'post_checkout' step"
     pre_system_dependencies:
       - echo "Command run at 'pre_system_dependencies' step"
-      - apt install -Y libdbus-1-dev
+      - apt install -y libdbus-1-dev
     post_system_dependencies:
       - echo "Command run at 'post_system_dependencies' step"
     pre_create_environment:
