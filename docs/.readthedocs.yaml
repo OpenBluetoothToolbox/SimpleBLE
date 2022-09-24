@@ -4,5 +4,5 @@ build:
   tools:
     python: "3.10"
   jobs:
-    pre_install:
+    pre_system_dependencies:
       - sudo apt install -Y libdbus-1-dev
