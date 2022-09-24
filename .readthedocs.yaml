@@ -18,9 +18,9 @@ build:
       - echo "Command run at 'post_create_environment' step"
     pre_install:
       - echo "Command run at 'pre_install' step"
-      - pip install breathe==4.34.0 sphinx_rtd_theme==1.0.0 sphinx==5.1.1
     post_install:
       - echo "Command run at 'post_install' step"
+      - pip install breathe==4.34.0 sphinx_rtd_theme==1.0.0 sphinx==5.1.1
     pre_build:
       - echo "Command run at 'pre_build' step"
     post_build:
