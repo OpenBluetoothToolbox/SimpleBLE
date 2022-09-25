@@ -7,8 +7,7 @@
 namespace py = pybind11;
 
 constexpr auto kDocsDescriptor = R"pbdoc(
-    Descriptor class
-
+    Descriptor
 )pbdoc";
 
 constexpr auto kDocsDescriptorUuid = R"pbdoc(
