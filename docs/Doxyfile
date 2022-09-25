@@ -48,7 +48,7 @@ PROJECT_NAME           = "SimpleBLE"
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = 0.5.0
+PROJECT_NUMBER         =
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -781,7 +781,7 @@ SHOW_NAMESPACES        = YES
 # by doxygen. Whatever the program writes to standard output is used as the file
 # version. For an example see the documentation.
 
-FILE_VERSION_FILTER    =
+FILE_VERSION_FILTER    = "cat ../VERSION"
 
 # The LAYOUT_FILE tag can be used to specify a layout file which will be parsed
 # by doxygen. The layout file controls the global structure of the generated

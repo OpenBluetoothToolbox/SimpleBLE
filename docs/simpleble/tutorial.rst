@@ -4,6 +4,7 @@ Tutorial
 
 In this page you'll find all the information you need to get up and running with SimpleBLE.
 
+
 Getting started
 ===============
 
@@ -34,7 +35,123 @@ One you have the correct header files included, you have two functions that shou
 act as a starting point for every program. The first one is :cpp:func:`SimpleBLE::Adapter::bluetooth_enabled()`,
 which will let you know if Bluetooth is enabled and permissions have been given
 to the running app. The second one is :cpp:func:`SimpleBLE::Adapter::get_adapters()`, which
-will provide a list of all available adapters that can be used.
+will provide a list of all available adapters that can be used. The following
+code snippet shows how to use these functions::
+
+   #include <simpleble/SimpleBLE.h>
+
+   int main(int argc, char** argv) {
+      if (!SimpleBLE::Adapter::bluetooth_enabled()) {
+         std::cout << "Bluetooth is not enabled" << std::endl;
+         return 1;
+      }
+
+      auto adapters = SimpleBLE::Adapter::get_adapters();
+      if (adapters.empty()) {
+         std::cout << "No Bluetooth adapters found" << std::endl;
+         return 1;
+      }
+
+      // Use the first adapter
+      auto adapter = adapters[0];
+
+      // Do something with the adapter
+      std::cout << "Adapter identifier: " << adapter.identifier() << std::endl;
+      std::cout << "Adapter address: " << adapter.address() << std::endl;
+
+      return 0;
+   }
+
+The above code will print the identifier and address of the first adapter found
+using :cpp:func:`SimpleBLE::Adapter::identifier()` and :cpp:func:`SimpleBLE::Adapter::address()`, respectively.
+If you have more than one adapter, you can use the identifier to select the
+one you want to use. The identifier is a string that uniquely identifies the
+adapter within the operating system. The address is a string that represents
+the MAC address of the adapter.
+
+
+Scanning for peripherals
+========================
+
+Once you have a list of available adapters, you can start scanning for
+peripherals. To do so, you need to create an :cpp:class:`SimpleBLE::Adapter` object
+and call the :cpp:func:`SimpleBLE::Adapter::scan_for()` method. This method will
+return a list of :cpp:class:`SimpleBLE::Peripheral` objects that are in range
+of the adapter. ::
+
+   // Get a list of all available adapters
+   std::vector<SimpleBLE::Adapter> adapters = SimpleBLE::Adapter::get_adapters();
+
+   // Get the first adapter
+   SimpleBLE::Adapter adapter = adapters[0];
+
+   // Scan for peripherals for 5000 milliseconds
+   adapter.scan_for(5000);
+
+   // Get the list of peripherals found
+   std::vector<SimpleBLE::Peripheral> peripherals = adapter.scan_get_results();
+
+   // Print the identifier of each peripheral
+   for (auto peripheral : peripherals) {
+       std::cout << "Peripheral identifier: " << peripheral.identifier() << std::endl;
+       std::cout << "Peripheral address: " << peripheral.address() << std::endl;
+   }
+
+The above code will print the identifier and address of each peripheral found
+using :cpp:func:`SimpleBLE::Peripheral::identifier()` and :cpp:func:`SimpleBLE::Peripheral::address()`, respectively.
+
+Additionally, you can use :cpp:func:`SimpleBLE::Adapter::scan_start()` and
+:cpp:func:`SimpleBLE::Adapter::scan_stop()` to start and stop scanning asynchronously.
+This is useful if you want to scan for peripherals in the background while
+performing other tasks. For this use case you can supply callback functions
+to receive notifications for different scan-related events by calling
+:cpp:func:`SimpleBLE::Adapter::set_callback_on_scan_start()`, :cpp:func:`SimpleBLE::Adapter::set_callback_on_scan_stop()`,
+:cpp:func:`SimpleBLE::Adapter::set_callback_on_scan_updated()` and :cpp:func:`SimpleBLE::Adapter::set_callback_on_scan_found()`.
+The following code snippet shows how to use these functions::
+
+   // Set the callback to be called when the scan starts
+   adapter.set_callback_on_scan_start([]() {
+      std::cout << "Scan started" << std::endl;
+   });
+
+   // Set the callback to be called when the scan stops
+   adapter.set_callback_on_scan_stop([]() {
+      std::cout << "Scan stopped" << std::endl;
+   });
+
+   // Set the callback to be called when the scan finds a new peripheral
+   adapter.set_callback_on_scan_found([](SimpleBLE::Peripheral peripheral) {
+      std::cout << "Peripheral found: " << peripheral.identifier() << std::endl;
+   });
+
+   // Set the callback to be called when a peripheral property has changed
+   adapter.set_callback_on_scan_updated([](SimpleBLE::Peripheral peripheral) {
+      std::cout << "Peripheral updated: " << peripheral.identifier() << std::endl;
+   });
+
+   // Start scanning for peripherals
+   adapter.scan_start();
+
+   // Wait for 5 seconds
+   std::this_thread::sleep_for(std::chrono::seconds(5));
+
+   // Stop scanning for peripherals
+   adapter.scan_stop();
+
+
+Connecting to a peripheral
+==========================
+
+Once you have a list of peripherals, you can connect to one of them. To do so,
+you need to create a :cpp:class:`SimpleBLE::Peripheral` object and call the
+:cpp:func:`SimpleBLE::Peripheral::connect()` method. ::
+
+   // Scan for peripherals for 5000 milliseconds
+   std::vector<SimpleBLE::Peripheral> peripherals = adapter.scan_for(5000);
+
+   // Connect to the first peripheral
+   SimpleBLE::Peripheral peripheral = peripherals[0];
+   peripheral.connect();
 
 .. note::
    **More coming soon, I swear. :P**

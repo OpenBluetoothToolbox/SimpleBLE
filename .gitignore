@@ -1,9 +1,11 @@
 .vscode
 *.binlog
 .DS_Store
-docs/_build
-docs/_doxygen
+_build
+_doxygen
+
 /build_*
+simplepyble/build
 
 __pycache__
 *.egg-info

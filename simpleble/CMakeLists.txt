@@ -1,15 +1,17 @@
 cmake_minimum_required(VERSION 3.21)
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
+
 project(
     simpleble
-    VERSION 0.5.0 # Make sure this matches the version in the changelog.
+    VERSION ${SIMPLEBLE_VERSION}
     DESCRIPTION "The ultimate fully-fledged cross-platform library for Bluetooth Low Energy (BLE)."
     HOMEPAGE_URL "https://github.com/OpenBluetoothToolbox/SimpleBLE"
     LANGUAGES CXX
 )
 
 # Run prelude script to set up environment
-include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/epilogue.cmake)
 
 include(GenerateExportHeader)
 include(GNUInstallDirs)

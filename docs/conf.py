@@ -13,8 +13,11 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+import pathlib
 import subprocess
 
+here = pathlib.Path(__file__).parent.resolve()
+root = here.parent.resolve()
 
 # -- Project information -----------------------------------------------------
 
@@ -29,6 +32,10 @@ author = 'Kevin Dewald'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx_rtd_theme',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.napoleon",
     'breathe'
 ]
 
@@ -40,7 +47,10 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
+# -- External Apps -----------------------------------------------------------
+
 subprocess.call('doxygen', shell=True)
+subprocess.call(["pip", "install", "."], cwd=(root / "simplepyble"))
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -56,3 +66,5 @@ html_static_path = ['_static']
 
 # -- Extension configuration -------------------------------------------------
 breathe_projects = { 'simpleble': '_doxygen/xml' }
+
+autosummary_generate = True

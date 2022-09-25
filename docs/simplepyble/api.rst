@@ -2,6 +2,28 @@
 API Reference
 =============
 
+.. .. automodule:: simplepyble
+.. autoclass:: simplepyble.Adapter
+   :members:
+   :undoc-members:
+
+.. autoclass:: simplepyble.Peripheral
+   :members:
+   :undoc-members:
+
+.. autoclass:: simplepyble.Service
+   :members:
+   :undoc-members:
+
+.. autoclass:: simplepyble.Characteristic
+   :members:
+   :undoc-members:
+
+.. autoclass:: simplepyble.Descriptor
+   :members:
+   :undoc-members:
+
+
 Examples
 ========
 
@@ -32,4 +54,3 @@ The following list briefly describes each example provided:
 .. _write: https://github.com/OpenBluetoothToolbox/SimpleBLE/tree/main/examples/simplepyble/write.py
 
 .. _notify: https://github.com/OpenBluetoothToolbox/SimpleBLE/tree/main/examples/simplepyble/notify.py
-

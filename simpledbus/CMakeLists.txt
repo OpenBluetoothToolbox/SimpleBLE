@@ -1,15 +1,17 @@
 cmake_minimum_required(VERSION 3.21)
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
+
 project(
     simpledbus
-    VERSION 2.3.0 # Make sure this matches the version in the changelog.
+    VERSION ${SIMPLEBLE_VERSION}
     DESCRIPTION "A simple C++ wrapper around DBus with a commercially-friendly licence."
     HOMEPAGE_URL "https://github.com/OpenBluetoothToolbox/SimpleDBus"
     LANGUAGES CXX
 )
 
 # Run prelude script to set up environment
-include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/epilogue.cmake)
 
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
 
