@@ -13,8 +13,8 @@ jobs:
         uses: DoozyX/clang-format-lint-action@v0.14
         with:
           source: '.'
-          exclude: 'simplepyble'
-          extensions: 'h,cpp,c'
+          exclude: './simplepyble'
+          extensions: 'h,hpp,cpp,c'
           clangFormatVersion: 14
           inplace: False
 
