@@ -19,7 +19,7 @@ If you want to use SimpleBLE and need help. **Please do not hesitate to reach ou
 
 * Visit our `ReadTheDocs`_ page.
 * Join our `Discord`_ server.
-* Contact me: ``kevin at dewald dot me``
+* Contact me: ``kevin at dewald dot me`` (Dedicated consulting services available)
 
 Are you using SimpleBLE on your own project and would like to see it featured here?
 Reach out and I'll add a link to it below!
@@ -31,6 +31,13 @@ Windows     Linux         MacOS                               iOS
 =========== ============= =================================== =====
 Windows 10+ Ubuntu 20.04+ 10.15+ (except 12.0, 12.1 and 12.2) 15.0+
 =========== ============= =================================== =====
+
+Projects using SimpleBLE
+------------------------
+Don't forget to check out the following projects using SimpleBLE:
+
+* `GDSimpleBLE`_
+* `BrainFlow`_
 
 Contributing
 ------------
@@ -55,3 +62,7 @@ external creators, are licensed under the terms of the `MIT Licence`_.
 
 .. _ReadTheDocs: https://simpleble.readthedocs.io/en/latest/
 
+.. Other projects using SimpleBLE
+
+.. _GDSimpleBLE: https://github.com/jferdelyi/GDSimpleBLE
+.. _BrainFlow: https://github.com/brainflow-dev/brainflow

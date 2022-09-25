@@ -24,6 +24,7 @@ performed:
 #. Review/update the version number in the following files:
 
    - ``VERSION``
+   - ``docs/changelog.rst``
    - ``simplepyble/setup.py``
 
 #. Commit the changes to the repository.

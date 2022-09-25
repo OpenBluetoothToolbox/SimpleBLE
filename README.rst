@@ -26,7 +26,7 @@ If you want to use SimpleBLE and need help. **Please do not hesitate to reach ou
 
 * Visit our `ReadTheDocs`_ page.
 * Join our `Discord`_ server.
-* Contact me: ``kevin at dewald dot me``
+* Contact me: ``kevin at dewald dot me`` (Dedicated consulting services available)
 
 Are you using SimpleBLE on your own project and would like to see it featured here?
 Reach out and I'll add a link to it below!
