@@ -112,6 +112,18 @@ Use the following instructions to build the provided SimpleBLE examples: ::
    cmake --build . -j7
 
 
+Plain-flavored Build
+====================
+
+Use the following instructions to build SimpleBLE with the plain-flavored API: ::
+
+   cd <path-to-simpleble>
+   mkdir build && cd build
+   cmake .. -DSIMPLEBLE_PLAIN=ON
+   cmake --build . -j7
+   sudo cmake --install .
+
+
 Testing
 =======
 

@@ -16,6 +16,8 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/epilogue.cmake)
 include(GenerateExportHeader)
 include(GNUInstallDirs)
 
+option(SIMPLEBLE_PLAIN "Use plain version of SimpleBLE" OFF)
+
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
 find_package(fmt REQUIRED)
 
@@ -117,7 +119,17 @@ target_link_libraries(simpleble-c PRIVATE simpleble::simpleble)
 append_sanitize_options("${SIMPLEBLE_SANITIZE}")
 
 # Detect the operating system and load the necessary dependencies
-if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+if(SIMPLEBLE_PLAIN)
+    message(STATUS "Plain Flavor Requested")
+
+    target_sources(simpleble PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/plain/AdapterBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/plain/PeripheralBase.cpp)
+
+    target_include_directories(simpleble PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/plain)
+
+elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     message(STATUS "Linux Host Detected")
 
     find_package(DBus1 REQUIRED)

@@ -46,6 +46,10 @@ while (( "$#" )); do
         FLAG_LOCAL=0
         shift
         ;;
+    -p|--plain)
+        FLAG_PLAIN=0
+        shift
+        ;;
     -sa|--sanitize_address)
         FLAG_SANITIZE_ADDRESS=0
         shift
@@ -112,13 +116,17 @@ if [[ ! -z "$FLAG_SHARED" ]]; then
     BUILD_SHARED_ARG="-DBUILD_SHARED_LIBS=ON"
 fi
 
+if [[ ! -z "$FLAG_PLAIN" ]]; then
+    BUILD_PLAIN="-DSIMPLEBLE_PLAIN=ON"
+fi
+
 # If FLAG_CLEAN is set, clean the build directory
 if [[ ! -z "$FLAG_CLEAN" ]]; then
     rm -rf $BUILD_PATH
     rm -rf $EXAMPLE_BUILD_PATH
 fi
 
-cmake -H$SOURCE_PATH -B $BUILD_PATH $BUILD_TEST_ARG $BUILD_SANITIZE_ADDRESS_ARG $BUILD_SANITIZE_THREAD_ARG $BUILD_SHARED_ARG $EXTRA_BUILD_ARGS
+cmake -H$SOURCE_PATH -B $BUILD_PATH $BUILD_TEST_ARG $BUILD_SANITIZE_ADDRESS_ARG $BUILD_SANITIZE_THREAD_ARG $BUILD_SHARED_ARG $EXTRA_BUILD_ARGS $BUILD_PLAIN
 cmake --build $BUILD_PATH -j7
 cmake --install $BUILD_PATH --prefix "${INSTALL_PATH}"
 

@@ -13,6 +13,13 @@ UUID is not persistent across reboots, so you should not use it to identify a
 peripheral. Instead, you should use the name of the peripheral, which is
 persistent across reboots.
 
+**What is the purpose behind the plain interface?**
+
+Building SimpleBLE with the plain-flavored interface allows you to use a version of the
+library that is independent of the operating system, which is achieved by hardcoding
+all behaviors and responses. This is useful for testing and debugging, especially when
+you don't need to deal with operating-system shenanigans and just want to test the API.
+
 **What is the correct approach to memory management of SimpleBLE objects in the C-API?**
 
 **How are vectors supposed to be handled in the C-API?**
