@@ -129,7 +129,7 @@ if(SIMPLEBLE_PLAIN)
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/plain)
 
-elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message(STATUS "Linux Host Detected")
 
     find_package(DBus1 REQUIRED)
@@ -197,7 +197,7 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
 
     set_property(TARGET simpleble-c PROPERTY INSTALL_RPATH $ORIGIN)
 
-elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     message(STATUS "Windows Host Detected")
 
     set(WINVERSION_CODE 0x0A00) # Selected Windows 10 based on https://docs.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt
@@ -225,7 +225,7 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/PeripheralBase.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/Utils.cpp)
 
-elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     message(STATUS "Darwin Host Detected")
 
     list(APPEND PRIVATE_COMPILE_OPTIONS -fobjc-arc)
