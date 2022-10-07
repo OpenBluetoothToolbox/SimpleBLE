@@ -11,7 +11,8 @@ namespace Safe {
 
 class SIMPLEBLE_EXPORT Adapter : public SimpleBLE::Adapter {
   public:
-    Adapter(SimpleBLE::Adapter& adapter);
+    Adapter() = default;
+    Adapter(SimpleBLE::Adapter& adapter); // TODO: Move into a builder
     virtual ~Adapter() = default;
 
     std::optional<std::string> identifier() noexcept;

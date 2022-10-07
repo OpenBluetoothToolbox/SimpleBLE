@@ -13,6 +13,7 @@ namespace Safe {
 
 class SIMPLEBLE_EXPORT Peripheral : public SimpleBLE::Peripheral {
   public:
+    Peripheral() = default;
     Peripheral(SimpleBLE::Peripheral& peripheral);
     virtual ~Peripheral() = default;
 

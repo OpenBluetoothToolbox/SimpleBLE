@@ -1,26 +1,25 @@
 #pragma once
 
-#include <functional>
-#include <memory>
-#include <string>
-#include <vector>
-
-#include <simpleble/export.h>
-
 #include <simpleble/Exceptions.h>
 #include <simpleble/Peripheral.h>
 #include <simpleble/Types.h>
 
+#include <kvn_safe_callback.hpp>
+
+#include <atomic>
+#include <functional>
+#include <memory>
+#include <set>
+#include <string>
+#include <vector>
+
 namespace SimpleBLE {
 
-class AdapterBase;
-
-class SIMPLEBLE_EXPORT Adapter {
+class AdapterBase {
   public:
-    Adapter() = default;
-    virtual ~Adapter() = default;
+    AdapterBase();
+    virtual ~AdapterBase();
 
-    bool initialized() const;
     void* underlying() const;
 
     std::string identifier();
@@ -39,15 +38,16 @@ class SIMPLEBLE_EXPORT Adapter {
 
     std::vector<Peripheral> get_paired_peripherals();
 
-    static bool bluetooth_enabled() noexcept;
+    static bool bluetooth_enabled();
+    static std::vector<std::shared_ptr<AdapterBase>> get_adapters();
 
-    /**
-     *  Fetches a list of all available cached_adapters.
-     */
-    static std::vector<Adapter> get_adapters();
+  private:
+    std::atomic_bool is_scanning_;
 
-  protected:
-    std::shared_ptr<AdapterBase> internal_;
+    kvn::safe_callback<void()> callback_on_scan_start_;
+    kvn::safe_callback<void()> callback_on_scan_stop_;
+    kvn::safe_callback<void(Peripheral)> callback_on_scan_updated_;
+    kvn::safe_callback<void(Peripheral)> callback_on_scan_found_;
 };
 
 }  // namespace SimpleBLE

@@ -134,6 +134,16 @@ if(SIMPLEBLE_PLAIN)
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/plain)
 
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
+    message(STATUS "Android platform requested")
+
+    target_sources(simpleble PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/android/AdapterBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/android/PeripheralBase.cpp)
+
+    target_include_directories(simpleble PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/android)
+
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message(STATUS "Linux Host Detected")
 

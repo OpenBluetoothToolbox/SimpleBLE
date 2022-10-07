@@ -12,6 +12,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 **Added**
 
 -  Option to build SimpleBLE plain-flavored (without any BLE code) for testing and debugging purposes.
+-  Added default constructors for ``Safe::Adapter`` and ``Safe::Peripheral``.
 
 **Fixed**
 
