@@ -21,6 +21,11 @@ option(SIMPLEBLE_PLAIN "Use plain version of SimpleBLE" OFF)
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
 find_package(fmt REQUIRED)
 
+if(SIMPLEBLE_TEST)
+    message(STATUS "Building tests requires plain version of SimpleBLE")
+    set(SIMPLEBLE_PLAIN ON)
+endif()
+
 set(SIMPLEBLE_PRIVATE_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/include
