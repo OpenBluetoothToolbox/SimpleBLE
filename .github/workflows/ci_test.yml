@@ -166,8 +166,8 @@ jobs:
 
       - name: Install SimplePyBLE
         run: pip3 install .
-        working-directory: simplepyble/test
+        working-directory: ./simplepyble
 
       - name: Run PyTest
         run: pytest
-        working-directory: simplepyble/test
+        working-directory: ./simplepyble/test
