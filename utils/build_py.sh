@@ -30,6 +30,14 @@ while (( "$#" )); do
         FLAG_CLEAN=0
         shift
         ;;
+    -p|--plain)
+        FLAG_PLAIN=0
+        shift
+        ;;
+    -i|--install)
+        FLAG_INSTALL=0
+        shift
+        ;;
     -*|--*=) # unsupported flags
         echo "Error: Unsupported flag $1" >&2
         exit 1
@@ -46,13 +54,26 @@ eval set -- "$PARAMS"
 
 PROJECT_ROOT=$(realpath $(dirname `realpath $0`)/..)
 SOURCE_PATH=$PROJECT_ROOT/simplepyble
-BUILD_PATH=$PROJECT_ROOT/build # Note: setup.py will append the project name to the build path
+BUILD_PATH=$PROJECT_ROOT/build_simplepyble # Note: setup.py will append the project name to the build path
+DIST_PATH=$BUILD_PATH/dist
 
 # If FLAG_CLEAN is set, clean the build directory
 if [[ ! -z "$FLAG_CLEAN" ]]; then
     rm -rf "$BUILD_PATH"_simplepyble
 fi
 
+if [[ ! -z "$FLAG_PLAIN" ]]; then
+    BUILD_PLAIN="--plain"
+fi
+
+SETUP_INSTRUCTIONS="build --build-base $BUILD_PATH"
+SETUP_INSTRUCTIONS="$SETUP_INSTRUCTIONS egg_info --egg-base $BUILD_PATH"
+SETUP_INSTRUCTIONS="$SETUP_INSTRUCTIONS bdist_wheel --dist-dir $DIST_PATH"
+
 cd $SOURCE_PATH
-python3 setup.py build --build-temp $BUILD_PATH
+python3 setup.py $SETUP_INSTRUCTIONS $BUILD_PLAIN  
 cd -
+
+if [[ ! -z "$FLAG_INSTALL" ]]; then
+    pip3 install $DIST_PATH/*.whl --force-reinstall
+fi

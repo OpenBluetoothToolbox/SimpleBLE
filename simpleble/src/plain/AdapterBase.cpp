@@ -25,7 +25,7 @@ void* AdapterBase::underlying() const { return nullptr; }
 
 std::string AdapterBase::identifier() { return "Plain Adapter"; }
 
-BluetoothAddress AdapterBase::address() { return "00:00:00:00:00:00"; }
+BluetoothAddress AdapterBase::address() { return "AA:BB:CC:DD:EE:FF"; }
 
 void AdapterBase::scan_start() {
     is_scanning_ = true;

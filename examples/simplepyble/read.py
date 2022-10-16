@@ -39,8 +39,8 @@ if __name__ == "__main__":
     services = peripheral.services()
     service_characteristic_pair = []
     for service in services:
-        for characteristic in service.characteristics:
-            service_characteristic_pair.append((service.uuid, characteristic))
+        for characteristic in service.characteristics():
+            service_characteristic_pair.append((service.uuid(), characteristic.uuid()))
 
     # Query the user to pick a service/characteristic pair
     print("Please select a service/characteristic pair:")

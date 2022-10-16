@@ -145,3 +145,25 @@ jobs:
         $GITHUB_WORKSPACE/build_tsan_simpledbus/bin/simpledbus_test
         cp "$(ls tsan_log.txt.* | head -1)" tsan_log.txt || true
         (test ! -f tsan_log.txt && echo "No TSAN log found") || (cat tsan_log.txt && exit 1)
+
+  # ------------------------------------------------------------
+
+  test-python:
+    runs-on: "ubuntu-20.04"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r simplepyble/requirements.txt
+
+      - name: Run PyTest
+        run: pytest
+        working-directory: simplepyble/test

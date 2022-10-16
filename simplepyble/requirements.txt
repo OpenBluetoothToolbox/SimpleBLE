@@ -1,3 +1,5 @@
 twine
+wheel
+pytest
 pybind11
 cibuildwheel==2.9

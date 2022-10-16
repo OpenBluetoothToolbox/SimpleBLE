@@ -23,9 +23,9 @@ void* PeripheralBase::underlying() const { return nullptr; }
 
 std::string PeripheralBase::identifier() { return "Plain Peripheral"; }
 
-BluetoothAddress PeripheralBase::address() { return "00:00:00:00:00:00"; }
+BluetoothAddress PeripheralBase::address() { return "11:22:33:44:55:66"; }
 
-int16_t PeripheralBase::rssi() { return -127; }
+int16_t PeripheralBase::rssi() { return -60; }
 
 void PeripheralBase::connect() {
     connected_ = true;
@@ -46,6 +46,8 @@ bool PeripheralBase::is_paired() { return paired_; }
 void PeripheralBase::unpair() { paired_ = false; }
 
 std::vector<Service> PeripheralBase::services() {
+    if (!connected_) return {};
+
     std::vector<Service> service_list;
 
     service_list.push_back(
