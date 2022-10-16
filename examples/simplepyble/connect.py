@@ -38,8 +38,8 @@ if __name__ == "__main__":
     print("Successfully connected, listing services...")
     services = peripheral.services()
     for service in services:
-        print(f"Service: {service.uuid}")
-        for characteristic in service.characteristics:
-            print(f"    Characteristic: {characteristic}")
+        print(f"Service: {service.uuid()}")
+        for characteristic in service.characteristics():
+            print(f"    Characteristic: {characteristic.uuid()}")
 
     peripheral.disconnect()

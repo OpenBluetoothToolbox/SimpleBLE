@@ -13,19 +13,17 @@ std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
     return adapter_list;
 }
 
-bool AdapterBase::bluetooth_enabled() {
-   return true;
-}
+bool AdapterBase::bluetooth_enabled() { return true; }
 
 AdapterBase::AdapterBase() {}
 
-AdapterBase::~AdapterBase() { }
+AdapterBase::~AdapterBase() {}
 
 void* AdapterBase::underlying() const { return nullptr; }
 
 std::string AdapterBase::identifier() { return "Plain Adapter"; }
 
-BluetoothAddress AdapterBase::address() { return "00:00:00:00:00:00"; }
+BluetoothAddress AdapterBase::address() { return "AA:BB:CC:DD:EE:FF"; }
 
 void AdapterBase::scan_start() {
     is_scanning_ = true;
@@ -34,7 +32,6 @@ void AdapterBase::scan_start() {
     PeripheralBuilder peripheral_builder(std::make_shared<PeripheralBase>());
     SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral_builder);
     SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral_builder);
-
 }
 
 void AdapterBase::scan_stop() {

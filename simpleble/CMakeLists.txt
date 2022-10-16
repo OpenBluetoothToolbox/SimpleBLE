@@ -309,6 +309,5 @@ if(SIMPLEBLE_TEST)
         POSITION_INDEPENDENT_CODE ON
         WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-    target_link_libraries(simpleble_test PRIVATE simpleble::simpleble ${GTEST_LIBRARIES})
-    target_include_directories(simpleble_test PRIVATE ${GTEST_INCLUDE_DIRS})
+    target_link_libraries(simpleble_test PRIVATE simpleble::simpleble GTest::gtest)
 endif()

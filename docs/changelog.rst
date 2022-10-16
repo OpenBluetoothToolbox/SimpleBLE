@@ -13,6 +13,10 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 -  Option to build SimpleBLE plain-flavored (without any BLE code) for testing and debugging purposes.
 
+**Fixed**
+
+-  Fixed incorrect handling of services and characteristics in the Python examples. *(Thanks Carl-CWX!)*
+
 
 [0.5.0] - 2022-09-25
 --------------------

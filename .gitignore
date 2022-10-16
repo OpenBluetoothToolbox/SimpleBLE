@@ -6,6 +6,7 @@ _doxygen
 
 /build_*
 simplepyble/build
+simplepyble/dist
 
 __pycache__
 *.egg-info

@@ -1,6 +1,12 @@
 import pathlib
 import sys
 import setuptools
+import argparse
+
+argparser = argparse.ArgumentParser(add_help=False)
+argparser.add_argument('--plain',  help='Use Plain SimpleBLE', required=False, action='store_true')
+args, unknown = argparser.parse_known_args()
+sys.argv = [sys.argv[0]] + unknown
 
 here = pathlib.Path(__file__).parent.resolve()
 root = here.parent.resolve()
@@ -25,6 +31,9 @@ elif sys.platform.startswith("darwin"):
     cmake_options.append("-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15")
 cmake_options.append(f"-DPYTHON_EXECUTABLE={sys.executable}")
 cmake_options.append(f"-DSIMPLEPYBLE_VERSION={version_str}")
+
+if args.plain:
+    cmake_options.append("-DSIMPLEBLE_PLAIN=ON")
 
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
@@ -51,6 +60,14 @@ setuptools.setup(
         "build_ext": cmake_build_extension.BuildExtension
     },
     zip_safe=False,
+    install_requires=[
+        "wheel",
+        "pybind11",
+        "ninja"
+    ],
+    test_requires=[
+        "pytest",
+    ],
     extras_require={},
     platforms="Windows, macOS, Linux",
     python_requires=">=3.7",

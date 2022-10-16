@@ -42,7 +42,7 @@ class AdapterBase {
     static std::vector<std::shared_ptr<AdapterBase>> get_adapters();
 
   private:
-    std::atomic_bool is_scanning_;
+    std::atomic_bool is_scanning_{false};
 
     kvn::safe_callback<void()> callback_on_scan_start_;
     kvn::safe_callback<void()> callback_on_scan_stop_;
