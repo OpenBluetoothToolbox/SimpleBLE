@@ -8,8 +8,8 @@
 
 #include <atomic>
 #include <condition_variable>
-#include <memory>
 #include <map>
+#include <memory>
 
 namespace SimpleBLE {
 
@@ -50,7 +50,6 @@ class PeripheralBase {
     void set_callback_on_disconnected(std::function<void()> on_disconnected);
 
   private:
-
     std::atomic_bool connected_;
     std::atomic_bool paired_;
 
