@@ -164,6 +164,10 @@ jobs:
       - name: Install dependencies
         run: pip install -r simplepyble/requirements.txt
 
+      - name: Install SimplePyBLE
+        run: pip3 install .
+        working-directory: simplepyble/test
+
       - name: Run PyTest
         run: pytest
         working-directory: simplepyble/test
