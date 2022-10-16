@@ -164,8 +164,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r simplepyble/requirements.txt
 
-      - name: Install SimplePyBLE
-        run: pip3 install .
+      - name: Install SimplePyBLE with Plain flavor
+        run: python setup.py install --plain
         working-directory: ./simplepyble
 
       - name: Run PyTest
