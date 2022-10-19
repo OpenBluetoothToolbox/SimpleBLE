@@ -230,8 +230,8 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/PeripheralBase.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/Utils.cpp)
 
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    message(STATUS "Darwin Host Detected")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    message(STATUS "Darwin / iOS Host Detected")
 
     list(APPEND PRIVATE_COMPILE_OPTIONS -fobjc-arc)
 
