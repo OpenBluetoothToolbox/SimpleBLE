@@ -16,6 +16,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 **Fixed**
 
 -  Fixed incorrect handling of services and characteristics in the Python examples. *(Thanks Carl-CWX!)*
+-  (MacOS) Increased priority of the dispatch queue to prevent jitter in the incoming data.
 
 
 [0.5.0] - 2022-09-25

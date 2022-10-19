@@ -25,8 +25,9 @@
     if (self) {
         _adapter = adapter;
 
-        // TODO: Review dispatch_queue attributes to see if there's a better way to handle this.
-        _centralManagerQueue = dispatch_queue_create("AdapterBaseMacOS.centralManagerQueue", DISPATCH_QUEUE_SERIAL);
+        // Use a high-priority queue to ensure that events are processed immediately.
+        dispatch_queue_attr_t qos = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, -1);
+        _centralManagerQueue = dispatch_queue_create("AdapterBaseMacOS.centralManagerQueue", qos);
         _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:_centralManagerQueue options:nil];
 
         // Wait for the central manager state to be updated for up to 5 seconds.
