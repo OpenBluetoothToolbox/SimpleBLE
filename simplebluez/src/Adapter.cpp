@@ -2,6 +2,7 @@
 #include <simplebluez/Device.h>
 
 #include <simplebluez/interfaces/Adapter1.h>
+#include <simplebluez/interfaces/LEAdvertisingManager1.h>
 
 using namespace SimpleBluez;
 
@@ -18,6 +19,8 @@ std::shared_ptr<SimpleDBus::Proxy> Adapter::path_create(const std::string& path)
 std::shared_ptr<SimpleDBus::Interface> Adapter::interfaces_create(const std::string& interface_name) {
     if (interface_name == "org.bluez.Adapter1") {
         return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Adapter1>(_conn, _path));
+    } else if (interface_name == "org.bluez.LEAdvertisingManager1") {
+        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<LEAdvertisingManager1>(_conn, _path));
     }
 
     auto interface = std::make_shared<SimpleDBus::Interface>(_conn, _bus_name, _path, interface_name);
