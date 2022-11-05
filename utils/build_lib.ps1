@@ -34,7 +34,7 @@ if ($clean) {
 New-Item -ItemType Directory -Force -Path "$BUILD_PATH" | Out-Null
 
 # Run CMake to create our build files.
-cmake -S "$SOURCE_PATH" -B "$BUILD_PATH" -DCMAKE_SYSTEM_VERSION="10.0.22000.0" -DBUILD_SHARED_LIBS=ON
+cmake -S "$SOURCE_PATH" -B "$BUILD_PATH" -DCMAKE_SYSTEM_VERSION="10.0.22000.0" -DBUILD_SHARED_LIBS=ON -A $WINDOWS_ARCH
 cmake --build "$BUILD_PATH" --config $TARGET --parallel 7
 cmake --install "$BUILD_PATH" --prefix "$INSTALL_PATH"
 
@@ -47,6 +47,6 @@ if ($examples) {
     New-Item -ItemType Directory -Force -Path "$EXAMPLE_BUILD_PATH" | Out-Null
 
     # Run CMake to create our build files.
-    cmake -S "$EXAMPLE_SOURCE_PATH" -B "$EXAMPLE_BUILD_PATH" -DCMAKE_SYSTEM_VERSION="10.0.22000.0" # -DSIMPLEBLE_LOCAL=ON
+    cmake -S "$EXAMPLE_SOURCE_PATH" -B "$EXAMPLE_BUILD_PATH" -DCMAKE_SYSTEM_VERSION="10.0.22000.0" -A $WINDOWS_ARCH # -DSIMPLEBLE_LOCAL=ON
     cmake --build "$EXAMPLE_BUILD_PATH" --config $TARGET --parallel 7
 }
