@@ -1,9 +1,14 @@
 #include "simplebluez/interfaces/LEAdvertisingManager1.h"
 
+#include <fmt/core.h>
+
 using namespace SimpleBluez;
 
 LEAdvertisingManager1::LEAdvertisingManager1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path)
-    : SimpleDBus::Interface(conn, "org.bluez", path, "org.bluez.LEAdvertisingManager1") {}
+    : SimpleDBus::Interface(conn, "org.bluez", path, "org.bluez.LEAdvertisingManager1") {
+
+        fmt::print("LEAdvertisingManager1::LEAdvertisingManager1()\n");
+    }
 
 void LEAdvertisingManager1::RegisterAdvertisement(std::string advertisement_path) {
     SimpleDBus::Holder properties = SimpleDBus::Holder::create_dict();
@@ -13,7 +18,7 @@ void LEAdvertisingManager1::RegisterAdvertisement(std::string advertisement_path
     auto msg = create_method_call("RegisterAdvertisement");
     msg.append_argument(SimpleDBus::Holder::create_object_path(advertisement_path), "o");
     msg.append_argument(properties, "a{sv}");
-    _conn->send_with_reply_and_block(msg);
+    _conn->send(msg);
 }
 
 void LEAdvertisingManager1::UnregisterAdvertisement(std::string advertisement_path) {

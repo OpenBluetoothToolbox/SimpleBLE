@@ -15,4 +15,8 @@ else()
     find_package(simpledbus CONFIG REQUIRED)
 endif()
 
-add_subdirectory(notification)
+add_executable(example_notification notification.cpp)
+target_link_libraries(example_notification simpledbus::simpledbus)
+
+add_executable(example_export export.cpp)
+target_link_libraries(example_export simpledbus::simpledbus)

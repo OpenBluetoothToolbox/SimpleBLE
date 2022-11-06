@@ -1,8 +1,6 @@
 #include <simplebluez/Adapter.h>
 #include <simplebluez/Device.h>
-
-#include <simplebluez/interfaces/Adapter1.h>
-#include <simplebluez/interfaces/LEAdvertisingManager1.h>
+#include <fmt/core.h>
 
 using namespace SimpleBluez;
 
@@ -29,6 +27,10 @@ std::shared_ptr<SimpleDBus::Interface> Adapter::interfaces_create(const std::str
 
 std::shared_ptr<Adapter1> Adapter::adapter1() {
     return std::dynamic_pointer_cast<Adapter1>(interface_get("org.bluez.Adapter1"));
+}
+
+std::shared_ptr<LEAdvertisingManager1> Adapter::le_advertising_manager1() {
+    return std::dynamic_pointer_cast<LEAdvertisingManager1>(interface_get("org.bluez.LEAdvertisingManager1"));
 }
 
 std::string Adapter::identifier() const {
@@ -86,3 +88,10 @@ void Adapter::clear_on_device_updated() {
     on_child_created.unload();
     on_child_signal_received.unload();
 }
+
+void Adapter::register_advertisement(const std::string& path) {
+    le_advertising_manager1()->RegisterAdvertisement(path);
+    fmt::print("Registered advertisement: {}\n", path);
+}
+
+void Adapter::unregister_advertisement(const std::string& path) {}
