@@ -1,7 +1,7 @@
 SimpleBLE
-==========
+================
 
-The ultimate fully-fledged cross-platform library and bindings for Bluetooth Low Energy (BLE).
+|Logo| The ultimate fully-fledged cross-platform library and bindings for Bluetooth Low Energy (BLE).
 
 |Latest Documentation Status|
 
@@ -58,6 +58,9 @@ All components within this project that have not been bundled from
 external creators, are licensed under the terms of the `MIT Licence`_.
 
 .. Links
+
+.. |Logo| image:: docs/static/logo.png
+   :width: 64px
 
 .. _SimplePyBLE: https://pypi.org/project/simplepyble/
 
