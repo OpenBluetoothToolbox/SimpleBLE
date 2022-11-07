@@ -48,6 +48,10 @@ int16_t PeripheralBase::rssi() { return rssi_; }
 void PeripheralBase::update_advertising_data(advertising_data_t advertising_data) {
     rssi_ = advertising_data.rssi;
     manufacturer_data_ = advertising_data.manufacturer_data;
+
+    if (identifier_ != advertising_data.identifier) {
+        std::cout << "Identifier mismatch! - Old: " << identifier_ << " - New: " << advertising_data.identifier << std::endl;
+    }
 }
 
 void PeripheralBase::connect() {
