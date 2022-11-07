@@ -37,6 +37,7 @@ class SIMPLEBLE_EXPORT Peripheral {
     void unpair();
 
     std::vector<Service> services();
+    std::vector<Service> advertised_services(); // TODO: implement
     std::map<uint16_t, ByteArray> manufacturer_data();
 
     // clang-format off
