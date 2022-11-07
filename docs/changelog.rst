@@ -12,12 +12,14 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 **Added**
 
 -  Option to build SimpleBLE plain-flavored (without any BLE code) for testing and debugging purposes.
+-  (Windows) Logging of WinRT initialization behavior.
 
 **Fixed**
 
--  Fixed incorrect handling of services and characteristics in the Python examples. *(Thanks Carl-CWX!)*
+-  Incorrect handling of services and characteristics in the Python examples. *(Thanks Carl-CWX!)*
 -  (MacOS) Increased priority of the dispatch queue to prevent jitter in the incoming data.
--  (Windows) Fixed missing peripheral identifier data.
+-  (Windows) Missing peripheral identifier data.
+-  (Windows) Multiple initialization of the WinRT backend.
 
 
 [0.5.0] - 2022-09-25
