@@ -30,24 +30,27 @@ set(SIMPLEBLE_PRIVATE_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/src/builders
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/external)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/external
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/common
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/safe)
 
 set(SIMPLEBLE_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Adapter.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Peripheral.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Service.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Characteristic.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Descriptor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/base/Adapter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/base/Peripheral.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/base/Service.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/base/Characteristic.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/base/Descriptor.cpp
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ServiceBase.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/CharacteristicBase.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/DescriptorBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/common/ServiceBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/common/CharacteristicBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/common/DescriptorBase.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Exceptions.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/AdapterSafe.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/PeripheralSafe.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logging.cpp
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/safe/AdapterSafe.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/safe/PeripheralSafe.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/AdapterBuilder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/PeripheralBuilder.cpp
@@ -151,9 +154,9 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLUEZ_LOG_LEVEL=${SIMPLEBLUEZ_LOG_LEVEL})
 
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/AdapterBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/PeripheralBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/linux/Bluez.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/AdapterBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/PeripheralBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/Bluez.cpp)
 
     target_sources(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/ProxyOrg.cpp
@@ -195,7 +198,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
         ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/linux)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux)
     # target_include_directories(simpleble-c PRIVATE
     #     ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
     #     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include)
@@ -224,11 +227,12 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         list(APPEND PRIVATE_COMPILE_OPTIONS "/W1")
     endif()
 
-    target_include_directories(simpleble PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/windows)
+    target_include_directories(simpleble PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows)
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/AdapterBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/PeripheralBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/Utils.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/AdapterBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/PeripheralBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/Utils.cpp)
 
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
     message(STATUS "Darwin / iOS Host Detected")
@@ -236,13 +240,14 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
     list(APPEND PRIVATE_COMPILE_OPTIONS -fobjc-arc)
 
     target_link_libraries(simpleble PUBLIC "-framework Foundation" "-framework CoreBluetooth" ObjC)
-    target_include_directories(simpleble PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/macos)
+    target_include_directories(simpleble PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos)
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/Utils.mm
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/AdapterBase.mm
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/AdapterBaseMacOS.mm
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/PeripheralBase.mm
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/macos/PeripheralBaseMacOS.mm)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/Utils.mm
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/AdapterBase.mm
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/AdapterBaseMacOS.mm
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/PeripheralBase.mm
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/PeripheralBaseMacOS.mm)
 
     set_property(TARGET simpleble-c PROPERTY INSTALL_RPATH @loader_path)
 
