@@ -45,6 +45,12 @@ int main() {
         for (auto& characteristic : service.characteristics()) {
             std::cout << "  Characteristic: " << characteristic.uuid() << std::endl;
 
+            std::cout << "    Capabilities: ";
+            for (auto& capability : characteristic.capabilities()) {
+                std::cout << capability << " ";
+            }
+            std::cout << std::endl;
+
             for (auto& descriptor : characteristic.descriptors()) {
                 std::cout << "    Descriptor: " << descriptor.uuid() << std::endl;
             }

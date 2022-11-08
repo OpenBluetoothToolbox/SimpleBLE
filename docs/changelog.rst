@@ -13,6 +13,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 -  Option to build SimpleBLE plain-flavored (without any BLE code) for testing and debugging purposes.
 -  Support for advertized services. (IN PROGRESS - Windows only)
+-  Support for GATT Characteristic properties. (IN PROGRESS - Windows only)
 -  (Windows) Logging of WinRT initialization behavior.
 
 **Fixed**
