@@ -69,7 +69,12 @@ void Peripheral::unpair() {
 
 std::vector<Service> Peripheral::services() {
     if (!initialized()) throw Exception::NotInitialized();
-    if (!is_connected()) throw Exception::NotConnected();
+
+    if (is_connected()) {
+        return internal_->services();
+    } else {
+        return internal_->advertised_services();
+    }
 
     return internal_->services();
 }

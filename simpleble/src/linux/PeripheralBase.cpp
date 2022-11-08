@@ -127,6 +127,10 @@ std::vector<Service> PeripheralBase::services() {
     return service_list;
 }
 
+std::vector<Service> PeripheralBase::advertised_services() {
+    return {};
+}
+
 std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() {
     std::map<uint16_t, ByteArray> manufacturer_data;
     for (auto& [manufacturer_id, value_array] : device_->manufacturer_data()) {
