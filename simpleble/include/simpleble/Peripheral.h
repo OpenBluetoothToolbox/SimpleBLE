@@ -36,6 +36,12 @@ class SIMPLEBLE_EXPORT Peripheral {
     bool is_paired();
     void unpair();
 
+    /**
+     * @brief Provides a list of all services that are available on the peripheral.
+     * 
+     * @note If the peripheral is not connected, it will return a list of services
+     *       that were advertised by the device.
+     */
     std::vector<Service> services();
     std::map<uint16_t, ByteArray> manufacturer_data();
 

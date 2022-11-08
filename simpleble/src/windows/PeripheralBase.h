@@ -98,6 +98,7 @@ class PeripheralBase {
     kvn::safe_callback<void()> callback_on_disconnected_;
 
     std::map<uint16_t, SimpleBLE::ByteArray> manufacturer_data_;
+    std::vector<std::string> advertised_services_;
 
     bool _attempt_connect();
     GattCharacteristic _fetch_characteristic(const BluetoothUUID& service_uuid,

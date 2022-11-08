@@ -27,6 +27,8 @@ PeripheralBase::PeripheralBase(advertising_data_t advertising_data) {
     rssi_ = advertising_data.rssi;
     manufacturer_data_ = advertising_data.manufacturer_data;
     connectable_ = advertising_data.connectable;
+    advertised_services_ = advertising_data.service_uuids;
+
     device_ = async_get(
         BluetoothLEDevice::FromBluetoothAddressAsync(_str_to_mac_address(advertising_data.mac_address)));
 }
@@ -49,6 +51,14 @@ void PeripheralBase::update_advertising_data(advertising_data_t advertising_data
     identifier_ = advertising_data.identifier;
     rssi_ = advertising_data.rssi;
     manufacturer_data_ = advertising_data.manufacturer_data;
+
+    // Append services that haven't been seen before
+    for (auto& service : advertising_data.service_uuids) {
+        if (std::find(advertised_services_.begin(), advertised_services_.end(), service) ==
+            advertised_services_.end()) {
+            advertised_services_.push_back(service);
+        }
+    }
 }
 
 void PeripheralBase::connect() {
@@ -118,7 +128,12 @@ std::vector<Service> PeripheralBase::services() {
 }
 
 std::vector<Service> PeripheralBase::advertised_services() {
-    return {};
+    std::vector<Service> service_list;
+    for (auto& service_uuid : advertised_services_) {
+        service_list.push_back(ServiceBuilder(service_uuid));
+    }
+
+    return service_list;
 }
 
 std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() { return manufacturer_data_; }
