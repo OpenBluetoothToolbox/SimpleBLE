@@ -47,6 +47,12 @@ BluetoothAddress PeripheralBase::address() { return address_; }
 
 int16_t PeripheralBase::rssi() { return rssi_; }
 
+uint16_t PeripheralBase::mtu() {
+    if (!is_connected()) return 0;
+
+    return mtu_;
+}
+
 void PeripheralBase::update_advertising_data(advertising_data_t advertising_data) {
     if (advertising_data.identifier != "") {
         identifier_ = advertising_data.identifier;
@@ -330,6 +336,9 @@ bool PeripheralBase::_attempt_connect() {
         // For each service...
         gatt_service_t gatt_service;
         gatt_service.obj = service;
+
+        // Save the MTU size
+        mtu_ = service.Session().MaxPduSize();
 
         // Fetch the service UUID
         std::string service_uuid = guid_to_uuid(service.Uuid());

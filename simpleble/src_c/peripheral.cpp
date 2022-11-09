@@ -48,6 +48,15 @@ int16_t simpleble_peripheral_rssi(simpleble_peripheral_t handle) {
     return peripheral->rssi().value_or(INT16_MIN);
 }
 
+uint16_t simpleble_peripheral_mtu(simpleble_peripheral_t handle) {
+    if (handle == nullptr) {
+        return 0;
+    }
+
+    SimpleBLE::Safe::Peripheral* peripheral = (SimpleBLE::Safe::Peripheral*)handle;
+    return peripheral->mtu().value_or(0);
+}
+
 simpleble_err_t simpleble_peripheral_connect(simpleble_peripheral_t handle) {
     if (handle == nullptr) {
         return SIMPLEBLE_FAILURE;

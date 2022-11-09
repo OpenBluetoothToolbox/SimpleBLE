@@ -23,6 +23,7 @@ class PeripheralBase {
     std::string identifier();
     BluetoothAddress address();
     int16_t rssi();
+    uint16_t mtu();
 
     void connect();
     void disconnect();

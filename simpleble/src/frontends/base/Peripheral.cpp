@@ -31,6 +31,12 @@ int16_t Peripheral::rssi() {
     return internal_->rssi();
 }
 
+uint16_t Peripheral::mtu() {
+    if (!initialized()) throw Exception::NotInitialized();
+
+    return internal_->mtu();
+}
+
 void Peripheral::connect() {
     if (!initialized()) throw Exception::NotInitialized();
 
