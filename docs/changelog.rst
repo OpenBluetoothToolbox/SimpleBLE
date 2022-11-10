@@ -16,6 +16,10 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  Retrieve the MTU value of an established connection. (IN PROGRESS - Windows/MacOS only)
 -  (Windows) Logging of WinRT initialization behavior.
 
+**Changed**
+
+-  (MacOS) More explicit exception messages.
+
 **Fixed**
 
 -  Incorrect handling of services and characteristics in the Python examples. *(Thanks Carl-CWX!)*
