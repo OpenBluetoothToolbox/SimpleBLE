@@ -50,7 +50,9 @@ int16_t PeripheralBase::rssi() { return rssi_; }
 uint16_t PeripheralBase::mtu() {
     if (!is_connected()) return 0;
 
-    return mtu_;
+    // The value provided by the MaxPduSize includes an extra 3 bytes from the GATT header
+    // which needs to be removed.
+    return mtu_ - 3;
 }
 
 void PeripheralBase::update_advertising_data(advertising_data_t advertising_data) {

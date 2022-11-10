@@ -48,7 +48,10 @@ BluetoothAddress PeripheralBase::address() {
 
 int16_t PeripheralBase::rssi() { return rssi_; }
 
-uint16_t PeripheralBase::mtu() { return 0; }
+uint16_t PeripheralBase::mtu() {
+    PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
+    return [internal mtu];
+}
 
 void PeripheralBase::update_advertising_data(advertising_data_t advertising_data) {
     is_connectable_ = advertising_data.connectable;

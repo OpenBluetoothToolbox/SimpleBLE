@@ -65,6 +65,10 @@ typedef struct {
     return [self.peripheral.identifier UUIDString];
 }
 
+- (uint16_t) mtu {
+    return [self.peripheral maximumWriteValueLengthForType:CBCharacteristicWriteWithoutResponse];
+}
+
 - (void)connect {
     @synchronized(self) {
         // NSLog(@"Connecting to peripheral: %@", self.peripheral.name);

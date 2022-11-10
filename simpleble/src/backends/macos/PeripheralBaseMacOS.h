@@ -5,6 +5,7 @@
 
 #include <functional>
 #include <vector>
+#include <cstdint>
 #include "PeripheralBase.h"
 
 @interface PeripheralBaseMacOS : NSObject<CBPeripheralDelegate>
@@ -15,6 +16,7 @@
 
 - (NSString*)identifier;
 - (NSString*)address;
+- (uint16_t) mtu;
 
 - (void)connect;
 - (void)disconnect;
