@@ -3,8 +3,7 @@ Changelog
 
 All notable changes to this project will be documented in this file.
 
-The format is based on `Keep a Changelog`_, and this project adheres to
-`Semantic Versioning`_.
+The format is based on `Keep a Changelog`_, and this project adheres to `Semantic Versioning`_.
 
 [0.6.0] - 2022-XX-XX
 --------------------
