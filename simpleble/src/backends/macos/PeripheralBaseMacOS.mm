@@ -183,7 +183,15 @@ typedef struct {
             for (CBDescriptor* descriptor in characteristic.descriptors) {
                 descriptor_list.push_back(SimpleBLE::DescriptorBuilder(uuidToSimpleBLE(descriptor.UUID)));
             }
-            characteristic_list.push_back(SimpleBLE::CharacteristicBuilder(uuidToSimpleBLE(characteristic.UUID), descriptor_list));
+
+            bool can_read = (characteristic.properties & CBCharacteristicPropertyRead) != 0;
+            bool can_write_request = (characteristic.properties & CBCharacteristicPropertyWrite) != 0;
+            bool can_write_command = (characteristic.properties & CBCharacteristicPropertyWriteWithoutResponse) != 0;
+            bool can_notify = (characteristic.properties & CBCharacteristicPropertyNotify) != 0;
+            bool can_indicate = (characteristic.properties & CBCharacteristicPropertyIndicate) != 0;
+
+            characteristic_list.push_back(SimpleBLE::CharacteristicBuilder(uuidToSimpleBLE(characteristic.UUID), descriptor_list, can_read,
+                                                                           can_write_request, can_write_command, can_notify, can_indicate));
         }
         service_list.push_back(SimpleBLE::ServiceBuilder(uuidToSimpleBLE(service.UUID), characteristic_list));
     }
@@ -196,6 +204,12 @@ typedef struct {
                                                                                        characteristic_uuid:characteristic_uuid];
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
+
+    // Check that the characteristic supports this feature.
+    if ((characteristic.properties & CBCharacteristicPropertyRead) == 0) {
+        NSLog(@"Characteristic does not support read.");
+        throw SimpleBLE::Exception::OperationNotSupported();
+    }
 
     @synchronized(self) {
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending = YES;
@@ -348,8 +362,9 @@ typedef struct {
     while (readPending && [NSDate.now compare:endDate] == NSOrderedAscending) {
         [NSThread sleepForTimeInterval:0.01];
         @synchronized(self) {
-            readPending =
-                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].readPending;
+            readPending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)]
+                              .descriptor_extras[uuidToSimpleBLE(descriptor.UUID)]
+                              .readPending;
         }
     }
 
@@ -385,8 +400,9 @@ typedef struct {
     while (writePending && [NSDate.now compare:endDate] == NSOrderedAscending) {
         [NSThread sleepForTimeInterval:0.01];
         @synchronized(self) {
-            writePending =
-                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].writePending;
+            writePending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)]
+                               .descriptor_extras[uuidToSimpleBLE(descriptor.UUID)]
+                               .writePending;
         }
     }
 
