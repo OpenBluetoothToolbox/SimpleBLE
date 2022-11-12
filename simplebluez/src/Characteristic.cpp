@@ -36,6 +36,8 @@ std::string Characteristic::uuid() { return gattcharacteristic1()->UUID(); }
 
 ByteArray Characteristic::value() { return gattcharacteristic1()->Value(); }
 
+std::vector<std::string> Characteristic::flags() { return gattcharacteristic1()->Flags(); }
+
 ByteArray Characteristic::read() { return gattcharacteristic1()->ReadValue(); }
 
 void Characteristic::write_request(ByteArray value) {

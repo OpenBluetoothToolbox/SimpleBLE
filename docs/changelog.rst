@@ -12,9 +12,10 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 
 -  Option to build SimpleBLE plain-flavored (without any BLE code) for testing and debugging purposes.
 -  Support for advertized services. (IN PROGRESS - Windows/MacOS only)
--  Support for GATT Characteristic properties. (IN PROGRESS - Windows/MacOS only)
+-  Support for GATT Characteristic properties.
 -  Retrieve the MTU value of an established connection. (IN PROGRESS - Windows/MacOS only)
 -  (Windows) Logging of WinRT initialization behavior.
+-  (SimpleBluez) Support for GATT characteristic flags.
 
 **Changed**
 

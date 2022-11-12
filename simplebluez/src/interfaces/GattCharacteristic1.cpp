@@ -61,6 +61,17 @@ ByteArray GattCharacteristic1::Value() {
     return _value;
 }
 
+std::vector<std::string> GattCharacteristic1::Flags() {
+    std::scoped_lock lock(_property_update_mutex);
+
+    std::vector<std::string> flags;
+    for (SimpleDBus::Holder& flag : _properties["Flags"].get_array()) {
+        flags.push_back(flag.get_string());
+    }
+
+    return flags;
+}
+
 bool GattCharacteristic1::Notifying(bool refresh) {
     if (refresh) {
         property_refresh("Notifying");
