@@ -131,11 +131,11 @@ if(SIMPLEBLE_PLAIN)
     message(STATUS "Plain Flavor Requested")
 
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/plain/AdapterBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/plain/PeripheralBase.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/AdapterBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/PeripheralBase.cpp)
 
     target_include_directories(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/plain)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain)
 
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message(STATUS "Linux Host Detected")
