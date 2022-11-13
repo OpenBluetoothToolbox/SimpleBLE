@@ -36,7 +36,18 @@ BluetoothAddress PeripheralBase::address() { return device_->address(); }
 
 int16_t PeripheralBase::rssi() { return device_->rssi(); }
 
-uint16_t PeripheralBase::mtu() { return 0; }
+uint16_t PeripheralBase::mtu() {
+    if (!is_connected()) return 0;
+
+    for (auto bluez_service : device_->services()) {
+        for (auto bluez_characteristic : bluez_service->characteristics()) {
+            // The value provided by Bluez includes an extra 3 bytes from the GATT header
+            // which needs to be removed.
+            return bluez_characteristic->mtu() - 3;
+        }
+    }
+    return 0;
+}
 
 void PeripheralBase::connect() {
     device_->clear_on_disconnected();
@@ -115,14 +126,13 @@ std::vector<Service> PeripheralBase::services() {
 
             std::vector<std::string> flags = bluez_characteristic->flags();
 
-            bool can_read          = std::find(flags.begin(), flags.end(), "read") != flags.end();
+            bool can_read = std::find(flags.begin(), flags.end(), "read") != flags.end();
             bool can_write_request = std::find(flags.begin(), flags.end(), "write") != flags.end();
             bool can_write_command = std::find(flags.begin(), flags.end(), "write-without-response") != flags.end();
-            bool can_notify        = std::find(flags.begin(), flags.end(), "notify") != flags.end();
-            bool can_indicate      = std::find(flags.begin(), flags.end(), "indicate") != flags.end();
+            bool can_notify = std::find(flags.begin(), flags.end(), "notify") != flags.end();
+            bool can_indicate = std::find(flags.begin(), flags.end(), "indicate") != flags.end();
 
-            characteristic_list.push_back(CharacteristicBuilder(
-                bluez_characteristic->uuid(), descriptor_list, can_read,
+            characteristic_list.push_back(CharacteristicBuilder(bluez_characteristic->uuid(), descriptor_list, can_read,
                                                                 can_write_request, can_write_command, can_notify,
                                                                 can_indicate));
         }
@@ -134,15 +144,14 @@ std::vector<Service> PeripheralBase::services() {
     if (!is_battery_service_available && device_->has_battery_interface()) {
         // Emulate the battery service through the Battery1 interface.
         service_list.push_back(
-            ServiceBuilder(BATTERY_SERVICE_UUID, {CharacteristicBuilder(BATTERY_CHARACTERISTIC_UUID, {}, true, false, false, true, false)}));
+            ServiceBuilder(BATTERY_SERVICE_UUID,
+                           {CharacteristicBuilder(BATTERY_CHARACTERISTIC_UUID, {}, true, false, false, true, false)}));
     }
 
     return service_list;
 }
 
-std::vector<Service> PeripheralBase::advertised_services() {
-    return {};
-}
+std::vector<Service> PeripheralBase::advertised_services() { return {}; }
 
 std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() {
     std::map<uint16_t, ByteArray> manufacturer_data;

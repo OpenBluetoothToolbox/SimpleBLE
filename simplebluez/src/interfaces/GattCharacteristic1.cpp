@@ -72,6 +72,11 @@ std::vector<std::string> GattCharacteristic1::Flags() {
     return flags;
 }
 
+uint16_t GattCharacteristic1::MTU() {
+    std::scoped_lock lock(_property_update_mutex);
+    return _properties["MTU"].get_uint16();
+}
+
 bool GattCharacteristic1::Notifying(bool refresh) {
     if (refresh) {
         property_refresh("Notifying");

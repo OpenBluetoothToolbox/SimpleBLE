@@ -27,6 +27,7 @@ class GattCharacteristic1 : public SimpleDBus::Interface {
     ByteArray Value();
     bool Notifying(bool refresh = true);
     std::vector<std::string> Flags();
+    uint16_t MTU();
 
     // ----- CALLBACKS -----
     kvn::safe_callback<void()> OnValueChanged;

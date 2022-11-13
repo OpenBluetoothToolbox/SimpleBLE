@@ -31,6 +31,7 @@ class Characteristic : public SimpleDBus::Proxy {
     ByteArray value();
     bool notifying();
     std::vector<std::string> flags();
+    uint16_t mtu();
 
     // ----- CALLBACKS -----
     void set_on_value_changed(std::function<void(ByteArray new_value)> callback);
