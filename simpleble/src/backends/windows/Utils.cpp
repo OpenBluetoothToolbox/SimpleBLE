@@ -65,6 +65,9 @@ void initialize_winrt() {
 }
 
 std::string _mac_address_to_str(uint64_t mac_address) {
+
+
+
     uint8_t* mac_ptr = (uint8_t*)&mac_address;
     char mac_str[MAC_ADDRESS_STR_LENGTH + 1] = {0};  // Include null terminator.
 

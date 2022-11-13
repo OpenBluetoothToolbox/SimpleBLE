@@ -39,7 +39,7 @@ class SIMPLEBLE_EXPORT Peripheral {
 
     /**
      * @brief Provides a list of all services that are available on the peripheral.
-     * 
+     *
      * @note If the peripheral is not connected, it will return a list of services
      *       that were advertised by the device.
      */

@@ -3,9 +3,9 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <Foundation/Foundation.h>
 
+#include <cstdint>
 #include <functional>
 #include <vector>
-#include <cstdint>
 #include "PeripheralBase.h"
 
 @interface PeripheralBaseMacOS : NSObject<CBPeripheralDelegate>
@@ -16,7 +16,7 @@
 
 - (NSString*)identifier;
 - (NSString*)address;
-- (uint16_t) mtu;
+- (uint16_t)mtu;
 
 - (void)connect;
 - (void)disconnect;
