@@ -151,7 +151,14 @@ std::vector<Service> PeripheralBase::services() {
     return service_list;
 }
 
-std::vector<Service> PeripheralBase::advertised_services() { return {}; }
+std::vector<Service> PeripheralBase::advertised_services() {
+    std::vector<Service> service_list;
+    for (auto& service : device_->service_data()) {
+        service_list.push_back(ServiceBuilder(service, {}));
+    }
+
+    return service_list;
+}
 
 std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() {
     std::map<uint16_t, ByteArray> manufacturer_data;
