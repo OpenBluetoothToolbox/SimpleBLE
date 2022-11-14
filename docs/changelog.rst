@@ -16,6 +16,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  Retrieve the MTU value of an established connection. *(Thanks Marco Cruz!)*
 -  (Windows) Logging of WinRT initialization behavior.
 -  (SimpleBluez) Support for GATT characteristic flags.
+-  (SimpleBluez) Support for GATT characteristic MTUs. *(Thanks Marco Cruz!)*
+-  (SimpleBluez) Support for advertized services.
 
 **Changed**
 
