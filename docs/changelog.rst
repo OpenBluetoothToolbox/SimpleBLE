@@ -3,8 +3,7 @@ Changelog
 
 All notable changes to this project will be documented in this file.
 
-The format is based on `Keep a Changelog`_, and this project adheres to
-`Semantic Versioning`_.
+The format is based on `Keep a Changelog`_, and this project adheres to `Semantic Versioning`_.
 
 [0.6.0] - 2022-XX-XX
 --------------------
@@ -12,13 +11,21 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 **Added**
 
 -  Option to build SimpleBLE plain-flavored (without any BLE code) for testing and debugging purposes.
+-  Support for advertized services.
+-  Support for GATT Characteristic properties.
+-  Retrieve the MTU value of an established connection. *(Thanks Marco Cruz!)*
 -  (Windows) Logging of WinRT initialization behavior.
+-  (SimpleBluez) Support for GATT characteristic flags.
+
+**Changed**
+
+-  (MacOS) More explicit exception messages.
 
 **Fixed**
 
 -  Incorrect handling of services and characteristics in the Python examples. *(Thanks Carl-CWX!)*
 -  (MacOS) Increased priority of the dispatch queue to prevent jitter in the incoming data.
--  (Windows) Missing peripheral identifier data.
+-  (Windows) Missing peripheral identifier data. *(Thanks eriklins!)*
 -  (Windows) Multiple initialization of the WinRT backend.
 
 
