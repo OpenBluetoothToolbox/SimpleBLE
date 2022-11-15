@@ -63,6 +63,8 @@ void Device::disconnect() { device1()->Disconnect(); }
 
 std::string Device::address() { return device1()->Address(); }
 
+std::string Device::address_type() { return device1()->AddressType(); }
+
 std::string Device::name() { return device1()->Name(); }
 
 std::string Device::alias() { return device1()->Alias(); }

@@ -53,6 +53,7 @@ int main(int argc, char* argv[]) {
     adapter->set_on_device_updated([](std::shared_ptr<SimpleBluez::Device> device) {
         std::cout << "Update received for " << device->address() << std::endl;
         std::cout << "\tName " << device->name() << std::endl;
+        std::cout << "\tAddress Type " << device->address_type() << std::endl;
         std::cout << "\tRSSI " << std::dec << device->rssi() << std::endl;
         std::cout << "\tTxPower " << std::dec << device->tx_power() << std::endl;
         auto manufacturer_data = device->manufacturer_data();

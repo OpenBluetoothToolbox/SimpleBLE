@@ -50,6 +50,11 @@ std::string Device1::Address() {
     return _properties["Address"].get_string();
 }
 
+std::string Device1::AddressType() {
+    std::scoped_lock lock(_property_update_mutex);
+    return _properties["AddressType"].get_string();
+}
+
 std::string Device1::Alias() {
     std::scoped_lock lock(_property_update_mutex);
     return _properties["Alias"].get_string();
