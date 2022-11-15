@@ -69,6 +69,8 @@ std::string Device::alias() { return device1()->Alias(); }
 
 int16_t Device::rssi() { return device1()->RSSI(); }
 
+int16_t Device::tx_power() { return device1()->TxPower(); }
+
 std::map<uint16_t, std::vector<uint8_t>> Device::manufacturer_data() { return device1()->ManufacturerData(); }
 
 std::vector<std::string> Device::service_data() { return device1()->ServiceData(); }

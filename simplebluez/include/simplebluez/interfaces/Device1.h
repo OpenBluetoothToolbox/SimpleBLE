@@ -20,6 +20,7 @@ class Device1 : public SimpleDBus::Interface {
 
     // ----- PROPERTIES -----
     int16_t RSSI();
+    int16_t TxPower();
     uint16_t Appearance();  // On Bluez 5.53, this always returns 0.
     std::string Address();
     std::string Alias();
@@ -38,6 +39,7 @@ class Device1 : public SimpleDBus::Interface {
     void property_changed(std::string option_name) override;
 
     int16_t _rssi;
+    int16_t _tx_power;
     std::string _name;
     std::string _alias;
     std::string _address;

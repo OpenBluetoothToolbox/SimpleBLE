@@ -25,6 +25,7 @@ class Device : public SimpleDBus::Proxy {
     std::string name();
     std::string alias();
     int16_t rssi();
+    int16_t tx_power();
 
     std::map<uint16_t, std::vector<uint8_t>> manufacturer_data();
     std::vector<std::string> service_data();

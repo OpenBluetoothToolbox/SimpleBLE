@@ -35,6 +35,11 @@ int16_t Device1::RSSI() {
     return _properties["RSSI"].get_int16();
 }
 
+int16_t Device1::TxPower() {
+    std::scoped_lock lock(_property_update_mutex);
+    return _properties["TxPower"].get_int16();
+}
+
 uint16_t Device1::Appearance() {
     std::scoped_lock lock(_property_update_mutex);
     return _properties["Appearance"].get_uint16();
