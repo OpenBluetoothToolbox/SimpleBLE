@@ -111,7 +111,7 @@ std::string Adapter1::Address() {
     return _properties["Address"].get_string();
 }
 
-std::string Adapter1::Address() {
+std::string Adapter1::AddressType() {
     std::scoped_lock lock(_property_update_mutex);
     return _properties["AddressType"].get_string();
 }
