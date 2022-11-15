@@ -35,6 +35,8 @@ std::string Adapter::identifier() const {
 
 std::string Adapter::address() { return adapter1()->Address(); }
 
+std::string Adapter::address_type() { return adapter1()->AddressType(); }
+
 bool Adapter::discovering() { return adapter1()->Discovering(); }
 
 bool Adapter::powered() { return adapter1()->Powered(); }

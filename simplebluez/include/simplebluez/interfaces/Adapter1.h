@@ -37,6 +37,7 @@ class Adapter1 : public SimpleDBus::Interface {
     bool Discovering(bool refresh = true);
     bool Powered(bool refresh = true);
     std::string Address();
+    std::string AddressType();
 
   protected:
     void property_changed(std::string option_name) override;
