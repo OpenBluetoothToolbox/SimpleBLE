@@ -87,6 +87,7 @@ class PeripheralBase {
     std::string identifier_;
     BluetoothAddress address_;
     int16_t rssi_;
+    int16_t tx_power_;
     uint16_t mtu_;
     bool connectable_;
     winrt::event_token connection_status_changed_token_;

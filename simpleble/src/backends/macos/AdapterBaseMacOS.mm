@@ -101,6 +101,10 @@
     // Extract RSSI
     advertisingData.rssi = [RSSI shortValue];
 
+    // Extract Tx Power
+    NSNumber* txPower = advertisementData[CBAdvertisementDataTxPowerLevelKey];
+    advertisingData.tx_power = [txPower shortValue];
+
     // Extract Manufacturer Data
     NSData* rawManufacturerData = advertisementData[CBAdvertisementDataManufacturerDataKey];
     if (rawManufacturerData != nil) {

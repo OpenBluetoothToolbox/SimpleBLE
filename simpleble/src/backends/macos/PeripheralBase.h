@@ -21,6 +21,7 @@ class PeripheralBase {
 
     std::string identifier();
     BluetoothAddress address();
+    int16_t tx_power();
     int16_t rssi();
     uint16_t mtu();
 
@@ -62,6 +63,7 @@ class PeripheralBase {
     void* opaque_internal_;
 
     int16_t rssi_;
+    int16_t tx_power_;
 
     bool is_connectable_;
 

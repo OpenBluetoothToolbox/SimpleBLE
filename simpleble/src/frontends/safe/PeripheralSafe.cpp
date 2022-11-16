@@ -30,6 +30,13 @@ std::optional<int16_t> SimpleBLE::Safe::Peripheral::rssi() noexcept {
     }
 }
 
+std::optional<int16_t> SimpleBLE::Safe::Peripheral::tx_power() noexcept {
+    try {
+        return SimpleBLE::Peripheral::tx_power();
+    } catch (...) {
+        return std::nullopt;
+    }
+}
 std::optional<uint16_t> SimpleBLE::Safe::Peripheral::mtu() noexcept {
     try {
         return SimpleBLE::Peripheral::mtu();

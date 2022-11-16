@@ -13,6 +13,7 @@ struct advertising_data_t {
     BluetoothAddress mac_address;
     bool connectable;
     int16_t rssi;
+    int16_t tx_power;
 
     std::vector<BluetoothUUID> service_uuids;
     std::map<uint16_t, ByteArray> manufacturer_data;
