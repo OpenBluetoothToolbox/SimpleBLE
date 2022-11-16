@@ -22,6 +22,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 **Changed**
 
 -  (MacOS) More explicit exception messages.
+-  (MacOS) 16-bit UUIDs are now presented in their 128-bit form.
 
 **Fixed**
 
