@@ -38,7 +38,16 @@ AdapterBase::AdapterBase(std::string device_id)
         [this](const auto& w, const Advertisement::BluetoothLEAdvertisementReceivedEventArgs args) {
             advertising_data_t data;
             data.mac_address = _mac_address_to_str(args.BluetoothAddress());
-            data.address_type = winrt::to_string(args.BluetoothAddressType());
+            std::string addr_type;
+            int16_t addr_type_enum = args.BluetoothAddressType();
+            if (addr_type_enum == 0) {
+                addr_type = "public";
+            } else if (addr_type_enum == 1) {
+                addr_type = "random";
+            } else {
+                addr_type = "unspecified";
+            }
+            data.address_type = addr_type;
             data.identifier = winrt::to_string(args.Advertisement().LocalName());
             data.connectable = args.IsConnectable();
             data.rssi = args.RawSignalStrengthInDBm();
