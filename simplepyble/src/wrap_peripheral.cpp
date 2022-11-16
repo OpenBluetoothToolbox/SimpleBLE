@@ -22,8 +22,16 @@ constexpr auto kDocsPeripheralAddress = R"pbdoc(
     Address of the peripheral
 )pbdoc";
 
+constexpr auto kDocsPeripheralAddressType = R"pbdoc(
+    Address Type of the peripheral
+)pbdoc";
+
 constexpr auto kDocsPeripheralRSSI = R"pbdoc(
     RSSI of the peripheral
+)pbdoc";
+
+constexpr auto kDocsPeripheralTxPower = R"pbdoc(
+    Transit Power of the peripheral in dBm
 )pbdoc";
 
 constexpr auto kDocsPeripheralConnect = R"pbdoc(
@@ -104,7 +112,9 @@ void wrap_peripheral(py::module& m) {
         .def("initialized", &SimpleBLE::Peripheral::initialized, kDocsPeripheralInitialized)
         .def("identifier", &SimpleBLE::Peripheral::identifier, kDocsPeripheralIdentifier)
         .def("address", &SimpleBLE::Peripheral::address, kDocsPeripheralAddress)
+        .def("address_type", &SimpleBLE::Peripheral::address_type, kDocsPeripheralAddressType)
         .def("rssi", &SimpleBLE::Peripheral::rssi, kDocsPeripheralRSSI)
+        .def("tx_power", &SimpleBLE::Peripheral::tx_power, kDocsPeripheralTxPower)
         .def("connect", &SimpleBLE::Peripheral::connect, py::call_guard<py::gil_scoped_release>(),
              kDocsPeripheralConnect)
         .def("disconnect", &SimpleBLE::Peripheral::disconnect, kDocsPeripheralDisconnect)
