@@ -18,7 +18,6 @@ class Adapter : public SimpleDBus::Proxy {
 
     std::string identifier() const;
     std::string address();
-    std::string address_type();
     bool discovering();
     bool powered();
 
