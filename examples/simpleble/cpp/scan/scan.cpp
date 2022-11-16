@@ -40,7 +40,7 @@ int main() {
 
         std::cout << "[" << i << "] " << peripheral_string << " " << connectable_string << std::endl;
 
-        std::cout << "Tx Power: " << peripherals[i].tx_power() << " dBm" << std::endl;
+        std::cout << "    Tx Power: " << peripherals[i].tx_power() << " dBm" << std::endl;
 
         std::vector<SimpleBLE::Service> services = peripherals[i].services();
         for (auto& service : services) {
