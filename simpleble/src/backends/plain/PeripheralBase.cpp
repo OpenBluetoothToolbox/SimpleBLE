@@ -21,7 +21,7 @@ PeripheralBase::~PeripheralBase() {}
 
 void* PeripheralBase::underlying() const { return nullptr; }
 
-std::string PeripheralBase::address_type() { return "random" };
+std::string PeripheralBase::address_type() { return "random"; };
 
 std::string PeripheralBase::identifier() { return "Plain Peripheral"; }
 
