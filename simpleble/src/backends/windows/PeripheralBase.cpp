@@ -22,6 +22,7 @@ using namespace SimpleBLE;
 using namespace std::chrono_literals;
 
 PeripheralBase::PeripheralBase(advertising_data_t advertising_data) {
+    address_type_ = advertising_data.address_type;
     identifier_ = advertising_data.identifier;
     address_ = advertising_data.mac_address;
     rssi_ = advertising_data.rssi;
@@ -41,6 +42,8 @@ PeripheralBase::~PeripheralBase() {
 }
 
 void* PeripheralBase::underlying() const { return reinterpret_cast<void*>(const_cast<BluetoothLEDevice*>(&device_)); }
+
+std::string PeripheralBase::address_type() { return address_type_ };
 
 std::string PeripheralBase::identifier() { return identifier_; }
 
@@ -62,6 +65,7 @@ void PeripheralBase::update_advertising_data(advertising_data_t advertising_data
     }
     rssi_ = advertising_data.rssi;
     tx_power_ = advertising_data.tx_power;
+    address_type_ = advertising_data.address_type;
     manufacturer_data_ = advertising_data.manufacturer_data;
 
     // Append services that haven't been seen before

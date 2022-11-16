@@ -37,6 +37,10 @@ void* PeripheralBase::underlying() const {
     return [internal underlying];
 }
 
+std::string PeripheralBase::address_type() {
+    throw Exception::OperationNotSupported();
+}
+
 std::string PeripheralBase::identifier() {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
     return std::string([[internal identifier] UTF8String]);

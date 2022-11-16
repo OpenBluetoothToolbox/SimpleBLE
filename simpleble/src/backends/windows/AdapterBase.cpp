@@ -38,6 +38,7 @@ AdapterBase::AdapterBase(std::string device_id)
         [this](const auto& w, const Advertisement::BluetoothLEAdvertisementReceivedEventArgs args) {
             advertising_data_t data;
             data.mac_address = _mac_address_to_str(args.BluetoothAddress());
+            data.address_type = winrt::to_string(args.BluetoothAddressType());
             data.identifier = winrt::to_string(args.Advertisement().LocalName());
             data.connectable = args.IsConnectable();
             data.rssi = args.RawSignalStrengthInDBm();

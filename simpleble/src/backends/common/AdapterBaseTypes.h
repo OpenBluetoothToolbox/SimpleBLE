@@ -10,6 +10,7 @@ namespace SimpleBLE {
 
 struct advertising_data_t {
     std::string identifier;
+    std::string address_type;
     BluetoothAddress mac_address;
     bool connectable;
     int16_t rssi;

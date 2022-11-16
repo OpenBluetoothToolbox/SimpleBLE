@@ -30,6 +30,8 @@ PeripheralBase::~PeripheralBase() {
 
 void* PeripheralBase::underlying() const { return device_.get(); }
 
+std::string PeripheralBase::address_type() { return device_->address_type(); }
+
 std::string PeripheralBase::identifier() { return device_->name(); }
 
 BluetoothAddress PeripheralBase::address() { return device_->address(); }

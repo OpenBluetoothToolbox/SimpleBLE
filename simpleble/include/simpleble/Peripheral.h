@@ -25,6 +25,7 @@ class SIMPLEBLE_EXPORT Peripheral {
     bool initialized() const;
     void* underlying() const;
 
+    std::string address_type();
     std::string identifier();
     BluetoothAddress address();
     int16_t rssi();

@@ -13,6 +13,12 @@ void* Peripheral::underlying() const {
     return internal_->underlying();
 }
 
+std::string Peripheral::address_type() {
+    if (!initialized()) throw Exception::NotInitialized();
+
+    return internal_->address_type();
+}
+
 std::string Peripheral::identifier() {
     if (!initialized()) throw Exception::NotInitialized();
 

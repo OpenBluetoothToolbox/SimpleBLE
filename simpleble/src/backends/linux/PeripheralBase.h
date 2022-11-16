@@ -24,6 +24,7 @@ class PeripheralBase {
     void* underlying() const;
 
     std::string identifier();
+    std::string address_type();
     BluetoothAddress address();
     int16_t rssi();
     int16_t tx_power();
