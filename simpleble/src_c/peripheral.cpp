@@ -15,6 +15,18 @@ void simpleble_peripheral_release_handle(simpleble_peripheral_t handle) {
     delete peripheral;
 }
 
+char* simpleble_peripheral_address_type(simpleble_peripheral_t handle) {
+    if (handle == nullptr) {
+        return nullptr;
+    }
+
+    SimpleBLE::Safe::Peripheral* peripheral = (SimpleBLE::Safe::Peripheral*)handle;
+    std::string address_type = peripheral->address_type().value_or("");
+    char* c_address_type = (char*)malloc(address.size() + 1);
+    strcpy(c_address_type, address_type.c_str());
+    return c_address_type;
+}
+
 char* simpleble_peripheral_identifier(simpleble_peripheral_t handle) {
     if (handle == nullptr) {
         return nullptr;
