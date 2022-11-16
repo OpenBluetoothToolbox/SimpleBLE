@@ -22,7 +22,7 @@ char* simpleble_peripheral_address_type(simpleble_peripheral_t handle) {
 
     SimpleBLE::Safe::Peripheral* peripheral = (SimpleBLE::Safe::Peripheral*)handle;
     std::string address_type = peripheral->address_type().value_or("");
-    char* c_address_type = (char*)malloc(address.size() + 1);
+    char* c_address_type = (char*)malloc(address_type.size() + 1);
     strcpy(c_address_type, address_type.c_str());
     return c_address_type;
 }
