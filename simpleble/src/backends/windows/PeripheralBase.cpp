@@ -51,6 +51,8 @@ BluetoothAddress PeripheralBase::address() { return address_; }
 
 int16_t PeripheralBase::rssi() { return rssi_; }
 
+int16_t PeripheralBase::tx_power() { return rssi_; }
+
 uint16_t PeripheralBase::mtu() {
     if (!is_connected()) return 0;
 
