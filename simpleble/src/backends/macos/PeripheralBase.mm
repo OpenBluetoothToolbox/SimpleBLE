@@ -20,7 +20,7 @@ PeripheralBase::PeripheralBase(void* opaque_peripheral, void* opaque_adapter, ad
     manual_disconnect_triggered_ = false;
     manufacturer_data_ = advertising_data.manufacturer_data;
     rssi_ = advertising_data.rssi;
-    tx_power_ = advtising_data.tx_power;
+    tx_power_ = advertising_data.tx_power;
 }
 
 PeripheralBase::~PeripheralBase() {
@@ -49,7 +49,7 @@ BluetoothAddress PeripheralBase::address() {
 
 int16_t PeripheralBase::rssi() { return rssi_; }
 
-int16_t PeripheralBase::rssi() { return tx_power_; }
+int16_t PeripheralBase::tx_power() { return tx_power_; }
 
 uint16_t PeripheralBase::mtu() {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
