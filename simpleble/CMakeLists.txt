@@ -135,7 +135,12 @@ target_link_libraries(simpleble-c PRIVATE simpleble::simpleble)
 append_sanitize_options("${SIMPLEBLE_SANITIZE}")
 
 if(NOT SIMPLEBLE_LOG_LEVEL)
-set(SIMPLEBLE_LOG_LEVEL "INFO")
+    set(SIMPLEBLE_LOG_LEVEL "INFO")
+endif()
+
+
+if(SIMPLEBLE_USE_SESSION_DBUS)
+    add_definitions (-DUSE_SESSION_DBUS)
 endif()
 
 list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLE_LOG_LEVEL=SIMPLEBLE_LOG_LEVEL_${SIMPLEBLE_LOG_LEVEL})
