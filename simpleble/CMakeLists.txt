@@ -84,7 +84,7 @@ set_target_properties(simpleble PROPERTIES
     OUTPUT_NAME simpleble
     RELEASE_POSTFIX ""
     RELWITHDEBINFO_POSTFIX "-relwithdebinfo"
-    MINSIZEREL_POSTFIX "$-minsizerel"
+    MINSIZEREL_POSTFIX "-minsizerel"
     DEBUG_POSTFIX "-debug")
 
 set_target_properties(simpleble-c PROPERTIES
@@ -101,7 +101,7 @@ set_target_properties(simpleble-c PROPERTIES
     OUTPUT_NAME simpleble-c
     RELEASE_POSTFIX ""
     RELWITHDEBINFO_POSTFIX "-relwithdebinfo"
-    MINSIZEREL_POSTFIX "$-minsizerel"
+    MINSIZEREL_POSTFIX "-minsizerel"
     DEBUG_POSTFIX "-debug")
 
 generate_export_header(
