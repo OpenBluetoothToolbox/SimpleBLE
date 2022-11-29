@@ -39,19 +39,26 @@ AdapterBase::AdapterBase(std::string device_id)
             advertising_data_t data;
             data.mac_address = _mac_address_to_str(args.BluetoothAddress());
             std::string addr_type;
-            int16_t addr_type_enum = args.BluetoothAddressType();
-            if (addr_type_enum == 0) {
-                addr_type = "public";
-            } else if (addr_type_enum == 1) {
-                addr_type = "random";
-            } else {
-                addr_type = "unspecified";
+            BluetoothAddressType addr_type_enum = args.BluetoothAddressType();
+            switch (addr_type_enum) {
+                case BluetoothAddressType::Public:
+                    addr_type = "public";
+                    break;
+
+                case BluetoothAddressType::Random:
+                    addr_type = "random";
+                    break;
+
+                case BluetoothAddressType::Unspecified: 
+                    addr_type = "unspecified";
+                    break;
             }
+
             data.address_type = addr_type;
             data.identifier = winrt::to_string(args.Advertisement().LocalName());
             data.connectable = args.IsConnectable();
             data.rssi = args.RawSignalStrengthInDBm();
-            data.tx_power = args.TransmitPowerLevelInDBm();
+            data.tx_power = args.TransmitPowerLevelInDBm().Value();
 
             // Parse manufacturer data
             auto manufacturer_data = args.Advertisement().ManufacturerData();
