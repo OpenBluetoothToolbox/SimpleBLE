@@ -13,22 +13,22 @@ void* Peripheral::underlying() const {
     return internal_->underlying();
 }
 
-std::string Peripheral::address_type() {
-    if (!initialized()) throw Exception::NotInitialized();
-
-    return internal_->address_type();
-}
-
 std::string Peripheral::identifier() {
     if (!initialized()) throw Exception::NotInitialized();
 
     return internal_->identifier();
 }
 
-BluetoothAddress Peripheral::address() {
+SimpleBLE::BluetoothAddress Peripheral::address() {
     if (!initialized()) throw Exception::NotInitialized();
 
     return internal_->address();
+}
+
+SimpleBLE::BluetoothAddressType Peripheral::address_type() {
+    if (!initialized()) throw Exception::NotInitialized();
+
+    return internal_->address_type();
 }
 
 int16_t Peripheral::rssi() {

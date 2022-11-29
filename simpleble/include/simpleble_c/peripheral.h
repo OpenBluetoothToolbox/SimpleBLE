@@ -26,14 +26,6 @@ SIMPLEBLE_EXPORT void simpleble_peripheral_release_handle(simpleble_peripheral_t
  * @param handle
  * @return char*
  */
-SIMPLEBLE_EXPORT char* simpleble_peripheral_address_type(simpleble_peripheral_t handle);
-
-/**
- * @brief
- *
- * @param handle
- * @return char*
- */
 SIMPLEBLE_EXPORT char* simpleble_peripheral_identifier(simpleble_peripheral_t handle);
 
 /**
@@ -43,6 +35,14 @@ SIMPLEBLE_EXPORT char* simpleble_peripheral_identifier(simpleble_peripheral_t ha
  * @return char*
  */
 SIMPLEBLE_EXPORT char* simpleble_peripheral_address(simpleble_peripheral_t handle);
+
+/**
+ * @brief
+ *
+ * @param handle
+ * @return simpleble_address_type_t
+ */
+SIMPLEBLE_EXPORT simpleble_address_type_t simpleble_peripheral_address_type(simpleble_peripheral_t handle);
 
 /**
  * @brief

@@ -15,18 +15,6 @@ void simpleble_peripheral_release_handle(simpleble_peripheral_t handle) {
     delete peripheral;
 }
 
-char* simpleble_peripheral_address_type(simpleble_peripheral_t handle) {
-    if (handle == nullptr) {
-        return nullptr;
-    }
-
-    SimpleBLE::Safe::Peripheral* peripheral = (SimpleBLE::Safe::Peripheral*)handle;
-    std::string address_type = peripheral->address_type().value_or("");
-    char* c_address_type = (char*)malloc(address_type.size() + 1);
-    strcpy(c_address_type, address_type.c_str());
-    return c_address_type;
-}
-
 char* simpleble_peripheral_identifier(simpleble_peripheral_t handle) {
     if (handle == nullptr) {
         return nullptr;
@@ -49,6 +37,16 @@ char* simpleble_peripheral_address(simpleble_peripheral_t handle) {
     char* c_address = (char*)malloc(address.size() + 1);
     strcpy(c_address, address.c_str());
     return c_address;
+}
+
+simpleble_address_type_t simpleble_peripheral_address_type(simpleble_peripheral_t handle) {
+    if (handle == nullptr) {
+        return SIMPLEBLE_ADDRESS_TYPE_UNSPECIFIED;
+    }
+
+    SimpleBLE::Safe::Peripheral* peripheral = (SimpleBLE::Safe::Peripheral*)handle;
+    SimpleBLE::BluetoothAddressType address_type = peripheral->address_type().value_or(SimpleBLE::BluetoothAddressType::UNSPECIFIED);
+    return (simpleble_address_type_t) address_type;
 }
 
 int16_t simpleble_peripheral_rssi(simpleble_peripheral_t handle) {

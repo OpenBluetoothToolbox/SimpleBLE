@@ -42,9 +42,9 @@ class PeripheralBase {
 
     void* underlying() const;
 
-    std::string address_type();
     std::string identifier();
     BluetoothAddress address();
+    SimpleBLE::BluetoothAddressType address_type();
     int16_t rssi();
     int16_t tx_power();
     uint16_t mtu();
@@ -86,9 +86,10 @@ class PeripheralBase {
     // initiate a connection, which can then cause further cascading failures.
     // See:
     // https://docs.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.bluetoothledevice.frombluetoothaddressasync
-    std::string address_type_;
+    
     std::string identifier_;
     BluetoothAddress address_;
+    SimpleBLE::BluetoothAddressType address_type_;
     int16_t rssi_;
     int16_t tx_power_;
     uint16_t mtu_;

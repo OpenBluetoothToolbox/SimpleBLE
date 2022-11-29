@@ -6,14 +6,6 @@
 
 SimpleBLE::Safe::Peripheral::Peripheral(SimpleBLE::Peripheral& peripheral) : SimpleBLE::Peripheral(peripheral) {}
 
-std::optional<std::string> SimpleBLE::Safe::Peripheral::address_type() noexcept {
-    try {
-        return SimpleBLE::Peripheral::address_type();
-    } catch (...) {
-        return std::nullopt;
-    }
-}
-
 std::optional<std::string> SimpleBLE::Safe::Peripheral::identifier() noexcept {
     try {
         return SimpleBLE::Peripheral::identifier();
@@ -25,6 +17,14 @@ std::optional<std::string> SimpleBLE::Safe::Peripheral::identifier() noexcept {
 std::optional<SimpleBLE::BluetoothAddress> SimpleBLE::Safe::Peripheral::address() noexcept {
     try {
         return SimpleBLE::Peripheral::address();
+    } catch (...) {
+        return std::nullopt;
+    }
+}
+
+std::optional<SimpleBLE::BluetoothAddressType> SimpleBLE::Safe::Peripheral::address_type() noexcept {
+    try {
+        return SimpleBLE::Peripheral::address_type();
     } catch (...) {
         return std::nullopt;
     }
