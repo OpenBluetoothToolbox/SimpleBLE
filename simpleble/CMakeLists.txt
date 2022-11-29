@@ -81,7 +81,11 @@ set_target_properties(simpleble PROPERTIES
     VERSION "${PROJECT_VERSION}"
     SOVERSION "${PROJECT_VERSION_MAJOR}"
     EXPORT_NAME simpleble
-    OUTPUT_NAME simpleble)
+    OUTPUT_NAME simpleble
+    RELEASE_POSTFIX ""
+    RELWITHDEBINFO_POSTFIX "-relwithdebinfo"
+    MINSIZEREL_POSTFIX "$-minsizerel"
+    DEBUG_POSTFIX "-debug")
 
 set_target_properties(simpleble-c PROPERTIES
     C_VISIBILITY_PRESET hidden
@@ -94,7 +98,11 @@ set_target_properties(simpleble-c PROPERTIES
     VERSION "${PROJECT_VERSION}"
     SOVERSION "${PROJECT_VERSION_MAJOR}"
     EXPORT_NAME simpleble-c
-    OUTPUT_NAME simpleble-c)
+    OUTPUT_NAME simpleble-c
+    RELEASE_POSTFIX ""
+    RELWITHDEBINFO_POSTFIX "-relwithdebinfo"
+    MINSIZEREL_POSTFIX "$-minsizerel"
+    DEBUG_POSTFIX "-debug")
 
 generate_export_header(
     simpleble
