@@ -49,7 +49,7 @@ AdapterBase::AdapterBase(std::string device_id)
                     addr_type = "random";
                     break;
 
-                case BluetoothAddressType::Unspecified: 
+                case BluetoothAddressType::Unspecified:
                     addr_type = "unspecified";
                     break;
             }
