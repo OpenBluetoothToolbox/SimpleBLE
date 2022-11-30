@@ -86,7 +86,7 @@ class PeripheralBase {
     // initiate a connection, which can then cause further cascading failures.
     // See:
     // https://docs.microsoft.com/en-us/uwp/api/windows.devices.bluetooth.bluetoothledevice.frombluetoothaddressasync
-    
+
     std::string identifier_;
     BluetoothAddress address_;
     SimpleBLE::BluetoothAddressType address_type_;

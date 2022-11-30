@@ -45,8 +45,9 @@ simpleble_address_type_t simpleble_peripheral_address_type(simpleble_peripheral_
     }
 
     SimpleBLE::Safe::Peripheral* peripheral = (SimpleBLE::Safe::Peripheral*)handle;
-    SimpleBLE::BluetoothAddressType address_type = peripheral->address_type().value_or(SimpleBLE::BluetoothAddressType::UNSPECIFIED);
-    return (simpleble_address_type_t) address_type;
+    SimpleBLE::BluetoothAddressType address_type = peripheral->address_type().value_or(
+        SimpleBLE::BluetoothAddressType::UNSPECIFIED);
+    return (simpleble_address_type_t)address_type;
 }
 
 int16_t simpleble_peripheral_rssi(simpleble_peripheral_t handle) {
