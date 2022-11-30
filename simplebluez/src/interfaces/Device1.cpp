@@ -36,8 +36,7 @@ int16_t Device1::RSSI() {
 }
 
 int16_t Device1::TxPower() {
-    std::scoped_lock lock(_property_update_mutex);
-    return _properties["TxPower"].get_int16();
+    return _tx_power;
 }
 
 uint16_t Device1::Appearance() {
@@ -145,5 +144,7 @@ void Device1::property_changed(std::string option_name) {
         for (auto& [key, value_array] : service_data) {
             _service_data.push_back(key);
         }
+    } else if (option_name == "TxPower") {
+        _tx_power = _properties["TxPower"].get_int16();
     }
 }

@@ -48,7 +48,7 @@ BluetoothAddress PeripheralBase::address() {
 }
 
 BluetoothAddressType PeripheralBase::address_type() {
-    throw BluetoothAddressType::UNSPECIFIED;
+    return BluetoothAddressType::UNSPECIFIED;
 }
 
 int16_t PeripheralBase::rssi() { return rssi_; }
