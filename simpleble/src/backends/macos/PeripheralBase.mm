@@ -37,10 +37,6 @@ void* PeripheralBase::underlying() const {
     return [internal underlying];
 }
 
-std::string PeripheralBase::address_type() {
-    throw Exception::OperationNotSupported();
-}
-
 std::string PeripheralBase::identifier() {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
     return std::string([[internal identifier] UTF8String]);
@@ -49,6 +45,10 @@ std::string PeripheralBase::identifier() {
 BluetoothAddress PeripheralBase::address() {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
     return std::string([[internal address] UTF8String]);
+}
+
+BluetoothAddressType PeripheralBase::address_type() {
+    throw BluetoothAddressType::UNSPECIFIED;
 }
 
 int16_t PeripheralBase::rssi() { return rssi_; }
