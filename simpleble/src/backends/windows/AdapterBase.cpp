@@ -56,7 +56,12 @@ AdapterBase::AdapterBase(std::string device_id)
             data.identifier = winrt::to_string(args.Advertisement().LocalName());
             data.connectable = args.IsConnectable();
             data.rssi = args.RawSignalStrengthInDBm();
-            data.tx_power = args.TransmitPowerLevelInDBm().Value();
+
+            if (args.TransmitPowerLevelInDBm()) {
+                data.tx_power = args.TransmitPowerLevelInDBm().Value();
+            } else {
+                data.tx_power = INT16_MIN;
+            }            
 
             // Parse manufacturer data
             auto manufacturer_data = args.Advertisement().ManufacturerData();

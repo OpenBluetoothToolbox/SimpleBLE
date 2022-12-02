@@ -90,8 +90,8 @@ class PeripheralBase {
     std::string identifier_;
     BluetoothAddress address_;
     SimpleBLE::BluetoothAddressType address_type_;
-    int16_t rssi_;
-    int16_t tx_power_;
+    int16_t rssi_ = INT16_MIN;
+    int16_t tx_power_ = INT16_MIN;
     uint16_t mtu_;
     bool connectable_;
     winrt::event_token connection_status_changed_token_;
