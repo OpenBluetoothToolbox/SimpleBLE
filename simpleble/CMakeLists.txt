@@ -193,15 +193,12 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
 
     target_link_libraries(simpleble PUBLIC pthread)
-    target_link_libraries(simpleble PRIVATE ${DBus1_LIBRARIES})
+    target_link_libraries(simpleble PRIVATE dbus-1)
 
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
         ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux)
-    # target_include_directories(simpleble-c PRIVATE
-    #     ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
-    #     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include)
 
     set_property(TARGET simpleble-c PROPERTY INSTALL_RPATH $ORIGIN)
 

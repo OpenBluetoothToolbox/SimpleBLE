@@ -55,15 +55,13 @@ set_target_properties(
 
 list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEDBUS_LOG_LEVEL=${SIMPLEDBUS_LOG_LEVEL})
 
-target_link_libraries(simpledbus PUBLIC ${DBus1_LIBRARIES})
+target_link_libraries(simpledbus PUBLIC dbus-1)
 target_link_libraries(simpledbus PRIVATE $<BUILD_INTERFACE:fmt::fmt-header-only>)
 
 target_include_directories(simpledbus PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(simpledbus INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-    $<INSTALL_INTERFACE:${DBus1_INCLUDE_DIR}>
-    $<INSTALL_INTERFACE:${DBus1_ARCH_INCLUDE_DIR}>)
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 append_sanitize_options("${SIMPLEDBUS_SANITIZE}")
 

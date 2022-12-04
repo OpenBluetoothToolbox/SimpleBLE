@@ -86,16 +86,14 @@ set_target_properties(
 list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEDBUS_LOG_LEVEL=${SIMPLEDBUS_LOG_LEVEL})
 list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLUEZ_LOG_LEVEL=${SIMPLEBLUEZ_LOG_LEVEL})
 
-target_link_libraries(simplebluez PUBLIC ${DBus1_LIBRARIES})
+target_link_libraries(simplebluez PUBLIC dbus-1)
 target_link_libraries(simplebluez PRIVATE $<BUILD_INTERFACE:fmt::fmt-header-only>)
 
 target_include_directories(simplebluez PRIVATE ${SIMPLEBLUEZ_INCLUDE})
 target_include_directories(simplebluez INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-    $<INSTALL_INTERFACE:${DBus1_INCLUDE_DIR}>
-    $<INSTALL_INTERFACE:${DBus1_ARCH_INCLUDE_DIR}>)
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 append_sanitize_options("${SIMPLEBLUEZ_SANITIZE}")
 
