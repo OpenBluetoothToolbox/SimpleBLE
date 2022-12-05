@@ -57,6 +57,13 @@ int main() {
             std::cout << "    Manufacturer data: ";
             Utils::print_byte_array(data);
         }
+
+        std::map<SimpleBLE::BluetoothUUID, SimpleBLE::ByteArray> service_data = peripherals[i].service_data();
+        for (auto& [service_uuid, data] : service_data) {
+            std::cout << "    Service UUID: " << service_uuid << std::endl;
+            std::cout << "    Service data: ";
+            Utils::print_byte_array(data);
+        }
     }
     return EXIT_SUCCESS;
 }

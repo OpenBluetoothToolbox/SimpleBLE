@@ -28,6 +28,7 @@ PeripheralBase::PeripheralBase(advertising_data_t advertising_data) {
     rssi_ = advertising_data.rssi;
     tx_power_ = advertising_data.tx_power;
     manufacturer_data_ = advertising_data.manufacturer_data;
+    service_data_ = advertising_data.service_data;
     connectable_ = advertising_data.connectable;
     advertised_services_ = advertising_data.service_uuids;
 }
@@ -66,6 +67,7 @@ void PeripheralBase::update_advertising_data(advertising_data_t advertising_data
     tx_power_ = advertising_data.tx_power;
     address_type_ = advertising_data.address_type;
     manufacturer_data_ = advertising_data.manufacturer_data;
+    service_data_ = advertising_data.service_data;
 
     // Append services that haven't been seen before
     for (auto& service : advertising_data.service_uuids) {
@@ -166,6 +168,8 @@ std::vector<Service> PeripheralBase::advertised_services() {
 }
 
 std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() { return manufacturer_data_; }
+
+std::map<BluetoothUUID, ByteArray> PeripheralBase::service_data() { return service_data_; }
 
 ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic).obj;
