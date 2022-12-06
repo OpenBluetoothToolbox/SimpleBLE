@@ -28,6 +28,7 @@ if __name__ == "__main__":
     for peripheral in peripherals:
         connectable_str = "Connectable" if peripheral.is_connectable() else "Non-Connectable"
         print(f"{peripheral.identifier()} [{peripheral.address()}] - {connectable_str}")
+        print(f'    Address Type: {peripheral.address_type()}')
         print(f'    Tx Power: {peripheral.tx_power()} dBm')
 
         manufacturer_data = peripheral.manufacturer_data()

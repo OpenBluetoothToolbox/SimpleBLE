@@ -14,6 +14,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  Support for advertized services.
 -  Support for GATT Characteristic properties.
 -  Retrieve the MTU value of an established connection. *(Thanks Marco Cruz!)*
+-  Peripheral addresses can now be queried for their type. *(Thanks camm73!)*
+-  Tx Power is decoded from advertising data if available. *(Thanks camm73!)*
 -  (Windows) Logging of WinRT initialization behavior.
 -  (SimpleBluez) Support for GATT characteristic flags.
 -  (SimpleBluez) Support for GATT characteristic MTUs. *(Thanks Marco Cruz!)*
@@ -29,6 +31,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  (MacOS) Increased priority of the dispatch queue to prevent jitter in the incoming data.
 -  (Windows) Missing peripheral identifier data. *(Thanks eriklins!)*
 -  (Windows) Multiple initialization of the WinRT backend.
+-  (Python) Type returned by ``simplepyble.get_operating_system()`` was not defined.
 
 
 [0.5.0] - 2022-09-25

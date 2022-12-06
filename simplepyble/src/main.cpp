@@ -13,6 +13,7 @@
 
 namespace py = pybind11;
 
+void wrap_types(py::module& m);
 void wrap_descriptor(py::module& m);
 void wrap_characteristic(py::module& m);
 void wrap_service(py::module& m);
@@ -39,6 +40,7 @@ PYBIND11_MODULE(simplepyble, m) {
         Returns the currently-running operating system.
     )pbdoc");
 
+    wrap_types(m);
     wrap_descriptor(m);
     wrap_characteristic(m);
     wrap_service(m);
