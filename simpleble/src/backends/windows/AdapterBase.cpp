@@ -61,7 +61,7 @@ AdapterBase::AdapterBase(std::string device_id)
                 data.tx_power = args.TransmitPowerLevelInDBm().Value();
             } else {
                 data.tx_power = INT16_MIN;
-            }            
+            }
 
             // Parse manufacturer data
             auto manufacturer_data = args.Advertisement().ManufacturerData();
