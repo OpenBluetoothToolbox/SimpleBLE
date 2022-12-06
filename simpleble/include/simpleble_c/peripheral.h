@@ -40,9 +40,25 @@ SIMPLEBLE_EXPORT char* simpleble_peripheral_address(simpleble_peripheral_t handl
  * @brief
  *
  * @param handle
+ * @return simpleble_address_type_t
+ */
+SIMPLEBLE_EXPORT simpleble_address_type_t simpleble_peripheral_address_type(simpleble_peripheral_t handle);
+
+/**
+ * @brief
+ *
+ * @param handle
  * @return int16_t
  */
 SIMPLEBLE_EXPORT int16_t simpleble_peripheral_rssi(simpleble_peripheral_t handle);
+
+/**
+ * @brief
+ *
+ * @param handle
+ * @return int16_t
+ */
+SIMPLEBLE_EXPORT int16_t simpleble_peripheral_tx_power(simpleble_peripheral_t handle);
 
 /**
  * @brief

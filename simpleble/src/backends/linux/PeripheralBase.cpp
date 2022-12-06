@@ -34,7 +34,21 @@ std::string PeripheralBase::identifier() { return device_->name(); }
 
 BluetoothAddress PeripheralBase::address() { return device_->address(); }
 
+BluetoothAddressType PeripheralBase::address_type() {
+    std::string address_type = device_->address_type();
+
+    if (address_type == "public") {
+        return BluetoothAddressType::PUBLIC;
+    } else if (address_type == "public") {
+        return BluetoothAddressType::RANDOM;
+    } else {
+        return BluetoothAddressType::UNSPECIFIED;
+    }
+}
+
 int16_t PeripheralBase::rssi() { return device_->rssi(); }
+
+int16_t PeripheralBase::tx_power() { return device_->tx_power(); }
 
 uint16_t PeripheralBase::mtu() {
     if (!is_connected()) return 0;

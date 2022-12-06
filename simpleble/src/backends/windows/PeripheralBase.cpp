@@ -22,9 +22,11 @@ using namespace SimpleBLE;
 using namespace std::chrono_literals;
 
 PeripheralBase::PeripheralBase(advertising_data_t advertising_data) {
+    address_type_ = advertising_data.address_type;
     identifier_ = advertising_data.identifier;
     address_ = advertising_data.mac_address;
     rssi_ = advertising_data.rssi;
+    tx_power_ = advertising_data.tx_power;
     manufacturer_data_ = advertising_data.manufacturer_data;
     connectable_ = advertising_data.connectable;
     advertised_services_ = advertising_data.service_uuids;
@@ -41,11 +43,15 @@ PeripheralBase::~PeripheralBase() {
 
 void* PeripheralBase::underlying() const { return reinterpret_cast<void*>(const_cast<BluetoothLEDevice*>(&device_)); }
 
+SimpleBLE::BluetoothAddressType PeripheralBase::address_type() { return address_type_; }
+
 std::string PeripheralBase::identifier() { return identifier_; }
 
 BluetoothAddress PeripheralBase::address() { return address_; }
 
 int16_t PeripheralBase::rssi() { return rssi_; }
+
+int16_t PeripheralBase::tx_power() { return tx_power_; }
 
 uint16_t PeripheralBase::mtu() {
     if (!is_connected()) return 0;
@@ -60,6 +66,8 @@ void PeripheralBase::update_advertising_data(advertising_data_t advertising_data
         identifier_ = advertising_data.identifier;
     }
     rssi_ = advertising_data.rssi;
+    tx_power_ = advertising_data.tx_power;
+    address_type_ = advertising_data.address_type;
     manufacturer_data_ = advertising_data.manufacturer_data;
 
     // Append services that haven't been seen before

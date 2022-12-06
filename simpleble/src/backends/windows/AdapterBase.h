@@ -20,6 +20,7 @@
 #include <vector>
 
 using namespace winrt::Windows;
+using namespace winrt::Windows::Devices;
 using namespace winrt::Windows::Devices::Bluetooth;
 using namespace winrt::Windows::Devices::Radios;
 
