@@ -18,7 +18,7 @@ jobs:
     - name: Clone Repository
       uses: actions/checkout@v3
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v1.1
     - name: Clone and build GTest
       run: |
         git clone https://github.com/google/googletest
@@ -49,7 +49,7 @@ jobs:
     - name: Clone Repository
       uses: actions/checkout@v3
     - name: Setup Cmake
-      uses: jwlawson/actions-setup-cmake@v1.12
+      uses: jwlawson/actions-setup-cmake@v1.13
       with:
         cmake-version: '3.21.x'
     - name: Clone and build GTest
@@ -90,7 +90,7 @@ jobs:
       run: |
         echo "DBUS_SESSION_BUS_ADDRESS=$(dbus-daemon --config-file=/usr/share/dbus-1/session.conf --print-address --fork | cut -d, -f1)" >> $GITHUB_ENV
     - name: Setup Cmake
-      uses: jwlawson/actions-setup-cmake@v1.12
+      uses: jwlawson/actions-setup-cmake@v1.13
       with:
         cmake-version: '3.21.x'
     - name: Clone and build GTest
