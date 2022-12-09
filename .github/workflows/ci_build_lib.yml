@@ -62,7 +62,7 @@ jobs:
     - name: Setup Cmake
       uses: jwlawson/actions-setup-cmake@v1.13
       with:
-        cmake-version: '3.21.x'
+        cmake-version: '3.21'
     - name: Compile SimpleBLE for MacOS arm64
       run: |
         cmake -B $GITHUB_WORKSPACE/build_arm64 -DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
@@ -97,7 +97,7 @@ jobs:
     - name: Setup Cmake
       uses: jwlawson/actions-setup-cmake@v1.13
       with:
-        cmake-version: '3.21.x'
+        cmake-version: '3.21'
     - name:  Compile SimpleBLE for Ubuntu
       run: |
         cmake -B $GITHUB_WORKSPACE/build_simpleble -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble

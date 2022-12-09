@@ -51,7 +51,7 @@ jobs:
     - name: Setup Cmake
       uses: jwlawson/actions-setup-cmake@v1.13
       with:
-        cmake-version: '3.21.x'
+        cmake-version: '3.21'
     - name: Clone and build GTest
       run: |
         git clone https://github.com/google/googletest
@@ -92,7 +92,7 @@ jobs:
     - name: Setup Cmake
       uses: jwlawson/actions-setup-cmake@v1.13
       with:
-        cmake-version: '3.21.x'
+        cmake-version: '3.21'
     - name: Clone and build GTest
       run: |
         git clone https://github.com/google/googletest
