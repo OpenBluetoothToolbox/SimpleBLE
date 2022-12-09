@@ -6,7 +6,6 @@ jobs:
 
   # ------------------------------------------------------------
   build-windows:
-    # name: 'CI Build Libs - Windows - Arch ${{ matrix.arch }} - SDK ${{ matrix.sdk }}'
     runs-on: windows-2022
 
     strategy:
@@ -15,7 +14,6 @@ jobs:
       matrix:
         arch: [Win32, x64]
         sdk: ["10.0.19041.0", "10.0.22000.0"]
-        # For windows-2022, the generator is for "Visual Studio 17 2022"
 
     steps:
     - name: Clone Repository
@@ -38,7 +36,8 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        os: [macos-11.0]
+        os: [macos-11.0, macos-12.0]
+        arch: [arm64, x86_64]
 
     steps:
     - name: Clone Repository
@@ -47,16 +46,11 @@ jobs:
       uses: jwlawson/actions-setup-cmake@v1.13
       with:
         cmake-version: '3.21'
-    - name: Compile SimpleBLE for MacOS arm64
+    - name: Compile SimpleBLE
       run: |
-        cmake -B $GITHUB_WORKSPACE/build_arm64 -DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
-        cmake --build $GITHUB_WORKSPACE/build_arm64 --config Release --parallel 4
-        cmake --install $GITHUB_WORKSPACE/build_arm64 --prefix $GITHUB_WORKSPACE/build_arm64/install
-    - name: Compile SimpleBLE for MacOS x86
-      run: |
-        cmake -B $GITHUB_WORKSPACE/build_x86 -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
-        cmake --build $GITHUB_WORKSPACE/build_x86 --config Release --parallel 4
-        cmake --install $GITHUB_WORKSPACE/build_x86 --prefix $GITHUB_WORKSPACE/build_x86/install
+        cmake -B $GITHUB_WORKSPACE/build -DCMAKE_OSX_ARCHITECTURES="${{ matrix.arch }}" -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
+        cmake --build $GITHUB_WORKSPACE/build --config Release --parallel 4
+        cmake --install $GITHUB_WORKSPACE/build --prefix $GITHUB_WORKSPACE/build/install
 
   # ------------------------------------------------------------
 
@@ -67,7 +61,7 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        os: [ubuntu-22.04]
+        os: [ubuntu-20.04, ubuntu-22.04]
 
     steps:
     - name: Clone Repository
