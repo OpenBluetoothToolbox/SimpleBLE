@@ -6,13 +6,15 @@ jobs:
 
   # ------------------------------------------------------------
   build-windows:
-    runs-on: ${{ matrix.os }}
+    name: 'CI Build Libs - Windows - Arch ${{ matrix.arch }} - SDK {{ matrix.sdk }}'
+    runs-on: windows-2022
 
     strategy:
       fail-fast: false
       max-parallel: 4
       matrix:
-        os: [windows-2019]
+        arch: [Win32, x64]
+        sdk: ["10.0.19041.0", "10.0.22000.0"]
         # For windows-2022, the generator is for "Visual Studio 17 2022"
 
     steps:
@@ -20,29 +22,11 @@ jobs:
       uses: actions/checkout@v3
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.1
-    - name: Compile SimpleBLE for Windows x86 - Windows SDK 10.0.19041.0
+    - name: Compile SimpleBLE
       run: |
-        cmake -B %GITHUB_WORKSPACE%\build32_19041 -G "Visual Studio 16 2019" -A Win32 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -S %GITHUB_WORKSPACE%/simpleble
-        cmake --build %GITHUB_WORKSPACE%\build32_19041 --config Release --parallel 4
-        cmake --install %GITHUB_WORKSPACE%\build32_19041 --prefix %GITHUB_WORKSPACE%\build32_19041\install
-      shell: cmd
-    - name: Compile SimpleBLE for Windows x64 - Windows SDK 10.0.19041.0
-      run: |
-        cmake -B %GITHUB_WORKSPACE%\build64_19041 -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION=10.0.19401.0 -S %GITHUB_WORKSPACE%/simpleble
-        cmake --build %GITHUB_WORKSPACE%\build64_19041 --config Release --parallel 4
-        cmake --install %GITHUB_WORKSPACE%\build64_19041 --prefix %GITHUB_WORKSPACE%\build64_19041\install
-      shell: cmd
-    - name: Compile SimpleBLE for Windows x86 - Windows SDK 10.0.22000.0
-      run: |
-        cmake -B %GITHUB_WORKSPACE%\build32 -G "Visual Studio 16 2019" -A Win32 -DCMAKE_SYSTEM_VERSION=10.0.22000.0 -S %GITHUB_WORKSPACE%/simpleble
-        cmake --build %GITHUB_WORKSPACE%\build32 --config Release --parallel 4
-        cmake --install %GITHUB_WORKSPACE%\build32 --prefix %GITHUB_WORKSPACE%\build32\install
-      shell: cmd
-    - name: Compile SimpleBLE for Windows x64 - Windows SDK 10.0.22000.0
-      run: |
-        cmake -B %GITHUB_WORKSPACE%\build64 -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION=10.0.22000.0 -S %GITHUB_WORKSPACE%/simpleble
-        cmake --build %GITHUB_WORKSPACE%\build64 --config Release --parallel 4
-        cmake --install %GITHUB_WORKSPACE%\build64 --prefix %GITHUB_WORKSPACE%\build64\install
+        cmake -B %GITHUB_WORKSPACE%\build -G "Visual Studio 17 2022" -A ${{ matrix.arch }} -DCMAKE_SYSTEM_VERSION={{ matrix.sdk }} -S %GITHUB_WORKSPACE%/simpleble
+        cmake --build %GITHUB_WORKSPACE%\build --config Release --parallel 4
+        cmake --install %GITHUB_WORKSPACE%\build --prefix %GITHUB_WORKSPACE%\build\install
       shell: cmd
 
   # ------------------------------------------------------------

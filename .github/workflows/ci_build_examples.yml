@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        os: [windows-2019]
+        os: [windows-2022]
         # For windows-2022, the generator is for "Visual Studio 17 2022"
 
     steps:
@@ -22,7 +22,7 @@ jobs:
       uses: microsoft/setup-msbuild@v1.1
     - name: Compile Examples for Windows
       run: |
-        cmake -B %GITHUB_WORKSPACE%\build_simpleble_examples -G "Visual Studio 16 2019" -DCMAKE_SYSTEM_VERSION=10.0.22000.0 -S %GITHUB_WORKSPACE%/examples/simpleble
+        cmake -B %GITHUB_WORKSPACE%\build_simpleble_examples -G "Visual Studio 17 2022" -DCMAKE_SYSTEM_VERSION=10.0.22000.0 -S %GITHUB_WORKSPACE%/examples/simpleble
         cmake --build %GITHUB_WORKSPACE%\build_simpleble_examples --config Release --parallel 4
       shell: cmd
 
