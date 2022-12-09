@@ -42,7 +42,7 @@ jobs:
             package-dir: simplepyble
 
       - name: Upload wheels
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: simpleble-wheels
           path: wheelhouse

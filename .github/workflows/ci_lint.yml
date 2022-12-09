@@ -39,7 +39,7 @@ jobs:
         run: cppcheck-htmlreport --title=SimpleBLE --file=cppcheck_res.xml --report-dir=report
       - name: Upload Report
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: report
           path: report
