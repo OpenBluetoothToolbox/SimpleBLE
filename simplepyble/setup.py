@@ -58,11 +58,14 @@ skbuild.setup(
     cmake_process_manifest_hook=exclude_unnecessary_files,
     cmake_install_dir="src/simplepyble",
 
-    setup_requires=["cmake"],
-    install_requires=[
+    setup_requires=[
+        "setuptools>=42",
+        "scikit-build",
+        "ninja; platform_system!='Windows'",
+        "cmake>=3.21",
         "pybind11",
-        "ninja"
     ],
+    install_requires=[],
     test_requires=[
         "pytest",
     ],
