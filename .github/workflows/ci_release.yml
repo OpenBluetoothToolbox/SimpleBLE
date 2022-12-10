@@ -51,7 +51,7 @@ jobs:
         run: twine check wheelhouse/*.whl
 
       - name: Publish packages
-        run: twine upload wheelhouse/*.whl --verbose
+        run: twine upload --skip-existing wheelhouse/*.whl --verbose
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USER }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
