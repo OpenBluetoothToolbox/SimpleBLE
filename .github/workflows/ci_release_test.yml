@@ -4,11 +4,18 @@ on: [push, pull_request]
 
 jobs:
   build_wheels:
+    runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
         os: [ubuntu-22.04 , windows-2022, macos-11]
-    runs-on: ${{ matrix.os }}
-    name: Build wheels on ${{ matrix.os }}
+        include:
+          - archs: [x86_64 i686]
+            os: [ubuntu-22.04]
+          - archs: [x86_64 arm64]
+            os: [macos-11]
+          - archs: [AMD64 x86]
+            os: [windows-2022]
 
     steps:
       - name: Checkout
@@ -35,9 +42,9 @@ jobs:
           CIBW_BUILD: cp39-* # Only build for Python 3.9
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_ALL_LINUX: "yum update -y && yum group install -y \"Development Tools\" && yum install -y dbus-devel"
-          CIBW_ARCHS_LINUX: x86_64
-          CIBW_ARCHS_MACOS: arm64
-          CIBW_ARCHS_WINDOWS: AMD64
+          CIBW_ARCHS_LINUX: ${{ matrix.archs }}
+          CIBW_ARCHS_MACOS: ${{ matrix.archs }}
+          CIBW_ARCHS_WINDOWS: ${{ matrix.archs }}
           CIBW_SKIP: "*musllinux_* pp*"
         with:
             package-dir: simplepyble
