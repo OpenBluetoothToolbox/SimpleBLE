@@ -9,11 +9,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - archs: [x86_64 i686]
+          - archs: [x86_64, i686]
             os: [ubuntu-22.04]
-          - archs: [x86_64 arm64]
+          - archs: [x86_64, arm64]
             os: [macos-11]
-          - archs: [AMD64 x86]
+          - archs: [AMD64, x86]
             os: [windows-2022]
 
     steps:
