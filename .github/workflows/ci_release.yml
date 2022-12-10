@@ -5,11 +5,11 @@ on:
 
 jobs:
   build_wheels:
+    runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
-        os: [ubuntu-22.04 , windows-2022, macos-11]
-    runs-on: ${{ matrix.os }}
-    name: Build wheels on ${{ matrix.os }}
+        os: [ubuntu-22.04 , windows-2022, macos-12]
 
     steps:
       - name: Checkout
@@ -31,7 +31,7 @@ jobs:
         run: pip install -r simplepyble/requirements.txt
 
       - name: Build wheel
-        uses: pypa/cibuildwheel@v2.9.0
+        uses: pypa/cibuildwheel@v2.11.3
         env:
           CIBW_BEFORE_ALL_LINUX: "yum update -y && yum group install -y \"Development Tools\" && yum install -y dbus-devel"
           CIBW_ARCHS_LINUX: x86_64 i686 aarch64
