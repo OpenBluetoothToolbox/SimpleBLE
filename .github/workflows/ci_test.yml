@@ -6,13 +6,7 @@ jobs:
 
 # ------------------------------------------------------------
   test-windows:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      fail-fast: false
-      max-parallel: 4
-      matrix:
-        os: [windows-2022]
+    runs-on: windows-2022
 
     steps:
     - name: Clone Repository
@@ -37,13 +31,7 @@ jobs:
   # ------------------------------------------------------------
 
   test-macos:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      fail-fast: false
-      max-parallel: 4
-      matrix:
-        os: [macos-11.0]
+    runs-on: macos-11.0
 
     steps:
     - name: Clone Repository
@@ -68,13 +56,7 @@ jobs:
   # ------------------------------------------------------------
 
   test-linux:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      fail-fast: false
-      max-parallel: 4
-      matrix:
-        os: [ubuntu-22.04]
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Clone Repository
@@ -149,7 +131,7 @@ jobs:
   # ------------------------------------------------------------
 
   test-python:
-    runs-on: "ubuntu-22.04"
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
