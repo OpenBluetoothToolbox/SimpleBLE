@@ -1,0 +1,15 @@
+[package]
+name = "simplersble"
+version = "0.1.0"
+edition = "2021"
+
+links = "simpleble"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cxx = "1.0"
+
+[build-dependencies]
+cmake = "0.1"
+cxx-build = "1.0"
