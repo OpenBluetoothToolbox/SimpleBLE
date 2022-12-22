@@ -1,7 +1,7 @@
 #pragma once
 
 #include <simpledbus/advanced/Interface.h>
-#include <simpledbus/external/kvn_safe_callback.hpp>
+#include <external/kvn_safe_callback.hpp>
 
 #include <cstdint>
 #include <string>

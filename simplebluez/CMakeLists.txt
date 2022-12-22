@@ -33,7 +33,8 @@ endif()
 
 set(SIMPLEBLUEZ_INCLUDE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include)
+    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../external/include)
 
 set(SIMPLEBLUEZ_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ProxyOrg.cpp
