@@ -6,6 +6,9 @@ use std::path::Path;
 fn main() {
     // TODO: Add all files that would trigger a rerun
     println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=src/lib.rs");
+    println!("cargo:rerun-if-changed=src/bindings/AdapterBindings.hpp");
+    println!("cargo:rerun-if-changed=src/bindings/AdapterBindings.cpp");
 
     let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
 
@@ -35,6 +38,7 @@ fn main() {
 
     // Build the bindings
     cxx_build::bridge("src/lib.rs")
+        .file("src/bindings/AdapterBindings.cpp")
         .flag_if_supported("-std=c++17")
         .compile("simpleble_bindings");
 }

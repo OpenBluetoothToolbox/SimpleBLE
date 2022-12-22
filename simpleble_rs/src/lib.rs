@@ -1,43 +1,61 @@
-use cxx;
+use std::mem;
+
 
 #[cxx::bridge]
 mod ffi {
+
+    #[namespace = "SimpleBLE"]
+    struct RustyWrapper {
+        internal: UniquePtr::<RustyAdapter>
+    }
 
     unsafe extern "C++" {
         include!("simplersble/src/bindings/AdapterBindings.hpp");
 
         #[namespace = "SimpleBLE"]
-        type Adapter;
+        type RustyAdapter;
 
-        fn Adapter_bluetooth_enabled() -> bool;
-        fn Adapter_get_adapters_count() -> i32;
+        fn RustyAdapter_bluetooth_enabled() -> bool;
+        fn RustyAdapter_get_adapters() -> Vec::<RustyWrapper>;
 
-        // THIS FUNCTION DOES NOT WORK, UNSURE WHY
-        fn Adapter_get_adapters_from_index(index: i32) -> cxx::UniquePtr<Adapter>;
+        fn identifier(&self) -> String;
+
 
     }
+
 }
 
 pub struct Adapter {
-    internal : ffi::Adapter,
+    internal : cxx::UniquePtr::<ffi::RustyAdapter>,
 }
 
 impl Adapter {
 
-    fn new(internal: ffi::Adapter) -> Self {
+    fn new(internal: cxx::UniquePtr::<ffi::RustyAdapter>) -> Self {
         Self { internal }
     }
 
-    pub fn identifier() -> String {
-        return "AdapterIdentifier".to_string();
+    pub fn identifier(&self) -> String {
+        return self.internal.identifier();
     }
 
     pub fn bluetooth_enabled() -> bool {
-        return ffi::Adapter_bluetooth_enabled();
+        return ffi::RustyAdapter_bluetooth_enabled();
     }
 
     pub fn get_adapters() -> Vec::<Adapter> {
-        return vec![];
+        let mut adapters = Vec::<Adapter>::new();
+
+        for adapter_wrapper in ffi::RustyAdapter_get_adapters().iter_mut() {
+            let mut carrier = cxx::UniquePtr::<ffi::RustyAdapter>::null();
+
+            // Swap the wrapper object to extract the internal pointer that we desire.
+            mem::swap(&mut carrier, &mut adapter_wrapper.internal);
+
+            adapters.push(Adapter::new(carrier));
+        }
+
+        return adapters;
     }
 
 }
