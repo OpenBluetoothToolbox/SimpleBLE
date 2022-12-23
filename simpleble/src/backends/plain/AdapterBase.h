@@ -4,7 +4,7 @@
 #include <simpleble/Peripheral.h>
 #include <simpleble/Types.h>
 
-#include <kvn_safe_callback.hpp>
+#include <external/kvn_safe_callback.hpp>
 
 #include <atomic>
 #include <functional>

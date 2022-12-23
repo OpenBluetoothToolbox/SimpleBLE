@@ -6,7 +6,7 @@
 
 #include "AdapterBaseTypes.h"
 
-#include <kvn_safe_callback.hpp>
+#include <external/kvn_safe_callback.hpp>
 
 #include <memory>
 

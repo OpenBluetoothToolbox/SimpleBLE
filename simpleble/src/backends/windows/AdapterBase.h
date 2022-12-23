@@ -7,7 +7,7 @@
 #include "AdapterBaseTypes.h"
 #include "PeripheralBase.h"
 
-#include <kvn_safe_callback.hpp>
+#include <external/kvn_safe_callback.hpp>
 
 #include "winrt/Windows.Devices.Bluetooth.Advertisement.h"
 #include "winrt/Windows.Devices.Bluetooth.h"

@@ -8,7 +8,7 @@
 #include <simplebluez/Characteristic.h>
 #include <simplebluez/Device.h>
 
-#include <kvn_safe_callback.hpp>
+#include <external/kvn_safe_callback.hpp>
 
 #include <atomic>
 #include <condition_variable>
