@@ -69,12 +69,28 @@ void initialize_winrt() {
         // Current thread is not associated with an apartment,
         // or the apartment type is determined by the current threading model.
         // Initialize the apartment based on the threading model.
-        if (GetCurrentThreadId() == GetWindowThreadProcessId(GetDesktopWindow(), NULL)) {
-            // Current thread is an STA thread
+        if (qualifier == APTTYPEQUALIFIER_IMPLICIT_MTA) {
+            // Initialize the apartment as an MTA
+            result = WINRT_IMPL_CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+        } else if (qualifier == APTTYPEQUALIFIER_NA_ON_MTA) {
+            // Initialize the apartment as an MTA
+            result = WINRT_IMPL_CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+        } else if (qualifier == APTTYPEQUALIFIER_NA_ON_IMPLICIT_MTA) {
+            // Initialize the apartment as an MTA
+            result = WINRT_IMPL_CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+        } else if (qualifier == APTTYPEQUALIFIER_NA_ON_STA) {
+            // Initialize the apartment as an STA
+            result = WINRT_IMPL_CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+        } else if (qualifier == APTTYPEQUALIFIER_NA_ON_MAINSTA) {
+            // Initialize the apartment as an STA
+            result = WINRT_IMPL_CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+        } else if (qualifier == APTTYPEQUALIFIER_APPLICATION_STA) {
+            // Initialize the apartment as an STA
             result = WINRT_IMPL_CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
         } else {
-            // Current thread is an MTA thread
-            result = WINRT_IMPL_CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+            // qualifier is an unknown value.
+            // Initialize the apartment with the default concurrency model.
+            result = WINRT_IMPL_CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
         }
     } else {
         // cotype is an unknown value.
