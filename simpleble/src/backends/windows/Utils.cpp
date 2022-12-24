@@ -55,13 +55,34 @@ void initialize_winrt() {
     SIMPLEBLE_LOG_INFO(
         fmt::format("CoGetApartmentType: cotype={}, qualifier={}, result={}", cotype, qualifier, result));
 
-    if (cotype == APTTYPE_CURRENT) {
-        // Attempt to initialize the WinRT backend if not already set.
-        winrt::hresult const result = WINRT_IMPL_CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    winrt::hresult const result;
 
-        // The apartment has not been initialized successfully.
-        SIMPLEBLE_LOG_INFO(fmt::format("CoInitializeEx: result={}", result));
+    if (cotype == APTTYPE_STA) {
+        // Current thread is already associated with an STA.
+        // No need to initialize the apartment.
+        return;
+    } else if (cotype == APTTYPE_MTA) {
+        // Current thread is already associated with an MTA.
+        // No need to initialize the apartment.
+        return;
+    } else if (cotype == APTTYPE_CURRENT) {
+        // Current thread is not associated with an apartment,
+        // or the apartment type is determined by the current threading model.
+        // Initialize the apartment based on the threading model.
+        if (GetCurrentThreadId() == GetWindowThreadProcessId(GetDesktopWindow(), NULL)) {
+            // Current thread is an STA thread
+            result = WINRT_IMPL_CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+        } else {
+            // Current thread is an MTA thread
+            result = WINRT_IMPL_CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+        }
+    } else {
+        // cotype is an unknown value.
+        // Initialize the apartment with the default concurrency model.
+        result = WINRT_IMPL_CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
     }
+
+    SIMPLEBLE_LOG_INFO(fmt::format("CoInitializeEx: result={}", result));
 }
 
 std::string _mac_address_to_str(uint64_t mac_address) {
