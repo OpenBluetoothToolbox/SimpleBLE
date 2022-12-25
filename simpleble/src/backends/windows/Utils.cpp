@@ -50,12 +50,12 @@ void initialize_winrt() {
     initialized = true;
 
     int32_t cotype, qualifier;
-    int32_t result = WINRT_IMPL_CoGetApartmentType(&cotype, &qualifier);
+    int32_t get_apartment_result = WINRT_IMPL_CoGetApartmentType(&cotype, &qualifier);
 
     SIMPLEBLE_LOG_INFO(
-        fmt::format("CoGetApartmentType: cotype={}, qualifier={}, result={}", cotype, qualifier, result));
+        fmt::format("CoGetApartmentType: cotype={}, qualifier={}, result={}", cotype, qualifier, get_apartment_result));
 
-    winrt::hresult const result;
+    winrt::hresult result;
 
     if (cotype == APTTYPE_STA) {
         // Current thread is already associated with an STA.
