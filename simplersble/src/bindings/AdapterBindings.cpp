@@ -2,11 +2,11 @@
 
 #include "simplersble/src/lib.rs.h"
 
-rust::Vec<SimpleBLE::RustyWrapper> RustyAdapter_get_adapters() {
-    rust::Vec<SimpleBLE::RustyWrapper> result;
+rust::Vec<SimpleBLE::RustyAdapterWrapper> RustyAdapter_get_adapters() {
+    rust::Vec<SimpleBLE::RustyAdapterWrapper> result;
 
     for (auto &adapter : SimpleBLE::Adapter::get_adapters() ) {
-        SimpleBLE::RustyWrapper wrapper;
+        SimpleBLE::RustyAdapterWrapper wrapper;
         wrapper.internal = std::make_unique<SimpleBLE::RustyAdapter>(adapter);
         result.push_back(std::move(wrapper));
     }

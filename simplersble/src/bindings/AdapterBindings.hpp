@@ -10,7 +10,7 @@
 
 namespace SimpleBLE {
 
-struct RustyWrapper;
+struct RustyAdapterWrapper;
 
 class RustyAdapter : private Adapter {
   public:
@@ -44,11 +44,13 @@ class RustyPeripheral : private Peripheral {
 
     rust::String identifier() const { return rust::String(_peripheral->identifier()); }
 
+    rust::String address() const { return rust::String(_peripheral->address()); }
+
   private:
     std::shared_ptr<Peripheral> _peripheral;
 };
 
 };  // namespace SimpleBLE
 
-rust::Vec<SimpleBLE::RustyWrapper> RustyAdapter_get_adapters();
+rust::Vec<SimpleBLE::RustyAdapterWrapper> RustyAdapter_get_adapters();
 bool RustyAdapter_bluetooth_enabled();

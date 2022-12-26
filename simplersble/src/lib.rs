@@ -5,7 +5,7 @@ use std::mem;
 mod ffi {
 
     #[namespace = "SimpleBLE"]
-    struct RustyWrapper {
+    struct RustyAdapterWrapper {
         internal: UniquePtr::<RustyAdapter>
     }
 
@@ -16,22 +16,22 @@ mod ffi {
         type RustyAdapter;
 
         fn RustyAdapter_bluetooth_enabled() -> bool;
-        fn RustyAdapter_get_adapters() -> Vec::<RustyWrapper>;
+        fn RustyAdapter_get_adapters() -> Vec::<RustyAdapterWrapper>;
 
-        fn identifier(&self) -> String;
-        fn address(&self) -> String;
+        fn identifier(self: &RustyAdapter) -> String;
+        fn address(self: &RustyAdapter) -> String;
 
-        fn scan_start(&self);
-        fn scan_stop(&self);
-        fn scan_for(&self, timeout_ms: i32);
-        fn scan_is_active(&self) -> bool;
+        fn scan_start(self: &RustyAdapter);
+        fn scan_stop(self: &RustyAdapter);
+        fn scan_for(self: &RustyAdapter, timeout_ms: i32);
+        fn scan_is_active(self: &RustyAdapter) -> bool;
         // std::vector<Peripheral> scan_get_results();
 
-        // #[namespace = "SimpleBLE"]
-        // type RustyPeripheral;
+        #[namespace = "SimpleBLE"]
+        type RustyPeripheral;
 
-        // fn identifier(&self) -> String;
-        // fn address(&self) -> String;
+        fn identifier(self: &RustyPeripheral) -> String;
+        fn address(self: &RustyPeripheral) -> String;
 
     }
 
@@ -61,7 +61,7 @@ impl Adapter {
         return adapters;
     }
 
-    fn new(wrapper: &mut ffi::RustyWrapper) -> Self {
+    fn new(wrapper: &mut ffi::RustyAdapterWrapper) -> Self {
         let mut this = Self { internal: cxx::UniquePtr::<ffi::RustyAdapter>::null() };
         mem::swap(&mut this.internal, &mut wrapper.internal);
         return this;
