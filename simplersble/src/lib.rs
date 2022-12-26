@@ -19,7 +19,19 @@ mod ffi {
         fn RustyAdapter_get_adapters() -> Vec::<RustyWrapper>;
 
         fn identifier(&self) -> String;
+        fn address(&self) -> String;
 
+        fn scan_start(&self);
+        fn scan_stop(&self);
+        fn scan_for(&self, timeout_ms: i32);
+        fn scan_is_active(&self) -> bool;
+        // std::vector<Peripheral> scan_get_results();
+
+        // #[namespace = "SimpleBLE"]
+        // type RustyPeripheral;
+
+        // fn identifier(&self) -> String;
+        // fn address(&self) -> String;
 
     }
 
@@ -29,15 +41,11 @@ pub struct Adapter {
     internal : cxx::UniquePtr::<ffi::RustyAdapter>,
 }
 
+// pub struct Peripheral {
+//     internal : cxx::UniquePtr::<ffi::RustyPeripheral>,
+// }
+
 impl Adapter {
-
-    fn new(internal: cxx::UniquePtr::<ffi::RustyAdapter>) -> Self {
-        Self { internal }
-    }
-
-    pub fn identifier(&self) -> String {
-        return self.internal.identifier();
-    }
 
     pub fn bluetooth_enabled() -> bool {
         return ffi::RustyAdapter_bluetooth_enabled();
@@ -47,30 +55,40 @@ impl Adapter {
         let mut adapters = Vec::<Adapter>::new();
 
         for adapter_wrapper in ffi::RustyAdapter_get_adapters().iter_mut() {
-            let mut carrier = cxx::UniquePtr::<ffi::RustyAdapter>::null();
-
-            // Swap the wrapper object to extract the internal pointer that we desire.
-            mem::swap(&mut carrier, &mut adapter_wrapper.internal);
-
-            adapters.push(Adapter::new(carrier));
+            adapters.push(Adapter::new(adapter_wrapper));
         }
 
         return adapters;
     }
 
-}
-
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+    fn new(wrapper: &mut ffi::RustyWrapper) -> Self {
+        let mut this = Self { internal: cxx::UniquePtr::<ffi::RustyAdapter>::null() };
+        mem::swap(&mut this.internal, &mut wrapper.internal);
+        return this;
     }
+
+    pub fn identifier(&self) -> String {
+        return self.internal.identifier();
+    }
+
+    pub fn address(&self) -> String {
+        return self.internal.address();
+    }
+
+    pub fn scan_start(&self) {
+        self.internal.scan_start();
+    }
+
+    pub fn scan_stop(&self) {
+        self.internal.scan_stop();
+    }
+
+    pub fn scan_for(&self, timeout_ms: i32) {
+        self.internal.scan_for(timeout_ms);
+    }
+
+    pub fn scan_is_active(&self) {
+        self.internal.scan_is_active();
+    }
+
 }

@@ -13,3 +13,7 @@ rust::Vec<SimpleBLE::RustyWrapper> RustyAdapter_get_adapters() {
 
     return result;
 }
+
+bool RustyAdapter_bluetooth_enabled() {
+    return SimpleBLE::Adapter::bluetooth_enabled();
+}

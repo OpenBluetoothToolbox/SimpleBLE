@@ -1,11 +1,12 @@
 #pragma once
 
-#include "simpleble/Adapter.h"
 #include "rust/cxx.h"
+#include "simpleble/Adapter.h"
+#include "simpleble/Peripheral.h"
 
 #include <cstdint>
-#include <memory>
 #include <iostream>
+#include <memory>
 
 namespace SimpleBLE {
 
@@ -16,23 +17,38 @@ class RustyAdapter : private Adapter {
     RustyAdapter() = default;
     virtual ~RustyAdapter() = default;
 
-    RustyAdapter(Adapter adapter) : _adapter(new Adapter(adapter)) {
-        std::cout << "Passing an adapter in!\n";
-    };
+    RustyAdapter(Adapter adapter) : _adapter(new Adapter(adapter)) {};
 
-    rust::String identifier() const {
-        return rust::String(_adapter->identifier());
-    }
+    rust::String identifier() const { return rust::String(_adapter->identifier()); }
+
+    rust::String address() const { return rust::String(_adapter->address()); }
+
+    void scan_start() const { _adapter->scan_start(); }
+
+    void scan_stop() const { _adapter->scan_stop(); }
+
+    void scan_for(int32_t timeout_ms) const { _adapter->scan_for(timeout_ms); }
+
+    bool scan_is_active() const { return _adapter->scan_is_active(); }
 
   private:
     std::shared_ptr<Adapter> _adapter;
 };
 
+class RustyPeripheral : private Peripheral {
+  public:
+    RustyPeripheral() = default;
+    virtual ~RustyPeripheral() = default;
+
+    RustyPeripheral(Peripheral peripheral) : _peripheral(new Peripheral(peripheral)) {}
+
+    rust::String identifier() const { return rust::String(_peripheral->identifier()); }
+
+  private:
+    std::shared_ptr<Peripheral> _peripheral;
 };
 
+};  // namespace SimpleBLE
+
 rust::Vec<SimpleBLE::RustyWrapper> RustyAdapter_get_adapters();
-
-
-bool RustyAdapter_bluetooth_enabled() {
-    return SimpleBLE::Adapter::bluetooth_enabled();
-}
+bool RustyAdapter_bluetooth_enabled();
