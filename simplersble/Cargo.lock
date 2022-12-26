@@ -112,7 +112,7 @@ checksum = "9c8132065adcfd6e02db789d9285a0deb2f3fcb04002865ab67d5fb103533898"
 
 [[package]]
 name = "simplersble"
-version = "0.1.0"
+version = "0.6.0-alpha1"
 dependencies = [
  "cmake",
  "cxx",
