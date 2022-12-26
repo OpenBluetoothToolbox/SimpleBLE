@@ -12,24 +12,28 @@ namespace SimpleBLE {
 
 struct RustyAdapterWrapper;
 
+struct RustyPeripheralWrapper;
+
 class RustyAdapter : private Adapter {
   public:
     RustyAdapter() = default;
     virtual ~RustyAdapter() = default;
 
-    RustyAdapter(Adapter adapter) : _adapter(new Adapter(adapter)) {};
+    RustyAdapter(Adapter adapter) : _adapter(new Adapter(adapter)){};
 
-    rust::String identifier() const { return rust::String(_adapter->identifier()); }
+    rust::String identifier() const;
 
-    rust::String address() const { return rust::String(_adapter->address()); }
+    rust::String address() const;
 
-    void scan_start() const { _adapter->scan_start(); }
+    void scan_start() const;
 
-    void scan_stop() const { _adapter->scan_stop(); }
+    void scan_stop() const;
 
-    void scan_for(int32_t timeout_ms) const { _adapter->scan_for(timeout_ms); }
+    void scan_for(int32_t timeout_ms) const;
 
-    bool scan_is_active() const { return _adapter->scan_is_active(); }
+    bool scan_is_active() const;
+
+    rust::Vec<SimpleBLE::RustyPeripheralWrapper> scan_get_results() const;
 
   private:
     std::shared_ptr<Adapter> _adapter;
