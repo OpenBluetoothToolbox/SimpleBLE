@@ -1,6 +1,6 @@
 #include "AdapterBindings.hpp"
 
-#include "simplersble/src/lib.rs.h"
+#include "simplersble/simplersble/src/lib.rs.h"
 
 rust::Vec<SimpleBLE::RustyAdapterWrapper> RustyAdapter_get_adapters() {
     rust::Vec<SimpleBLE::RustyAdapterWrapper> result;

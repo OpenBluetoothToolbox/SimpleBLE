@@ -6,7 +6,15 @@ version = "0.6.0-alpha1"
 license = "MIT"
 description = "The all-in-one Bluetooth library that makes it easy to add wireless connectivity to your projects."
 
+build = "simplersble/build.rs"
 links = "simpleble"
+
+[lib]
+path = "simplersble/src/lib.rs"
+
+[[bin]]
+name = "simplersble-demo"
+path = "simplersble/src/main.rs"
 
 [dependencies]
 cxx = "1.0"

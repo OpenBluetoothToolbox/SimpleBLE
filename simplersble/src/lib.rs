@@ -14,7 +14,7 @@ mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("simplersble/src/bindings/AdapterBindings.hpp");
+        include!("src/bindings/AdapterBindings.hpp");
 
         #[namespace = "SimpleBLE"]
         type RustyAdapter;
