@@ -2,7 +2,7 @@ Overview
 --------
 
 The SimpleBLE project aims to provide fully cross-platform BLE libraries and bindings
-for Python and C++, designed for simplicity and ease of use with a licencing scheme
+for Python, Rust and C++, designed for simplicity and ease of use with a licencing scheme
 chosen to be friendly towards commercial use. All specific operating system quirks
 are handled internally to provide a consistent behavior across all platforms. The
 libraries also provide first-class support for vendorization of all third-party
@@ -12,6 +12,7 @@ This repository offers the source code for the following related libraries:
 
 * **SimpleBLE:** C++ cross-platform BLE library.
 * **SimplePyBLE:** Python bindings for SimpleBLE. See `SimplePyBLE`_ PyPI page for more details.
+* **SimpleRsBLE:** Rust bindings for SimpleBLE. See the `SimpleRsBLE`_ Crates.io page for more details.
 * **SimpleBluez:** C++ abstraction layer for BlueZ over DBus. (Linux only)
 * **SimpleDBus:** C++ wrapper for libdbus-1 with convenience classes to handle DBus object hierarchies effectively. (Linux only)
 
@@ -53,6 +54,8 @@ external creators, are licensed under the terms of the `MIT Licence`_.
 .. Links
 
 .. _SimplePyBLE: https://pypi.org/project/simplepyble/
+
+.. _SimpleRsBLE: https://crates.io/crates/simplersble
 
 .. _MIT Licence: https://github.com/OpenBluetoothToolbox/SimpleBLE/blob/main/LICENCE.md
 

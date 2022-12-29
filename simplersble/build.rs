@@ -3,13 +3,7 @@ use cxx_build;
 use std::env;
 use std::path::Path;
 
-fn main() {
-    // TODO: Add all files that would trigger a rerun
-    println!("cargo:rerun-if-changed=build.rs");
-    println!("cargo:rerun-if-changed=src/lib.rs");
-    println!("cargo:rerun-if-changed=src/bindings/AdapterBindings.hpp");
-    println!("cargo:rerun-if-changed=src/bindings/AdapterBindings.cpp");
-
+fn compile_simpleble() {
     let build_debug = env::var("DEBUG").unwrap() == "true";
     if build_debug { println!("cargo:warning=Building in DEBUG mode"); }
 
@@ -42,7 +36,20 @@ fn main() {
         "windows" => {},
         "linux" => {},
         &_ => panic!("Unexpected target OS")
+    }
+}
 
+fn main() {
+    // TODO: Add all files that would trigger a rerun
+    println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=src/lib.rs");
+    println!("cargo:rerun-if-changed=src/bindings/AdapterBindings.hpp");
+    println!("cargo:rerun-if-changed=src/bindings/AdapterBindings.cpp");
+
+    compile_simpleble();
+
+    if std::env::var("DOCS_RS").is_ok() {
+        println!("cargo:warning=Building DOCS");
     }
 
     // Build the bindings
