@@ -16,6 +16,13 @@ rust::Vec<SimpleBLE::RustyAdapterWrapper> RustyAdapter_get_adapters() {
 
 bool RustyAdapter_bluetooth_enabled() { return SimpleBLE::Adapter::bluetooth_enabled(); }
 
+void SimpleBLE::RustyAdapter::link(SimpleRsBLE::Adapter &target) const {
+    target.on_callback_scan_start();
+}
+void SimpleBLE::RustyAdapter::unlink() const {
+    std::cout << "unlink!\n";
+}
+
 rust::String SimpleBLE::RustyAdapter::identifier() const { return rust::String(_adapter->identifier()); }
 
 rust::String SimpleBLE::RustyAdapter::address() const { return rust::String(_adapter->address()); }

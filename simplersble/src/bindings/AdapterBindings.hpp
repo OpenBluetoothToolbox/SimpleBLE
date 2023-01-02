@@ -24,8 +24,8 @@ class RustyAdapter : private Adapter {
 
     RustyAdapter(Adapter adapter) : _adapter(new Adapter(adapter)){};
 
-    void link(SimpleRsBLE::Adapter const &target) const {}
-    void unlink() const {}
+    void link(SimpleRsBLE::Adapter &target) const;
+    void unlink() const;
 
     rust::String identifier() const;
     rust::String address() const;
@@ -41,9 +41,6 @@ class RustyAdapter : private Adapter {
         cb();
         std::cout << "Callback called\n";
     }
-
-    void set_callback_on_scan_start(std::function<void()> on_scan_start) {}
-    void set_callback_on_scan_stop(std::function<void()> on_scan_stop) {}
 
   private:
     std::shared_ptr<Adapter> _adapter;

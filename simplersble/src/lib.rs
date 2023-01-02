@@ -1,5 +1,4 @@
 use std::mem;
-use std::ffi::c_void;
 
 #[cxx::bridge]
 mod ffi {
@@ -14,11 +13,11 @@ mod ffi {
         internal: UniquePtr<RustyPeripheral>,
     }
 
+    #[namespace = "SimpleRsBLE"]
     extern "Rust" {
-        #[namespace = "SimpleRsBLE"]
         type Adapter;
 
-        //fn on_callback_scan_start(self: &Adapter);
+        fn on_callback_scan_start(self: &mut Adapter);
     }
 
     unsafe extern "C++" {
@@ -30,7 +29,7 @@ mod ffi {
         fn RustyAdapter_bluetooth_enabled() -> bool;
         fn RustyAdapter_get_adapters() -> Vec<RustyAdapterWrapper>;
 
-        fn link(self: &RustyAdapter, target: &Adapter);
+        fn link(self: &RustyAdapter, target: &mut Adapter);
         fn unlink(self: &RustyAdapter);
 
         fn identifier(self: &RustyAdapter) -> String;
@@ -85,8 +84,12 @@ impl Adapter {
             internal: cxx::UniquePtr::<ffi::RustyAdapter>::null(),
             on_scan_start: Box::new(||{}),
         };
+
+        // Configure the internal object while still inside the wrappers
+        wrapper.internal.link(&mut this);
+
+        // Load the internal object held by the wrapper into this class.
         mem::swap(&mut this.internal, &mut wrapper.internal);
-        this.internal.link(&this);
         return this;
     }
 
