@@ -1,4 +1,5 @@
 use std::mem;
+use std::ffi::c_void;
 
 #[cxx::bridge]
 mod ffi {
@@ -13,6 +14,13 @@ mod ffi {
         internal: UniquePtr<RustyPeripheral>,
     }
 
+    extern "Rust" {
+        #[namespace = "SimpleRsBLE"]
+        type Adapter;
+
+        //fn on_callback_scan_start(self: &Adapter);
+    }
+
     unsafe extern "C++" {
         include!("src/bindings/AdapterBindings.hpp");
 
@@ -21,6 +29,9 @@ mod ffi {
 
         fn RustyAdapter_bluetooth_enabled() -> bool;
         fn RustyAdapter_get_adapters() -> Vec<RustyAdapterWrapper>;
+
+        fn link(self: &RustyAdapter, target: &Adapter);
+        fn unlink(self: &RustyAdapter);
 
         fn identifier(self: &RustyAdapter) -> String;
         fn address(self: &RustyAdapter) -> String;
@@ -31,17 +42,23 @@ mod ffi {
         fn scan_is_active(self: &RustyAdapter) -> bool;
         fn scan_get_results(self: &RustyAdapter) -> Vec<RustyPeripheralWrapper>;
 
+        fn set_callback_on_scan_start(self: &RustyAdapter, cb: fn());
+
         #[namespace = "SimpleBLE"]
         type RustyPeripheral;
 
         fn identifier(self: &RustyPeripheral) -> String;
         fn address(self: &RustyPeripheral) -> String;
 
+
+
     }
 }
 
+
 pub struct Adapter {
     internal: cxx::UniquePtr<ffi::RustyAdapter>,
+    on_scan_start: Box<dyn Fn() + Send + Sync + 'static>,
 }
 
 pub struct Peripheral {
@@ -66,8 +83,10 @@ impl Adapter {
     fn new(wrapper: &mut ffi::RustyAdapterWrapper) -> Self {
         let mut this = Self {
             internal: cxx::UniquePtr::<ffi::RustyAdapter>::null(),
+            on_scan_start: Box::new(||{}),
         };
         mem::swap(&mut this.internal, &mut wrapper.internal);
+        this.internal.link(&this);
         return this;
     }
 
@@ -104,6 +123,14 @@ impl Adapter {
 
         return peripherals;
     }
+
+    pub fn set_callback_on_scan_start(&mut self, cb: Box<dyn Fn() + Send + Sync + 'static>) {
+        self.on_scan_start = cb;
+    }
+
+    fn on_callback_scan_start(&mut self) {
+        println!("On callback scan start");
+    }
 }
 
 impl Peripheral {
@@ -121,5 +148,21 @@ impl Peripheral {
 
     pub fn address(&self) -> String {
         return self.internal.address();
+    }
+}
+
+
+unsafe impl Sync for Adapter {}
+
+unsafe impl Sync for Peripheral {}
+
+unsafe impl Send for Adapter {}
+
+unsafe impl Send for Peripheral {}
+
+
+impl Drop for Adapter {
+    fn drop(&mut self) {
+        self.internal.unlink();
     }
 }

@@ -6,12 +6,16 @@ fn main() {
         simplersble::Adapter::bluetooth_enabled()
     );
 
-    let adapters = simplersble::Adapter::get_adapters();
+    let mut adapters = simplersble::Adapter::get_adapters();
     println!("Adapters length is {}", adapters.len());
 
-    for adapter in adapters.iter() {
+    for adapter in adapters.iter_mut() {
         println!("Adapter identifier is {}", adapter.identifier());
         println!("Adapter address is {}", adapter.address());
+
+        adapter.set_callback_on_scan_start(Box::new(|| {
+            println!("Callback executed");
+        }));
 
         adapter.scan_for(3000);
         println!("Scan complete");
