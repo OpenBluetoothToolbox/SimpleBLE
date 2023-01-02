@@ -1,4 +1,5 @@
 use std::mem;
+use std::pin::Pin;
 
 #[cxx::bridge]
 mod ffi {
@@ -69,8 +70,8 @@ impl Adapter {
         return ffi::RustyAdapter_bluetooth_enabled();
     }
 
-    pub fn get_adapters() -> Vec<Adapter> {
-        let mut adapters = Vec::<Adapter>::new();
+    pub fn get_adapters() -> Vec<Pin<Box<Adapter>>> {
+        let mut adapters = Vec::<Pin<Box<Adapter>>>::new();
 
         for adapter_wrapper in ffi::RustyAdapter_get_adapters().iter_mut() {
             adapters.push(Adapter::new(adapter_wrapper));
@@ -79,7 +80,7 @@ impl Adapter {
         return adapters;
     }
 
-    fn new(wrapper: &mut ffi::RustyAdapterWrapper) -> Self {
+    fn new(wrapper: &mut ffi::RustyAdapterWrapper) -> Pin<Box<Self>> {
         let mut this = Self {
             internal: cxx::UniquePtr::<ffi::RustyAdapter>::null(),
             on_scan_start: Box::new(||{}),
@@ -90,7 +91,9 @@ impl Adapter {
 
         // Load the internal object held by the wrapper into this class.
         mem::swap(&mut this.internal, &mut wrapper.internal);
-        return this;
+
+        let this_boxed = Box::pin(this);
+        return this_boxed;
     }
 
     pub fn identifier(&self) -> String {
