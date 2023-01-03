@@ -124,8 +124,8 @@ impl Adapter {
         self.internal.scan_is_active();
     }
 
-    pub fn scan_get_results(&self) -> Vec<Peripheral> {
-        let mut peripherals = Vec::<Peripheral>::new();
+    pub fn scan_get_results(&self) -> Vec<Pin<Box<Peripheral>>> {
+        let mut peripherals = Vec::<Pin<Box<Peripheral>>>::new();
 
         for peripheral_wrapper in self.internal.scan_get_results().iter_mut() {
             peripherals.push(Peripheral::new(peripheral_wrapper));
@@ -160,12 +160,22 @@ impl Adapter {
 }
 
 impl Peripheral {
-    fn new(wrapper: &mut ffi::RustyPeripheralWrapper) -> Self {
+    fn new(wrapper: &mut ffi::RustyPeripheralWrapper) -> Pin<Box<Self>> {
         let mut this = Self {
             internal: cxx::UniquePtr::<ffi::RustyPeripheral>::null(),
         };
-        mem::swap(&mut this.internal, &mut wrapper.internal);
-        return this;
+
+        // Pin the object to guarantee that its location in memory is
+        // fixed throughout the lifetime of the application
+        let mut this_boxed = Box::pin(this);
+
+        // Link `this` to the RustyPeripheral
+        // TODO: wrapper.internal.link(this_boxed.as_mut());
+
+        // Copy the RustyPeripheral pointer into `this`
+        mem::swap(&mut this_boxed.internal, &mut wrapper.internal);
+
+        return this_boxed;
     }
 
     pub fn identifier(&self) -> String {
