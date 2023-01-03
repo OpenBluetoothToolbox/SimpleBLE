@@ -30,7 +30,7 @@ mod ffi {
         fn RustyAdapter_bluetooth_enabled() -> bool;
         fn RustyAdapter_get_adapters() -> Vec<RustyAdapterWrapper>;
 
-        fn link(self: &RustyAdapter, target: &mut Adapter);
+        fn link(self: &RustyAdapter, target: Pin<&mut Adapter>);
         fn unlink(self: &RustyAdapter);
 
         fn identifier(self: &RustyAdapter) -> String;
@@ -81,18 +81,21 @@ impl Adapter {
     }
 
     fn new(wrapper: &mut ffi::RustyAdapterWrapper) -> Pin<Box<Self>> {
-        let mut this = Self {
+        let this = Self {
             internal: cxx::UniquePtr::<ffi::RustyAdapter>::null(),
             on_scan_start: Box::new(||{}),
         };
 
-        // Configure the internal object while still inside the wrappers
-        wrapper.internal.link(&mut this);
+        // Pin the object to guarantee that its location in memory is
+        // fixed throughout the lifetime of the application
+        let mut this_boxed = Box::pin(this);
 
-        // Load the internal object held by the wrapper into this class.
-        mem::swap(&mut this.internal, &mut wrapper.internal);
+        // Link `this` to the RustyAdapter
+        wrapper.internal.link(this_boxed.as_mut());
 
-        let this_boxed = Box::pin(this);
+        // Copy the RustyAdapter pointer into `this`
+        mem::swap(&mut this_boxed.internal, &mut wrapper.internal);
+
         return this_boxed;
     }
 
