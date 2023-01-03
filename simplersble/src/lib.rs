@@ -42,8 +42,6 @@ mod ffi {
         fn scan_is_active(self: &RustyAdapter) -> bool;
         fn scan_get_results(self: &RustyAdapter) -> Vec<RustyPeripheralWrapper>;
 
-        fn set_callback_on_scan_start(self: &RustyAdapter, cb: fn());
-
         #[namespace = "SimpleBLE"]
         type RustyPeripheral;
 
@@ -137,8 +135,8 @@ impl Adapter {
         self.on_scan_start = cb;
     }
 
-    fn on_callback_scan_start(&mut self) {
-        println!("On callback scan start");
+    fn on_callback_scan_start(&self) {
+        (self.on_scan_start)();
     }
 }
 
@@ -160,7 +158,6 @@ impl Peripheral {
     }
 }
 
-
 unsafe impl Sync for Adapter {}
 
 unsafe impl Sync for Peripheral {}
@@ -168,7 +165,6 @@ unsafe impl Sync for Peripheral {}
 unsafe impl Send for Adapter {}
 
 unsafe impl Send for Peripheral {}
-
 
 impl Drop for Adapter {
     fn drop(&mut self) {

@@ -9,7 +9,9 @@
 #include <memory>
 
 namespace SimpleRsBLE {
-  struct Adapter;
+
+struct Adapter;
+
 };
 
 namespace SimpleBLE {
@@ -22,9 +24,10 @@ class RustyAdapter : private Adapter {
     RustyAdapter() = default;
     virtual ~RustyAdapter() = default;
 
-    RustyAdapter(Adapter adapter) : _adapter(new Adapter(adapter)){};
+    RustyAdapter(Adapter adapter)
+        : _internal(new Adapter(adapter)), _adapter(std::make_unique<SimpleRsBLE::Adapter*>()){};
 
-    void link(SimpleRsBLE::Adapter &target) const;
+    void link(SimpleRsBLE::Adapter& target) const;
     void unlink() const;
 
     rust::String identifier() const;
@@ -36,14 +39,13 @@ class RustyAdapter : private Adapter {
     bool scan_is_active() const;
     rust::Vec<SimpleBLE::RustyPeripheralWrapper> scan_get_results() const;
 
-    void set_callback_on_scan_start(rust::Fn<void()> cb) const {
-        std::cout << "Calling callback!\n";
-        cb();
-        std::cout << "Callback called\n";
-    }
-
   private:
-    std::shared_ptr<Adapter> _adapter;
+    // NOTE: All internal properties need to be handled as pointers,
+    // allowing the calls to RustyAdapter to always be const.
+    // This might require us to store pointers to pointers, so it's
+    // important to be careful when handling these.
+    std::shared_ptr<Adapter> _internal;
+    std::unique_ptr<SimpleRsBLE::Adapter*> _adapter;
 };
 
 class RustyPeripheral : private Peripheral {
@@ -54,7 +56,6 @@ class RustyPeripheral : private Peripheral {
     RustyPeripheral(Peripheral peripheral) : _peripheral(new Peripheral(peripheral)) {}
 
     rust::String identifier() const { return rust::String(_peripheral->identifier()); }
-
     rust::String address() const { return rust::String(_peripheral->address()); }
 
   private:
