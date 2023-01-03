@@ -40,6 +40,12 @@ void SimpleBLE::RustyAdapter::link(SimpleRsBLE::Adapter &target) const {
         p_adapter->on_callback_scan_start();
     });
 
+    _internal->set_callback_on_scan_stop([this]() {
+        SimpleRsBLE::Adapter* p_adapter = *this->_adapter;
+        if (p_adapter == nullptr) return;
+
+        p_adapter->on_callback_scan_stop();
+    });
 }
 void SimpleBLE::RustyAdapter::unlink() const {
     // `_adapter` is a pointer to a pointer.

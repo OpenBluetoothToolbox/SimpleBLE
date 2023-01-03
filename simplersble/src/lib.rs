@@ -19,6 +19,7 @@ mod ffi {
         type Adapter;
 
         fn on_callback_scan_start(self: &mut Adapter);
+        fn on_callback_scan_stop(self: &mut Adapter);
     }
 
     unsafe extern "C++" {
@@ -57,6 +58,7 @@ mod ffi {
 pub struct Adapter {
     internal: cxx::UniquePtr<ffi::RustyAdapter>,
     on_scan_start: Box<dyn Fn() + Send + Sync + 'static>,
+    on_scan_stop: Box<dyn Fn() + Send + Sync + 'static>,
 }
 
 pub struct Peripheral {
@@ -82,6 +84,7 @@ impl Adapter {
         let this = Self {
             internal: cxx::UniquePtr::<ffi::RustyAdapter>::null(),
             on_scan_start: Box::new(||{}),
+            on_scan_stop: Box::new(||{}),
         };
 
         // Pin the object to guarantee that its location in memory is
@@ -135,8 +138,24 @@ impl Adapter {
         self.on_scan_start = cb;
     }
 
+    pub fn set_callback_on_scan_stop(&mut self, cb: Box<dyn Fn() + Send + Sync + 'static>) {
+        self.on_scan_stop = cb;
+    }
+
+    pub fn set_callback_on_scan_updated(&mut self, cb: Box<dyn Fn() + Send + Sync + 'static>) {
+        // TODO
+    }
+
+    pub fn set_callback_on_scan_found(&mut self, cb: Box<dyn Fn() + Send + Sync + 'static>) {
+        // TODO
+    }
+
     fn on_callback_scan_start(&self) {
         (self.on_scan_start)();
+    }
+
+    fn on_callback_scan_stop(&self) {
+        (self.on_scan_stop)();
     }
 }
 

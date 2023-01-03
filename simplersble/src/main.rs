@@ -14,10 +14,14 @@ fn main() {
         println!("Adapter address is {}", adapter.address());
 
         adapter.set_callback_on_scan_start(Box::new(|| {
-            println!("Callback executed");
+            println!("Scan started.");
         }));
 
-        adapter.scan_for(3000);
+        adapter.set_callback_on_scan_stop(Box::new(|| {
+            println!("Scan stopped.");
+        }));
+
+        adapter.scan_for(1000);
         println!("Scan complete");
 
         for peripheral in adapter.scan_get_results().iter() {
