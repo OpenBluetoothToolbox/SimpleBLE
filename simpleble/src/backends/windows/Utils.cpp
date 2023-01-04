@@ -90,12 +90,12 @@ void initialize_winrt() {
         } else {
             // qualifier is an unknown value.
             // Initialize the apartment with the default concurrency model.
-            result = WINRT_IMPL_CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+            result = WINRT_IMPL_CoInitializeEx(nullptr, COINIT_MULTITHREADED);
         }
     } else {
         // cotype is an unknown value.
         // Initialize the apartment with the default concurrency model.
-        result = WINRT_IMPL_CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+        result = WINRT_IMPL_CoInitializeEx(nullptr, COINIT_MULTITHREADED);
     }
 
     SIMPLEBLE_LOG_INFO(fmt::format("CoInitializeEx: result={}", result));
