@@ -1,0 +1,35 @@
+use simplersble;
+
+fn main() {
+    let mut adapters = simplersble::Adapter::get_adapters();
+
+    // Pick the first adapter
+    let mut adapter = adapters.pop().unwrap();
+    println!("Adapter identifier is {}", adapter.identifier());
+    println!("Adapter address is {}", adapter.address());
+
+    adapter.set_callback_on_scan_start(Box::new(|| {
+        println!("Scan started.");
+    }));
+
+    adapter.set_callback_on_scan_stop(Box::new(|| {
+        println!("Scan stopped.");
+    }));
+
+    adapter.set_callback_on_scan_found(Box::new(|peripheral| {
+        println!("[FOUND] Identifier: {} Address: {}", peripheral.identifier(), peripheral.address());
+    }));
+
+    adapter.set_callback_on_scan_updated(Box::new(|peripheral| {
+        println!("[UPDATE] Identifier: {} Address: {}", peripheral.identifier(), peripheral.address());
+    }));
+
+    adapter.scan_for(4000);
+    println!("Scan complete");
+
+    for peripheral in adapter.scan_get_results().iter() {
+        println!("Peripheral identifier is {}", peripheral.identifier());
+        println!("Peripheral address is {}", peripheral.address())
+        }
+
+}
