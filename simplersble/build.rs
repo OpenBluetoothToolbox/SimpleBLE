@@ -34,7 +34,9 @@ fn compile_simpleble() {
             println!("cargo:rustc-link-lib=framework=CoreBluetooth");
         },
         "windows" => {},
-        "linux" => {},
+        "linux" => {
+            println!("cargo:rustc-link-lib=dbus-1");
+        },
         &_ => panic!("Unexpected target OS")
     }
 }

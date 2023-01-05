@@ -11,6 +11,7 @@
 namespace SimpleRsBLE {
 
 struct Adapter;
+struct Peripheral;
 
 };
 
@@ -53,13 +54,21 @@ class RustyPeripheral : private Peripheral {
     RustyPeripheral() = default;
     virtual ~RustyPeripheral() = default;
 
-    RustyPeripheral(Peripheral peripheral) : _peripheral(new Peripheral(peripheral)) {}
+    RustyPeripheral(Peripheral peripheral) : _internal(new Peripheral(peripheral)), _peripheral(std::make_unique<SimpleRsBLE::Peripheral*>()) {}
 
-    rust::String identifier() const { return rust::String(_peripheral->identifier()); }
-    rust::String address() const { return rust::String(_peripheral->address()); }
+    void link(SimpleRsBLE::Peripheral& target) const;
+    void unlink() const;
+
+    rust::String identifier() const { return rust::String(_internal->identifier()); }
+    rust::String address() const { return rust::String(_internal->address()); }
 
   private:
-    std::shared_ptr<Peripheral> _peripheral;
+    // NOTE: All internal properties need to be handled as pointers,
+    // allowing the calls to RustyPeripheral to always be const.
+    // This might require us to store pointers to pointers, so it's
+    // important to be careful when handling these.
+    std::shared_ptr<Peripheral> _internal;
+    std::unique_ptr<SimpleRsBLE::Peripheral*> _peripheral;
 };
 
 };  // namespace SimpleBLE

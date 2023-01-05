@@ -20,6 +20,8 @@ mod ffi {
 
         fn on_callback_scan_start(self: &mut Adapter);
         fn on_callback_scan_stop(self: &mut Adapter);
+     
+        type Peripheral;
     }
 
     unsafe extern "C++" {
@@ -46,11 +48,11 @@ mod ffi {
         #[namespace = "SimpleBLE"]
         type RustyPeripheral;
 
+        fn link(self: &RustyPeripheral, target: Pin<&mut Peripheral>);
+        fn unlink(self: &RustyPeripheral);
+
         fn identifier(self: &RustyPeripheral) -> String;
         fn address(self: &RustyPeripheral) -> String;
-
-
-
     }
 }
 
@@ -161,7 +163,7 @@ impl Adapter {
 
 impl Peripheral {
     fn new(wrapper: &mut ffi::RustyPeripheralWrapper) -> Pin<Box<Self>> {
-        let mut this = Self {
+        let this = Self {
             internal: cxx::UniquePtr::<ffi::RustyPeripheral>::null(),
         };
 
@@ -170,7 +172,7 @@ impl Peripheral {
         let mut this_boxed = Box::pin(this);
 
         // Link `this` to the RustyPeripheral
-        // TODO: wrapper.internal.link(this_boxed.as_mut());
+        wrapper.internal.link(this_boxed.as_mut());
 
         // Copy the RustyPeripheral pointer into `this`
         mem::swap(&mut this_boxed.internal, &mut wrapper.internal);
@@ -196,6 +198,12 @@ unsafe impl Send for Adapter {}
 unsafe impl Send for Peripheral {}
 
 impl Drop for Adapter {
+    fn drop(&mut self) {
+        self.internal.unlink();
+    }
+}
+
+impl Drop for Peripheral {
     fn drop(&mut self) {
         self.internal.unlink();
     }

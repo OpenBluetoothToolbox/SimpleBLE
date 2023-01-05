@@ -2,6 +2,8 @@
 
 #include "simplersble/simplersble/src/lib.rs.h"
 
+// Adapter Bindings
+
 rust::Vec<SimpleBLE::RustyAdapterWrapper> RustyAdapter_get_adapters() {
     rust::Vec<SimpleBLE::RustyAdapterWrapper> result;
 
@@ -74,4 +76,28 @@ rust::Vec<SimpleBLE::RustyPeripheralWrapper> SimpleBLE::RustyAdapter::scan_get_r
     }
 
     return result;
+}
+
+
+// Peripheral Bindings
+
+void SimpleBLE::RustyPeripheral::link(SimpleRsBLE::Peripheral &target) const {
+    // Time to explain the weird shenanigan we're doing here:
+    // The TL;DR is that we're making the Peripheral(Rust) and the RustyPeripheral(C++)
+    // point to each other in a safe way.
+    // To achieve this, the Peripheral(Rust) owns a RustyPeripheral(C++) via a UniquePtr,
+    // which ensures that calls will always be made to a valid C++ object.
+    // We now give the RustyPeripheral(C++) a pointer back to the Peripheral(Rust),
+    // so that callbacks can be forwarded back to the Rust domain.
+    // In order to ensure that the Peripheral(Rust) is always valid (given
+    // that Rust is keen on moving stuff around) the object is created as a
+    // Pin<Box<T>>
+
+
+    // `_peripheral` is a pointer to a pointer, allowing us to manipulate the contents within const functions.
+    *_peripheral = &target; // THIS LINE IS SUPER IMPORTANT
+}
+void SimpleBLE::RustyPeripheral::unlink() const {
+    // `_peripheral` is a pointer to a pointer.
+    *_peripheral = nullptr;
 }
