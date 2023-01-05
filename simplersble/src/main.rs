@@ -21,7 +21,15 @@ fn main() {
             println!("Scan stopped.");
         }));
 
-        adapter.scan_for(1000);
+        adapter.set_callback_on_scan_found(Box::new(|peripheral| {
+            println!("[FOUND] Identifier: {} Address: {}", peripheral.identifier(), peripheral.address());
+        }));
+
+        adapter.set_callback_on_scan_updated(Box::new(|peripheral| {
+            println!("[UPDATE] Identifier: {} Address: {}", peripheral.identifier(), peripheral.address());
+        }));
+
+        adapter.scan_for(4000);
         println!("Scan complete");
 
         for peripheral in adapter.scan_get_results().iter() {

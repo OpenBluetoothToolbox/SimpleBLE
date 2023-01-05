@@ -20,6 +20,8 @@ mod ffi {
 
         fn on_callback_scan_start(self: &mut Adapter);
         fn on_callback_scan_stop(self: &mut Adapter);
+        fn on_callback_scan_updated(self: &mut Adapter, peripheral: &mut RustyPeripheralWrapper);
+        fn on_callback_scan_found(self: &mut Adapter, peripheral: &mut RustyPeripheralWrapper);
      
         type Peripheral;
     }
@@ -61,6 +63,8 @@ pub struct Adapter {
     internal: cxx::UniquePtr<ffi::RustyAdapter>,
     on_scan_start: Box<dyn Fn() + Send + Sync + 'static>,
     on_scan_stop: Box<dyn Fn() + Send + Sync + 'static>,
+    on_scan_found: Box<dyn Fn(Pin<Box<Peripheral>>) + Send + Sync + 'static>,
+    on_scan_updated: Box<dyn Fn(Pin<Box<Peripheral>>) + Send + Sync + 'static>,
 }
 
 pub struct Peripheral {
@@ -87,6 +91,8 @@ impl Adapter {
             internal: cxx::UniquePtr::<ffi::RustyAdapter>::null(),
             on_scan_start: Box::new(||{}),
             on_scan_stop: Box::new(||{}),
+            on_scan_found: Box::new(|_|{}),
+            on_scan_updated: Box::new(|_|{}),
         };
 
         // Pin the object to guarantee that its location in memory is
@@ -144,12 +150,12 @@ impl Adapter {
         self.on_scan_stop = cb;
     }
 
-    pub fn set_callback_on_scan_updated(&mut self, cb: Box<dyn Fn() + Send + Sync + 'static>) {
-        // TODO
+    pub fn set_callback_on_scan_updated(&mut self, cb: Box<dyn Fn(Pin<Box<Peripheral>>) + Send + Sync + 'static>) {
+        self.on_scan_updated = cb;
     }
 
-    pub fn set_callback_on_scan_found(&mut self, cb: Box<dyn Fn() + Send + Sync + 'static>) {
-        // TODO
+    pub fn set_callback_on_scan_found(&mut self, cb: Box<dyn Fn(Pin<Box<Peripheral>>) + Send + Sync + 'static>) {
+        self.on_scan_found = cb;
     }
 
     fn on_callback_scan_start(&self) {
@@ -158,6 +164,14 @@ impl Adapter {
 
     fn on_callback_scan_stop(&self) {
         (self.on_scan_stop)();
+    }
+
+    fn on_callback_scan_updated(&self, peripheral: &mut ffi::RustyPeripheralWrapper) {
+        (self.on_scan_updated)(Peripheral::new(peripheral));
+    }
+
+    fn on_callback_scan_found(&self, peripheral: &mut ffi::RustyPeripheralWrapper) {
+        (self.on_scan_found)(Peripheral::new(peripheral));
     }
 }
 

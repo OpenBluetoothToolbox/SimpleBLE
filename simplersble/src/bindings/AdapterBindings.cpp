@@ -48,6 +48,24 @@ void SimpleBLE::RustyAdapter::link(SimpleRsBLE::Adapter &target) const {
 
         p_adapter->on_callback_scan_stop();
     });
+
+    _internal->set_callback_on_scan_found([this](SimpleBLE::Peripheral peripheral) {
+        SimpleRsBLE::Adapter* p_adapter = *this->_adapter;
+        if (p_adapter == nullptr) return;
+
+        SimpleBLE::RustyPeripheralWrapper wrapper;
+        wrapper.internal = std::make_unique<SimpleBLE::RustyPeripheral>(peripheral);
+        p_adapter->on_callback_scan_found(wrapper);
+    });
+
+    _internal->set_callback_on_scan_updated([this](SimpleBLE::Peripheral peripheral) {
+        SimpleRsBLE::Adapter* p_adapter = *this->_adapter;
+        if (p_adapter == nullptr) return;
+
+        SimpleBLE::RustyPeripheralWrapper wrapper;
+        wrapper.internal = std::make_unique<SimpleBLE::RustyPeripheral>(peripheral);
+        p_adapter->on_callback_scan_updated(wrapper);
+    });
 }
 void SimpleBLE::RustyAdapter::unlink() const {
     // `_adapter` is a pointer to a pointer.
