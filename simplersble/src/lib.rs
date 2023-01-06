@@ -1,5 +1,6 @@
 use std::mem;
 use std::pin::Pin;
+use std::fmt;
 
 #[cxx::bridge]
 mod ffi {
@@ -247,6 +248,16 @@ impl Peripheral {
         return self.internal.rssi();
     }
 
+}
+
+impl fmt::Display for BluetoothAddressType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            BluetoothAddressType::Public => write!(f, "Public"),
+            BluetoothAddressType::Random => write!(f, "Random"),
+            BluetoothAddressType::Unspecified => write!(f, "Unspecified"),
+        }
+    }
 }
 
 unsafe impl Sync for Adapter {}

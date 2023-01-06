@@ -1,7 +1,6 @@
 use simplersble;
 
 fn main() {
-    println!("List adapters!");
 
     println!(
         "Bluetooth enabled: {}",
@@ -9,10 +8,14 @@ fn main() {
     );
 
     let mut adapters = simplersble::Adapter::get_adapters();
-    println!("Adapters length is {}", adapters.len());
+
+    // If the adapter list is empty, print a message and exit
+    if adapters.is_empty() {
+        println!("No adapters found.");
+        return;
+    }
 
     for adapter in adapters.iter_mut() {
-        println!("Adapter identifier is {}", adapter.identifier());
-        println!("Adapter address is {}", adapter.address());
+        println!("Adapter: {} [{}]", adapter.identifier(), adapter.address());
     }
 }

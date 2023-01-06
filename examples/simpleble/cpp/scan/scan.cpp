@@ -26,7 +26,9 @@ int main() {
     });
 
     adapter.set_callback_on_scan_start([]() { std::cout << "Scan started." << std::endl; });
+
     adapter.set_callback_on_scan_stop([]() { std::cout << "Scan stopped." << std::endl; });
+
     // Scan for 5 seconds.
     adapter.scan_for(5000);
 
@@ -36,7 +38,8 @@ int main() {
     std::cout << "The following devices were found:" << std::endl;
     for (size_t i = 0; i < peripherals.size(); i++) {
         std::string connectable_string = peripherals[i].is_connectable() ? "Connectable" : "Non-Connectable";
-        std::string peripheral_string = peripherals[i].identifier() + " [" + peripherals[i].address() + "]";
+        std::string peripheral_string = peripherals[i].identifier() + " [" + peripherals[i].address() + "] " +
+                                        std::to_string(peripherals[i].rssi()) + " dBm";
 
         std::cout << "[" << i << "] " << peripheral_string << " " << connectable_string << std::endl;
 

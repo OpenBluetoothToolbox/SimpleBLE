@@ -3,10 +3,14 @@ use simplersble;
 fn main() {
     let mut adapters = simplersble::Adapter::get_adapters();
 
+    // If the adapter list is empty, print a message and exit
+    if adapters.is_empty() {
+        println!("No adapters found.");
+        return;
+    }
+
     // Pick the first adapter
     let mut adapter = adapters.pop().unwrap();
-    println!("Adapter identifier is {}", adapter.identifier());
-    println!("Adapter address is {}", adapter.address());
 
     adapter.set_callback_on_scan_start(Box::new(|| {
         println!("Scan started.");
@@ -17,19 +21,39 @@ fn main() {
     }));
 
     adapter.set_callback_on_scan_found(Box::new(|peripheral| {
-        println!("[FOUND] Identifier: {} Address: {}", peripheral.identifier(), peripheral.address());
+        println!(
+            "Found device: {} [{}] {} dBm",
+            peripheral.identifier(),
+            peripheral.address(),
+            peripheral.rssi()
+        );
     }));
 
     adapter.set_callback_on_scan_updated(Box::new(|peripheral| {
-        println!("[UPDATE] Identifier: {} Address: {}", peripheral.identifier(), peripheral.address());
+        println!(
+            "Updated device: {} [{}] {} dBm",
+            peripheral.identifier(),
+            peripheral.address(),
+            peripheral.rssi()
+        );
     }));
 
-    adapter.scan_for(4000);
-    println!("Scan complete");
+    adapter.scan_for(5000);
+    println!("Scan complete.");
 
-    for peripheral in adapter.scan_get_results().iter() {
-        println!("Peripheral identifier is {}", peripheral.identifier());
-        println!("Peripheral address is {}", peripheral.address())
-        }
+    println!("The following devices were found:");
 
+    for (i, peripheral) in adapter.scan_get_results().iter().enumerate() {
+        let connectable_str = "unknown";
+        let peripheral_str = format!(
+            "{} [{}] {} dBm",
+            peripheral.identifier(),
+            peripheral.address(),
+            peripheral.rssi()
+        );
+
+        println!("{}: {} {}", i, peripheral_str, connectable_str);
+
+        println!("    Address Type: {}", peripheral.address_type());
+    }
 }
