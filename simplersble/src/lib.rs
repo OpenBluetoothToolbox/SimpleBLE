@@ -14,6 +14,14 @@ mod ffi {
         internal: UniquePtr<RustyPeripheral>,
     }
 
+    #[namespace = "SimpleBLE"]
+    #[repr(i32)]
+    enum BluetoothAddressType {
+        PUBLIC,
+        RANDOM,
+        UNSPECIFIED,
+    }
+
     #[namespace = "SimpleRsBLE"]
     extern "Rust" {
         type Adapter;
@@ -28,6 +36,9 @@ mod ffi {
 
     unsafe extern "C++" {
         include!("src/bindings/AdapterBindings.hpp");
+
+        #[namespace = "SimpleBLE"]
+        type BluetoothAddressType;
 
         #[namespace = "SimpleBLE"]
         type RustyAdapter;
@@ -57,6 +68,8 @@ mod ffi {
 
         fn identifier(self: &RustyPeripheral) -> String;
         fn address(self: &RustyPeripheral) -> String;
+        fn address_type(self: &RustyPeripheral) -> BluetoothAddressType;
+        fn rssi(self: &RustyPeripheral) -> i16;
     }
 }
 
@@ -71,6 +84,13 @@ pub struct Adapter {
 
 pub struct Peripheral {
     internal: cxx::UniquePtr<ffi::RustyPeripheral>,
+}
+
+#[derive(Debug)]
+pub enum BluetoothAddressType {
+    Public,
+    Random,
+    Unspecified,
 }
 
 impl Adapter {
@@ -144,6 +164,16 @@ impl Adapter {
         return peripherals;
     }
 
+    pub fn get_paired_peripherals(&self) -> Vec<Pin<Box<Peripheral>>> {
+        let mut peripherals = Vec::<Pin<Box<Peripheral>>>::new();
+
+        for peripheral_wrapper in self.internal.get_paired_peripherals().iter_mut() {
+            peripherals.push(Peripheral::new(peripheral_wrapper));
+        }
+
+        return peripherals;
+    }
+
     pub fn set_callback_on_scan_start(&mut self, cb: Box<dyn Fn() + Send + Sync + 'static>) {
         self.on_scan_start = cb;
     }
@@ -203,6 +233,20 @@ impl Peripheral {
     pub fn address(&self) -> String {
         return self.internal.address();
     }
+
+    pub fn address_type(&self) -> BluetoothAddressType {
+        return match self.internal.address_type() {
+            ffi::BluetoothAddressType::PUBLIC => BluetoothAddressType::Public,
+            ffi::BluetoothAddressType::RANDOM => BluetoothAddressType::Random,
+            ffi::BluetoothAddressType::UNSPECIFIED => BluetoothAddressType::Unspecified,
+            _ => BluetoothAddressType::Unspecified,
+        };
+    }
+
+    pub fn rssi(&self) -> i16 {
+        return self.internal.rssi();
+    }
+
 }
 
 unsafe impl Sync for Adapter {}

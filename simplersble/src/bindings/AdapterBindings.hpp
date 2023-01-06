@@ -63,6 +63,9 @@ class RustyPeripheral : private Peripheral {
 
     rust::String identifier() const { return rust::String(_internal->identifier()); }
     rust::String address() const { return rust::String(_internal->address()); }
+    BluetoothAddressType address_type() const { return _internal->address_type(); }
+    int16_t rssi() const { return _internal->rssi(); }
+
 
   private:
     // NOTE: All internal properties need to be handled as pointers,
