@@ -47,6 +47,8 @@ mod ffi {
         fn scan_is_active(self: &RustyAdapter) -> bool;
         fn scan_get_results(self: &RustyAdapter) -> Vec<RustyPeripheralWrapper>;
 
+        fn get_paired_peripherals(self: &RustyAdapter) -> Vec<RustyPeripheralWrapper>;
+
         #[namespace = "SimpleBLE"]
         type RustyPeripheral;
 

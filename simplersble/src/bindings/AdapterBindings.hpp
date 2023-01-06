@@ -40,6 +40,8 @@ class RustyAdapter : private Adapter {
     bool scan_is_active() const;
     rust::Vec<SimpleBLE::RustyPeripheralWrapper> scan_get_results() const;
 
+    rust::Vec<SimpleBLE::RustyPeripheralWrapper> get_paired_peripherals() const;
+
   private:
     // NOTE: All internal properties need to be handled as pointers,
     // allowing the calls to RustyAdapter to always be const.

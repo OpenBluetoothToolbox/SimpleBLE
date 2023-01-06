@@ -67,6 +67,7 @@ void SimpleBLE::RustyAdapter::link(SimpleRsBLE::Adapter &target) const {
         p_adapter->on_callback_scan_updated(wrapper);
     });
 }
+
 void SimpleBLE::RustyAdapter::unlink() const {
     // `_adapter` is a pointer to a pointer.
     *_adapter = nullptr;
@@ -88,6 +89,18 @@ rust::Vec<SimpleBLE::RustyPeripheralWrapper> SimpleBLE::RustyAdapter::scan_get_r
     rust::Vec<SimpleBLE::RustyPeripheralWrapper> result;
 
     for (auto& peripheral : _internal->scan_get_results()) {
+        SimpleBLE::RustyPeripheralWrapper wrapper;
+        wrapper.internal = std::make_unique<SimpleBLE::RustyPeripheral>(peripheral);
+        result.push_back(std::move(wrapper));
+    }
+
+    return result;
+}
+
+rust::Vec<SimpleBLE::RustyPeripheralWrapper> SimpleBLE::RustyAdapter::get_paired_peripherals() const {
+    rust::Vec<SimpleBLE::RustyPeripheralWrapper> result;
+
+    for (auto& peripheral : _internal->get_paired_peripherals()) {
         SimpleBLE::RustyPeripheralWrapper wrapper;
         wrapper.internal = std::make_unique<SimpleBLE::RustyPeripheral>(peripheral);
         result.push_back(std::move(wrapper));
