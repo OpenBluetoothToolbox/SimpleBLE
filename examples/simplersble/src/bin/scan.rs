@@ -54,6 +54,7 @@ fn main() {
 
         println!("{}: {} {}", i, peripheral_str, connectable_str);
 
+        println!("    Tx Power: {}", peripheral.tx_power());
         println!("    Address Type: {}", peripheral.address_type());
     }
 }

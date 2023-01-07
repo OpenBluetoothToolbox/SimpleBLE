@@ -66,6 +66,15 @@ class RustyPeripheral : private Peripheral {
     BluetoothAddressType address_type() const { return _internal->address_type(); }
     int16_t rssi() const { return _internal->rssi(); }
 
+    int16_t tx_power() const { return _internal->tx_power(); }
+    uint16_t mtu() const { return _internal->mtu(); }
+
+    void connect() const { _internal->connect(); }
+    void disconnect() const { _internal->disconnect(); }
+    bool is_connected() const { return _internal->is_connected(); }
+    bool is_connectable() const { return _internal->is_connectable(); }
+    bool is_paired() const { return _internal->is_paired(); }
+    void unpair() const { _internal->unpair(); }
 
   private:
     // NOTE: All internal properties need to be handled as pointers,

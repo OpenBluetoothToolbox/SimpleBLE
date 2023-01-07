@@ -71,6 +71,17 @@ mod ffi {
         fn address(self: &RustyPeripheral) -> String;
         fn address_type(self: &RustyPeripheral) -> BluetoothAddressType;
         fn rssi(self: &RustyPeripheral) -> i16;
+
+        // Implement the C++ functions below in Rust
+        fn tx_power(self: &RustyPeripheral) -> i16;
+        fn mtu(self: &RustyPeripheral) -> u16;
+
+        fn connect(self: &RustyPeripheral);
+        fn disconnect(self: &RustyPeripheral);
+        fn is_connected(self: &RustyPeripheral) -> bool;
+        fn is_connectable(self: &RustyPeripheral) -> bool;
+        fn is_paired(self: &RustyPeripheral) -> bool;
+        fn unpair(self: &RustyPeripheral);
     }
 }
 
@@ -246,6 +257,38 @@ impl Peripheral {
 
     pub fn rssi(&self) -> i16 {
         return self.internal.rssi();
+    }
+
+    pub fn tx_power(&self) -> i16 {
+        return self.internal.tx_power();
+    }
+
+    pub fn mtu(&self) -> u16 {
+        return self.internal.mtu();
+    }
+
+    pub fn connect(&self) {
+        self.internal.connect();
+    }
+
+    pub fn disconnect(&self) {
+        self.internal.disconnect();
+    }
+
+    pub fn is_connected(&self) -> bool {
+        return self.internal.is_connected();
+    }
+
+    pub fn is_connectable(&self) -> bool {
+        return self.internal.is_connectable();
+    }
+
+    pub fn is_paired(&self) -> bool {
+        return self.internal.is_paired();
+    }
+
+    pub fn unpair(&self) {
+        self.internal.unpair();
     }
 
 }
