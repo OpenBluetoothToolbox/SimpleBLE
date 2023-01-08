@@ -9,5 +9,8 @@ name = "list_adapters"
 [[bin]]
 name = "scan"
 
+[[bin]]
+name = "connect"
+
 [dependencies]
 simplersble = { path = "../.." }

@@ -16,6 +16,21 @@ mod ffi {
     }
 
     #[namespace = "SimpleBLE"]
+    struct RustyServiceWrapper {
+        internal: UniquePtr<RustyService>,
+    }
+
+    #[namespace = "SimpleBLE"]
+    struct RustyCharacteristicWrapper {
+        internal: UniquePtr<RustyCharacteristic>,
+    }
+
+    #[namespace = "SimpleBLE"]
+    struct RustyDescriptorWrapper {
+        internal: UniquePtr<RustyDescriptor>,
+    }
+
+    #[namespace = "SimpleBLE"]
     #[repr(i32)]
     enum BluetoothAddressType {
         PUBLIC,
@@ -82,9 +97,34 @@ mod ffi {
         fn is_connectable(self: &RustyPeripheral) -> bool;
         fn is_paired(self: &RustyPeripheral) -> bool;
         fn unpair(self: &RustyPeripheral);
+
+        fn services(self: &RustyPeripheral) -> Vec<RustyServiceWrapper>;
+
+        #[namespace = "SimpleBLE"]
+        type RustyService;
+
+        fn uuid(self: &RustyService) -> String;
+        fn characteristics(self: &RustyService) -> Vec<RustyCharacteristicWrapper>;
+
+        #[namespace = "SimpleBLE"]
+        type RustyCharacteristic;
+
+        fn uuid(self: &RustyCharacteristic) -> String;
+        fn descriptors(self: &RustyCharacteristic) -> Vec<RustyDescriptorWrapper>;
+
+        #[namespace = "SimpleBLE"]
+        type RustyDescriptor;
+
+        fn uuid(self: &RustyDescriptor) -> String;
     }
 }
 
+#[derive(Debug)]
+pub enum BluetoothAddressType {
+    Public,
+    Random,
+    Unspecified,
+}
 
 pub struct Adapter {
     internal: cxx::UniquePtr<ffi::RustyAdapter>,
@@ -98,11 +138,16 @@ pub struct Peripheral {
     internal: cxx::UniquePtr<ffi::RustyPeripheral>,
 }
 
-#[derive(Debug)]
-pub enum BluetoothAddressType {
-    Public,
-    Random,
-    Unspecified,
+pub struct Service {
+    internal: cxx::UniquePtr<ffi::RustyService>,
+}
+
+pub struct Characteristic {
+    internal: cxx::UniquePtr<ffi::RustyCharacteristic>,
+}
+
+pub struct Descriptor {
+    internal: cxx::UniquePtr<ffi::RustyDescriptor>,
 }
 
 impl Adapter {
@@ -291,6 +336,98 @@ impl Peripheral {
         self.internal.unpair();
     }
 
+    pub fn services(&self) -> Vec<Pin<Box<Service>>> {
+        let mut services = Vec::<Pin<Box<Service>>>::new();
+
+        for service_wrapper in self.internal.services().iter_mut() {
+            services.push(Service::new(service_wrapper));
+        }
+
+        return services;
+    }
+}
+
+impl Service {
+    fn new(wrapper: &mut ffi::RustyServiceWrapper) -> Pin<Box<Self>> {
+        let this = Self {
+            internal: cxx::UniquePtr::<ffi::RustyService>::null(),
+        };
+
+        // Pin the object to guarantee that its location in memory is
+        // fixed throughout the lifetime of the application
+        let mut this_boxed = Box::pin(this);
+
+        // Copy the RustyService pointer into `this`
+        mem::swap(&mut this_boxed.internal, &mut wrapper.internal);
+
+        return this_boxed;
+    }
+
+    pub fn uuid(&self) -> String {
+        return self.internal.uuid();
+    }
+
+    pub fn characteristics(&self) -> Vec<Pin<Box<Characteristic>>> {
+        let mut characteristics = Vec::<Pin<Box<Characteristic>>>::new();
+
+        for characteristic_wrapper in self.internal.characteristics().iter_mut() {
+            characteristics.push(Characteristic::new(characteristic_wrapper));
+        }
+
+        return characteristics;
+    }
+}
+
+impl Characteristic {
+    fn new(wrapper: &mut ffi::RustyCharacteristicWrapper) -> Pin<Box<Self>> {
+        let this = Self {
+            internal: cxx::UniquePtr::<ffi::RustyCharacteristic>::null(),
+        };
+
+        // Pin the object to guarantee that its location in memory is
+        // fixed throughout the lifetime of the application
+        let mut this_boxed = Box::pin(this);
+
+        // Copy the RustyCharacteristic pointer into `this`
+        mem::swap(&mut this_boxed.internal, &mut wrapper.internal);
+
+        return this_boxed;
+    }
+
+    pub fn uuid(&self) -> String {
+        return self.internal.uuid();
+    }
+
+    pub fn descriptors(&self) -> Vec<Pin<Box<Descriptor>>> {
+        let mut descriptors = Vec::<Pin<Box<Descriptor>>>::new();
+
+        for descriptor_wrapper in self.internal.descriptors().iter_mut() {
+            descriptors.push(Descriptor::new(descriptor_wrapper));
+        }
+
+        return descriptors;
+    }
+}
+
+impl Descriptor {
+    fn new(wrapper: &mut ffi::RustyDescriptorWrapper) -> Pin<Box<Self>> {
+        let this = Self {
+            internal: cxx::UniquePtr::<ffi::RustyDescriptor>::null(),
+        };
+
+        // Pin the object to guarantee that its location in memory is
+        // fixed throughout the lifetime of the application
+        let mut this_boxed = Box::pin(this);
+
+        // Copy the RustyDescriptor pointer into `this`
+        mem::swap(&mut this_boxed.internal, &mut wrapper.internal);
+
+        return this_boxed;
+    }
+
+    pub fn uuid(&self) -> String {
+        return self.internal.uuid();
+    }
 }
 
 impl fmt::Display for BluetoothAddressType {
@@ -307,9 +444,21 @@ unsafe impl Sync for Adapter {}
 
 unsafe impl Sync for Peripheral {}
 
+unsafe impl Sync for Service {}
+
+unsafe impl Sync for Characteristic {}
+
+unsafe impl Sync for Descriptor {}
+
 unsafe impl Send for Adapter {}
 
 unsafe impl Send for Peripheral {}
+
+unsafe impl Send for Service {}
+
+unsafe impl Send for Characteristic {}
+
+unsafe impl Send for Descriptor {}
 
 impl Drop for Adapter {
     fn drop(&mut self) {

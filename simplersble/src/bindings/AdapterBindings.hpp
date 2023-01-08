@@ -13,12 +13,15 @@ namespace SimpleRsBLE {
 struct Adapter;
 struct Peripheral;
 
-};
+};  // namespace SimpleRsBLE
 
 namespace SimpleBLE {
 
 struct RustyAdapterWrapper;
 struct RustyPeripheralWrapper;
+struct RustyServiceWrapper;
+struct RustyCharacteristicWrapper;
+struct RustyDescriptorWrapper;
 
 class RustyAdapter : private Adapter {
   public:
@@ -56,25 +59,28 @@ class RustyPeripheral : private Peripheral {
     RustyPeripheral() = default;
     virtual ~RustyPeripheral() = default;
 
-    RustyPeripheral(Peripheral peripheral) : _internal(new Peripheral(peripheral)), _peripheral(std::make_unique<SimpleRsBLE::Peripheral*>()) {}
+    RustyPeripheral(Peripheral peripheral)
+        : _internal(new Peripheral(peripheral)), _peripheral(std::make_unique<SimpleRsBLE::Peripheral*>()) {}
 
     void link(SimpleRsBLE::Peripheral& target) const;
     void unlink() const;
 
-    rust::String identifier() const { return rust::String(_internal->identifier()); }
-    rust::String address() const { return rust::String(_internal->address()); }
-    BluetoothAddressType address_type() const { return _internal->address_type(); }
-    int16_t rssi() const { return _internal->rssi(); }
+    rust::String identifier() const;
+    rust::String address() const;
+    BluetoothAddressType address_type() const;
+    int16_t rssi() const;
 
-    int16_t tx_power() const { return _internal->tx_power(); }
-    uint16_t mtu() const { return _internal->mtu(); }
+    int16_t tx_power() const;
+    uint16_t mtu() const;
 
-    void connect() const { _internal->connect(); }
-    void disconnect() const { _internal->disconnect(); }
-    bool is_connected() const { return _internal->is_connected(); }
-    bool is_connectable() const { return _internal->is_connectable(); }
-    bool is_paired() const { return _internal->is_paired(); }
-    void unpair() const { _internal->unpair(); }
+    void connect() const;
+    void disconnect() const;
+    bool is_connected() const;
+    bool is_connectable() const;
+    bool is_paired() const;
+    void unpair() const;
+
+    rust::Vec<SimpleBLE::RustyServiceWrapper> services() const;
 
   private:
     // NOTE: All internal properties need to be handled as pointers,
@@ -83,6 +89,61 @@ class RustyPeripheral : private Peripheral {
     // important to be careful when handling these.
     std::shared_ptr<Peripheral> _internal;
     std::unique_ptr<SimpleRsBLE::Peripheral*> _peripheral;
+};
+
+class RustyService : private Service {
+  public:
+    RustyService() = default;
+    virtual ~RustyService() = default;
+
+    RustyService(Service service) : _internal(new Service(service)) {}
+
+    rust::String uuid() const { return rust::String(_internal->uuid()); }
+
+    rust::Vec<SimpleBLE::RustyCharacteristicWrapper> characteristics() const;
+
+  private:
+    // NOTE: All internal properties need to be handled as pointers,
+    // allowing the calls to RustyService to always be const.
+    // This might require us to store pointers to pointers, so it's
+    // important to be careful when handling these.
+    std::shared_ptr<Service> _internal;
+};
+
+class RustyCharacteristic : private Characteristic {
+  public:
+    RustyCharacteristic() = default;
+    virtual ~RustyCharacteristic() = default;
+
+    RustyCharacteristic(Characteristic characteristic) : _internal(new Characteristic(characteristic)) {}
+
+    rust::String uuid() const { return rust::String(_internal->uuid()); }
+
+    rust::Vec<SimpleBLE::RustyDescriptorWrapper> descriptors() const;
+
+  private:
+    // NOTE: All internal properties need to be handled as pointers,
+    // allowing the calls to RustyCharacteristic to always be const.
+    // This might require us to store pointers to pointers, so it's
+    // important to be careful when handling these.
+    std::shared_ptr<Characteristic> _internal;
+};
+
+class RustyDescriptor : private Descriptor {
+  public:
+    RustyDescriptor() = default;
+    virtual ~RustyDescriptor() = default;
+
+    RustyDescriptor(Descriptor descriptor) : _internal(new Descriptor(descriptor)) {}
+
+    rust::String uuid() const { return rust::String(_internal->uuid()); }
+
+  private:
+    // NOTE: All internal properties need to be handled as pointers,
+    // allowing the calls to RustyDescriptor to always be const.
+    // This might require us to store pointers to pointers, so it's
+    // important to be careful when handling these.
+    std::shared_ptr<Descriptor> _internal;
 };
 
 };  // namespace SimpleBLE
