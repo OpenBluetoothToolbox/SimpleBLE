@@ -27,6 +27,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  **API CHANGE**: Log level convention changed from uppercase to capitalizing the first letter.
 -  (MacOS) More explicit exception messages.
 -  (MacOS) 16-bit UUIDs are now presented in their 128-bit form.
+-  (Windows) Reinitialize the WinRT backend if a single-threaded apartment is detected. *(Thanks jferdelyi)*
 
 **Fixed**
 
