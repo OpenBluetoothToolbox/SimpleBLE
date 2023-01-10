@@ -11,6 +11,9 @@
 
 #if WDK_NTDDI_VERSION < NTDDI_WIN10_VB
 #error "Windows SDK version before 10.0.19041.0 is not supported"
+#elif WDK_NTDDI_VERSION == NTDDI_WIN10_VB
+// For Windows SDK version before 10.0.19041.0, remap functions to post-10.0.19041.0 versions
+#define WINRT_IMPL_CoGetApartmentType WINRT_CoGetApartmentType
 #endif
 
 #define MAC_ADDRESS_STR_LENGTH (size_t)17  // Two chars per byte, 5 chars for colon
