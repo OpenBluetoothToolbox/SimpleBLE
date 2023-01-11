@@ -16,6 +16,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  Retrieve the MTU value of an established connection. *(Thanks Marco Cruz!)*
 -  Peripheral addresses can now be queried for their type. *(Thanks camm73!)*
 -  Tx Power is decoded from advertising data if available. *(Thanks camm73!)*
+-  Logger now provides default functions to log to a file or to stdout.
 -  (Windows) Logging of WinRT initialization behavior.
 -  (SimpleBluez) Support for GATT characteristic flags.
 -  (SimpleBluez) Support for GATT characteristic MTUs. *(Thanks Marco Cruz!)*
@@ -25,6 +26,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 
 -  Debug, MinSizeRel and RelWithDebInfo targets now contain their appropriate suffix. *(Thanks kutij!)*
 -  **API CHANGE**: Log level convention changed from uppercase to capitalizing the first letter.
+-  Updated ``libfmt`` dependency to version 9.1.0.
 -  (MacOS) More explicit exception messages.
 -  (MacOS) 16-bit UUIDs are now presented in their 128-bit form.
 -  (Windows) Reinitialize the WinRT backend if a single-threaded apartment is detected. *(Thanks jferdelyi)*
