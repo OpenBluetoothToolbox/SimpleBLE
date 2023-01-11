@@ -1,7 +1,7 @@
 #include "simpleble/Logging.h"
 
-#include <fmt/core.h>
 #include <fmt/chrono.h>
+#include <fmt/core.h>
 #include <ctime>
 #include <fstream>
 #include <mutex>
@@ -15,9 +15,7 @@ Logger* Logger::get() {
     return &instance;
 }
 
-Logger::Logger() {
-    log_default_stdout();
-}
+Logger::Logger() { log_default_stdout(); }
 
 Logger::~Logger() {}
 
