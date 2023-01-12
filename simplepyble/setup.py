@@ -6,7 +6,7 @@ import pybind11
 
 def exclude_unnecessary_files(cmake_manifest):
     def is_necessary(name):
-        is_necessary = name.endswith(".so") or name.endswith(".dylib") or name.endswith("py")
+        is_necessary = name.endswith(".so") or name.endswith(".dylib") or name.endswith("py") or name.endswith("pyd")
         print(f"Parsing file: {name} - {is_necessary}")
         return is_necessary
 
@@ -23,7 +23,7 @@ root = here.parent.resolve()
 # Generate the version string
 # TODO: Make the dev portion smarter by looking at tags.
 version_str = (root / "VERSION").read_text(encoding="utf-8").strip()
-version_str += ".dev2" # ! Ensure it matches the intended release version!
+version_str += ".dev3" # ! Ensure it matches the intended release version!
 
 # Get the long description from the README file
 long_description = (here / "README.rst").read_text(encoding="utf-8")
