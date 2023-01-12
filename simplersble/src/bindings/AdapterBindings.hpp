@@ -121,6 +121,12 @@ class RustyCharacteristic : private Characteristic {
 
     rust::Vec<SimpleBLE::RustyDescriptorWrapper> descriptors() const;
 
+    bool can_read() const { return _internal->can_read(); }
+    bool can_write_request() const { return _internal->can_write_request(); }
+    bool can_write_command() const { return _internal->can_write_command(); }
+    bool can_notify() const { return _internal->can_notify(); }
+    bool can_indicate() const { return _internal->can_indicate(); }
+
   private:
     // NOTE: All internal properties need to be handled as pointers,
     // allowing the calls to RustyCharacteristic to always be const.

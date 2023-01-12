@@ -112,6 +112,12 @@ mod ffi {
         fn uuid(self: &RustyCharacteristic) -> String;
         fn descriptors(self: &RustyCharacteristic) -> Vec<RustyDescriptorWrapper>;
 
+        fn can_read(self: &RustyCharacteristic) -> bool;
+        fn can_write_request(self: &RustyCharacteristic) -> bool;
+        fn can_write_command(self: &RustyCharacteristic) -> bool;
+        fn can_notify(self: &RustyCharacteristic) -> bool;
+        fn can_indicate(self: &RustyCharacteristic) -> bool;
+
         #[namespace = "SimpleBLE"]
         type RustyDescriptor;
 
@@ -124,6 +130,15 @@ pub enum BluetoothAddressType {
     Public,
     Random,
     Unspecified,
+}
+
+#[derive(Debug)]
+pub enum CharacteristicCapability {
+    Read,
+    WriteRequest,
+    WriteCommand,
+    Notify,
+    Indicate,
 }
 
 pub struct Adapter {
@@ -407,6 +422,54 @@ impl Characteristic {
 
         return descriptors;
     }
+
+    pub fn capabilities(&self) -> Vec::<CharacteristicCapability> {
+        let mut capabilities = Vec::<CharacteristicCapability>::new();
+
+        if self.internal.can_read() {
+            capabilities.push(CharacteristicCapability::Read);
+        }
+
+        if self.internal.can_write_request() {
+            capabilities.push(CharacteristicCapability::WriteRequest);
+        }
+
+        if self.internal.can_write_command() {
+            capabilities.push(CharacteristicCapability::WriteCommand);
+        }
+
+        if self.internal.can_notify() {
+            capabilities.push(CharacteristicCapability::Notify);
+        }
+
+        if self.internal.can_indicate() {
+            capabilities.push(CharacteristicCapability::Indicate);
+        }
+
+        return capabilities;
+    }
+
+    pub fn can_read(&self) -> bool {
+        return self.internal.can_read();
+    }
+
+    pub fn can_write_request(&self) -> bool {
+        return self.internal.can_write_request();
+    }
+
+    pub fn can_write_command(&self) -> bool {
+        return self.internal.can_write_command();
+    }
+
+    pub fn can_notify(&self) -> bool {
+        return self.internal.can_notify();
+    }
+
+    pub fn can_indicate(&self) -> bool {
+        return self.internal.can_indicate();
+    }
+
+
 }
 
 impl Descriptor {
@@ -430,15 +493,7 @@ impl Descriptor {
     }
 }
 
-impl fmt::Display for BluetoothAddressType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            BluetoothAddressType::Public => write!(f, "Public"),
-            BluetoothAddressType::Random => write!(f, "Random"),
-            BluetoothAddressType::Unspecified => write!(f, "Unspecified"),
-        }
-    }
-}
+
 
 unsafe impl Sync for Adapter {}
 
@@ -459,6 +514,28 @@ unsafe impl Send for Service {}
 unsafe impl Send for Characteristic {}
 
 unsafe impl Send for Descriptor {}
+
+impl fmt::Display for BluetoothAddressType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            BluetoothAddressType::Public => write!(f, "Public"),
+            BluetoothAddressType::Random => write!(f, "Random"),
+            BluetoothAddressType::Unspecified => write!(f, "Unspecified"),
+        }
+    }
+}
+
+impl fmt::Display for CharacteristicCapability {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            CharacteristicCapability::Read => write!(f, "Read"),
+            CharacteristicCapability::WriteRequest => write!(f, "WriteRequest"),
+            CharacteristicCapability::WriteCommand => write!(f, "WriteCommand"),
+            CharacteristicCapability::Notify => write!(f, "Notify"),
+            CharacteristicCapability::Indicate => write!(f, "Indicate"),
+        }
+    }
+}
 
 impl Drop for Adapter {
     fn drop(&mut self) {

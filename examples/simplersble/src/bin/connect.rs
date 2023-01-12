@@ -77,10 +77,12 @@ fn main() {
 
         for characteristic in service.characteristics().iter() {
             println!("    Characteristic: {}", characteristic.uuid());
-
+            println!("        Capabilities: {:?}", characteristic.capabilities());
             for descriptor in characteristic.descriptors().iter() {
                 println!("        Descriptor: {}", descriptor.uuid());
             }
         }
     }
+
+    peripheral.disconnect();
 }
