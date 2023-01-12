@@ -22,6 +22,7 @@ struct RustyPeripheralWrapper;
 struct RustyServiceWrapper;
 struct RustyCharacteristicWrapper;
 struct RustyDescriptorWrapper;
+struct RustyManufacturerDataWrapper;
 
 class RustyAdapter : private Adapter {
   public:
@@ -81,6 +82,7 @@ class RustyPeripheral : private Peripheral {
     void unpair() const;
 
     rust::Vec<SimpleBLE::RustyServiceWrapper> services() const;
+    rust::Vec<SimpleBLE::RustyManufacturerDataWrapper> manufacturer_data() const;
 
   private:
     // NOTE: All internal properties need to be handled as pointers,

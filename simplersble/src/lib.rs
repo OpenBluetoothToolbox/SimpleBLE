@@ -1,6 +1,7 @@
 use std::mem;
 use std::pin::Pin;
 use std::fmt;
+use std::collections::HashMap;
 
 #[cxx::bridge]
 mod ffi {
@@ -28,6 +29,12 @@ mod ffi {
     #[namespace = "SimpleBLE"]
     struct RustyDescriptorWrapper {
         internal: UniquePtr<RustyDescriptor>,
+    }
+
+    #[namespace = "SimpleBLE"]
+    struct RustyManufacturerDataWrapper {
+        company_id: u16,
+        data: Vec<u8>,
     }
 
     #[namespace = "SimpleBLE"]
@@ -99,6 +106,7 @@ mod ffi {
         fn unpair(self: &RustyPeripheral);
 
         fn services(self: &RustyPeripheral) -> Vec<RustyServiceWrapper>;
+        fn manufacturer_data(self: &RustyPeripheral) -> Vec<RustyManufacturerDataWrapper>;
 
         #[namespace = "SimpleBLE"]
         type RustyService;
@@ -359,6 +367,16 @@ impl Peripheral {
         }
 
         return services;
+    }
+
+    pub fn manufacturer_data(&self) -> HashMap<u16, Vec::<u8>> {
+        let mut manufacturer_data = HashMap::<u16, Vec::<u8>>::new();
+
+        for raw_manuf_data in self.internal.manufacturer_data().iter() {
+            manufacturer_data.insert(raw_manuf_data.company_id, raw_manuf_data.data.clone());
+        }
+
+        return manufacturer_data;
     }
 }
 

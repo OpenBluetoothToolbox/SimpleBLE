@@ -165,6 +165,23 @@ rust::Vec<SimpleBLE::RustyServiceWrapper> SimpleBLE::RustyPeripheral::services()
     return result;
 }
 
+rust::Vec<SimpleBLE::RustyManufacturerDataWrapper> SimpleBLE::RustyPeripheral::manufacturer_data() const {
+    rust::Vec<SimpleBLE::RustyManufacturerDataWrapper> result;
+
+    for (auto& manufacturer_data : _internal->manufacturer_data()) {
+        SimpleBLE::RustyManufacturerDataWrapper wrapper;
+        wrapper.company_id = manufacturer_data.first;
+
+        for (auto& byte : manufacturer_data.second) {
+            wrapper.data.push_back(byte);
+        }
+
+        result.push_back(std::move(wrapper));
+    }
+
+    return result;
+}
+
 // Service Bindings
 
 rust::Vec<SimpleBLE::RustyCharacteristicWrapper> SimpleBLE::RustyService::characteristics() const {

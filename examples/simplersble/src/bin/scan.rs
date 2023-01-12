@@ -56,5 +56,14 @@ fn main() {
 
         println!("    Tx Power: {}", peripheral.tx_power());
         println!("    Address Type: {}", peripheral.address_type());
+
+        for service in peripheral.services().iter() {
+            println!("    Service: {}", service.uuid());
+        }
+
+        for (manufacturer_id, manufacturer_data) in peripheral.manufacturer_data().iter() {
+            println!("    Manufacturer ID: {}", manufacturer_id);
+            println!("    Manufacturer Data: {:?}", manufacturer_data);
+        }
     }
 }
