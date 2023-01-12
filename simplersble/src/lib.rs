@@ -378,6 +378,38 @@ impl Peripheral {
 
         return manufacturer_data;
     }
+
+    pub fn read(&self, service: &String, characteristic: &String) -> Vec::<u8>{
+        return Vec::<u8>::new();
+    }
+
+    pub fn write_request(&self, service: &String, characteristic: &String, data: &Vec::<u8>) {
+        
+    }
+
+    pub fn write_command(&self, service: &String, characteristic: &String, data: &Vec::<u8>) {
+        
+    }
+
+    pub fn notify(&self, service: &String, characteristic: &String, cb: Box<dyn Fn(Vec::<u8>) + Send + Sync + 'static>) {
+        
+    }
+
+    pub fn indicate(&self, service: &String, characteristic: &String, cb: Box<dyn Fn(Vec::<u8>) + Send + Sync + 'static>) {
+        
+    }
+
+    pub fn unsubscribe(&self, service: &String, characteristic: &String) {
+        
+    }
+
+    pub fn descriptor_read(&self, service: &String, characteristic: &String, descriptor: &String) -> Vec::<u8>{
+        return Vec::<u8>::new();
+    }
+
+    pub fn descriptor_write(&self, service: &String, characteristic: &String, descriptor: &String, data: &Vec::<u8>) {
+        
+    }
 }
 
 impl Service {
@@ -510,8 +542,6 @@ impl Descriptor {
         return self.internal.uuid();
     }
 }
-
-
 
 unsafe impl Sync for Adapter {}
 
