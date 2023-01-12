@@ -6,7 +6,7 @@ import pybind11
 
 def exclude_unnecessary_files(cmake_manifest):
     def is_necessary(name):
-        is_necessary = name.endswith(".so") or name.endswith(".dylib") or name.endswith("py")
+        is_necessary = name.endswith(".so") or name.endswith(".dylib") or name.endswith("py") or name.endswith("pyd")
         print(f"Parsing file: {name} - {is_necessary}")
         return is_necessary
 
