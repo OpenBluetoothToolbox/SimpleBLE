@@ -123,6 +123,20 @@ void SimpleBLE::RustyPeripheral::link(SimpleRsBLE::Peripheral& target) const {
 
     // `_peripheral` is a pointer to a pointer, allowing us to manipulate the contents within const functions.
     *_peripheral = &target;  // THIS LINE IS SUPER IMPORTANT
+
+    _internal->set_callback_on_connected([this]() {
+        SimpleRsBLE::Peripheral* p_peripheral = *this->_peripheral;
+        if (p_peripheral == nullptr) return;
+
+        p_peripheral->on_callback_connected();
+    });
+
+    _internal->set_callback_on_disconnected([this]() {
+        SimpleRsBLE::Peripheral* p_peripheral = *this->_peripheral;
+        if (p_peripheral == nullptr) return;
+
+        p_peripheral->on_callback_disconnected();
+    });
 }
 void SimpleBLE::RustyPeripheral::unlink() const {
     // `_peripheral` is a pointer to a pointer.
@@ -180,6 +194,99 @@ rust::Vec<SimpleBLE::RustyManufacturerDataWrapper> SimpleBLE::RustyPeripheral::m
     }
 
     return result;
+}
+
+rust::Vec<uint8_t> SimpleBLE::RustyPeripheral::read(rust::String const& service,
+                                                    rust::String const& characteristic) const {
+    std::string read_result = _internal->read(std::string(service), std::string(characteristic));
+
+    rust::Vec<uint8_t> result;
+    for (auto& byte : read_result) {
+        result.push_back(byte);
+    }
+
+    return result;
+}
+
+void SimpleBLE::RustyPeripheral::write_request(rust::String const& service_rs, rust::String const& characteristic_rs,
+                                               rust::Vec<uint8_t> const& data) const {
+    std::string service(service_rs);
+    std::string characteristic(characteristic_rs);
+    std::string data_vec((char*)data.data(), data.size());
+
+    _internal->write_request(service, characteristic, data_vec);
+}
+
+void SimpleBLE::RustyPeripheral::write_command(rust::String const& service_rs, rust::String const& characteristic_rs,
+                                               rust::Vec<uint8_t> const& data) const {
+    std::string service(service_rs);
+    std::string characteristic(characteristic_rs);
+    std::string data_vec((char*)data.data(), data.size());
+
+    _internal->write_command(service, characteristic, data_vec);
+}
+
+void SimpleBLE::RustyPeripheral::notify(rust::String const& service_rs, rust::String const& characteristic_rs) const {
+    std::string service(service_rs);
+    std::string characteristic(characteristic_rs);
+
+    _internal->notify(service, characteristic, [this, service_rs, characteristic_rs](std::string data) {
+        SimpleRsBLE::Peripheral* p_peripheral = *this->_peripheral;
+        if (p_peripheral == nullptr) return;
+
+        rust::Vec<uint8_t> data_vec;
+        for (auto& byte : data) {
+            data_vec.push_back(byte);
+        }
+
+        p_peripheral->on_callback_characteristic_updated(service_rs, characteristic_rs, data_vec);
+    });
+}
+
+void SimpleBLE::RustyPeripheral::indicate(rust::String const& service_rs, rust::String const& characteristic_rs) const {
+    std::string service(service_rs);
+    std::string characteristic(characteristic_rs);
+
+    _internal->indicate(service, characteristic, [this, service_rs, characteristic_rs](std::string data) {
+        SimpleRsBLE::Peripheral* p_peripheral = *this->_peripheral;
+        if (p_peripheral == nullptr) return;
+
+        rust::Vec<uint8_t> data_vec;
+        for (auto& byte : data) {
+            data_vec.push_back(byte);
+        }
+
+        p_peripheral->on_callback_characteristic_updated(service_rs, characteristic_rs, data_vec);
+    });
+}
+
+void SimpleBLE::RustyPeripheral::unsubscribe(rust::String const& service_rs,
+                                             rust::String const& characteristic_rs) const {
+    std::string service(service_rs);
+    std::string characteristic(characteristic_rs);
+
+    _internal->unsubscribe(service, characteristic);
+}
+
+rust::Vec<uint8_t> SimpleBLE::RustyPeripheral::read_descriptor(rust::String const& service,
+                                                               rust::String const& characteristic,
+                                                               rust::String const& descriptor) const {
+    std::string read_result = _internal->read(std::string(service), std::string(characteristic),
+                                                         std::string(descriptor));
+
+    rust::Vec<uint8_t> result;
+    for (auto& byte : read_result) {
+        result.push_back(byte);
+    }
+
+    return result;
+}
+
+void SimpleBLE::RustyPeripheral::write_descriptor(rust::String const& service, rust::String const& characteristic,
+                                                  rust::String const& descriptor,
+                                                  rust::Vec<uint8_t> const& data) const {
+    _internal->write(std::string(service), std::string(characteristic), std::string(descriptor),
+                                std::string((char*)data.data(), data.size()));
 }
 
 // Service Bindings

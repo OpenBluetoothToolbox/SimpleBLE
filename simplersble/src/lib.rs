@@ -55,6 +55,10 @@ mod ffi {
         fn on_callback_scan_found(self: &mut Adapter, peripheral: &mut RustyPeripheralWrapper);
      
         type Peripheral;
+
+        fn on_callback_connected(self: &mut Peripheral);
+        fn on_callback_disconnected(self: &mut Peripheral);
+        fn on_callback_characteristic_updated(self: &mut Peripheral, service: &String, Characteristic: &String, data: &Vec<u8>);
     }
 
     unsafe extern "C++" {
@@ -108,6 +112,16 @@ mod ffi {
         fn services(self: &RustyPeripheral) -> Vec<RustyServiceWrapper>;
         fn manufacturer_data(self: &RustyPeripheral) -> Vec<RustyManufacturerDataWrapper>;
 
+        fn read(self: &RustyPeripheral, service: &String, characteristic: &String) -> Vec<u8>;
+        fn write_request(self: &RustyPeripheral, service: &String, characteristic: &String, data: &Vec<u8>);
+        fn write_command(self: &RustyPeripheral, service: &String, characteristic: &String, data: &Vec<u8>);
+        fn notify(self: &RustyPeripheral, service: &String, characteristic: &String);
+        fn indicate(self: &RustyPeripheral, service: &String, characteristic: &String);
+        fn unsubscribe(self: &RustyPeripheral, service: &String, characteristic: &String);
+
+        fn read_descriptor(self: &RustyPeripheral, service: &String, characteristic: &String, descriptor: &String) -> Vec<u8>;
+        fn write_descriptor(self: &RustyPeripheral, service: &String, characteristic: &String, descriptor: &String, data: &Vec<u8>);
+
         #[namespace = "SimpleBLE"]
         type RustyService;
 
@@ -159,6 +173,11 @@ pub struct Adapter {
 
 pub struct Peripheral {
     internal: cxx::UniquePtr<ffi::RustyPeripheral>,
+
+    on_connected: Box<dyn Fn() + Send + Sync + 'static>,
+    on_disconnected: Box<dyn Fn() + Send + Sync + 'static>,
+
+    on_characteristic_update_map: HashMap<String, Box<dyn Fn(Vec<u8>) + Send + Sync + 'static>>,
 }
 
 pub struct Service {
@@ -291,6 +310,9 @@ impl Peripheral {
     fn new(wrapper: &mut ffi::RustyPeripheralWrapper) -> Pin<Box<Self>> {
         let this = Self {
             internal: cxx::UniquePtr::<ffi::RustyPeripheral>::null(),
+            on_connected: Box::new(||{}),
+            on_disconnected: Box::new(||{}),
+            on_characteristic_update_map: HashMap::new(),
         };
 
         // Pin the object to guarantee that its location in memory is
@@ -380,35 +402,72 @@ impl Peripheral {
     }
 
     pub fn read(&self, service: &String, characteristic: &String) -> Vec::<u8>{
-        return Vec::<u8>::new();
+        return self.internal.read(service, characteristic);
     }
 
     pub fn write_request(&self, service: &String, characteristic: &String, data: &Vec::<u8>) {
-        
+        self.internal.write_request(service, characteristic, data);
     }
 
     pub fn write_command(&self, service: &String, characteristic: &String, data: &Vec::<u8>) {
-        
+        self.internal.write_command(service, characteristic, data);
     }
 
-    pub fn notify(&self, service: &String, characteristic: &String, cb: Box<dyn Fn(Vec::<u8>) + Send + Sync + 'static>) {
-        
+    pub fn notify(&mut self, service: &String, characteristic: &String, cb: Box<dyn Fn(Vec::<u8>) + Send + Sync + 'static>) {
+        // Make a string joining the service and characteristic, then save it in the map
+        let key = format!("{}{}", service, characteristic);
+        self.on_characteristic_update_map.insert(key, cb);
+
+        self.internal.notify(service, characteristic);
     }
 
-    pub fn indicate(&self, service: &String, characteristic: &String, cb: Box<dyn Fn(Vec::<u8>) + Send + Sync + 'static>) {
-        
+    pub fn indicate(&mut self, service: &String, characteristic: &String, cb: Box<dyn Fn(Vec::<u8>) + Send + Sync + 'static>) {
+        // Make a string joining the service and characteristic, then save it in the map
+        let key = format!("{}{}", service, characteristic);
+        self.on_characteristic_update_map.insert(key, cb);
+
+        self.internal.indicate(service, characteristic);
     }
 
-    pub fn unsubscribe(&self, service: &String, characteristic: &String) {
-        
+    pub fn unsubscribe(&mut self, service: &String, characteristic: &String) {
+        // Make a string joining the service and characteristic, then remove it from the map
+        let key = format!("{}{}", service, characteristic);
+        self.on_characteristic_update_map.remove(&key);
+
+        self.internal.unsubscribe(service, characteristic);
     }
 
     pub fn descriptor_read(&self, service: &String, characteristic: &String, descriptor: &String) -> Vec::<u8>{
-        return Vec::<u8>::new();
+        return self.internal.read_descriptor(service, characteristic, descriptor);
     }
 
     pub fn descriptor_write(&self, service: &String, characteristic: &String, descriptor: &String, data: &Vec::<u8>) {
+        self.internal.write_descriptor(service, characteristic, descriptor, data);
+    }
+
+    pub fn set_callback_on_connected(&mut self, cb: Box<dyn Fn() + Send + Sync + 'static>) {
+        self.on_connected = cb;
+    }
+
+    pub fn set_callback_on_disconnected(&mut self, cb: Box<dyn Fn() + Send + Sync + 'static>) {
+        self.on_disconnected = cb;
+    }
+
+    fn on_callback_connected(&self) {
+        (self.on_connected)();
+    }
+
+    fn on_callback_disconnected(&self) {
+        (self.on_disconnected)();
+    }
+
+    fn on_callback_characteristic_updated(&self, service: &String, characteristic: &String, data: &Vec<u8>) {
+        // Make a string joining the service and characteristic, then look up the callback and call it.
+        let key = format!("{}{}", service, characteristic);
         
+        if let Some(cb) = self.on_characteristic_update_map.get(&key) {
+            (cb)(data.clone());
+        }
     }
 }
 

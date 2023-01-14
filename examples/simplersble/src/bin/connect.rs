@@ -65,6 +65,14 @@ fn main() {
     // Get the selected device by moving it out of the scan results
     let peripheral = adapter.scan_get_results().remove(input);
 
+    peripheral.set_callback_on_connected(Box::new(|| {
+        println!("Connected to device.");
+    }));
+
+    peripheral.set_callback_on_disconnected(Box::new(|| {
+        println!("Disconnected from device.");
+    }));
+
     // Connect to the device
     println!("Connecting to device...");
     peripheral.connect();

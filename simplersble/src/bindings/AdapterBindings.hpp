@@ -84,6 +84,16 @@ class RustyPeripheral : private Peripheral {
     rust::Vec<SimpleBLE::RustyServiceWrapper> services() const;
     rust::Vec<SimpleBLE::RustyManufacturerDataWrapper> manufacturer_data() const;
 
+    rust::Vec<uint8_t> read(rust::String const& service, rust::String const& characteristic) const;
+    void write_request(rust::String const& service, rust::String const& characteristic, rust::Vec<uint8_t> const& data) const;
+    void write_command(rust::String const& service, rust::String const& characteristic, rust::Vec<uint8_t> const& data) const;
+    void notify(rust::String const& service, rust::String const& characteristic) const;
+    void indicate(rust::String const& service, rust::String const& characteristic) const;
+    void unsubscribe(rust::String const& service, rust::String const& characteristic) const;
+
+    rust::Vec<uint8_t> read_descriptor(rust::String const& service, rust::String const& characteristic, rust::String const& descriptor) const;
+    void write_descriptor(rust::String const& service, rust::String const& characteristic, rust::String const& descriptor, rust::Vec<uint8_t> const& data) const;
+
   private:
     // NOTE: All internal properties need to be handled as pointers,
     // allowing the calls to RustyPeripheral to always be const.
