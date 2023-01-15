@@ -12,3 +12,5 @@ simplepyble/dist
 __pycache__
 *.egg-info
 wheelhouse
+
+target

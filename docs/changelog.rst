@@ -17,6 +17,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  Peripheral addresses can now be queried for their type. *(Thanks camm73!)*
 -  Tx Power is decoded from advertising data if available. *(Thanks camm73!)*
 -  Logger now provides default functions to log to a file or to stdout.
+-  (Rust) Preliminary implementation of Rust bindings.
 -  (Windows) Logging of WinRT initialization behavior.
 -  (SimpleBluez) Support for GATT characteristic flags.
 -  (SimpleBluez) Support for GATT characteristic MTUs. *(Thanks Marco Cruz!)*

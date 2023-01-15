@@ -14,8 +14,6 @@ int main() {
 
     for (auto& adapter : adapter_list) {
         std::cout << "Adapter: " << adapter.identifier() << " [" << adapter.address() << "]" << std::endl;
-
-        adapter.underlying();
     }
 
     return EXIT_SUCCESS;
