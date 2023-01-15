@@ -12,5 +12,8 @@ name = "scan"
 [[bin]]
 name = "connect"
 
+[[bin]]
+name = "notify"
+
 [dependencies]
 simplersble = { path = "../.." }

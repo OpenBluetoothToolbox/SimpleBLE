@@ -12,26 +12,9 @@ fn main() {
     // Pick the first adapter
     let mut adapter = adapters.pop().unwrap();
 
-    adapter.set_callback_on_scan_start(Box::new(|| {
-        println!("Scan started.");
-    }));
-
-    adapter.set_callback_on_scan_stop(Box::new(|| {
-        println!("Scan stopped.");
-    }));
-
     adapter.set_callback_on_scan_found(Box::new(|peripheral| {
         println!(
             "Found device: {} [{}] {} dBm",
-            peripheral.identifier(),
-            peripheral.address(),
-            peripheral.rssi()
-        );
-    }));
-
-    adapter.set_callback_on_scan_updated(Box::new(|peripheral| {
-        println!(
-            "Updated device: {} [{}] {} dBm",
             peripheral.identifier(),
             peripheral.address(),
             peripheral.rssi()
@@ -78,19 +61,43 @@ fn main() {
     peripheral.connect();
 
     println!("Connected to device.");
-    println!("MTU: {}", peripheral.mtu());
 
+    // Make a Vec of all service/characteristic pairs
+    let mut service_characteristic_pairs = Vec::new();
     for service in peripheral.services().iter() {
-        println!("Service: {}", service.uuid());
-
         for characteristic in service.characteristics().iter() {
-            println!("    Characteristic: {}", characteristic.uuid());
-            println!("        Capabilities: {:?}", characteristic.capabilities());
-            for descriptor in characteristic.descriptors().iter() {
-                println!("        Descriptor: {}", descriptor.uuid());
-            }
+            service_characteristic_pairs.push((service.uuid(), characteristic.uuid()));
         }
     }
+
+    // Print the list of services and characteristics
+    println!("The following services and characteristics were found:");
+    for (i, (service, characteristic)) in service_characteristic_pairs.iter().enumerate() {
+        println!("{}: {} {}", i, service, characteristic);
+    }
+
+    // Prompt the user to select a service/characteristic pair
+    println!("Select a service/characteristic pair to subscribe to:");
+    let mut input = String::new();
+    std::io::stdin().read_line(&mut input).unwrap();
+    let input = input.trim();
+    let input = input.parse::<usize>().unwrap();
+
+    // Get the selected service/characteristic pair by moving it out of the Vec
+    let (service, characteristic) = service_characteristic_pairs.remove(input);
+
+    // Subscribe to the characteristic
+    println!("Subscribing to characteristic...");
+    peripheral.notify(&service, &characteristic, Box::new(|data| {
+        println!("Received data: {:?}", data);
+    }));
+
+    // Sleep for 5 seconds
+    std::thread::sleep(std::time::Duration::from_secs(5));
+
+    // Unsubscribe from the characteristic
+    println!("Unsubscribing from characteristic...");
+    peripheral.unsubscribe(&service, &characteristic);
 
     peripheral.disconnect();
 }
