@@ -138,6 +138,7 @@ void SimpleBLE::RustyPeripheral::link(SimpleRsBLE::Peripheral& target) const {
         p_peripheral->on_callback_disconnected();
     });
 }
+
 void SimpleBLE::RustyPeripheral::unlink() const {
     // `_peripheral` is a pointer to a pointer.
     *_peripheral = nullptr;
@@ -272,7 +273,7 @@ rust::Vec<uint8_t> SimpleBLE::RustyPeripheral::read_descriptor(rust::String cons
                                                                rust::String const& characteristic,
                                                                rust::String const& descriptor) const {
     std::string read_result = _internal->read(std::string(service), std::string(characteristic),
-                                                         std::string(descriptor));
+                                              std::string(descriptor));
 
     rust::Vec<uint8_t> result;
     for (auto& byte : read_result) {
@@ -286,7 +287,7 @@ void SimpleBLE::RustyPeripheral::write_descriptor(rust::String const& service, r
                                                   rust::String const& descriptor,
                                                   rust::Vec<uint8_t> const& data) const {
     _internal->write(std::string(service), std::string(characteristic), std::string(descriptor),
-                                std::string((char*)data.data(), data.size()));
+                     std::string((char*)data.data(), data.size()));
 }
 
 // Service Bindings

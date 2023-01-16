@@ -27,7 +27,7 @@ struct RustyManufacturerDataWrapper;
 class RustyAdapter : private Adapter {
   public:
     RustyAdapter() = default;
-    virtual ~RustyAdapter() = default;
+    virtual ~RustyAdapter() { _internal.reset(); }
 
     RustyAdapter(Adapter adapter)
         : _internal(new Adapter(adapter)), _adapter(std::make_unique<SimpleRsBLE::Adapter*>()){};
@@ -51,14 +51,14 @@ class RustyAdapter : private Adapter {
     // allowing the calls to RustyAdapter to always be const.
     // This might require us to store pointers to pointers, so it's
     // important to be careful when handling these.
-    std::shared_ptr<Adapter> _internal;
+    std::unique_ptr<Adapter> _internal;
     std::unique_ptr<SimpleRsBLE::Adapter*> _adapter;
 };
 
 class RustyPeripheral : private Peripheral {
   public:
     RustyPeripheral() = default;
-    virtual ~RustyPeripheral() = default;
+    virtual ~RustyPeripheral() { _internal.reset(); }
 
     RustyPeripheral(Peripheral peripheral)
         : _internal(new Peripheral(peripheral)), _peripheral(std::make_unique<SimpleRsBLE::Peripheral*>()) {}
@@ -85,21 +85,25 @@ class RustyPeripheral : private Peripheral {
     rust::Vec<SimpleBLE::RustyManufacturerDataWrapper> manufacturer_data() const;
 
     rust::Vec<uint8_t> read(rust::String const& service, rust::String const& characteristic) const;
-    void write_request(rust::String const& service, rust::String const& characteristic, rust::Vec<uint8_t> const& data) const;
-    void write_command(rust::String const& service, rust::String const& characteristic, rust::Vec<uint8_t> const& data) const;
+    void write_request(rust::String const& service, rust::String const& characteristic,
+                       rust::Vec<uint8_t> const& data) const;
+    void write_command(rust::String const& service, rust::String const& characteristic,
+                       rust::Vec<uint8_t> const& data) const;
     void notify(rust::String const& service, rust::String const& characteristic) const;
     void indicate(rust::String const& service, rust::String const& characteristic) const;
     void unsubscribe(rust::String const& service, rust::String const& characteristic) const;
 
-    rust::Vec<uint8_t> read_descriptor(rust::String const& service, rust::String const& characteristic, rust::String const& descriptor) const;
-    void write_descriptor(rust::String const& service, rust::String const& characteristic, rust::String const& descriptor, rust::Vec<uint8_t> const& data) const;
+    rust::Vec<uint8_t> read_descriptor(rust::String const& service, rust::String const& characteristic,
+                                       rust::String const& descriptor) const;
+    void write_descriptor(rust::String const& service, rust::String const& characteristic,
+                          rust::String const& descriptor, rust::Vec<uint8_t> const& data) const;
 
   private:
     // NOTE: All internal properties need to be handled as pointers,
     // allowing the calls to RustyPeripheral to always be const.
     // This might require us to store pointers to pointers, so it's
     // important to be careful when handling these.
-    std::shared_ptr<Peripheral> _internal;
+    std::unique_ptr<Peripheral> _internal;
     std::unique_ptr<SimpleRsBLE::Peripheral*> _peripheral;
 };
 
