@@ -39,8 +39,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  (Linux) Peripheral would still issue callbacks after deletion.
 -  (MacOS) Increased priority of the dispatch queue to prevent jitter in the incoming data.
 -  (Windows) Missing peripheral identifier data. *(Thanks eriklins!)*
--  (Windows) Multiple initialization of the WinRT backend.
--  (Windows) Fixed incorrect initialization of the WinRT backend. *(Thanks ChatGPT & Andrey1994!)*
+-  (Windows) Multiple initializations of the WinRT backend.
+-  (Windows) Incorrect initialization of the WinRT backend. *(Thanks ChatGPT & Andrey1994!)*
+-  (Windows) Scan callbacks would continue after scan stopped.
 -  (Python) Type returned by ``simplepyble.get_operating_system()`` was not defined.
 
 

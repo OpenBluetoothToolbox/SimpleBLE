@@ -36,6 +36,9 @@ AdapterBase::AdapterBase(std::string device_id)
 
     scanner_received_token_ = scanner_.Received(
         [this](const auto& w, const Advertisement::BluetoothLEAdvertisementReceivedEventArgs args) {
+            std::lock_guard<std::mutex> lock(this->scan_update_mutex_);
+            if (!this->scan_is_active_) return;
+
             advertising_data_t data;
             data.mac_address = _mac_address_to_str(args.BluetoothAddress());
             Bluetooth::BluetoothAddressType addr_type_enum = args.BluetoothAddressType();
@@ -230,6 +233,7 @@ void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_
 // Private functions
 
 void AdapterBase::_scan_stopped_callback() {
+    std::lock_guard<std::mutex> lock(scan_update_mutex_);
     scan_is_active_ = false;
     scan_stop_cv_.notify_all();
 
