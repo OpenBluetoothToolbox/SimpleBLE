@@ -26,7 +26,7 @@ PeripheralBase::~PeripheralBase() {
     // Clear the callbacks to prevent any further events from being sent to the user.
     this->callback_on_connected_.unload();
     this->callback_on_disconnected_.unload();
-    
+
     device_->clear_on_disconnected();
     device_->clear_on_services_resolved();
     _cleanup_characteristics();
