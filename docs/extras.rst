@@ -5,7 +5,7 @@ Building documentation
 To build documentation for the projects in this repository,
 you first need to install Sphynx, using the following commands: ::
 
-   pip3 install sphinx sphinx_rtd_theme
+   pip3 install -r docs/requirements.txt
 
 Once all dependencies have been installed, HTML documentation can be built
 by calling the following commands: ::
