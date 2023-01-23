@@ -84,7 +84,7 @@ void Logger::log_default_stdout() {
     set_callback([](Level level, const std::string& module, const std::string& file, uint32_t line,
                     const std::string& function, const std::string& message) {
         std::string level_str = level_to_str(level);
-        fmt::print("[{}] {}: {}:{} in {}: {}", level_str, module, file, line, function, message);
+        fmt::print("[{}] {}: {}:{} in {}: {}\n", level_str, module, file, line, function, message);
     });
 }
 
@@ -99,7 +99,7 @@ void Logger::log_default_file(const std::string path) {
     set_callback([=](Level level, const std::string& module, const std::string& file, uint32_t line,
                      const std::string& function, const std::string& message) {
         std::string level_str = level_to_str(level);
-        std::string log_message = fmt::format("[{}] {}: {}:{} in {}: {}", level_str, module, file, line, function,
+        std::string log_message = fmt::format("[{}] {}: {}:{} in {}: {}\n", level_str, module, file, line, function,
                                               message);
 
         std::ofstream outfile;

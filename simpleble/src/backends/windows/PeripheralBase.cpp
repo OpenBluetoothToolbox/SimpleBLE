@@ -30,13 +30,10 @@ PeripheralBase::PeripheralBase(advertising_data_t advertising_data) {
     manufacturer_data_ = advertising_data.manufacturer_data;
     connectable_ = advertising_data.connectable;
     advertised_services_ = advertising_data.service_uuids;
-
-    device_ = async_get(
-        BluetoothLEDevice::FromBluetoothAddressAsync(_str_to_mac_address(advertising_data.mac_address)));
 }
 
 PeripheralBase::~PeripheralBase() {
-    if (connection_status_changed_token_) {
+    if (connection_status_changed_token_ && device_ != nullptr) {
         device_.ConnectionStatusChanged(connection_status_changed_token_);
     }
 }
@@ -80,6 +77,8 @@ void PeripheralBase::update_advertising_data(advertising_data_t advertising_data
 }
 
 void PeripheralBase::connect() {
+    device_ = async_get(BluetoothLEDevice::FromBluetoothAddressAsync(_str_to_mac_address(address_)));
+
     // Attempt to connect to the device.
     for (size_t i = 0; i < 3; i++) {
         if (_attempt_connect()) {
@@ -105,14 +104,15 @@ void PeripheralBase::disconnect() {
     gatt_map_.clear();
     if (device_ != nullptr) {
         device_.Close();
+        device_ = nullptr;
     }
 
     std::unique_lock<std::mutex> lock(disconnection_mutex_);
     if (disconnection_cv_.wait_for(lock, 5s, [=] { return !this->is_connected(); })) {
         // Disconnection successful
     } else {
-        // Failed to disconnect
-        // TODO: Raise an error
+        SIMPLEBLE_LOG_ERROR("Disconnection failed");
+        throw SimpleBLE::Exception::OperationFailed("Disconnection attempt was not acknowledged.");
     }
 }
 
