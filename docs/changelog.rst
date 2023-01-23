@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog`_, and this project adheres to `Semantic Versioning`_.
 
-[0.6.0] - 2022-XX-XX
+[0.6.0] - 2023-XX-XX
 --------------------
 
 **Added**
@@ -42,6 +42,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  (Windows) Multiple initializations of the WinRT backend.
 -  (Windows) Incorrect initialization of the WinRT backend. *(Thanks ChatGPT & Andrey1994!)*
 -  (Windows) Scan callbacks would continue after scan stopped.
+-  (Windows) Disconnecting would prevent the user from connecting again. *(Thanks klaff, felixdollack & lairdrt!)*
 -  (Python) Type returned by ``simplepyble.get_operating_system()`` was not defined.
 
 
