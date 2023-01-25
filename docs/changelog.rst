@@ -31,6 +31,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  (MacOS) More explicit exception messages.
 -  (MacOS) 16-bit UUIDs are now presented in their 128-bit form.
 -  (Windows) Reinitialize the WinRT backend if a single-threaded apartment is detected. *(Thanks jferdelyi)*
+-  (Windows) Callbacks for indications and notifications are now swapped if one already exists.
 
 **Fixed**
 
@@ -43,6 +44,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  (Windows) Incorrect initialization of the WinRT backend. *(Thanks ChatGPT & Andrey1994!)*
 -  (Windows) Scan callbacks would continue after scan stopped.
 -  (Windows) Disconnecting would prevent the user from connecting again. *(Thanks klaff, felixdollack & lairdrt!)*
+-  (Windows) Uncleared callbacks when unsubscribe is called.
 -  (Python) Type returned by ``simplepyble.get_operating_system()`` was not defined.
 
 
