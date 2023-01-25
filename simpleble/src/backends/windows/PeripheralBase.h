@@ -112,11 +112,15 @@ class PeripheralBase {
     bool _attempt_connect();
 
     gatt_characteristic_t& _fetch_characteristic(const BluetoothUUID& service_uuid,
-                                             const BluetoothUUID& characteristic_uuid);
+                                                 const BluetoothUUID& characteristic_uuid);
 
     GattDescriptor PeripheralBase::_fetch_descriptor(const BluetoothUUID& service_uuid,
                                                      const BluetoothUUID& characteristic_uuid,
                                                      const BluetoothUUID& descriptor_uuid);
+
+    void _subscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                    std::function<void(ByteArray payload)> callback, GattCharacteristicProperties property,
+                    GattClientCharacteristicConfigurationDescriptorValue descriptor_value);
 };
 
 }  // namespace SimpleBLE

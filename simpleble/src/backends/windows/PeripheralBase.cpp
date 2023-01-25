@@ -225,65 +225,14 @@ void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID c
 
 void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                             std::function<void(ByteArray payload)> callback) {
-
-    gatt_characteristic_t& gatt_characteristic_holder = _fetch_characteristic(service, characteristic);
-    GattCharacteristic gatt_characteristic = gatt_characteristic_holder.obj;
-
-    // Validate that the operation can be performed.
-    uint32_t gatt_characteristic_prop = (uint32_t)gatt_characteristic.CharacteristicProperties();
-    if ((gatt_characteristic_prop & (uint32_t)GattCharacteristicProperties::Notify) == 0) {
-        throw SimpleBLE::Exception::OperationNotSupported();
-    }
-
-    // TODO: Verify that the operation is not currently in progress.
-
-    gatt_characteristic_holder.value_changed_callback = [=](const GattCharacteristic& sender, const GattValueChangedEventArgs& args) {
-        // Convert the payload to a ByteArray.
-        ByteArray payload = ibuffer_to_bytearray(args.CharacteristicValue());
-        callback(payload);
-    };
-
-    // Register the callback.
-    gatt_characteristic_holder.value_changed_token = gatt_characteristic.ValueChanged(gatt_characteristic_holder.value_changed_callback);
-
-    // Start the notification.
-    auto result = async_get(gatt_characteristic.WriteClientCharacteristicConfigurationDescriptorWithResultAsync(
-        GattClientCharacteristicConfigurationDescriptorValue::Notify));
-
-    if (result.Status() != GenericAttributeProfile::GattCommunicationStatus::Success) {
-        throw SimpleBLE::Exception::OperationFailed();
-    }
+    _subscribe(service, characteristic, std::move(callback), GattCharacteristicProperties::Notify,
+               GattClientCharacteristicConfigurationDescriptorValue::Notify);
 }
 
 void PeripheralBase::indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                               std::function<void(ByteArray payload)> callback) {
-    gatt_characteristic_t& gatt_characteristic_holder = _fetch_characteristic(service, characteristic);
-    GattCharacteristic gatt_characteristic = gatt_characteristic_holder.obj;
-
-    // Validate that the operation can be performed.
-    uint32_t gatt_characteristic_prop = (uint32_t)gatt_characteristic.CharacteristicProperties();
-    if ((gatt_characteristic_prop & (uint32_t)GattCharacteristicProperties::Indicate) == 0) {
-        throw SimpleBLE::Exception::OperationNotSupported();
-    }
-
-    // TODO: Verify that the operation is not currently in progress.
-
-    gatt_characteristic_holder.value_changed_callback = [=](const GattCharacteristic& sender, const GattValueChangedEventArgs& args) {
-        // Convert the payload to a ByteArray.
-        ByteArray payload = ibuffer_to_bytearray(args.CharacteristicValue());
-        callback(payload);
-    };
-
-    // Register the callback.
-    gatt_characteristic_holder.value_changed_token = gatt_characteristic.ValueChanged(gatt_characteristic_holder.value_changed_callback);
-
-    // Start the indication.
-    auto result = async_get(gatt_characteristic.WriteClientCharacteristicConfigurationDescriptorWithResultAsync(
-        GattClientCharacteristicConfigurationDescriptorValue::Indicate));
-
-    if (result.Status() != GenericAttributeProfile::GattCommunicationStatus::Success) {
-        throw SimpleBLE::Exception::OperationFailed();
-    }
+    _subscribe(service, characteristic, std::move(callback), GattCharacteristicProperties::Indicate,
+               GattClientCharacteristicConfigurationDescriptorValue::Indicate);
 }
 
 void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
@@ -293,7 +242,7 @@ void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID con
     if (gatt_characteristic_holder.value_changed_token) {
         // Unregister the callback.
         gatt_characteristic.ValueChanged(gatt_characteristic_holder.value_changed_token);
-        gatt_characteristic_holder.value_changed_token = { 0 };
+        gatt_characteristic_holder.value_changed_token = {0};
     }
 
     // Start the indication.
@@ -348,6 +297,46 @@ void PeripheralBase::set_callback_on_disconnected(std::function<void()> on_disco
 }
 
 // Private methods
+
+void PeripheralBase::_subscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                std::function<void(ByteArray payload)> callback, GattCharacteristicProperties property,
+                                GattClientCharacteristicConfigurationDescriptorValue descriptor_value) {
+    gatt_characteristic_t& gatt_characteristic_holder = _fetch_characteristic(service, characteristic);
+    GattCharacteristic gatt_characteristic = gatt_characteristic_holder.obj;
+
+    // Validate that the operation can be performed.
+    uint32_t gatt_characteristic_prop = (uint32_t)gatt_characteristic.CharacteristicProperties();
+    if ((gatt_characteristic_prop & (uint32_t)property) == 0) {
+        throw SimpleBLE::Exception::OperationNotSupported();
+    }
+
+    // If a notification for the given characteristic is already in progress, swap the callbacks.
+    if (gatt_characteristic_holder.value_changed_token) {
+        SIMPLEBLE_LOG_WARN("A notification for the given characteristic is already in progress. Swapping callbacks.");
+        // Unregister the callback.
+        gatt_characteristic.ValueChanged(gatt_characteristic_holder.value_changed_token);
+        gatt_characteristic_holder.value_changed_token = {0};
+    }
+
+    gatt_characteristic_holder.value_changed_callback = [=](const GattCharacteristic& sender,
+                                                            const GattValueChangedEventArgs& args) {
+        // Convert the payload to a ByteArray.
+        ByteArray payload = ibuffer_to_bytearray(args.CharacteristicValue());
+        callback(payload);
+    };
+
+    // Register the callback.
+    gatt_characteristic_holder.value_changed_token = gatt_characteristic.ValueChanged(
+        gatt_characteristic_holder.value_changed_callback);
+
+    // Start the notification.
+    auto result = async_get(
+        gatt_characteristic.WriteClientCharacteristicConfigurationDescriptorWithResultAsync(descriptor_value));
+
+    if (result.Status() != GenericAttributeProfile::GattCommunicationStatus::Success) {
+        throw SimpleBLE::Exception::OperationFailed();
+    }
+}
 
 bool PeripheralBase::_attempt_connect() {
     gatt_map_.clear();
@@ -419,7 +408,7 @@ bool PeripheralBase::_attempt_connect() {
 }
 
 gatt_characteristic_t& PeripheralBase::_fetch_characteristic(const BluetoothUUID& service_uuid,
-                                                         const BluetoothUUID& characteristic_uuid) {
+                                                             const BluetoothUUID& characteristic_uuid) {
     if (gatt_map_.count(service_uuid) == 0) {
         throw SimpleBLE::Exception::ServiceNotFound(service_uuid);
     }
