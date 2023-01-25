@@ -20,7 +20,17 @@ General Requirements
 Linux
 -----
 
+APT-based Distros
+~~~~~~~~~~~~~~~~~
+
    - `libdbus-1-dev` (install via ``sudo apt install libdbus-1-dev``)
+
+RPM-based Distros
+~~~~~~~~~~~~~~~~~
+
+   - `dbus-devel`
+      - On Fedora, install via ``sudo dnf install dbus-devel``
+      - On CentOS, install via ``sudo yum install dbus-devel``
 
 Windows
 -------
