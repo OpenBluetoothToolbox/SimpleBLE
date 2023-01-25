@@ -27,6 +27,8 @@ struct gatt_descriptor_t {
 
 struct gatt_characteristic_t {
     GattCharacteristic obj = nullptr;
+    winrt::event_token value_changed_token;
+    std::function<void(const GattCharacteristic& sender, const GattValueChangedEventArgs& args)> value_changed_callback;
     std::map<BluetoothUUID, gatt_descriptor_t> descriptors;
 };
 
@@ -108,7 +110,8 @@ class PeripheralBase {
     std::vector<BluetoothUUID> advertised_services_;
 
     bool _attempt_connect();
-    GattCharacteristic _fetch_characteristic(const BluetoothUUID& service_uuid,
+
+    gatt_characteristic_t& _fetch_characteristic(const BluetoothUUID& service_uuid,
                                              const BluetoothUUID& characteristic_uuid);
 
     GattDescriptor PeripheralBase::_fetch_descriptor(const BluetoothUUID& service_uuid,
