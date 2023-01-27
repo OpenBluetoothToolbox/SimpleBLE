@@ -40,10 +40,7 @@ jobs:
       with:
         cmake-version: '3.21'
     - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-          toolchain: stable
-          override: true
+      uses: dtolnay/rust-toolchain@stable
     - name: Compile SimpleBLE
       run: cargo build
 
