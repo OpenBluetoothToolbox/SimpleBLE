@@ -53,7 +53,7 @@ mod ffi {
         fn on_callback_scan_stop(self: &mut Adapter);
         fn on_callback_scan_updated(self: &mut Adapter, peripheral: &mut RustyPeripheralWrapper);
         fn on_callback_scan_found(self: &mut Adapter, peripheral: &mut RustyPeripheralWrapper);
-     
+
         type Peripheral;
 
         fn on_callback_connected(self: &mut Peripheral);
@@ -62,7 +62,7 @@ mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("src/bindings/AdapterBindings.hpp");
+        include!("src/bindings/Bindings.hpp");
 
         #[namespace = "SimpleBLE"]
         type BluetoothAddressType;
@@ -464,7 +464,7 @@ impl Peripheral {
     fn on_callback_characteristic_updated(&self, service: &String, characteristic: &String, data: &Vec<u8>) {
         // Make a string joining the service and characteristic, then look up the callback and call it.
         let key = format!("{}{}", service, characteristic);
-        
+
         if let Some(cb) = self.on_characteristic_update_map.get(&key) {
             (cb)(data.clone());
         }
