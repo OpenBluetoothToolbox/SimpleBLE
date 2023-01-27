@@ -1,4 +1,4 @@
-name: Build Rust
+name: Rust Build
 
 on: [push, pull_request]
 
