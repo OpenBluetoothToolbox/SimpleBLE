@@ -45,6 +45,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  (Windows) Scan callbacks would continue after scan stopped.
 -  (Windows) Disconnecting would prevent the user from connecting again. *(Thanks klaff, felixdollack & lairdrt!)*
 -  (Windows) Uncleared callbacks when unsubscribe is called.
+-  (Windows) Incorrect handling of non-english locale by MSVC. *(Thanks felixdollack!)*
 -  (Python) Type returned by ``simplepyble.get_operating_system()`` was not defined.
 
 
