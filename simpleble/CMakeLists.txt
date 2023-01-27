@@ -226,6 +226,8 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         # /D_USE_MATH_DEFINES -> Specifies that the math.h header file should be included.
         list(APPEND PRIVATE_COMPILE_DEFINITIONS "/D_USE_MATH_DEFINES")
 
+        # /utf-8 -> Set source and executable character sets to utf-8. https://learn.microsoft.com/en-us/cpp/build/reference/utf-8-set-source-and-executable-character-sets-to-utf-8
+        list(APPEND PRIVATE_COMPILE_OPTIONS "/utf-8")
         # /Gd -> Use __cdecl as the default calling convention. https://docs.microsoft.com/en-us/cpp/cpp/cdecl
         list(APPEND PRIVATE_COMPILE_OPTIONS "/Gd")
         # /WX -> Treats all warnings as errors.
