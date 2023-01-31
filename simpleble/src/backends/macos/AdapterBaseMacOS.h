@@ -22,4 +22,6 @@
 
 - (bool)scanIsActive;
 
+- (NSString*)address;
+
 @end
