@@ -8,6 +8,8 @@
 
 @interface AdapterBaseMacOS : NSObject<CBCentralManagerDelegate>
 
+@property NSString *uuid;
+
 - (bool)isBluetoothEnabled;
 
 - (instancetype)init:(SimpleBLE::AdapterBase*)adapter;
