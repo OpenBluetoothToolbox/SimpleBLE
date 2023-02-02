@@ -1,24 +1,24 @@
-#include "AdapterBindings.hpp"
+#include "Bindings.hpp"
 
 #include "simplersble/simplersble/src/lib.rs.h"
 
-// Adapter Bindings
-
-rust::Vec<SimpleBLE::RustyAdapterWrapper> RustyAdapter_get_adapters() {
-    rust::Vec<SimpleBLE::RustyAdapterWrapper> result;
+rust::Vec<Bindings::RustyAdapterWrapper> Bindings::RustyAdapter_get_adapters() {
+    rust::Vec<Bindings::RustyAdapterWrapper> result;
 
     for (auto& adapter : SimpleBLE::Adapter::get_adapters()) {
-        SimpleBLE::RustyAdapterWrapper wrapper;
-        wrapper.internal = std::make_unique<SimpleBLE::RustyAdapter>(adapter);
+        Bindings::RustyAdapterWrapper wrapper;
+        wrapper.internal = std::make_unique<Bindings::RustyAdapter>(adapter);
         result.push_back(std::move(wrapper));
     }
 
     return result;
 }
 
-bool RustyAdapter_bluetooth_enabled() { return SimpleBLE::Adapter::bluetooth_enabled(); }
+bool Bindings::RustyAdapter_bluetooth_enabled() { return SimpleBLE::Adapter::bluetooth_enabled(); }
 
-void SimpleBLE::RustyAdapter::link(SimpleRsBLE::Adapter& target) const {
+// Adapter Bindings
+
+void Bindings::RustyAdapter::link(SimpleRsBLE::Adapter& target) const {
     // Time to explain the weird shenanigan we're doing here:
     // The TL;DR is that we're making the Adapter(Rust) and the RustyAdapter(C++)
     // point to each other in a safe way.
@@ -51,8 +51,8 @@ void SimpleBLE::RustyAdapter::link(SimpleRsBLE::Adapter& target) const {
         SimpleRsBLE::Adapter* p_adapter = *this->_adapter;
         if (p_adapter == nullptr) return;
 
-        SimpleBLE::RustyPeripheralWrapper wrapper;
-        wrapper.internal = std::make_unique<SimpleBLE::RustyPeripheral>(peripheral);
+        Bindings::RustyPeripheralWrapper wrapper;
+        wrapper.internal = std::make_unique<Bindings::RustyPeripheral>(peripheral);
         p_adapter->on_callback_scan_found(wrapper);
     });
 
@@ -60,47 +60,47 @@ void SimpleBLE::RustyAdapter::link(SimpleRsBLE::Adapter& target) const {
         SimpleRsBLE::Adapter* p_adapter = *this->_adapter;
         if (p_adapter == nullptr) return;
 
-        SimpleBLE::RustyPeripheralWrapper wrapper;
-        wrapper.internal = std::make_unique<SimpleBLE::RustyPeripheral>(peripheral);
+        Bindings::RustyPeripheralWrapper wrapper;
+        wrapper.internal = std::make_unique<Bindings::RustyPeripheral>(peripheral);
         p_adapter->on_callback_scan_updated(wrapper);
     });
 }
 
-void SimpleBLE::RustyAdapter::unlink() const {
+void Bindings::RustyAdapter::unlink() const {
     // `_adapter` is a pointer to a pointer.
     *_adapter = nullptr;
 }
 
-rust::String SimpleBLE::RustyAdapter::identifier() const { return rust::String(_internal->identifier()); }
+rust::String Bindings::RustyAdapter::identifier() const { return rust::String(_internal->identifier()); }
 
-rust::String SimpleBLE::RustyAdapter::address() const { return rust::String(_internal->address()); }
+rust::String Bindings::RustyAdapter::address() const { return rust::String(_internal->address()); }
 
-void SimpleBLE::RustyAdapter::scan_start() const { _internal->scan_start(); }
+void Bindings::RustyAdapter::scan_start() const { _internal->scan_start(); }
 
-void SimpleBLE::RustyAdapter::scan_stop() const { _internal->scan_stop(); }
+void Bindings::RustyAdapter::scan_stop() const { _internal->scan_stop(); }
 
-void SimpleBLE::RustyAdapter::scan_for(int32_t timeout_ms) const { _internal->scan_for(timeout_ms); }
+void Bindings::RustyAdapter::scan_for(int32_t timeout_ms) const { _internal->scan_for(timeout_ms); }
 
-bool SimpleBLE::RustyAdapter::scan_is_active() const { return _internal->scan_is_active(); }
+bool Bindings::RustyAdapter::scan_is_active() const { return _internal->scan_is_active(); }
 
-rust::Vec<SimpleBLE::RustyPeripheralWrapper> SimpleBLE::RustyAdapter::scan_get_results() const {
-    rust::Vec<SimpleBLE::RustyPeripheralWrapper> result;
+rust::Vec<Bindings::RustyPeripheralWrapper> Bindings::RustyAdapter::scan_get_results() const {
+    rust::Vec<Bindings::RustyPeripheralWrapper> result;
 
     for (auto& peripheral : _internal->scan_get_results()) {
-        SimpleBLE::RustyPeripheralWrapper wrapper;
-        wrapper.internal = std::make_unique<SimpleBLE::RustyPeripheral>(peripheral);
+        Bindings::RustyPeripheralWrapper wrapper;
+        wrapper.internal = std::make_unique<Bindings::RustyPeripheral>(peripheral);
         result.push_back(std::move(wrapper));
     }
 
     return result;
 }
 
-rust::Vec<SimpleBLE::RustyPeripheralWrapper> SimpleBLE::RustyAdapter::get_paired_peripherals() const {
-    rust::Vec<SimpleBLE::RustyPeripheralWrapper> result;
+rust::Vec<Bindings::RustyPeripheralWrapper> Bindings::RustyAdapter::get_paired_peripherals() const {
+    rust::Vec<Bindings::RustyPeripheralWrapper> result;
 
     for (auto& peripheral : _internal->get_paired_peripherals()) {
-        SimpleBLE::RustyPeripheralWrapper wrapper;
-        wrapper.internal = std::make_unique<SimpleBLE::RustyPeripheral>(peripheral);
+        Bindings::RustyPeripheralWrapper wrapper;
+        wrapper.internal = std::make_unique<Bindings::RustyPeripheral>(peripheral);
         result.push_back(std::move(wrapper));
     }
 
@@ -109,7 +109,7 @@ rust::Vec<SimpleBLE::RustyPeripheralWrapper> SimpleBLE::RustyAdapter::get_paired
 
 // Peripheral Bindings
 
-void SimpleBLE::RustyPeripheral::link(SimpleRsBLE::Peripheral& target) const {
+void Bindings::RustyPeripheral::link(SimpleRsBLE::Peripheral& target) const {
     // Time to explain the weird shenanigan we're doing here:
     // The TL;DR is that we're making the Peripheral(Rust) and the RustyPeripheral(C++)
     // point to each other in a safe way.
@@ -139,52 +139,52 @@ void SimpleBLE::RustyPeripheral::link(SimpleRsBLE::Peripheral& target) const {
     });
 }
 
-void SimpleBLE::RustyPeripheral::unlink() const {
+void Bindings::RustyPeripheral::unlink() const {
     // `_peripheral` is a pointer to a pointer.
     *_peripheral = nullptr;
 }
 
-rust::String SimpleBLE::RustyPeripheral::identifier() const { return rust::String(_internal->identifier()); }
+rust::String Bindings::RustyPeripheral::identifier() const { return rust::String(_internal->identifier()); }
 
-rust::String SimpleBLE::RustyPeripheral::address() const { return rust::String(_internal->address()); }
+rust::String Bindings::RustyPeripheral::address() const { return rust::String(_internal->address()); }
 
-SimpleBLE::BluetoothAddressType SimpleBLE::RustyPeripheral::address_type() const { return _internal->address_type(); }
+SimpleBLE::BluetoothAddressType Bindings::RustyPeripheral::address_type() const { return _internal->address_type(); }
 
-int16_t SimpleBLE::RustyPeripheral::rssi() const { return _internal->rssi(); }
+int16_t Bindings::RustyPeripheral::rssi() const { return _internal->rssi(); }
 
-int16_t SimpleBLE::RustyPeripheral::tx_power() const { return _internal->tx_power(); }
+int16_t Bindings::RustyPeripheral::tx_power() const { return _internal->tx_power(); }
 
-uint16_t SimpleBLE::RustyPeripheral::mtu() const { return _internal->mtu(); }
+uint16_t Bindings::RustyPeripheral::mtu() const { return _internal->mtu(); }
 
-void SimpleBLE::RustyPeripheral::connect() const { _internal->connect(); }
+void Bindings::RustyPeripheral::connect() const { _internal->connect(); }
 
-void SimpleBLE::RustyPeripheral::disconnect() const { _internal->disconnect(); }
+void Bindings::RustyPeripheral::disconnect() const { _internal->disconnect(); }
 
-bool SimpleBLE::RustyPeripheral::is_connected() const { return _internal->is_connected(); }
+bool Bindings::RustyPeripheral::is_connected() const { return _internal->is_connected(); }
 
-bool SimpleBLE::RustyPeripheral::is_connectable() const { return _internal->is_connectable(); }
+bool Bindings::RustyPeripheral::is_connectable() const { return _internal->is_connectable(); }
 
-bool SimpleBLE::RustyPeripheral::is_paired() const { return _internal->is_paired(); }
+bool Bindings::RustyPeripheral::is_paired() const { return _internal->is_paired(); }
 
-void SimpleBLE::RustyPeripheral::unpair() const { _internal->unpair(); }
+void Bindings::RustyPeripheral::unpair() const { _internal->unpair(); }
 
-rust::Vec<SimpleBLE::RustyServiceWrapper> SimpleBLE::RustyPeripheral::services() const {
-    rust::Vec<SimpleBLE::RustyServiceWrapper> result;
+rust::Vec<Bindings::RustyServiceWrapper> Bindings::RustyPeripheral::services() const {
+    rust::Vec<Bindings::RustyServiceWrapper> result;
 
     for (auto& service : _internal->services()) {
-        SimpleBLE::RustyServiceWrapper wrapper;
-        wrapper.internal = std::make_unique<SimpleBLE::RustyService>(service);
+        Bindings::RustyServiceWrapper wrapper;
+        wrapper.internal = std::make_unique<Bindings::RustyService>(service);
         result.push_back(std::move(wrapper));
     }
 
     return result;
 }
 
-rust::Vec<SimpleBLE::RustyManufacturerDataWrapper> SimpleBLE::RustyPeripheral::manufacturer_data() const {
-    rust::Vec<SimpleBLE::RustyManufacturerDataWrapper> result;
+rust::Vec<Bindings::RustyManufacturerDataWrapper> Bindings::RustyPeripheral::manufacturer_data() const {
+    rust::Vec<Bindings::RustyManufacturerDataWrapper> result;
 
     for (auto& manufacturer_data : _internal->manufacturer_data()) {
-        SimpleBLE::RustyManufacturerDataWrapper wrapper;
+        Bindings::RustyManufacturerDataWrapper wrapper;
         wrapper.company_id = manufacturer_data.first;
 
         for (auto& byte : manufacturer_data.second) {
@@ -197,7 +197,7 @@ rust::Vec<SimpleBLE::RustyManufacturerDataWrapper> SimpleBLE::RustyPeripheral::m
     return result;
 }
 
-rust::Vec<uint8_t> SimpleBLE::RustyPeripheral::read(rust::String const& service,
+rust::Vec<uint8_t> Bindings::RustyPeripheral::read(rust::String const& service,
                                                     rust::String const& characteristic) const {
     std::string read_result = _internal->read(std::string(service), std::string(characteristic));
 
@@ -209,7 +209,7 @@ rust::Vec<uint8_t> SimpleBLE::RustyPeripheral::read(rust::String const& service,
     return result;
 }
 
-void SimpleBLE::RustyPeripheral::write_request(rust::String const& service_rs, rust::String const& characteristic_rs,
+void Bindings::RustyPeripheral::write_request(rust::String const& service_rs, rust::String const& characteristic_rs,
                                                rust::Vec<uint8_t> const& data) const {
     std::string service(service_rs);
     std::string characteristic(characteristic_rs);
@@ -218,7 +218,7 @@ void SimpleBLE::RustyPeripheral::write_request(rust::String const& service_rs, r
     _internal->write_request(service, characteristic, data_vec);
 }
 
-void SimpleBLE::RustyPeripheral::write_command(rust::String const& service_rs, rust::String const& characteristic_rs,
+void Bindings::RustyPeripheral::write_command(rust::String const& service_rs, rust::String const& characteristic_rs,
                                                rust::Vec<uint8_t> const& data) const {
     std::string service(service_rs);
     std::string characteristic(characteristic_rs);
@@ -227,7 +227,7 @@ void SimpleBLE::RustyPeripheral::write_command(rust::String const& service_rs, r
     _internal->write_command(service, characteristic, data_vec);
 }
 
-void SimpleBLE::RustyPeripheral::notify(rust::String const& service_rs, rust::String const& characteristic_rs) const {
+void Bindings::RustyPeripheral::notify(rust::String const& service_rs, rust::String const& characteristic_rs) const {
     std::string service(service_rs);
     std::string characteristic(characteristic_rs);
 
@@ -244,7 +244,7 @@ void SimpleBLE::RustyPeripheral::notify(rust::String const& service_rs, rust::St
     });
 }
 
-void SimpleBLE::RustyPeripheral::indicate(rust::String const& service_rs, rust::String const& characteristic_rs) const {
+void Bindings::RustyPeripheral::indicate(rust::String const& service_rs, rust::String const& characteristic_rs) const {
     std::string service(service_rs);
     std::string characteristic(characteristic_rs);
 
@@ -261,7 +261,7 @@ void SimpleBLE::RustyPeripheral::indicate(rust::String const& service_rs, rust::
     });
 }
 
-void SimpleBLE::RustyPeripheral::unsubscribe(rust::String const& service_rs,
+void Bindings::RustyPeripheral::unsubscribe(rust::String const& service_rs,
                                              rust::String const& characteristic_rs) const {
     std::string service(service_rs);
     std::string characteristic(characteristic_rs);
@@ -269,7 +269,7 @@ void SimpleBLE::RustyPeripheral::unsubscribe(rust::String const& service_rs,
     _internal->unsubscribe(service, characteristic);
 }
 
-rust::Vec<uint8_t> SimpleBLE::RustyPeripheral::read_descriptor(rust::String const& service,
+rust::Vec<uint8_t> Bindings::RustyPeripheral::read_descriptor(rust::String const& service,
                                                                rust::String const& characteristic,
                                                                rust::String const& descriptor) const {
     std::string read_result = _internal->read(std::string(service), std::string(characteristic),
@@ -283,7 +283,7 @@ rust::Vec<uint8_t> SimpleBLE::RustyPeripheral::read_descriptor(rust::String cons
     return result;
 }
 
-void SimpleBLE::RustyPeripheral::write_descriptor(rust::String const& service, rust::String const& characteristic,
+void Bindings::RustyPeripheral::write_descriptor(rust::String const& service, rust::String const& characteristic,
                                                   rust::String const& descriptor,
                                                   rust::Vec<uint8_t> const& data) const {
     _internal->write(std::string(service), std::string(characteristic), std::string(descriptor),
@@ -292,12 +292,12 @@ void SimpleBLE::RustyPeripheral::write_descriptor(rust::String const& service, r
 
 // Service Bindings
 
-rust::Vec<SimpleBLE::RustyCharacteristicWrapper> SimpleBLE::RustyService::characteristics() const {
-    rust::Vec<SimpleBLE::RustyCharacteristicWrapper> result;
+rust::Vec<Bindings::RustyCharacteristicWrapper> Bindings::RustyService::characteristics() const {
+    rust::Vec<Bindings::RustyCharacteristicWrapper> result;
 
     for (auto& characteristic : _internal->characteristics()) {
-        SimpleBLE::RustyCharacteristicWrapper wrapper;
-        wrapper.internal = std::make_unique<SimpleBLE::RustyCharacteristic>(characteristic);
+        Bindings::RustyCharacteristicWrapper wrapper;
+        wrapper.internal = std::make_unique<Bindings::RustyCharacteristic>(characteristic);
         result.push_back(std::move(wrapper));
     }
 
@@ -306,12 +306,12 @@ rust::Vec<SimpleBLE::RustyCharacteristicWrapper> SimpleBLE::RustyService::charac
 
 // Characteristic Bindings
 
-rust::Vec<SimpleBLE::RustyDescriptorWrapper> SimpleBLE::RustyCharacteristic::descriptors() const {
-    rust::Vec<SimpleBLE::RustyDescriptorWrapper> result;
+rust::Vec<Bindings::RustyDescriptorWrapper> Bindings::RustyCharacteristic::descriptors() const {
+    rust::Vec<Bindings::RustyDescriptorWrapper> result;
 
     for (auto& descriptor : _internal->descriptors()) {
-        SimpleBLE::RustyDescriptorWrapper wrapper;
-        wrapper.internal = std::make_unique<SimpleBLE::RustyDescriptor>(descriptor);
+        Bindings::RustyDescriptorWrapper wrapper;
+        wrapper.internal = std::make_unique<Bindings::RustyDescriptor>(descriptor);
         result.push_back(std::move(wrapper));
     }
 

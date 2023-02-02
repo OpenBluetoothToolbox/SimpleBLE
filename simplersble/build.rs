@@ -45,8 +45,8 @@ fn main() {
     // TODO: Add all files that would trigger a rerun
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=src/lib.rs");
-    println!("cargo:rerun-if-changed=src/bindings/AdapterBindings.hpp");
-    println!("cargo:rerun-if-changed=src/bindings/AdapterBindings.cpp");
+    println!("cargo:rerun-if-changed=src/bindings/Bindings.hpp");
+    println!("cargo:rerun-if-changed=src/bindings/Bindings.cpp");
 
     compile_simpleble();
 
@@ -56,7 +56,7 @@ fn main() {
 
     // Build the bindings
     cxx_build::bridge("simplersble/src/lib.rs")
-        .file("simplersble/src/bindings/AdapterBindings.cpp")
+        .file("simplersble/src/bindings/Bindings.cpp")
         .flag_if_supported("-std=c++17")
         .compile("simpleble_bindings");
 }

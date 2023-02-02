@@ -6,32 +6,32 @@ use std::collections::HashMap;
 #[cxx::bridge]
 mod ffi {
 
-    #[namespace = "SimpleBLE"]
+    #[namespace = "Bindings"]
     struct RustyAdapterWrapper {
         internal: UniquePtr<RustyAdapter>,
     }
 
-    #[namespace = "SimpleBLE"]
+    #[namespace = "Bindings"]
     struct RustyPeripheralWrapper {
         internal: UniquePtr<RustyPeripheral>,
     }
 
-    #[namespace = "SimpleBLE"]
+    #[namespace = "Bindings"]
     struct RustyServiceWrapper {
         internal: UniquePtr<RustyService>,
     }
 
-    #[namespace = "SimpleBLE"]
+    #[namespace = "Bindings"]
     struct RustyCharacteristicWrapper {
         internal: UniquePtr<RustyCharacteristic>,
     }
 
-    #[namespace = "SimpleBLE"]
+    #[namespace = "Bindings"]
     struct RustyDescriptorWrapper {
         internal: UniquePtr<RustyDescriptor>,
     }
 
-    #[namespace = "SimpleBLE"]
+    #[namespace = "Bindings"]
     struct RustyManufacturerDataWrapper {
         company_id: u16,
         data: Vec<u8>,
@@ -62,16 +62,35 @@ mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("src/bindings/AdapterBindings.hpp");
+        include!("src/bindings/Bindings.hpp");
 
         #[namespace = "SimpleBLE"]
         type BluetoothAddressType;
 
-        #[namespace = "SimpleBLE"]
+        #[namespace = "Bindings"]
         type RustyAdapter;
 
+        #[namespace = "Bindings"]
+        type RustyPeripheral;
+
+        #[namespace = "Bindings"]
+        type RustyService;
+
+        #[namespace = "Bindings"]
+        type RustyCharacteristic;
+
+        #[namespace = "Bindings"]
+        type RustyDescriptor;
+
+        // Common functions
+
+        #[namespace = "Bindings"]
         fn RustyAdapter_bluetooth_enabled() -> bool;
+
+        #[namespace = "Bindings"]
         fn RustyAdapter_get_adapters() -> Vec<RustyAdapterWrapper>;
+
+        // RustyAdapter functions
 
         fn link(self: &RustyAdapter, target: Pin<&mut Adapter>);
         fn unlink(self: &RustyAdapter);
@@ -87,8 +106,7 @@ mod ffi {
 
         fn get_paired_peripherals(self: &RustyAdapter) -> Vec<RustyPeripheralWrapper>;
 
-        #[namespace = "SimpleBLE"]
-        type RustyPeripheral;
+        // RustyPeripheral functions
 
         fn link(self: &RustyPeripheral, target: Pin<&mut Peripheral>);
         fn unlink(self: &RustyPeripheral);
@@ -98,7 +116,6 @@ mod ffi {
         fn address_type(self: &RustyPeripheral) -> BluetoothAddressType;
         fn rssi(self: &RustyPeripheral) -> i16;
 
-        // Implement the C++ functions below in Rust
         fn tx_power(self: &RustyPeripheral) -> i16;
         fn mtu(self: &RustyPeripheral) -> u16;
 
@@ -122,14 +139,12 @@ mod ffi {
         fn read_descriptor(self: &RustyPeripheral, service: &String, characteristic: &String, descriptor: &String) -> Vec<u8>;
         fn write_descriptor(self: &RustyPeripheral, service: &String, characteristic: &String, descriptor: &String, data: &Vec<u8>);
 
-        #[namespace = "SimpleBLE"]
-        type RustyService;
+        // RustyService functions
 
         fn uuid(self: &RustyService) -> String;
         fn characteristics(self: &RustyService) -> Vec<RustyCharacteristicWrapper>;
 
-        #[namespace = "SimpleBLE"]
-        type RustyCharacteristic;
+        // RustyCharacteristic functions
 
         fn uuid(self: &RustyCharacteristic) -> String;
         fn descriptors(self: &RustyCharacteristic) -> Vec<RustyDescriptorWrapper>;
@@ -140,8 +155,7 @@ mod ffi {
         fn can_notify(self: &RustyCharacteristic) -> bool;
         fn can_indicate(self: &RustyCharacteristic) -> bool;
 
-        #[namespace = "SimpleBLE"]
-        type RustyDescriptor;
+        // RustyDescriptor functions
 
         fn uuid(self: &RustyDescriptor) -> String;
     }

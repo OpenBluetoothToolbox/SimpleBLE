@@ -42,7 +42,7 @@ jobs:
     steps:
     - name: Clone Repository
       uses: actions/checkout@v3
-    - name: Setup Cmake
+    - name: Install CMake
       uses: jwlawson/actions-setup-cmake@v1.13
       with:
         cmake-version: '3.21'
@@ -72,7 +72,7 @@ jobs:
         sudo -H apt-get install -y libdbus-1-dev
       env:
         DEBIAN_FRONTEND: noninteractive
-    - name: Setup Cmake
+    - name: Install CMake
       uses: jwlawson/actions-setup-cmake@v1.13
       with:
         cmake-version: '3.21'
