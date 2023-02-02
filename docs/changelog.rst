@@ -30,7 +30,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  Updated ``libfmt`` dependency to version 9.1.0.
 -  (MacOS) More explicit exception messages.
 -  (MacOS) 16-bit UUIDs are now presented in their 128-bit form.
--  (Windows) Reinitialize the WinRT backend if a single-threaded apartment is detected. *(Thanks jferdelyi)*
+-  (MacOS) Adapter address now swapped for a random UUID. *(Thanks nothingisdead!)*
+-  (Windows) Reinitialize the WinRT backend if a single-threaded apartment is detected. *(Thanks jferdelyi!)*
 -  (Windows) Callbacks for indications and notifications are now swapped if one already exists.
 
 **Fixed**
