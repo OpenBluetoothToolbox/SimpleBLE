@@ -1,4 +1,5 @@
 #include "Bindings.hpp"
+#include <exception>
 
 #include "simplersble/simplersble/src/lib.rs.h"
 
@@ -198,7 +199,7 @@ rust::Vec<Bindings::RustyManufacturerDataWrapper> Bindings::RustyPeripheral::man
 }
 
 rust::Vec<uint8_t> Bindings::RustyPeripheral::read(rust::String const& service,
-                                                    rust::String const& characteristic) const {
+                                                   rust::String const& characteristic) const {
     std::string read_result = _internal->read(std::string(service), std::string(characteristic));
 
     rust::Vec<uint8_t> result;
@@ -210,7 +211,7 @@ rust::Vec<uint8_t> Bindings::RustyPeripheral::read(rust::String const& service,
 }
 
 void Bindings::RustyPeripheral::write_request(rust::String const& service_rs, rust::String const& characteristic_rs,
-                                               rust::Vec<uint8_t> const& data) const {
+                                              rust::Vec<uint8_t> const& data) const {
     std::string service(service_rs);
     std::string characteristic(characteristic_rs);
     std::string data_vec((char*)data.data(), data.size());
@@ -219,7 +220,7 @@ void Bindings::RustyPeripheral::write_request(rust::String const& service_rs, ru
 }
 
 void Bindings::RustyPeripheral::write_command(rust::String const& service_rs, rust::String const& characteristic_rs,
-                                               rust::Vec<uint8_t> const& data) const {
+                                              rust::Vec<uint8_t> const& data) const {
     std::string service(service_rs);
     std::string characteristic(characteristic_rs);
     std::string data_vec((char*)data.data(), data.size());
@@ -262,7 +263,7 @@ void Bindings::RustyPeripheral::indicate(rust::String const& service_rs, rust::S
 }
 
 void Bindings::RustyPeripheral::unsubscribe(rust::String const& service_rs,
-                                             rust::String const& characteristic_rs) const {
+                                            rust::String const& characteristic_rs) const {
     std::string service(service_rs);
     std::string characteristic(characteristic_rs);
 
@@ -270,8 +271,8 @@ void Bindings::RustyPeripheral::unsubscribe(rust::String const& service_rs,
 }
 
 rust::Vec<uint8_t> Bindings::RustyPeripheral::read_descriptor(rust::String const& service,
-                                                               rust::String const& characteristic,
-                                                               rust::String const& descriptor) const {
+                                                              rust::String const& characteristic,
+                                                              rust::String const& descriptor) const {
     std::string read_result = _internal->read(std::string(service), std::string(characteristic),
                                               std::string(descriptor));
 
@@ -284,8 +285,7 @@ rust::Vec<uint8_t> Bindings::RustyPeripheral::read_descriptor(rust::String const
 }
 
 void Bindings::RustyPeripheral::write_descriptor(rust::String const& service, rust::String const& characteristic,
-                                                  rust::String const& descriptor,
-                                                  rust::Vec<uint8_t> const& data) const {
+                                                 rust::String const& descriptor, rust::Vec<uint8_t> const& data) const {
     _internal->write(std::string(service), std::string(characteristic), std::string(descriptor),
                      std::string((char*)data.data(), data.size()));
 }

@@ -8,7 +8,7 @@
 
 @interface AdapterBaseMacOS : NSObject<CBCentralManagerDelegate>
 
-@property NSString *uuid;
+@property NSString* uuid;
 
 - (bool)isBluetoothEnabled;
 

@@ -1,7 +1,7 @@
+use std::collections::HashMap;
+use std::fmt;
 use std::mem;
 use std::pin::Pin;
-use std::fmt;
-use std::collections::HashMap;
 
 #[cxx::bridge]
 mod ffi {
@@ -58,7 +58,12 @@ mod ffi {
 
         fn on_callback_connected(self: &mut Peripheral);
         fn on_callback_disconnected(self: &mut Peripheral);
-        fn on_callback_characteristic_updated(self: &mut Peripheral, service: &String, Characteristic: &String, data: &Vec<u8>);
+        fn on_callback_characteristic_updated(
+            self: &mut Peripheral,
+            service: &String,
+            Characteristic: &String,
+            data: &Vec<u8>,
+        );
     }
 
     unsafe extern "C++" {
@@ -85,10 +90,10 @@ mod ffi {
         // Common functions
 
         #[namespace = "Bindings"]
-        fn RustyAdapter_bluetooth_enabled() -> bool;
+        fn RustyAdapter_bluetooth_enabled() -> Result<bool>;
 
         #[namespace = "Bindings"]
-        fn RustyAdapter_get_adapters() -> Vec<RustyAdapterWrapper>;
+        fn RustyAdapter_get_adapters() -> Result<Vec<RustyAdapterWrapper>>;
 
         // RustyAdapter functions
 
@@ -130,14 +135,35 @@ mod ffi {
         fn manufacturer_data(self: &RustyPeripheral) -> Vec<RustyManufacturerDataWrapper>;
 
         fn read(self: &RustyPeripheral, service: &String, characteristic: &String) -> Vec<u8>;
-        fn write_request(self: &RustyPeripheral, service: &String, characteristic: &String, data: &Vec<u8>);
-        fn write_command(self: &RustyPeripheral, service: &String, characteristic: &String, data: &Vec<u8>);
+        fn write_request(
+            self: &RustyPeripheral,
+            service: &String,
+            characteristic: &String,
+            data: &Vec<u8>,
+        );
+        fn write_command(
+            self: &RustyPeripheral,
+            service: &String,
+            characteristic: &String,
+            data: &Vec<u8>,
+        );
         fn notify(self: &RustyPeripheral, service: &String, characteristic: &String);
         fn indicate(self: &RustyPeripheral, service: &String, characteristic: &String);
         fn unsubscribe(self: &RustyPeripheral, service: &String, characteristic: &String);
 
-        fn read_descriptor(self: &RustyPeripheral, service: &String, characteristic: &String, descriptor: &String) -> Vec<u8>;
-        fn write_descriptor(self: &RustyPeripheral, service: &String, characteristic: &String, descriptor: &String, data: &Vec<u8>);
+        fn read_descriptor(
+            self: &RustyPeripheral,
+            service: &String,
+            characteristic: &String,
+            descriptor: &String,
+        ) -> Vec<u8>;
+        fn write_descriptor(
+            self: &RustyPeripheral,
+            service: &String,
+            characteristic: &String,
+            descriptor: &String,
+            data: &Vec<u8>,
+        );
 
         // RustyService functions
 
@@ -159,6 +185,11 @@ mod ffi {
 
         fn uuid(self: &RustyDescriptor) -> String;
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct Error {
+    msg: String,
 }
 
 #[derive(Debug)]
@@ -207,27 +238,31 @@ pub struct Descriptor {
 }
 
 impl Adapter {
-    pub fn bluetooth_enabled() -> bool {
-        return ffi::RustyAdapter_bluetooth_enabled();
+    pub fn bluetooth_enabled() -> Result<bool, Error> {
+        ffi::RustyAdapter_bluetooth_enabled().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn get_adapters() -> Vec<Pin<Box<Adapter>>> {
-        let mut adapters = Vec::<Pin<Box<Adapter>>>::new();
+    pub fn get_adapters() -> Result<Vec<Pin<Box<Adapter>>>, Error> {
+        let mut raw_adapter_list = ffi::RustyAdapter_get_adapters().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })?;
 
-        for adapter_wrapper in ffi::RustyAdapter_get_adapters().iter_mut() {
+        let mut adapters = Vec::<Pin<Box<Adapter>>>::new();
+        for adapter_wrapper in raw_adapter_list.iter_mut() {
             adapters.push(Adapter::new(adapter_wrapper));
         }
-
-        return adapters;
+        Ok(adapters)
     }
 
     fn new(wrapper: &mut ffi::RustyAdapterWrapper) -> Pin<Box<Self>> {
         let this = Self {
             internal: cxx::UniquePtr::<ffi::RustyAdapter>::null(),
-            on_scan_start: Box::new(||{}),
-            on_scan_stop: Box::new(||{}),
-            on_scan_found: Box::new(|_|{}),
-            on_scan_updated: Box::new(|_|{}),
+            on_scan_start: Box::new(|| {}),
+            on_scan_stop: Box::new(|| {}),
+            on_scan_found: Box::new(|_| {}),
+            on_scan_updated: Box::new(|_| {}),
         };
 
         // Pin the object to guarantee that its location in memory is
@@ -295,11 +330,17 @@ impl Adapter {
         self.on_scan_stop = cb;
     }
 
-    pub fn set_callback_on_scan_updated(&mut self, cb: Box<dyn Fn(Pin<Box<Peripheral>>) + Send + Sync + 'static>) {
+    pub fn set_callback_on_scan_updated(
+        &mut self,
+        cb: Box<dyn Fn(Pin<Box<Peripheral>>) + Send + Sync + 'static>,
+    ) {
         self.on_scan_updated = cb;
     }
 
-    pub fn set_callback_on_scan_found(&mut self, cb: Box<dyn Fn(Pin<Box<Peripheral>>) + Send + Sync + 'static>) {
+    pub fn set_callback_on_scan_found(
+        &mut self,
+        cb: Box<dyn Fn(Pin<Box<Peripheral>>) + Send + Sync + 'static>,
+    ) {
         self.on_scan_found = cb;
     }
 
@@ -324,8 +365,8 @@ impl Peripheral {
     fn new(wrapper: &mut ffi::RustyPeripheralWrapper) -> Pin<Box<Self>> {
         let this = Self {
             internal: cxx::UniquePtr::<ffi::RustyPeripheral>::null(),
-            on_connected: Box::new(||{}),
-            on_disconnected: Box::new(||{}),
+            on_connected: Box::new(|| {}),
+            on_disconnected: Box::new(|| {}),
             on_characteristic_update_map: HashMap::new(),
         };
 
@@ -405,8 +446,8 @@ impl Peripheral {
         return services;
     }
 
-    pub fn manufacturer_data(&self) -> HashMap<u16, Vec::<u8>> {
-        let mut manufacturer_data = HashMap::<u16, Vec::<u8>>::new();
+    pub fn manufacturer_data(&self) -> HashMap<u16, Vec<u8>> {
+        let mut manufacturer_data = HashMap::<u16, Vec<u8>>::new();
 
         for raw_manuf_data in self.internal.manufacturer_data().iter() {
             manufacturer_data.insert(raw_manuf_data.company_id, raw_manuf_data.data.clone());
@@ -415,19 +456,24 @@ impl Peripheral {
         return manufacturer_data;
     }
 
-    pub fn read(&self, service: &String, characteristic: &String) -> Vec::<u8>{
+    pub fn read(&self, service: &String, characteristic: &String) -> Vec<u8> {
         return self.internal.read(service, characteristic);
     }
 
-    pub fn write_request(&self, service: &String, characteristic: &String, data: &Vec::<u8>) {
+    pub fn write_request(&self, service: &String, characteristic: &String, data: &Vec<u8>) {
         self.internal.write_request(service, characteristic, data);
     }
 
-    pub fn write_command(&self, service: &String, characteristic: &String, data: &Vec::<u8>) {
+    pub fn write_command(&self, service: &String, characteristic: &String, data: &Vec<u8>) {
         self.internal.write_command(service, characteristic, data);
     }
 
-    pub fn notify(&mut self, service: &String, characteristic: &String, cb: Box<dyn Fn(Vec::<u8>) + Send + Sync + 'static>) {
+    pub fn notify(
+        &mut self,
+        service: &String,
+        characteristic: &String,
+        cb: Box<dyn Fn(Vec<u8>) + Send + Sync + 'static>,
+    ) {
         // Make a string joining the service and characteristic, then save it in the map
         let key = format!("{}{}", service, characteristic);
         self.on_characteristic_update_map.insert(key, cb);
@@ -435,7 +481,12 @@ impl Peripheral {
         self.internal.notify(service, characteristic);
     }
 
-    pub fn indicate(&mut self, service: &String, characteristic: &String, cb: Box<dyn Fn(Vec::<u8>) + Send + Sync + 'static>) {
+    pub fn indicate(
+        &mut self,
+        service: &String,
+        characteristic: &String,
+        cb: Box<dyn Fn(Vec<u8>) + Send + Sync + 'static>,
+    ) {
         // Make a string joining the service and characteristic, then save it in the map
         let key = format!("{}{}", service, characteristic);
         self.on_characteristic_update_map.insert(key, cb);
@@ -451,12 +502,26 @@ impl Peripheral {
         self.internal.unsubscribe(service, characteristic);
     }
 
-    pub fn descriptor_read(&self, service: &String, characteristic: &String, descriptor: &String) -> Vec::<u8>{
-        return self.internal.read_descriptor(service, characteristic, descriptor);
+    pub fn descriptor_read(
+        &self,
+        service: &String,
+        characteristic: &String,
+        descriptor: &String,
+    ) -> Vec<u8> {
+        return self
+            .internal
+            .read_descriptor(service, characteristic, descriptor);
     }
 
-    pub fn descriptor_write(&self, service: &String, characteristic: &String, descriptor: &String, data: &Vec::<u8>) {
-        self.internal.write_descriptor(service, characteristic, descriptor, data);
+    pub fn descriptor_write(
+        &self,
+        service: &String,
+        characteristic: &String,
+        descriptor: &String,
+        data: &Vec<u8>,
+    ) {
+        self.internal
+            .write_descriptor(service, characteristic, descriptor, data);
     }
 
     pub fn set_callback_on_connected(&mut self, cb: Box<dyn Fn() + Send + Sync + 'static>) {
@@ -475,7 +540,12 @@ impl Peripheral {
         (self.on_disconnected)();
     }
 
-    fn on_callback_characteristic_updated(&self, service: &String, characteristic: &String, data: &Vec<u8>) {
+    fn on_callback_characteristic_updated(
+        &self,
+        service: &String,
+        characteristic: &String,
+        data: &Vec<u8>,
+    ) {
         // Make a string joining the service and characteristic, then look up the callback and call it.
         let key = format!("{}{}", service, characteristic);
 
@@ -546,7 +616,7 @@ impl Characteristic {
         return descriptors;
     }
 
-    pub fn capabilities(&self) -> Vec::<CharacteristicCapability> {
+    pub fn capabilities(&self) -> Vec<CharacteristicCapability> {
         let mut capabilities = Vec::<CharacteristicCapability>::new();
 
         if self.internal.can_read() {
@@ -591,8 +661,6 @@ impl Characteristic {
     pub fn can_indicate(&self) -> bool {
         return self.internal.can_indicate();
     }
-
-
 }
 
 impl Descriptor {
@@ -636,6 +704,8 @@ unsafe impl Send for Characteristic {}
 
 unsafe impl Send for Descriptor {}
 
+impl std::error::Error for Error {}
+
 impl fmt::Display for BluetoothAddressType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -655,6 +725,12 @@ impl fmt::Display for CharacteristicCapability {
             CharacteristicCapability::Notify => write!(f, "Notify"),
             CharacteristicCapability::Indicate => write!(f, "Indicate"),
         }
+    }
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "SimpleBLE error: {}", self.msg)
     }
 }
 

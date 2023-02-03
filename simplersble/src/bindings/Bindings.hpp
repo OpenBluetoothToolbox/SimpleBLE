@@ -54,7 +54,7 @@ class RustyAdapter : private SimpleBLE::Adapter {
     // allowing the calls to RustyAdapter to always be const.
     // This might require us to store pointers to pointers, so it's
     // important to be careful when handling these.
-    std::unique_ptr<Adapter> _internal;
+    std::unique_ptr<SimpleBLE::Adapter> _internal;
     std::unique_ptr<SimpleRsBLE::Adapter*> _adapter;
 };
 
@@ -134,7 +134,8 @@ class RustyCharacteristic : private SimpleBLE::Characteristic {
     RustyCharacteristic() = default;
     virtual ~RustyCharacteristic() = default;
 
-    RustyCharacteristic(SimpleBLE::Characteristic characteristic) : _internal(new SimpleBLE::Characteristic(characteristic)) {}
+    RustyCharacteristic(SimpleBLE::Characteristic characteristic)
+        : _internal(new SimpleBLE::Characteristic(characteristic)) {}
 
     rust::String uuid() const { return rust::String(_internal->uuid()); }
 
@@ -171,4 +172,4 @@ class RustyDescriptor : private SimpleBLE::Descriptor {
     std::shared_ptr<SimpleBLE::Descriptor> _internal;
 };
 
-};  // namespace SimpleBLE
+};  // namespace Bindings
