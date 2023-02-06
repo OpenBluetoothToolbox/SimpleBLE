@@ -38,6 +38,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 
 -  Incorrect handling of services and characteristics in the Python examples. *(Thanks Carl-CWX!)*
 -  Minor potential race condition in the safe callback.
+-  Compilation-time log levels were not being set correctly. *(Thanks chen3496!)*
 -  (Linux) Peripheral would still issue callbacks after deletion.
 -  (MacOS) Increased priority of the dispatch queue to prevent jitter in the incoming data.
 -  (Windows) Missing peripheral identifier data. *(Thanks eriklins!)*

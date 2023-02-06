@@ -71,7 +71,7 @@ variable to ``TRUE`` ::
    cmake -H <path-to-simpleble> -B build_simpleble -DSIMPLEBLE_PLAIN=TRUE
 
 To modify the log level, set the ``SIMPLEBLE_LOG_LEVEL`` CMake variable to one of the
-following values: ``VERBOSE``, ``DEBUG``, ``INFO``, ``WARNING``, ``ERROR``, ``FATAL`` ::
+following values: ``VERBOSE``, ``DEBUG``, ``INFO``, ``WARN``, ``ERROR``, ``FATAL`` ::
 
    cmake -H <path-to-simpleble> -B build_simpleble -DSIMPLEBLE_LOG_LEVEL=DEBUG
 

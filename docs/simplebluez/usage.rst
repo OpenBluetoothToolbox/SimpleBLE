@@ -16,7 +16,7 @@ CMake is freely available for download from https://www.cmake.org/download/. ::
 
    cd <path-to-simplebluez>
    mkdir build && cd build
-   cmake .. -DSIMPLEBLUEZ_LOG_LEVEL=[VERBOSE|DEBUG|INFO|WARNING|ERROR|FATAL]
+   cmake .. -DSIMPLEBLUEZ_LOG_LEVEL=[VERBOSE|DEBUG|INFO|WARN|ERROR|FATAL]
    cmake --build . -j7
    sudo cmake --install .
 
