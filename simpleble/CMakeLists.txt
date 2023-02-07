@@ -217,6 +217,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     #     ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
     #     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include)
 
+    set_property(TARGET simpleble PROPERTY INSTALL_RPATH $ORIGIN)
     set_property(TARGET simpleble-c PROPERTY INSTALL_RPATH $ORIGIN)
 
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -265,6 +266,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/PeripheralBase.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/PeripheralBaseMacOS.mm)
 
+    set_property(TARGET simpleble PROPERTY INSTALL_RPATH @loader_path)
     set_property(TARGET simpleble-c PROPERTY INSTALL_RPATH @loader_path)
 
 else()
