@@ -48,6 +48,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  (Windows) Disconnecting would prevent the user from connecting again. *(Thanks klaff, felixdollack & lairdrt!)*
 -  (Windows) Uncleared callbacks when unsubscribe is called.
 -  (Windows) Incorrect handling of non-english locale by MSVC. *(Thanks felixdollack!)*
+-  (Windows) Disconnection callback would not be triggered on a manual disconnect. *(Thanks crashtua!)*
 -  (Python) Type returned by ``simplepyble.get_operating_system()`` was not defined.
 
 

@@ -37,6 +37,9 @@ int main() {
     }
 
     auto peripheral = peripherals[selection.value()];
+    peripheral.set_callback_on_connected([]() { std::cout << "Connected callback triggered" << std::endl; });
+    peripheral.set_callback_on_disconnected([]() { std::cout << "Disconnected callback triggered" << std::endl; });
+
     std::cout << "Connecting to " << peripheral.identifier() << " [" << peripheral.address() << "]" << std::endl;
 
     for (size_t i = 0; i < 5; i++) {
@@ -47,7 +50,6 @@ int main() {
 
             peripheral.disconnect();
             std::cout << "Successfully disconnected." << std::endl;
-            std::this_thread::sleep_for(2s);
         } catch (const std::exception& ex) {
             std::cout << "Failed at " << i << " with: " << ex.what() << std::endl;
             throw;

@@ -104,15 +104,16 @@ void PeripheralBase::disconnect() {
     gatt_map_.clear();
     if (device_ != nullptr) {
         device_.Close();
-        device_ = nullptr;
-    }
 
-    std::unique_lock<std::mutex> lock(disconnection_mutex_);
-    if (disconnection_cv_.wait_for(lock, 5s, [=] { return !this->is_connected(); })) {
-        // Disconnection successful
-    } else {
-        SIMPLEBLE_LOG_ERROR("Disconnection failed");
-        throw SimpleBLE::Exception::OperationFailed("Disconnection attempt was not acknowledged.");
+        std::unique_lock<std::mutex> lock(disconnection_mutex_);
+        if (disconnection_cv_.wait_for(lock, 10s, [=] { return !this->is_connected(); })) {
+            // Disconnection successful
+        } else {
+            SIMPLEBLE_LOG_ERROR("Disconnection failed");
+            throw SimpleBLE::Exception::OperationFailed("Disconnection attempt was not acknowledged.");
+        }
+
+        device_ = nullptr;
     }
 }
 
