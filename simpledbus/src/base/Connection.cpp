@@ -56,9 +56,7 @@ void Connection::uninit() {
     _initialized = false;
 }
 
-bool Connection::is_initialized() {
-    return _initialized;
-}
+bool Connection::is_initialized() { return _initialized; }
 
 void Connection::add_match(std::string rule) {
     if (!_initialized) {
