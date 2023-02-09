@@ -50,6 +50,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  (Windows) Incorrect handling of non-english locale by MSVC. *(Thanks felixdollack!)*
 -  (Windows) Disconnection callback would not be triggered on a manual disconnect. *(Thanks crashtua!)*
 -  (Python) Type returned by ``simplepyble.get_operating_system()`` was not defined.
+-  (SimpleBluez) Incorrect attempt to operate on an uninitialized DBus connection. *(Thanks jacobbreen25!)*
 
 
 [0.5.0] - 2022-09-25

@@ -40,6 +40,8 @@ Windows     Linux         MacOS                               iOS
 Windows 10+ Ubuntu 20.04+ 10.15+ (except 12.0, 12.1 and 12.2) 15.0+
 =========== ============= =================================== =====
 
+**NOTE:** WSL does not support Bluetooth.
+
 Projects using SimpleBLE
 ------------------------
 Don't forget to check out the following projects using SimpleBLE:

@@ -12,6 +12,8 @@ System Requirements
 When building SimpleBLE from source, you will need some dependencies based on your
 current operating system.
 
+**NOTE:** WSL does not support Bluetooth.
+
 General Requirements
 --------------------
 
