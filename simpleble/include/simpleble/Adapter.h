@@ -38,7 +38,7 @@ class SIMPLEBLE_EXPORT Adapter {
     void set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found);
 
     std::vector<Peripheral> get_paired_peripherals();
-    
+
     static bool bluetooth_enabled();
 
     /**

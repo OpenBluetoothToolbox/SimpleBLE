@@ -25,7 +25,8 @@ int main() {
     }
 
     for (auto& adapter : *adapter_list) {
-        std::cout << "Adapter: " << adapter.identifier().value() << " [" << adapter.address().value() << "]" << std::endl;
+        std::cout << "Adapter: " << adapter.identifier().value() << " [" << adapter.address().value() << "]"
+                  << std::endl;
     }
 
     return EXIT_SUCCESS;
