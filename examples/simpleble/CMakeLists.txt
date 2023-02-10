@@ -17,6 +17,7 @@ endif()
 
 # C++
 add_subdirectory(cpp/list_adapters)
+add_subdirectory(cpp/list_adapters_safe)
 add_subdirectory(cpp/scan)
 add_subdirectory(cpp/connect)
 add_subdirectory(cpp/connect_safe)
