@@ -106,6 +106,10 @@ constexpr auto kDocsPeripheralSetCallbackOnDisconnected = R"pbdoc(
     Set callback on disconnected
 )pbdoc";
 
+constexpr auto kDocsPeripheralMtu = R"pbdoc(
+    Get the negotiated mtu
+)pbdoc";
+
 void wrap_peripheral(py::module& m) {
     // TODO: Add __str__ and __repr__ methods
     py::class_<SimpleBLE::Peripheral>(m, "Peripheral", kDocsPeripheral)
@@ -182,4 +186,6 @@ void wrap_peripheral(py::module& m) {
              kDocsPeripheralSetCallbackOnConnected)
         .def("set_callback_on_disconnected", &SimpleBLE::Peripheral::set_callback_on_disconnected,
              py::keep_alive<1, 2>(), kDocsPeripheralSetCallbackOnDisconnected);
+
+        .def("mtu", &SimpleBLE::Peripheral::mtu, kDocsPeripheralMtu)
 }
