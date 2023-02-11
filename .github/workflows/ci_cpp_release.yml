@@ -1,0 +1,149 @@
+name: Cpp Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "The tag to upload artifacts"
+        required: true
+
+jobs:
+
+  # ------------------------------------------------------------
+
+  cpp-release-linux:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        options: [
+          {container: dockcross/linux-x64, target: linux-x64},
+          {container: dockcross/linux-x86, target: linux-x86},
+          {container: dockcross/linux-armv6-lts, target: linux-armv6},
+        ]
+    container:
+      image: ${{ matrix.options.container }}
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+        env:
+          TAG: ${{ inputs.tag || github.ref }}
+        with:
+          ref: ${{ env.TAG }}
+
+      - name: Install dependencies
+        run: |
+          sudo -H apt-get update -y
+          sudo -H apt-get install -y libdbus-1-dev
+        env:
+          DEBIAN_FRONTEND: noninteractive
+
+      - name: Build SimpleBLE
+        run: |
+          GITHUB_WORKSPACE=$(pwd)
+
+          cmake -B $GITHUB_WORKSPACE/build_simpleble -DCMAKE_BUILD_TYPE=RelWithDebInfo -S $GITHUB_WORKSPACE/simpleble
+          cmake --build $GITHUB_WORKSPACE/build_simpleble --config RelWithDebInfo --parallel 4
+          cmake --install $GITHUB_WORKSPACE/build_simpleble --prefix $GITHUB_WORKSPACE/build_simpleble/install
+
+          mkdir -p $GITHUB_WORKSPACE/artifacts
+          zip -r $GITHUB_WORKSPACE/artifacts/simpleble_${{ matrix.options.target }}.zip $GITHUB_WORKSPACE/build_simpleble/install
+
+      - name: Upload binaries
+        uses: svenstaro/upload-release-action@v2
+        env:
+          TAG: ${{ inputs.tag || github.ref }}
+        with:
+          file: ${{ github.workspace }}/artifacts/**/*
+          tag: ${{ env.TAG }}
+          overwrite: true
+          file_glob: true
+
+  # ------------------------------------------------------------
+
+  cpp-release-windows:
+    runs-on: windows-2022
+
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        arch: [Win32, x64]
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+        env:
+          TAG: ${{ inputs.tag || github.ref }}
+        with:
+          ref: ${{ env.TAG }}
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Compile SimpleBLE
+        shell: cmd
+        run: |
+          cmake -B %GITHUB_WORKSPACE%\build -G "Visual Studio 17 2022" -A ${{ matrix.arch }} -DCMAKE_SYSTEM_VERSION="10.0.19041.0" -DCMAKE_BUILD_TYPE=RelWithDebInfo -S %GITHUB_WORKSPACE%/simpleble
+          cmake --build %GITHUB_WORKSPACE%\build --config RelWithDebInfo --parallel 4
+          cmake --install %GITHUB_WORKSPACE%\build --prefix %GITHUB_WORKSPACE%\build\install
+
+          mkdir -p $GITHUB_WORKSPACE\artifacts
+          7z a -tzip %GITHUB_WORKSPACE%\artifacts\simpleble_windows-${{ matrix.arch }}.zip %GITHUB_WORKSPACE%\build\install
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        env:
+          TAG: ${{ inputs.tag || github.ref }}
+        with:
+          file: ${{ github.workspace }}/artifacts/**/*
+          tag: ${{ env.TAG }}
+          overwrite: true
+          file_glob: true
+
+  # ------------------------------------------------------------
+
+  cpp-release-macos:
+    runs-on: macos-12
+
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        arch: [arm64, x86_64]
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+        env:
+          TAG: ${{ inputs.tag || github.ref }}
+        with:
+          ref: ${{ env.TAG }}
+
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v1.13
+        with:
+          cmake-version: '3.21'
+
+      - name: Compile SimpleBLE
+        run: |
+          cmake -B $GITHUB_WORKSPACE/build -DCMAKE_OSX_ARCHITECTURES="${{ matrix.arch }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo -S $GITHUB_WORKSPACE/simpleble
+          cmake --build $GITHUB_WORKSPACE/build --config RelWithDebInfo --parallel 4
+          cmake --install $GITHUB_WORKSPACE/build --prefix $GITHUB_WORKSPACE/build/install
+
+          mkdir -p $GITHUB_WORKSPACE/artifacts
+          zip -r $GITHUB_WORKSPACE/artifacts/simpleble_macos-${{ matrix.arch }}.zip $GITHUB_WORKSPACE/build/install
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        env:
+          TAG: ${{ inputs.tag || github.ref }}
+        with:
+          file: ${{ github.workspace }}/artifacts/**/*
+          tag: ${{ env.TAG }}
+          overwrite: true
+          file_glob: true
