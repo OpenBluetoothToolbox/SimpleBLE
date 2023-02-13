@@ -25,6 +25,8 @@ jobs:
           {container: dockcross/linux-x86, target: linux-x86},
           {container: dockcross/linux-armv6-lts, target: linux-armv6},
         ]
+        type: [shared, static]
+
     container:
       image: ${{ matrix.options.container }}
     steps:
@@ -46,18 +48,24 @@ jobs:
         run: |
           GITHUB_WORKSPACE=$(pwd)
 
-          cmake -B $GITHUB_WORKSPACE/build_simpleble -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
+          if [ "${{ matrix.type }}" = "shared" ]; then
+            BUILD_SHARED_LIBS=ON
+          else
+            BUILD_SHARED_LIBS=OFF
+          fi
+
+          cmake -B $GITHUB_WORKSPACE/build_simpleble -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble -DBUILD_SHARED_LIBS=$BUILS_SHARED_LIBS
           cmake --build $GITHUB_WORKSPACE/build_simpleble --config Release --parallel 4
           cmake --install $GITHUB_WORKSPACE/build_simpleble --prefix $GITHUB_WORKSPACE/build_simpleble/install
 
           mkdir -p $GITHUB_WORKSPACE/artifacts
-          zip -r $GITHUB_WORKSPACE/artifacts/simpleble_${{ matrix.options.target }}.zip $GITHUB_WORKSPACE/build_simpleble/install
+          zip -r $GITHUB_WORKSPACE/artifacts/simpleble_${{ matrix.type }}_${{ matrix.options.target }}.zip $GITHUB_WORKSPACE/build_simpleble/install
 
       - name: Upload binaries to job
         uses: actions/upload-artifact@v3
         with:
-          name: simpleble_${{ matrix.options.target }}
-          path: artifacts/simpleble_${{ matrix.options.target }}.zip
+          name: simpleble_${{ matrix.type }}_${{ matrix.options.target }}
+          path: artifacts/simpleble_${{ matrix.type }}_${{ matrix.options.target }}.zip
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
@@ -79,6 +87,7 @@ jobs:
       max-parallel: 4
       matrix:
         arch: [Win32, x64]
+        type: [shared, static]
 
     steps:
       - name: Clone repository
@@ -94,18 +103,25 @@ jobs:
       - name: Compile SimpleBLE
         shell: cmd
         run: |
-          cmake -B %GITHUB_WORKSPACE%\build -G "Visual Studio 17 2022" -A ${{ matrix.arch }} -DCMAKE_SYSTEM_VERSION="10.0.19041.0" -DCMAKE_BUILD_TYPE=Release -S %GITHUB_WORKSPACE%/simpleble
+
+          if "${{ matrix.type }}" == "shared" (
+            set BUILD_SHARED_LIBS=ON
+          ) else (
+            set BUILD_SHARED_LIBS=OFF
+          )
+
+          cmake -B %GITHUB_WORKSPACE%\build -G "Visual Studio 17 2022" -A ${{ matrix.arch }} -DCMAKE_SYSTEM_VERSION="10.0.19041.0" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=%BUILS_SHARED_LIBS% -S %GITHUB_WORKSPACE%/simpleble
           cmake --build %GITHUB_WORKSPACE%\build --config Release --parallel 4
           cmake --install %GITHUB_WORKSPACE%\build --prefix %GITHUB_WORKSPACE%\build\install
 
           mkdir -p $GITHUB_WORKSPACE\artifacts
-          7z a -tzip %GITHUB_WORKSPACE%\artifacts\simpleble_windows-${{ matrix.arch }}.zip %GITHUB_WORKSPACE%\build\install
+          7z a -tzip %GITHUB_WORKSPACE%\artifacts\simpleble_${{ matrix.type }}_windows-${{ matrix.arch }}.zip %GITHUB_WORKSPACE%\build\install
 
       - name: Upload binaries to job
         uses: actions/upload-artifact@v3
         with:
-          name: simpleble_windows-${{ matrix.arch }}
-          path: artifacts/simpleble_windows-${{ matrix.arch }}.zip
+          name: simpleble_${{ matrix.type }}_windows-${{ matrix.arch }}
+          path: artifacts/simpleble_${{ matrix.type }}_windows-${{ matrix.arch }}.zip
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
@@ -127,6 +143,7 @@ jobs:
       max-parallel: 4
       matrix:
         arch: [arm64, x86_64]
+        type: [shared, static]
 
     steps:
       - name: Clone repository
@@ -143,18 +160,25 @@ jobs:
 
       - name: Compile SimpleBLE
         run: |
-          cmake -B $GITHUB_WORKSPACE/build -DCMAKE_OSX_ARCHITECTURES="${{ matrix.arch }}" -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble
+
+          if [ "${{ matrix.type }}" = "shared" ]; then
+            BUILD_SHARED_LIBS=ON
+          else
+            BUILD_SHARED_LIBS=OFF
+          fi
+
+          cmake -B $GITHUB_WORKSPACE/build -DCMAKE_OSX_ARCHITECTURES="${{ matrix.arch }}" -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble -DBUILD_SHARED_LIBS=$BUILS_SHARED_LIBS
           cmake --build $GITHUB_WORKSPACE/build --config Release --parallel 4
           cmake --install $GITHUB_WORKSPACE/build --prefix $GITHUB_WORKSPACE/build/install
 
           mkdir -p $GITHUB_WORKSPACE/artifacts
-          zip -r $GITHUB_WORKSPACE/artifacts/simpleble_macos-${{ matrix.arch }}.zip $GITHUB_WORKSPACE/build/install
+          zip -r $GITHUB_WORKSPACE/artifacts/simpleble_${{ matrix.type }}_macos-${{ matrix.arch }}.zip $GITHUB_WORKSPACE/build/install
 
       - name: Upload binaries to job
         uses: actions/upload-artifact@v3
         with:
-          name: simpleble_macos-${{ matrix.arch }}
-          path: artifacts/simpleble_macos-${{ matrix.arch }}.zip
+          name: simpleble_${{ matrix.type }}_macos-${{ matrix.arch }}
+          path: artifacts/simpleble_${{ matrix.type }}_macos-${{ matrix.arch }}.zip
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
