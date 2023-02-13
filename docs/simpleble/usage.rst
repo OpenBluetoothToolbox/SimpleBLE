@@ -77,6 +77,9 @@ following values: ``VERBOSE``, ``DEBUG``, ``INFO``, ``WARN``, ``ERROR``, ``FATAL
 
    cmake -H <path-to-simpleble> -B build_simpleble -DSIMPLEBLE_LOG_LEVEL=DEBUG
 
+**(Linux only)** To force the usage of the DBus session bus, enable the ``SIMPLEBLE_USE_SESSION_DBUS`` flag ::
+
+   cmake -H <path-to-simplebluez> -B build_simplebluez -DSIMPLEBLE_USE_SESSION_DBUS=TRUE
 
 Installing SimpleBLE
 --------------------
