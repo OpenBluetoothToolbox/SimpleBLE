@@ -7,9 +7,9 @@
 using namespace SimpleBluez;
 
 #ifdef SIMPLEBLUEZ_USE_SESSION_DBUS
-#define DBUS_BUS DBUS_BUS_SESSION;
+#define DBUS_BUS DBUS_BUS_SESSION
 #else
-#define DBUS_BUS DBUS_BUS_SYSTEM;
+#define DBUS_BUS DBUS_BUS_SYSTEM
 #endif
 
 Bluez::Bluez() : Proxy(std::make_shared<SimpleDBus::Connection>(DBUS_BUS), "org.bluez", "/") {
