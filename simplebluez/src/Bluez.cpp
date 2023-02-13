@@ -6,7 +6,7 @@
 
 using namespace SimpleBluez;
 
-#ifdef USE_SESSION_DBUS
+#ifdef SIMPLEBLUEZ_USE_SESSION_DBUS
 #define DBUS_BUS DBUS_BUS_SESSION;
 #else
 #define DBUS_BUS DBUS_BUS_SYSTEM;
