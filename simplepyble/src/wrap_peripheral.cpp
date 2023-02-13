@@ -34,6 +34,10 @@ constexpr auto kDocsPeripheralTxPower = R"pbdoc(
     Transit Power of the peripheral in dBm
 )pbdoc";
 
+constexpr auto kDocsPeripheralMtu = R"pbdoc(
+    Get the negotiated MTU value
+)pbdoc";
+
 constexpr auto kDocsPeripheralConnect = R"pbdoc(
     Connect to the peripheral
 )pbdoc";
@@ -106,10 +110,6 @@ constexpr auto kDocsPeripheralSetCallbackOnDisconnected = R"pbdoc(
     Set callback on disconnected
 )pbdoc";
 
-constexpr auto kDocsPeripheralMtu = R"pbdoc(
-    Get the negotiated mtu
-)pbdoc";
-
 void wrap_peripheral(py::module& m) {
     // TODO: Add __str__ and __repr__ methods
     py::class_<SimpleBLE::Peripheral>(m, "Peripheral", kDocsPeripheral)
@@ -119,6 +119,7 @@ void wrap_peripheral(py::module& m) {
         .def("address_type", &SimpleBLE::Peripheral::address_type, kDocsPeripheralAddressType)
         .def("rssi", &SimpleBLE::Peripheral::rssi, kDocsPeripheralRSSI)
         .def("tx_power", &SimpleBLE::Peripheral::tx_power, kDocsPeripheralTxPower)
+        .def("mtu", &SimpleBLE::Peripheral::mtu, kDocsPeripheralMtu)
         .def("connect", &SimpleBLE::Peripheral::connect, py::call_guard<py::gil_scoped_release>(),
              kDocsPeripheralConnect)
         .def("disconnect", &SimpleBLE::Peripheral::disconnect, kDocsPeripheralDisconnect)
@@ -186,6 +187,4 @@ void wrap_peripheral(py::module& m) {
              kDocsPeripheralSetCallbackOnConnected)
         .def("set_callback_on_disconnected", &SimpleBLE::Peripheral::set_callback_on_disconnected,
              py::keep_alive<1, 2>(), kDocsPeripheralSetCallbackOnDisconnected);
-
-        .def("mtu", &SimpleBLE::Peripheral::mtu, kDocsPeripheralMtu)
 }
