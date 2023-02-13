@@ -52,10 +52,10 @@ jobs:
         run: twine check wheelhouse/*.whl
 
       - name: Publish packages
-        if: github.repository == 'OpenBluetoothToolbox/SimpleBLE'
+        if: ${{ env.HAS_TWINE_USERNAME == 'true' }}
         run: |
-          echo "Repository is: ${{ github.repository_owner }}""
           twine upload --repository testpypi --skip-existing wheelhouse/*.whl --verbose
         env:
+          HAS_TWINE_USERNAME: ${{ secrets.TEST_PYPI_USER != '' }}
           TWINE_USERNAME: ${{ secrets.TEST_PYPI_USER }}
           TWINE_PASSWORD: ${{ secrets.TEST_PYPI_PASSWORD }}
