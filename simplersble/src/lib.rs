@@ -97,73 +97,85 @@ mod ffi {
 
         // RustyAdapter functions
 
-        fn link(self: &RustyAdapter, target: Pin<&mut Adapter>);
-        fn unlink(self: &RustyAdapter);
+        fn link(self: &RustyAdapter, target: Pin<&mut Adapter>) -> Result<()>;
+        fn unlink(self: &RustyAdapter) -> Result<()>;
 
-        fn identifier(self: &RustyAdapter) -> String;
-        fn address(self: &RustyAdapter) -> String;
+        fn identifier(self: &RustyAdapter) -> Result<String>;
+        fn address(self: &RustyAdapter) -> Result<String>;
 
-        fn scan_start(self: &RustyAdapter);
-        fn scan_stop(self: &RustyAdapter);
-        fn scan_for(self: &RustyAdapter, timeout_ms: i32);
-        fn scan_is_active(self: &RustyAdapter) -> bool;
-        fn scan_get_results(self: &RustyAdapter) -> Vec<RustyPeripheralWrapper>;
+        fn scan_start(self: &RustyAdapter) -> Result<()>;
+        fn scan_stop(self: &RustyAdapter) -> Result<()>;
+        fn scan_for(self: &RustyAdapter, timeout_ms: i32) -> Result<()>;
+        fn scan_is_active(self: &RustyAdapter) -> Result<bool>;
+        fn scan_get_results(self: &RustyAdapter) -> Result<Vec<RustyPeripheralWrapper>>;
 
-        fn get_paired_peripherals(self: &RustyAdapter) -> Vec<RustyPeripheralWrapper>;
+        fn get_paired_peripherals(self: &RustyAdapter) -> Result<Vec<RustyPeripheralWrapper>>;
 
         // RustyPeripheral functions
 
-        fn link(self: &RustyPeripheral, target: Pin<&mut Peripheral>);
-        fn unlink(self: &RustyPeripheral);
+        fn link(self: &RustyPeripheral, target: Pin<&mut Peripheral>) -> Result<()>;
+        fn unlink(self: &RustyPeripheral) -> Result<()>;
 
-        fn identifier(self: &RustyPeripheral) -> String;
-        fn address(self: &RustyPeripheral) -> String;
-        fn address_type(self: &RustyPeripheral) -> BluetoothAddressType;
-        fn rssi(self: &RustyPeripheral) -> i16;
+        fn identifier(self: &RustyPeripheral) -> Result<String>;
+        fn address(self: &RustyPeripheral) -> Result<String>;
+        fn address_type(self: &RustyPeripheral) -> Result<BluetoothAddressType>;
+        fn rssi(self: &RustyPeripheral) -> Result<i16>;
 
-        fn tx_power(self: &RustyPeripheral) -> i16;
-        fn mtu(self: &RustyPeripheral) -> u16;
+        fn tx_power(self: &RustyPeripheral) -> Result<i16>;
+        fn mtu(self: &RustyPeripheral) -> Result<u16>;
 
-        fn connect(self: &RustyPeripheral);
-        fn disconnect(self: &RustyPeripheral);
-        fn is_connected(self: &RustyPeripheral) -> bool;
-        fn is_connectable(self: &RustyPeripheral) -> bool;
-        fn is_paired(self: &RustyPeripheral) -> bool;
-        fn unpair(self: &RustyPeripheral);
+        fn connect(self: &RustyPeripheral) -> Result<()>;
+        fn disconnect(self: &RustyPeripheral) -> Result<()>;
+        fn is_connected(self: &RustyPeripheral) -> Result<bool>;
+        fn is_connectable(self: &RustyPeripheral) -> Result<bool>;
+        fn is_paired(self: &RustyPeripheral) -> Result<bool>;
+        fn unpair(self: &RustyPeripheral) -> Result<()>;
 
-        fn services(self: &RustyPeripheral) -> Vec<RustyServiceWrapper>;
-        fn manufacturer_data(self: &RustyPeripheral) -> Vec<RustyManufacturerDataWrapper>;
+        fn services(self: &RustyPeripheral) -> Result<Vec<RustyServiceWrapper>>;
+        fn manufacturer_data(self: &RustyPeripheral) -> Result<Vec<RustyManufacturerDataWrapper>>;
 
-        fn read(self: &RustyPeripheral, service: &String, characteristic: &String) -> Vec<u8>;
+        fn read(
+            self: &RustyPeripheral,
+            service: &String,
+            characteristic: &String,
+        ) -> Result<Vec<u8>>;
         fn write_request(
             self: &RustyPeripheral,
             service: &String,
             characteristic: &String,
             data: &Vec<u8>,
-        );
+        ) -> Result<()>;
         fn write_command(
             self: &RustyPeripheral,
             service: &String,
             characteristic: &String,
             data: &Vec<u8>,
-        );
-        fn notify(self: &RustyPeripheral, service: &String, characteristic: &String);
-        fn indicate(self: &RustyPeripheral, service: &String, characteristic: &String);
-        fn unsubscribe(self: &RustyPeripheral, service: &String, characteristic: &String);
+        ) -> Result<()>;
+        fn notify(self: &RustyPeripheral, service: &String, characteristic: &String) -> Result<()>;
+        fn indicate(
+            self: &RustyPeripheral,
+            service: &String,
+            characteristic: &String,
+        ) -> Result<()>;
+        fn unsubscribe(
+            self: &RustyPeripheral,
+            service: &String,
+            characteristic: &String,
+        ) -> Result<()>;
 
         fn read_descriptor(
             self: &RustyPeripheral,
             service: &String,
             characteristic: &String,
             descriptor: &String,
-        ) -> Vec<u8>;
+        ) -> Result<Vec<u8>>;
         fn write_descriptor(
             self: &RustyPeripheral,
             service: &String,
             characteristic: &String,
             descriptor: &String,
             data: &Vec<u8>,
-        );
+        ) -> Result<()>;
 
         // RustyService functions
 
@@ -270,7 +282,7 @@ impl Adapter {
         let mut this_boxed = Box::pin(this);
 
         // Link `this` to the RustyAdapter
-        wrapper.internal.link(this_boxed.as_mut());
+        wrapper.internal.link(this_boxed.as_mut()).unwrap();
 
         // Copy the RustyAdapter pointer into `this`
         mem::swap(&mut this_boxed.internal, &mut wrapper.internal);
@@ -278,48 +290,67 @@ impl Adapter {
         return this_boxed;
     }
 
-    pub fn identifier(&self) -> String {
-        return self.internal.identifier();
+    pub fn identifier(&self) -> Result<String, Error> {
+        self.internal.identifier().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn address(&self) -> String {
-        return self.internal.address();
+    pub fn address(&self) -> Result<String, Error> {
+        self.internal.address().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn scan_start(&self) {
-        self.internal.scan_start();
+    pub fn scan_start(&self) -> Result<(), Error> {
+        self.internal.scan_start().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn scan_stop(&self) {
-        self.internal.scan_stop();
+    pub fn scan_stop(&self) -> Result<(), Error> {
+        self.internal.scan_stop().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn scan_for(&self, timeout_ms: i32) {
-        self.internal.scan_for(timeout_ms);
+    pub fn scan_for(&self, timeout_ms: i32) -> Result<(), Error> {
+        self.internal.scan_for(timeout_ms).map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn scan_is_active(&self) -> bool {
-        self.internal.scan_is_active()
+    pub fn scan_is_active(&self) -> Result<bool, Error> {
+        self.internal.scan_is_active().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn scan_get_results(&self) -> Vec<Pin<Box<Peripheral>>> {
+    pub fn scan_get_results(&self) -> Result<Vec<Pin<Box<Peripheral>>>, Error> {
+        let mut raw_peripheral_list = self.internal.scan_get_results().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })?;
+
         let mut peripherals = Vec::<Pin<Box<Peripheral>>>::new();
-
-        for peripheral_wrapper in self.internal.scan_get_results().iter_mut() {
+        for peripheral_wrapper in raw_peripheral_list.iter_mut() {
             peripherals.push(Peripheral::new(peripheral_wrapper));
         }
 
-        return peripherals;
+        return Ok(peripherals);
     }
 
-    pub fn get_paired_peripherals(&self) -> Vec<Pin<Box<Peripheral>>> {
-        let mut peripherals = Vec::<Pin<Box<Peripheral>>>::new();
+    pub fn get_paired_peripherals(&self) -> Result<Vec<Pin<Box<Peripheral>>>, Error> {
+        let mut raw_peripheral_list =
+            self.internal.get_paired_peripherals().map_err(|e| Error {
+                msg: e.what().to_string(),
+            })?;
 
-        for peripheral_wrapper in self.internal.get_paired_peripherals().iter_mut() {
+        let mut peripherals = Vec::<Pin<Box<Peripheral>>>::new();
+        for peripheral_wrapper in raw_peripheral_list.iter_mut() {
             peripherals.push(Peripheral::new(peripheral_wrapper));
         }
 
-        return peripherals;
+        return Ok(peripherals);
     }
 
     pub fn set_callback_on_scan_start(&mut self, cb: Box<dyn Fn() + Send + Sync + 'static>) {
@@ -375,7 +406,7 @@ impl Peripheral {
         let mut this_boxed = Box::pin(this);
 
         // Link `this` to the RustyPeripheral
-        wrapper.internal.link(this_boxed.as_mut());
+        wrapper.internal.link(this_boxed.as_mut()).unwrap();
 
         // Copy the RustyPeripheral pointer into `this`
         mem::swap(&mut this_boxed.internal, &mut wrapper.internal);
@@ -383,89 +414,143 @@ impl Peripheral {
         return this_boxed;
     }
 
-    pub fn identifier(&self) -> String {
-        return self.internal.identifier();
+    pub fn identifier(&self) -> Result<String, Error> {
+        self.internal.identifier().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn address(&self) -> String {
-        return self.internal.address();
+    pub fn address(&self) -> Result<String, Error> {
+        self.internal.address().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn address_type(&self) -> BluetoothAddressType {
-        return match self.internal.address_type() {
-            ffi::BluetoothAddressType::PUBLIC => BluetoothAddressType::Public,
-            ffi::BluetoothAddressType::RANDOM => BluetoothAddressType::Random,
-            ffi::BluetoothAddressType::UNSPECIFIED => BluetoothAddressType::Unspecified,
-            _ => BluetoothAddressType::Unspecified,
+    pub fn address_type(&self) -> Result<BluetoothAddressType, Error> {
+        let address_type = self.internal.address_type().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })?;
+
+        return match address_type {
+            ffi::BluetoothAddressType::PUBLIC => Ok(BluetoothAddressType::Public),
+            ffi::BluetoothAddressType::RANDOM => Ok(BluetoothAddressType::Random),
+            ffi::BluetoothAddressType::UNSPECIFIED => Ok(BluetoothAddressType::Unspecified),
+            _ => Ok(BluetoothAddressType::Unspecified),
         };
     }
 
-    pub fn rssi(&self) -> i16 {
-        return self.internal.rssi();
+    pub fn rssi(&self) -> Result<i16, Error> {
+        self.internal.rssi().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn tx_power(&self) -> i16 {
-        return self.internal.tx_power();
+    pub fn tx_power(&self) -> Result<i16, Error> {
+        self.internal.tx_power().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn mtu(&self) -> u16 {
-        return self.internal.mtu();
+    pub fn mtu(&self) -> Result<u16, Error> {
+        self.internal.mtu().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn connect(&self) {
-        self.internal.connect();
+    pub fn connect(&self) -> Result<(), Error> {
+        self.internal.connect().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn disconnect(&self) {
-        self.internal.disconnect();
+    pub fn disconnect(&self) -> Result<(), Error> {
+        self.internal.disconnect().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn is_connected(&self) -> bool {
-        return self.internal.is_connected();
+    pub fn is_connected(&self) -> Result<bool, Error> {
+        self.internal.is_connected().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn is_connectable(&self) -> bool {
-        return self.internal.is_connectable();
+    pub fn is_connectable(&self) -> Result<bool, Error> {
+        self.internal.is_connectable().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn is_paired(&self) -> bool {
-        return self.internal.is_paired();
+    pub fn is_paired(&self) -> Result<bool, Error> {
+        self.internal.is_paired().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn unpair(&self) {
-        self.internal.unpair();
+    pub fn unpair(&self) -> Result<(), Error> {
+        self.internal.unpair().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
     }
 
-    pub fn services(&self) -> Vec<Pin<Box<Service>>> {
+    pub fn services(&self) -> Result<Vec<Pin<Box<Service>>>, Error> {
+        let mut raw_services = self.internal.services().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })?;
+
         let mut services = Vec::<Pin<Box<Service>>>::new();
-
-        for service_wrapper in self.internal.services().iter_mut() {
+        for service_wrapper in raw_services.iter_mut() {
             services.push(Service::new(service_wrapper));
         }
 
-        return services;
+        Ok(services)
     }
 
-    pub fn manufacturer_data(&self) -> HashMap<u16, Vec<u8>> {
-        let mut manufacturer_data = HashMap::<u16, Vec<u8>>::new();
+    pub fn manufacturer_data(&self) -> Result<HashMap<u16, Vec<u8>>, Error> {
+        let raw_manufacturer_data = self.internal.manufacturer_data().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })?;
 
-        for raw_manuf_data in self.internal.manufacturer_data().iter() {
+        let mut manufacturer_data = HashMap::<u16, Vec<u8>>::new();
+        for raw_manuf_data in raw_manufacturer_data.iter() {
             manufacturer_data.insert(raw_manuf_data.company_id, raw_manuf_data.data.clone());
         }
 
-        return manufacturer_data;
+        Ok(manufacturer_data)
     }
 
-    pub fn read(&self, service: &String, characteristic: &String) -> Vec<u8> {
-        return self.internal.read(service, characteristic);
+    pub fn read(&self, service: &String, characteristic: &String) -> Result<Vec<u8>, Error> {
+        self.internal
+            .read(service, characteristic)
+            .map_err(|e| Error {
+                msg: e.what().to_string(),
+            })
     }
 
-    pub fn write_request(&self, service: &String, characteristic: &String, data: &Vec<u8>) {
-        self.internal.write_request(service, characteristic, data);
+    pub fn write_request(
+        &self,
+        service: &String,
+        characteristic: &String,
+        data: &Vec<u8>,
+    ) -> Result<(), Error> {
+        self.internal
+            .write_request(service, characteristic, data)
+            .map_err(|e| Error {
+                msg: e.what().to_string(),
+            })
     }
 
-    pub fn write_command(&self, service: &String, characteristic: &String, data: &Vec<u8>) {
-        self.internal.write_command(service, characteristic, data);
+    pub fn write_command(
+        &self,
+        service: &String,
+        characteristic: &String,
+        data: &Vec<u8>,
+    ) -> Result<(), Error> {
+        self.internal
+            .write_command(service, characteristic, data)
+            .map_err(|e| Error {
+                msg: e.what().to_string(),
+            })
     }
 
     pub fn notify(
@@ -473,12 +558,16 @@ impl Peripheral {
         service: &String,
         characteristic: &String,
         cb: Box<dyn Fn(Vec<u8>) + Send + Sync + 'static>,
-    ) {
+    ) -> Result<(), Error> {
         // Make a string joining the service and characteristic, then save it in the map
         let key = format!("{}{}", service, characteristic);
         self.on_characteristic_update_map.insert(key, cb);
 
-        self.internal.notify(service, characteristic);
+        self.internal
+            .notify(service, characteristic)
+            .map_err(|e| Error {
+                msg: e.what().to_string(),
+            })
     }
 
     pub fn indicate(
@@ -486,20 +575,28 @@ impl Peripheral {
         service: &String,
         characteristic: &String,
         cb: Box<dyn Fn(Vec<u8>) + Send + Sync + 'static>,
-    ) {
+    ) -> Result<(), Error> {
         // Make a string joining the service and characteristic, then save it in the map
         let key = format!("{}{}", service, characteristic);
         self.on_characteristic_update_map.insert(key, cb);
 
-        self.internal.indicate(service, characteristic);
+        self.internal
+            .indicate(service, characteristic)
+            .map_err(|e| Error {
+                msg: e.what().to_string(),
+            })
     }
 
-    pub fn unsubscribe(&mut self, service: &String, characteristic: &String) {
+    pub fn unsubscribe(&mut self, service: &String, characteristic: &String) -> Result<(), Error> {
         // Make a string joining the service and characteristic, then remove it from the map
         let key = format!("{}{}", service, characteristic);
         self.on_characteristic_update_map.remove(&key);
 
-        self.internal.unsubscribe(service, characteristic);
+        self.internal
+            .unsubscribe(service, characteristic)
+            .map_err(|e| Error {
+                msg: e.what().to_string(),
+            })
     }
 
     pub fn descriptor_read(
@@ -507,10 +604,12 @@ impl Peripheral {
         service: &String,
         characteristic: &String,
         descriptor: &String,
-    ) -> Vec<u8> {
-        return self
-            .internal
-            .read_descriptor(service, characteristic, descriptor);
+    ) -> Result<Vec<u8>, Error> {
+        self.internal
+            .read_descriptor(service, characteristic, descriptor)
+            .map_err(|e| Error {
+                msg: e.what().to_string(),
+            })
     }
 
     pub fn descriptor_write(
@@ -519,9 +618,12 @@ impl Peripheral {
         characteristic: &String,
         descriptor: &String,
         data: &Vec<u8>,
-    ) {
+    ) -> Result<(), Error> {
         self.internal
-            .write_descriptor(service, characteristic, descriptor, data);
+            .write_descriptor(service, characteristic, descriptor, data)
+            .map_err(|e| Error {
+                msg: e.what().to_string(),
+            })
     }
 
     pub fn set_callback_on_connected(&mut self, cb: Box<dyn Fn() + Send + Sync + 'static>) {
@@ -736,12 +838,12 @@ impl fmt::Display for Error {
 
 impl Drop for Adapter {
     fn drop(&mut self) {
-        self.internal.unlink();
+        self.internal.unlink().unwrap();
     }
 }
 
 impl Drop for Peripheral {
     fn drop(&mut self) {
-        self.internal.unlink();
+        self.internal.unlink().unwrap();
     }
 }

@@ -15,24 +15,24 @@ fn main() {
     adapter.set_callback_on_scan_found(Box::new(|peripheral| {
         println!(
             "Found device: {} [{}] {} dBm",
-            peripheral.identifier(),
-            peripheral.address(),
-            peripheral.rssi()
+            peripheral.identifier().unwrap(),
+            peripheral.address().unwrap(),
+            peripheral.rssi().unwrap()
         );
     }));
 
-    adapter.scan_for(5000);
+    adapter.scan_for(5000).unwrap();
     println!("Scan complete.");
 
     println!("The following devices were found:");
 
-    for (i, peripheral) in adapter.scan_get_results().iter().enumerate() {
+    for (i, peripheral) in adapter.scan_get_results().unwrap().iter().enumerate() {
         let connectable_str = "unknown";
         let peripheral_str = format!(
             "{} [{}] {} dBm",
-            peripheral.identifier(),
-            peripheral.address(),
-            peripheral.rssi()
+            peripheral.identifier().unwrap(),
+            peripheral.address().unwrap(),
+            peripheral.rssi().unwrap()
         );
 
         println!("{}: {} {}", i, peripheral_str, connectable_str);
@@ -46,7 +46,7 @@ fn main() {
     let input = input.parse::<usize>().unwrap();
 
     // Get the selected device by moving it out of the scan results
-    let mut peripheral = adapter.scan_get_results().remove(input);
+    let mut peripheral = adapter.scan_get_results().unwrap().remove(input);
 
     peripheral.set_callback_on_connected(Box::new(|| {
         println!("Connected to device.");
@@ -58,13 +58,13 @@ fn main() {
 
     // Connect to the device
     println!("Connecting to device...");
-    peripheral.connect();
+    peripheral.connect().unwrap();
 
     println!("Connected to device.");
 
     // Make a Vec of all service/characteristic pairs
     let mut service_characteristic_pairs = Vec::new();
-    for service in peripheral.services().iter() {
+    for service in peripheral.services().unwrap().iter() {
         for characteristic in service.characteristics().iter() {
             service_characteristic_pairs.push((service.uuid(), characteristic.uuid()));
         }
@@ -90,14 +90,14 @@ fn main() {
     println!("Subscribing to characteristic...");
     peripheral.notify(&service, &characteristic, Box::new(|data| {
         println!("Received data: {:?}", data);
-    }));
+    })).unwrap();
 
     // Sleep for 5 seconds
     std::thread::sleep(std::time::Duration::from_secs(5));
 
     // Unsubscribe from the characteristic
     println!("Unsubscribing from characteristic...");
-    peripheral.unsubscribe(&service, &characteristic);
+    peripheral.unsubscribe(&service, &characteristic).unwrap();
 
-    peripheral.disconnect();
+    peripheral.disconnect().unwrap();
 }

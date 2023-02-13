@@ -17,11 +17,11 @@ If you want to use SimpleBLE and need help. **Please do not hesitate to
 reach out!**
 
 -   Join our [Discord](https://discord.gg/N9HqNEcvP3) server.
--   Contact me: `kevin at dewald dot me` (Dedicated consulting services
-    available)
+-   Contact me: `kevin at dewald dot me`
 
 ## Supported platforms
 
-  Windows       Linux           MacOS                                 iOS
-  ------------- --------------- ------------------------------------- -------
-  Windows 10+   Ubuntu 20.04+   10.15+ (except 12.0, 12.1 and 12.2)   15.0+
+-   Windows: Windows 10+
+-   Linux: Ubuntu 20.04+
+-   MacOS: 10.15+ (except 12.0, 12.1, and 12.2)
+-   iOS: 15.0+

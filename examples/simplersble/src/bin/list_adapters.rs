@@ -16,6 +16,6 @@ fn main() {
     }
 
     for adapter in adapters.iter_mut() {
-        println!("Adapter: {} [{}]", adapter.identifier(), adapter.address());
+        println!("Adapter: {} [{}]", adapter.identifier().unwrap(), adapter.address().unwrap());
     }
 }

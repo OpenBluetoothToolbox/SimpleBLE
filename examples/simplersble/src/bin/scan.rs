@@ -23,45 +23,45 @@ fn main() {
     adapter.set_callback_on_scan_found(Box::new(|peripheral| {
         println!(
             "Found device: {} [{}] {} dBm",
-            peripheral.identifier(),
-            peripheral.address(),
-            peripheral.rssi()
+            peripheral.identifier().unwrap(),
+            peripheral.address().unwrap(),
+            peripheral.rssi().unwrap()
         );
     }));
 
     adapter.set_callback_on_scan_updated(Box::new(|peripheral| {
         println!(
             "Updated device: {} [{}] {} dBm",
-            peripheral.identifier(),
-            peripheral.address(),
-            peripheral.rssi()
+            peripheral.identifier().unwrap(),
+            peripheral.address().unwrap(),
+            peripheral.rssi().unwrap()
         );
     }));
 
-    adapter.scan_for(5000);
+    adapter.scan_for(5000).unwrap();
     println!("Scan complete.");
 
     println!("The following devices were found:");
 
-    for (i, peripheral) in adapter.scan_get_results().iter().enumerate() {
+    for (i, peripheral) in adapter.scan_get_results().unwrap().iter().enumerate() {
         let connectable_str = "unknown";
         let peripheral_str = format!(
             "{} [{}] {} dBm",
-            peripheral.identifier(),
-            peripheral.address(),
-            peripheral.rssi()
+            peripheral.identifier().unwrap(),
+            peripheral.address().unwrap(),
+            peripheral.rssi().unwrap()
         );
 
         println!("{}: {} {}", i, peripheral_str, connectable_str);
 
-        println!("    Tx Power: {}", peripheral.tx_power());
-        println!("    Address Type: {}", peripheral.address_type());
+        println!("    Tx Power: {}", peripheral.tx_power().unwrap());
+        println!("    Address Type: {}", peripheral.address_type().unwrap());
 
-        for service in peripheral.services().iter() {
+        for service in peripheral.services().unwrap().iter() {
             println!("    Service: {}", service.uuid());
         }
 
-        for (manufacturer_id, manufacturer_data) in peripheral.manufacturer_data().iter() {
+        for (manufacturer_id, manufacturer_data) in peripheral.manufacturer_data().unwrap().iter() {
             println!("    Manufacturer ID: {}", manufacturer_id);
             println!("    Manufacturer Data: {:?}", manufacturer_data);
         }
