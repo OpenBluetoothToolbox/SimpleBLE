@@ -34,6 +34,10 @@ constexpr auto kDocsPeripheralTxPower = R"pbdoc(
     Transit Power of the peripheral in dBm
 )pbdoc";
 
+constexpr auto kDocsPeripheralMtu = R"pbdoc(
+    Get the negotiated MTU value
+)pbdoc";
+
 constexpr auto kDocsPeripheralConnect = R"pbdoc(
     Connect to the peripheral
 )pbdoc";
@@ -115,6 +119,7 @@ void wrap_peripheral(py::module& m) {
         .def("address_type", &SimpleBLE::Peripheral::address_type, kDocsPeripheralAddressType)
         .def("rssi", &SimpleBLE::Peripheral::rssi, kDocsPeripheralRSSI)
         .def("tx_power", &SimpleBLE::Peripheral::tx_power, kDocsPeripheralTxPower)
+        .def("mtu", &SimpleBLE::Peripheral::mtu, kDocsPeripheralMtu)
         .def("connect", &SimpleBLE::Peripheral::connect, py::call_guard<py::gil_scoped_release>(),
              kDocsPeripheralConnect)
         .def("disconnect", &SimpleBLE::Peripheral::disconnect, kDocsPeripheralDisconnect)
