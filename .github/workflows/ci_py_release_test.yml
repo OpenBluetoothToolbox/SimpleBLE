@@ -53,7 +53,9 @@ jobs:
 
       - name: Publish packages
         if: github.repository == 'OpenBluetoothToolbox/SimpleBLE'
-        run: twine upload --repository testpypi --skip-existing wheelhouse/*.whl --verbose
+        run: |
+          echo Repository is: ${{ github.repository }}
+          twine upload --repository testpypi --skip-existing wheelhouse/*.whl --verbose
         env:
           TWINE_USERNAME: ${{ secrets.TEST_PYPI_USER }}
           TWINE_PASSWORD: ${{ secrets.TEST_PYPI_PASSWORD }}
