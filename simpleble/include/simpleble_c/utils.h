@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-simpleble_os_t get_operating_system(void);
+SIMPLEBLE_EXPORT simpleble_os_t get_operating_system(void);
 
 #ifdef __cplusplus
 }
