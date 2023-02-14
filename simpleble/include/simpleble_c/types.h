@@ -50,6 +50,12 @@ typedef struct {
     // and the remaining 27 bytes are the manufacturer data.
 } simpleble_manufacturer_data_t;
 
+typedef struct {
+    simpleble_uuid_t service_uuid;
+    size_t data_length;
+    uint8_t data[27];
+} simpleble_service_data_t;
+
 typedef void* simpleble_adapter_t;
 typedef void* simpleble_peripheral_t;
 

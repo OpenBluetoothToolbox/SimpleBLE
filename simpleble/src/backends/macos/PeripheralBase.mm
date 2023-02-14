@@ -19,6 +19,7 @@ PeripheralBase::PeripheralBase(void* opaque_peripheral, void* opaque_adapter, ad
     is_connectable_ = advertising_data.connectable;
     manual_disconnect_triggered_ = false;
     manufacturer_data_ = advertising_data.manufacturer_data;
+    service_data_ = advertising_data.service_data;
     rssi_ = advertising_data.rssi;
     tx_power_ = advertising_data.tx_power;
 }
@@ -63,6 +64,7 @@ uint16_t PeripheralBase::mtu() {
 void PeripheralBase::update_advertising_data(advertising_data_t advertising_data) {
     is_connectable_ = advertising_data.connectable;
     manufacturer_data_ = advertising_data.manufacturer_data;
+    service_data_ = advertising_data.service_data;
     rssi_ = advertising_data.rssi;
     tx_power_ = advertising_data.tx_power;
 
@@ -119,6 +121,8 @@ std::vector<Service> PeripheralBase::advertised_services() {
 }
 
 std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() { return manufacturer_data_; }
+
+std::map<BluetoothUUID, ByteArray> PeripheralBase::service_data() { return service_data_; }
 
 ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;

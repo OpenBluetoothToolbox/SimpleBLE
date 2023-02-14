@@ -36,6 +36,7 @@ class PeripheralBase {
     std::vector<Service> services();
     std::vector<Service> advertised_services();
     std::map<uint16_t, ByteArray> manufacturer_data();
+    std::map<BluetoothUUID, ByteArray> service_data();
 
     // clang-format off
     ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic);
@@ -72,6 +73,7 @@ class PeripheralBase {
 
     std::vector<BluetoothUUID> advertised_services_;
     std::map<uint16_t, ByteArray> manufacturer_data_;
+    std::map<BluetoothUUID, ByteArray> service_data_;
 
     kvn::safe_callback<void()> callback_on_connected_;
     kvn::safe_callback<void()> callback_on_disconnected_;

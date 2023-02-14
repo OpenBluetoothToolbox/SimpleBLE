@@ -124,6 +124,17 @@
         advertisingData.manufacturer_data[manufacturerID] = manufacturerData;
     }
 
+    // Extract Service Data
+    NSDictionary* service_data = advertisement_data[CBAdvertisementDataServiceDataKey];
+    for (CBUUID* uuid in service_data) {
+        NSData* data = service_data[uuid];
+        const uint8_t* bytes = static_cast<const uint8_t*>([data bytes]);
+        size_t length = [data length];
+        SimpleBLE::ByteArray serviceData = SimpleBLE::ByteArray(bytes, (size_t)(data.length));
+        advertisingData.service_data[uuidToSimpleBLE(uuid)] = serviceData;
+    }
+
+    // Extract Service UUIDs
     NSArray* services = advertisementData[CBAdvertisementDataServiceUUIDsKey];
     if (services != nil) {
         for (CBUUID* serviceUuid in services) {

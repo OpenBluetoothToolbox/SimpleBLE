@@ -18,6 +18,7 @@ struct advertising_data_t {
 
     std::vector<BluetoothUUID> service_uuids;
     std::map<uint16_t, ByteArray> manufacturer_data;
+    std::map<BluetoothUUID, ByteArray> service_data;
 };
 
 }  // namespace SimpleBLE
