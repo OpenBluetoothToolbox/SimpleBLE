@@ -125,13 +125,13 @@
     }
 
     // Extract Service Data
-    NSDictionary* service_data = advertisement_data[CBAdvertisementDataServiceDataKey];
-    for (CBUUID* uuid in service_data) {
-        NSData* data = service_data[uuid];
-        const uint8_t* bytes = static_cast<const uint8_t*>([data bytes]);
-        size_t length = [data length];
-        SimpleBLE::ByteArray serviceData = SimpleBLE::ByteArray(bytes, (size_t)(data.length));
-        advertisingData.service_data[uuidToSimpleBLE(uuid)] = serviceData;
+    NSDictionary* rawServiceDataDict = advertisementData[CBAdvertisementDataServiceDataKey];
+    for (CBUUID* serviceUuid in rawServiceDataDict) {
+        NSData* rawServiceData = rawServiceDataDict[serviceUuid];
+        const char* rawServiceDataBytes = (const char*) rawServiceData.bytes;
+        size_t rawServiceDataLength = (size_t) rawServiceData.length;
+        SimpleBLE::ByteArray serviceData = SimpleBLE::ByteArray(rawServiceDataBytes, rawServiceDataLength);
+        advertisingData.service_data[uuidToSimpleBLE(serviceUuid)] = serviceData;
     }
 
     // Extract Service UUIDs
