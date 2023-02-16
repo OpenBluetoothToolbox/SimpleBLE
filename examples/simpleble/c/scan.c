@@ -10,6 +10,20 @@
 
 #include "simpleble_c/simpleble.h"
 
+static void print_buffer_hex(uint8_t *buf, size_t len, bool newline) {
+    for (size_t i = 0; i < len; i++) {
+        printf("%02X", buf[i]);
+
+        if (i < (len - 1)) {
+            printf(" ");
+        }
+    }
+
+    if (newline) {
+        printf("\n");
+    }
+}
+
 static void adapter_on_scan_start(simpleble_adapter_t adapter, void* userdata);
 static void adapter_on_scan_stop(simpleble_adapter_t adapter, void* userdata);
 static void adapter_on_scan_found(simpleble_adapter_t adapter, simpleble_peripheral_t peripheral, void* userdata);
@@ -42,6 +56,59 @@ int main() {
     // If there are any detections during this period, it means that the
     // internal peripheral took longer to stop than anticipated.
     SLEEP_SEC(1);
+
+    size_t peripheral_count = simpleble_adapter_scan_get_results_count(adapter);
+    for (size_t peripheral_index = 0; peripheral_index < peripheral_count; peripheral_index++) {
+        simpleble_peripheral_t peripheral = simpleble_adapter_scan_get_results_handle(adapter, peripheral_index);
+
+        char* peripheral_identifier = simpleble_peripheral_identifier(peripheral);
+        char* peripheral_address = simpleble_peripheral_address(peripheral);
+
+        bool peripheral_connectable = false;
+        simpleble_peripheral_is_connectable(peripheral, &peripheral_connectable);
+
+        int16_t peripheral_rssi = simpleble_peripheral_rssi(peripheral);
+
+        printf("[%zu] %s [%s] %d dBm %s\n",
+            peripheral_index,
+            peripheral_identifier,
+            peripheral_address,
+            peripheral_rssi,
+            peripheral_connectable ? "Connectable" : "Non-Connectable"
+        );
+
+        size_t services_count = simpleble_peripheral_services_count(peripheral);
+        for (size_t service_index = 0; service_index < services_count; service_index++) {
+            simpleble_service_t service;
+            simpleble_peripheral_services_get(peripheral, service_index, &service);
+
+            printf("    Service: %s\n", service.uuid.value);
+        }
+
+        size_t manufacturer_data_count = simpleble_peripheral_manufacturer_data_count(peripheral);
+        for (size_t manuf_data_index = 0; manuf_data_index < manufacturer_data_count; manuf_data_index++) {
+            simpleble_manufacturer_data_t manuf_data;
+            simpleble_peripheral_manufacturer_data_get(peripheral, manuf_data_index, &manuf_data);
+            printf("    Manufacturer ID: %04X\n", manuf_data.manufacturer_id);
+            printf("    Manufacturer data: ");
+            print_buffer_hex(manuf_data.data, manuf_data.data_length, true);
+        }
+
+        size_t service_data_count = simpleble_peripheral_service_data_count(peripheral);
+        for (size_t service_data_index = 0; service_data_index < service_data_count; service_data_index++) {
+            simpleble_service_data_t service_data;
+            simpleble_peripheral_service_data_get(peripheral, service_data_index, &service_data);
+
+            printf("    Service UUID: %s\n", service_data.service_uuid.value);
+            printf("    Service data: ");
+            print_buffer_hex(service_data.data, service_data.data_length, true);
+        }
+
+        // Let's not forget to release the associated handles and memory
+        simpleble_peripheral_release_handle(peripheral);
+        simpleble_free(peripheral_address);
+        simpleble_free(peripheral_identifier);
+    }
 
     // Let's not forget to release the associated handle.
     simpleble_adapter_release_handle(adapter);
