@@ -20,6 +20,7 @@ option(SIMPLEBLE_PLAIN "Use plain version of SimpleBLE" OFF)
 
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
 find_package(fmt REQUIRED)
+set_target_properties(fmt PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
 if(SIMPLEBLE_TEST)
     message(STATUS "Building tests requires plain version of SimpleBLE")

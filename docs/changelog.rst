@@ -29,6 +29,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  Debug, MinSizeRel and RelWithDebInfo targets now contain their appropriate suffix. *(Thanks kutij!)*
 -  **API CHANGE**: Log level convention changed from uppercase to capitalizing the first letter.
 -  Updated ``libfmt`` dependency to version 9.1.0.
+-  Unused ``libfmt`` targets removed from the build process.
 -  (MacOS) More explicit exception messages.
 -  (MacOS) 16-bit UUIDs are now presented in their 128-bit form.
 -  (MacOS) Adapter address now swapped for a random UUID. *(Thanks nothingisdead!)*
