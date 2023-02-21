@@ -254,6 +254,52 @@ simpleble_err_t simpleble_peripheral_manufacturer_data_get(simpleble_peripheral_
     return SIMPLEBLE_SUCCESS;
 }
 
+size_t simpleble_peripheral_service_data_count(simpleble_peripheral_t handle) {
+    if (handle == nullptr) {
+        return 0;
+    }
+
+    SimpleBLE::Safe::Peripheral* peripheral = (SimpleBLE::Safe::Peripheral*)handle;
+
+    auto service_data = peripheral->service_data();
+    if (service_data.has_value()) {
+        return service_data.value().size();
+    } else {
+        return 0;
+    }
+}
+
+simpleble_err_t simpleble_peripheral_service_data_get(simpleble_peripheral_t handle, size_t index,
+                                                      simpleble_service_data_t* service_data) {
+    if (handle == nullptr || service_data == nullptr) {
+        return SIMPLEBLE_FAILURE;
+    }
+
+    SimpleBLE::Safe::Peripheral* peripheral = (SimpleBLE::Safe::Peripheral*)handle;
+
+    auto peripheral_service_data = peripheral->service_data();
+    if (!peripheral_service_data.has_value()) {
+        return SIMPLEBLE_FAILURE;
+    }
+
+    if (index >= peripheral_service_data.value().size()) {
+        return SIMPLEBLE_FAILURE;
+    }
+
+    // Build an iterator and advance to the expected element
+    std::map<SimpleBLE::BluetoothUUID, SimpleBLE::ByteArray>::iterator it = peripheral_service_data.value().begin();
+    for (size_t i = 0; i < index; i++) {
+        it++;
+    }
+
+    auto& selected_service_data = *it;
+    service_data->data_length = selected_service_data.second.size();
+    memcpy(service_data->service_uuid.value, selected_service_data.first.c_str(), SIMPLEBLE_UUID_STR_LEN);
+    memcpy(service_data->data, selected_service_data.second.data(), selected_service_data.second.size());
+
+    return SIMPLEBLE_SUCCESS;
+}
+
 simpleble_err_t simpleble_peripheral_read(simpleble_peripheral_t handle, simpleble_uuid_t service,
                                           simpleble_uuid_t characteristic, uint8_t** data, size_t* data_length) {
     if (handle == nullptr || data == nullptr || data_length == nullptr) {

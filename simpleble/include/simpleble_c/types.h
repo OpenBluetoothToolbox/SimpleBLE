@@ -50,6 +50,17 @@ typedef struct {
     // and the remaining 27 bytes are the manufacturer data.
 } simpleble_manufacturer_data_t;
 
+typedef struct {
+    simpleble_uuid_t service_uuid;
+    size_t data_length;
+    uint8_t data[27];
+    // Note: The maximum length of a BLE advertisement is 31 bytes.
+    // The first byte will be the length of the field,
+    // the second byte will be the type of the field,
+    // the next two bytes will be the service UUID,
+    // and the remaining 27 bytes are the manufacturer data.
+} simpleble_service_data_t;
+
 typedef void* simpleble_adapter_t;
 typedef void* simpleble_peripheral_t;
 

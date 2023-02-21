@@ -35,3 +35,12 @@ if __name__ == "__main__":
         for manufacturer_id, value in manufacturer_data.items():
             print(f"    Manufacturer ID: {manufacturer_id}")
             print(f"    Manufacturer data: {value}")
+
+        services = peripheral.services()
+        for service in services:
+            print(f"    Service: {service.uuid()}")
+
+        service_data = peripheral.service_data()
+        for service_uuid, value in service_data.items():
+            print(f"    Service UUID: {service_uuid}")
+            print(f"    Service data: {value}")

@@ -23,6 +23,7 @@ struct RustyServiceWrapper;
 struct RustyCharacteristicWrapper;
 struct RustyDescriptorWrapper;
 struct RustyManufacturerDataWrapper;
+struct RustyServiceDataWrapper;
 
 rust::Vec<Bindings::RustyAdapterWrapper> RustyAdapter_get_adapters();
 bool RustyAdapter_bluetooth_enabled();
@@ -86,6 +87,7 @@ class RustyPeripheral : private SimpleBLE::Peripheral {
 
     rust::Vec<Bindings::RustyServiceWrapper> services() const;
     rust::Vec<Bindings::RustyManufacturerDataWrapper> manufacturer_data() const;
+    rust::Vec<Bindings::RustyServiceDataWrapper> service_data() const;
 
     rust::Vec<uint8_t> read(rust::String const& service, rust::String const& characteristic) const;
     void write_request(rust::String const& service, rust::String const& characteristic,

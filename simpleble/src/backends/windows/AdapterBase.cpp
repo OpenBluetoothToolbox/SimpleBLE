@@ -14,8 +14,13 @@
 #include "winrt/Windows.Foundation.h"
 #include "winrt/base.h"
 
+#include <algorithm>
 #include <iostream>
+#include <iterator>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace SimpleBLE;
 using namespace std::chrono_literals;
@@ -72,6 +77,47 @@ AdapterBase::AdapterBase(std::string device_id)
                 uint16_t company_id = item.CompanyId();
                 ByteArray manufacturer_data_buffer = ibuffer_to_bytearray(item.Data());
                 data.manufacturer_data[company_id] = manufacturer_data_buffer;
+            }
+
+            // Parse service data.
+            const auto& sections = args.Advertisement().DataSections();
+            for (const auto& section : sections) {
+                ByteArray section_data_buffer = ibuffer_to_bytearray(section.Data());
+
+                std::string service_uuid;
+                ByteArray service_data;
+
+                if (section.DataType() == Advertisement::BluetoothLEAdvertisementDataTypes::ServiceData128BitUuids()) {
+                    service_uuid = fmt::format(
+                        "{:02x}{:02x}{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-"
+                        "{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}",
+                        (uint8_t)section_data_buffer[15], (uint8_t)section_data_buffer[14],
+                        (uint8_t)section_data_buffer[13], (uint8_t)section_data_buffer[12],
+                        (uint8_t)section_data_buffer[11], (uint8_t)section_data_buffer[10],
+                        (uint8_t)section_data_buffer[9], (uint8_t)section_data_buffer[8],
+                        (uint8_t)section_data_buffer[7], (uint8_t)section_data_buffer[6],
+                        (uint8_t)section_data_buffer[5], (uint8_t)section_data_buffer[4],
+                        (uint8_t)section_data_buffer[3], (uint8_t)section_data_buffer[2],
+                        (uint8_t)section_data_buffer[1], (uint8_t)section_data_buffer[0]);
+                    service_data = section_data_buffer.substr(16);
+                }
+
+                else if (section.DataType() ==
+                         Advertisement::BluetoothLEAdvertisementDataTypes::ServiceData32BitUuids()) {
+                    service_uuid = fmt::format("{:02x}{:02x}{:02x}{:02x}-0000-1000-8000-00805f9b34fb",
+                                               (uint8_t)section_data_buffer[3], (uint8_t)section_data_buffer[2],
+                                               (uint8_t)section_data_buffer[1], (uint8_t)section_data_buffer[0]);
+                    service_data = section_data_buffer.substr(4);
+                } else if (section.DataType() ==
+                           Advertisement::BluetoothLEAdvertisementDataTypes::ServiceData16BitUuids()) {
+                    service_uuid = fmt::format("0000{:02x}{:02x}-0000-1000-8000-00805f9b34fb",
+                                               (uint8_t)section_data_buffer[1], (uint8_t)section_data_buffer[0]);
+                    service_data = section_data_buffer.substr(2);
+                } else {
+                    continue;
+                }
+
+                data.service_data.emplace(std::make_pair(service_uuid, service_data));
             }
 
             // Parse service uuids

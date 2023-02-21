@@ -158,6 +158,25 @@ SIMPLEBLE_EXPORT simpleble_err_t simpleble_peripheral_manufacturer_data_get(
     simpleble_peripheral_t handle, size_t index, simpleble_manufacturer_data_t* manufacturer_data);
 
 /**
+ * @brief Returns the number of services with data.
+ *
+ * @param handle Peripheral
+ * @return size_t Number of services with data.
+ */
+SIMPLEBLE_EXPORT size_t simpleble_peripheral_service_data_count(simpleble_peripheral_t handle);
+
+/**
+ * @brief Returns data about/from a service.
+ *
+ * @param handle Peripheral.
+ * @param index
+ * @param[out] service_data Service data.
+ * @return simpleble_err_t
+ */
+SIMPLEBLE_EXPORT simpleble_err_t simpleble_peripheral_service_data_get(simpleble_peripheral_t handle, size_t index,
+                                                                       simpleble_service_data_t* service_data);
+
+/**
  * @brief
  *
  * @note The user is responsible for freeing the pointer returned in data.

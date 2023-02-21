@@ -24,6 +24,7 @@ performed:
 #. Review/update the version number in the following files:
 
    - ``VERSION``
+   - ``Cargo.toml``
    - ``docs/changelog.rst``
    - ``simplepyble/setup.py``
 
@@ -37,8 +38,13 @@ performed:
 
 #. Run the CI job to build and upload the package to PyPI.
 
+#. Run the CI job to build and upload the artifacts to GitHub.
+
+#. Perform a manual release of the Rust crate to crates.io.
+
 #. Advance the version number in the following files:
 
    - ``VERSION``
+   - ``Cargo.toml``
    - ``docs/changelog.rst``
    - ``simplepyble/setup.py``
