@@ -29,6 +29,8 @@ Windows     Linux         MacOS                               iOS
 Windows 10+ Ubuntu 20.04+ 10.15+ (except 12.0, 12.1 and 12.2) 15.0+
 =========== ============= =================================== =====
 
+**NOTE:** WSL does not support Bluetooth.
+
 Installation
 ------------
 
@@ -68,4 +70,3 @@ external creators, are licensed under the terms of the `MIT Licence`_.
    :target: http://simpleble.readthedocs.org/en/latest
 
 .. |PyPI Licence| image:: https://img.shields.io/pypi/l/simplepyble
-

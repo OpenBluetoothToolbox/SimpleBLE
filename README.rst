@@ -48,6 +48,7 @@ Don't forget to check out the following projects using SimpleBLE:
 
 * `GDSimpleBLE`_
 * `BrainFlow`_
+* `InsideBlue`_
 
 Contributing
 ------------
@@ -79,3 +80,4 @@ external creators, are licensed under the terms of the `MIT Licence`_.
 
 .. _GDSimpleBLE: https://github.com/jferdelyi/GDSimpleBLE
 .. _BrainFlow: https://github.com/brainflow-dev/brainflow
+.. _InsideBlue: https://github.com/eriklins/InsideBlue-BLE-Tool
