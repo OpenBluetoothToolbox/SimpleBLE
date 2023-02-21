@@ -270,7 +270,7 @@ size_t simpleble_peripheral_service_data_count(simpleble_peripheral_t handle) {
 }
 
 simpleble_err_t simpleble_peripheral_service_data_get(simpleble_peripheral_t handle, size_t index,
-                                                           simpleble_service_data_t* service_data) {
+                                                      simpleble_service_data_t* service_data) {
     if (handle == nullptr || service_data == nullptr) {
         return SIMPLEBLE_FAILURE;
     }
@@ -291,7 +291,6 @@ simpleble_err_t simpleble_peripheral_service_data_get(simpleble_peripheral_t han
     for (size_t i = 0; i < index; i++) {
         it++;
     }
-
 
     auto& selected_service_data = *it;
     service_data->data_length = selected_service_data.second.size();
