@@ -198,6 +198,23 @@ rust::Vec<Bindings::RustyManufacturerDataWrapper> Bindings::RustyPeripheral::man
     return result;
 }
 
+rust::Vec<Bindings::RustyServiceDataWrapper> Bindings::RustyPeripheral::service_data() const {
+    rust::Vec<Bindings::RustyServiceDataWrapper> result;
+
+    for (auto& service_data : _internal->service_data()) {
+        Bindings::RustyServiceDataWrapper wrapper;
+        wrapper.service = rust::String(service_data.first);
+
+        for (auto& byte : service_data.second) {
+            wrapper.data.push_back(byte);
+        }
+
+        result.push_back(std::move(wrapper));
+    }
+
+    return result;
+}
+
 rust::Vec<uint8_t> Bindings::RustyPeripheral::read(rust::String const& service,
                                                    rust::String const& characteristic) const {
     std::string read_result = _internal->read(std::string(service), std::string(characteristic));

@@ -37,6 +37,12 @@ mod ffi {
         data: Vec<u8>,
     }
 
+    #[namespace = "Bindings"]
+    struct RustyServiceDataWrapper {
+        service: String,
+        data: Vec<u8>,
+    }
+
     #[namespace = "SimpleBLE"]
     #[repr(i32)]
     enum BluetoothAddressType {
@@ -133,6 +139,7 @@ mod ffi {
 
         fn services(self: &RustyPeripheral) -> Result<Vec<RustyServiceWrapper>>;
         fn manufacturer_data(self: &RustyPeripheral) -> Result<Vec<RustyManufacturerDataWrapper>>;
+        fn service_data(self: &RustyPeripheral) -> Result<Vec<RustyServiceDataWrapper>>;
 
         fn read(
             self: &RustyPeripheral,
@@ -517,6 +524,19 @@ impl Peripheral {
         }
 
         Ok(manufacturer_data)
+    }
+
+    pub fn service_data(&self) -> Result<HashMap<String, Vec<u8>>, Error> {
+        let raw_service_data = self.internal.service_data().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })?;
+
+        let mut service_data = HashMap::<String, Vec<u8>>::new();
+        for raw_service_data in raw_service_data.iter() {
+            service_data.insert(raw_service_data.service.clone(), raw_service_data.data.clone());
+        }
+
+        Ok(service_data)
     }
 
     pub fn read(&self, service: &String, characteristic: &String) -> Result<Vec<u8>, Error> {

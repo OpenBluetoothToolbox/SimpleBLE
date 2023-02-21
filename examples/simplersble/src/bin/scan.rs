@@ -65,5 +65,10 @@ fn main() {
             println!("    Manufacturer ID: {}", manufacturer_id);
             println!("    Manufacturer Data: {:?}", manufacturer_data);
         }
+
+        for (service_uuid, service_data) in peripheral.service_data().unwrap().iter() {
+            println!("    Service UUID: {}", service_uuid);
+            println!("    Service Data: {:?}", service_data);
+        }
     }
 }
