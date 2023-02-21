@@ -112,7 +112,8 @@ std::optional<std::map<uint16_t, SimpleBLE::ByteArray>> SimpleBLE::Safe::Periphe
     }
 }
 
-std::optional<std::map<SimpleBLE::BluetoothUUID, SimpleBLE::ByteArray>> SimpleBLE::Safe::Peripheral::service_data() noexcept {
+std::optional<std::map<SimpleBLE::BluetoothUUID, SimpleBLE::ByteArray>>
+SimpleBLE::Safe::Peripheral::service_data() noexcept {
     try {
         return SimpleBLE::Peripheral::service_data();
     } catch (...) {

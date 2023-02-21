@@ -173,8 +173,8 @@ SIMPLEBLE_EXPORT size_t simpleble_peripheral_service_data_count(simpleble_periph
  * @param[out] service_data Service data.
  * @return simpleble_err_t
  */
-SIMPLEBLE_EXPORT simpleble_err_t simpleble_peripheral_service_data_get(
-    simpleble_peripheral_t handle, size_t index, simpleble_service_data_t* service_data);
+SIMPLEBLE_EXPORT simpleble_err_t simpleble_peripheral_service_data_get(simpleble_peripheral_t handle, size_t index,
+                                                                       simpleble_service_data_t* service_data);
 
 /**
  * @brief

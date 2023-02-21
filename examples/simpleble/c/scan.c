@@ -10,7 +10,7 @@
 
 #include "simpleble_c/simpleble.h"
 
-static void print_buffer_hex(uint8_t *buf, size_t len, bool newline) {
+static void print_buffer_hex(uint8_t* buf, size_t len, bool newline) {
     for (size_t i = 0; i < len; i++) {
         printf("%02X", buf[i]);
 
@@ -69,13 +69,8 @@ int main() {
 
         int16_t peripheral_rssi = simpleble_peripheral_rssi(peripheral);
 
-        printf("[%zu] %s [%s] %d dBm %s\n",
-            peripheral_index,
-            peripheral_identifier,
-            peripheral_address,
-            peripheral_rssi,
-            peripheral_connectable ? "Connectable" : "Non-Connectable"
-        );
+        printf("[%zu] %s [%s] %d dBm %s\n", peripheral_index, peripheral_identifier, peripheral_address,
+               peripheral_rssi, peripheral_connectable ? "Connectable" : "Non-Connectable");
 
         size_t services_count = simpleble_peripheral_services_count(peripheral);
         for (size_t service_index = 0; service_index < services_count; service_index++) {
