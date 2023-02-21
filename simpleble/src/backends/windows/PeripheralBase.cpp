@@ -67,6 +67,8 @@ void PeripheralBase::update_advertising_data(advertising_data_t advertising_data
     tx_power_ = advertising_data.tx_power;
     address_type_ = advertising_data.address_type;
     manufacturer_data_ = advertising_data.manufacturer_data;
+    
+    advertising_data.service_data.merge(service_data_);
     service_data_ = advertising_data.service_data;
 
     // Append services that haven't been seen before

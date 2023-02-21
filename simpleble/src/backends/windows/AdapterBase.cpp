@@ -14,13 +14,13 @@
 #include "winrt/Windows.Foundation.h"
 #include "winrt/base.h"
 
-#include <iostream>
-#include <sstream>
-#include <iterator>
 #include <algorithm>
-#include <vector>
+#include <iostream>
+#include <iterator>
+#include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
 
 using namespace SimpleBLE;
 using namespace std::chrono_literals;
@@ -82,45 +82,42 @@ AdapterBase::AdapterBase(std::string device_id)
             // Parse service data.
             const auto& sections = args.Advertisement().DataSections();
             for (const auto& section : sections) {
-                size_t size = 0;
-                std::vector<uint8_t> section_data;
+                ByteArray section_data_buffer = ibuffer_to_bytearray(section.Data());
+
+                std::string service_uuid;
+                ByteArray service_data;
 
                 if (section.DataType() == Advertisement::BluetoothLEAdvertisementDataTypes::ServiceData128BitUuids()) {
-                    size = 128 / 8;
-                } else if (section.DataType() == Advertisement::BluetoothLEAdvertisementDataTypes::ServiceData32BitUuids()) {
-                    size = 32 / 8;
-                } else if (section.DataType() == Advertisement::BluetoothLEAdvertisementDataTypes::ServiceData32BitUuids()) {
-                    size = 16 / 8;
+                    service_uuid = fmt::format(
+                        "{:02x}{:02x}{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-"
+                        "{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}",
+                        (uint8_t)section_data_buffer[15], (uint8_t)section_data_buffer[14],
+                        (uint8_t)section_data_buffer[13], (uint8_t)section_data_buffer[12],
+                        (uint8_t)section_data_buffer[11], (uint8_t)section_data_buffer[10],
+                        (uint8_t)section_data_buffer[9], (uint8_t)section_data_buffer[8],
+                        (uint8_t)section_data_buffer[7], (uint8_t)section_data_buffer[6],
+                        (uint8_t)section_data_buffer[5], (uint8_t)section_data_buffer[4],
+                        (uint8_t)section_data_buffer[3], (uint8_t)section_data_buffer[2],
+                        (uint8_t)section_data_buffer[1], (uint8_t)section_data_buffer[0]);
+                    service_data = section_data_buffer.substr(16);
+                }
+
+                else if (section.DataType() ==
+                         Advertisement::BluetoothLEAdvertisementDataTypes::ServiceData32BitUuids()) {
+                    service_uuid = fmt::format("{:02x}{:02x}{:02x}{:02x}-0000-1000-8000-00805f9b34fb",
+                                               (uint8_t)section_data_buffer[3], (uint8_t)section_data_buffer[2],
+                                               (uint8_t)section_data_buffer[1], (uint8_t)section_data_buffer[0]);
+                    service_data = section_data_buffer.substr(4);
+                } else if (section.DataType() ==
+                           Advertisement::BluetoothLEAdvertisementDataTypes::ServiceData16BitUuids()) {
+                    service_uuid = fmt::format("0000{:02x}{:02x}-0000-1000-8000-00805f9b34fb",
+                                               (uint8_t)section_data_buffer[1], (uint8_t)section_data_buffer[0]);
+                    service_data = section_data_buffer.substr(2);
                 } else {
                     continue;
                 }
-                for (const auto& d : section.Data()) {
-                    section_data.push_back(d);
-                }
 
-                auto uuid_start = section_data.begin();
-                auto uuid_end = section_data.begin() + size + 1;
-                auto data_start = section_data.begin() + size + 1;
-                auto data_end = section_data.end();
-
-                vector<uint8_t> uuid_bytes(size + 1);
-                vector<uint8_t> data_bytes(section_data.size() - size + 1);
-                std::string uuid_str;
-                std::ostringstream uuid_str_stream;
-
-                std::copy(uuid_start, uuid_end, uuid_bytes.begin());
-                std::copy(data_start, data_end, data_bytes.begin());
-                std::reverse(std::begin(uuid_bytes), std::end(uuid_bytes));
-
-                for (const auto& c : uuid_bytes) {
-                    uuid_str_stream << std::hex << c;
-                }
-                uuid_str = uuid_str_stream.str();
-                data.service_data.emplace(std::make_pair(uuid_str, data_bytes));
-
-                // TODO: Will this delete?
-                //uuid_bytes.clear();
-                //data_bytes.clear();
+                data.service_data.emplace(std::make_pair(service_uuid, service_data));
             }
 
             // Parse service uuids
