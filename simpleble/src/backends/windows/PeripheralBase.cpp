@@ -153,7 +153,7 @@ std::vector<Service> PeripheralBase::services() {
 
 std::vector<Service> PeripheralBase::advertised_services() {
     std::vector<Service> service_list;
-    for (auto& [service_uuid, data] : service_data) {
+    for (auto& [service_uuid, data] : service_data_) {
         service_list.push_back(ServiceBuilder(service_uuid, data));
     }
 
