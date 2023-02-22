@@ -175,8 +175,11 @@ simpleble_err_t simpleble_peripheral_services_get(simpleble_peripheral_t handle,
     SimpleBLE::Service service = peripheral_services.value()[index];
 
     memcpy(services->uuid.value, service.uuid().c_str(), SIMPLEBLE_UUID_STR_LEN);
-    services->characteristic_count = service.characteristics().size();
 
+    services->data_length = service.data().size();
+    memcpy(services->data, service.data().data(), service.data().size());
+
+    services->characteristic_count = service.characteristics().size();
     if (services->characteristic_count > SIMPLEBLE_CHARACTERISTIC_MAX_COUNT) {
         services->characteristic_count = SIMPLEBLE_CHARACTERISTIC_MAX_COUNT;
     }
@@ -250,52 +253,6 @@ simpleble_err_t simpleble_peripheral_manufacturer_data_get(simpleble_peripheral_
     manufacturer_data->manufacturer_id = selected_manufacturer_data.first;
     manufacturer_data->data_length = selected_manufacturer_data.second.size();
     memcpy(manufacturer_data->data, selected_manufacturer_data.second.data(), selected_manufacturer_data.second.size());
-
-    return SIMPLEBLE_SUCCESS;
-}
-
-size_t simpleble_peripheral_service_data_count(simpleble_peripheral_t handle) {
-    if (handle == nullptr) {
-        return 0;
-    }
-
-    SimpleBLE::Safe::Peripheral* peripheral = (SimpleBLE::Safe::Peripheral*)handle;
-
-    auto service_data = peripheral->service_data();
-    if (service_data.has_value()) {
-        return service_data.value().size();
-    } else {
-        return 0;
-    }
-}
-
-simpleble_err_t simpleble_peripheral_service_data_get(simpleble_peripheral_t handle, size_t index,
-                                                      simpleble_service_data_t* service_data) {
-    if (handle == nullptr || service_data == nullptr) {
-        return SIMPLEBLE_FAILURE;
-    }
-
-    SimpleBLE::Safe::Peripheral* peripheral = (SimpleBLE::Safe::Peripheral*)handle;
-
-    auto peripheral_service_data = peripheral->service_data();
-    if (!peripheral_service_data.has_value()) {
-        return SIMPLEBLE_FAILURE;
-    }
-
-    if (index >= peripheral_service_data.value().size()) {
-        return SIMPLEBLE_FAILURE;
-    }
-
-    // Build an iterator and advance to the expected element
-    std::map<SimpleBLE::BluetoothUUID, SimpleBLE::ByteArray>::iterator it = peripheral_service_data.value().begin();
-    for (size_t i = 0; i < index; i++) {
-        it++;
-    }
-
-    auto& selected_service_data = *it;
-    service_data->data_length = selected_service_data.second.size();
-    memcpy(service_data->service_uuid.value, selected_service_data.first.c_str(), SIMPLEBLE_UUID_STR_LEN);
-    memcpy(service_data->data, selected_service_data.second.data(), selected_service_data.second.size());
 
     return SIMPLEBLE_SUCCESS;
 }

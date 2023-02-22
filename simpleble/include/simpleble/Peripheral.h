@@ -54,7 +54,6 @@ class SIMPLEBLE_EXPORT Peripheral {
      */
     std::vector<Service> services();
     std::map<uint16_t, ByteArray> manufacturer_data();
-    std::map<BluetoothUUID, ByteArray> service_data();
 
     // clang-format off
     ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic);

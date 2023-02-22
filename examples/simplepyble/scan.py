@@ -38,9 +38,5 @@ if __name__ == "__main__":
 
         services = peripheral.services()
         for service in services:
-            print(f"    Service: {service.uuid()}")
-
-        service_data = peripheral.service_data()
-        for service_uuid, value in service_data.items():
-            print(f"    Service UUID: {service_uuid}")
-            print(f"    Service data: {value}")
+            print(f"    Service UUID: {service.uuid()}")
+            print(f"    Service data: {service.data()}")

@@ -138,7 +138,7 @@
     NSArray* services = advertisementData[CBAdvertisementDataServiceUUIDsKey];
     if (services != nil) {
         for (CBUUID* serviceUuid in services) {
-            advertisingData.service_uuids.push_back(uuidToSimpleBLE(serviceUuid));
+            advertisingData.service_data[uuidToSimpleBLE(serviceUuid)] = SimpleBLE::ByteArray();
         }
     }
 

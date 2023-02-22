@@ -172,7 +172,7 @@ std::vector<Service> PeripheralBase::services() {
 std::vector<Service> PeripheralBase::advertised_services() {
     std::vector<Service> service_list;
     for (auto& [service_uuid, value_array] : device_->service_data()) {
-        service_list.push_back(ServiceBuilder(service_uuid));
+        service_list.push_back(ServiceBuilder(service_uuid, ByteArray((const char*)value_array.data(), value_array.size())));
     }
 
     return service_list;
@@ -185,15 +185,6 @@ std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() {
     }
 
     return manufacturer_data;
-}
-
-std::map<BluetoothUUID, ByteArray> PeripheralBase::service_data() {
-    std::map<BluetoothUUID, ByteArray> service_data;
-    for (auto& [service_uuid, value_array] : device_->service_data()) {
-        service_data[service_uuid] = ByteArray((const char*)value_array.data(), value_array.size());
-    }
-
-    return service_data;
 }
 
 ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) {

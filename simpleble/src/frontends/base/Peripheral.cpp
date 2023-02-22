@@ -103,12 +103,6 @@ std::map<uint16_t, ByteArray> Peripheral::manufacturer_data() {
     return internal_->manufacturer_data();
 }
 
-std::map<BluetoothUUID, ByteArray> Peripheral::service_data() {
-    if (!initialized()) throw Exception::NotInitialized();
-
-    return internal_->service_data();
-}
-
 ByteArray Peripheral::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     if (!initialized()) throw Exception::NotInitialized();
     if (!is_connected()) throw Exception::NotConnected();

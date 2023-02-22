@@ -77,7 +77,9 @@ int main() {
             simpleble_service_t service;
             simpleble_peripheral_services_get(peripheral, service_index, &service);
 
-            printf("    Service: %s\n", service.uuid.value);
+            printf("    Service UUID: %s\n", service.uuid.value);
+            printf("    Service data: ");
+            print_buffer_hex(service.data, service.data_length, true);
         }
 
         size_t manufacturer_data_count = simpleble_peripheral_manufacturer_data_count(peripheral);
@@ -87,16 +89,6 @@ int main() {
             printf("    Manufacturer ID: %04X\n", manuf_data.manufacturer_id);
             printf("    Manufacturer data: ");
             print_buffer_hex(manuf_data.data, manuf_data.data_length, true);
-        }
-
-        size_t service_data_count = simpleble_peripheral_service_data_count(peripheral);
-        for (size_t service_data_index = 0; service_data_index < service_data_count; service_data_index++) {
-            simpleble_service_data_t service_data;
-            simpleble_peripheral_service_data_get(peripheral, service_data_index, &service_data);
-
-            printf("    Service UUID: %s\n", service_data.service_uuid.value);
-            printf("    Service data: ");
-            print_buffer_hex(service_data.data, service_data.data_length, true);
         }
 
         // Let's not forget to release the associated handles and memory

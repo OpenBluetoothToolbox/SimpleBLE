@@ -66,10 +66,6 @@ constexpr auto kDocsPeripheralServices = R"pbdoc(
     Services of the peripheral
 )pbdoc";
 
-constexpr auto kDocsPeripheralServiceData = R"pbdoc(
-    Service data advertised by the peripheral
-)pbdoc";
-
 constexpr auto kDocsPeripheralManufacturerData = R"pbdoc(
     Manufacturer data of the peripheral
 )pbdoc";
@@ -132,16 +128,6 @@ void wrap_peripheral(py::module& m) {
         .def("is_paired", &SimpleBLE::Peripheral::is_paired, kDocsPeripheralIsPaired)
         .def("unpair", &SimpleBLE::Peripheral::unpair, kDocsPeripheralUnpair)
         .def("services", &SimpleBLE::Peripheral::services, kDocsPeripheralServices)
-        .def(
-            "service_data",
-            [](SimpleBLE::Peripheral& p) {
-                std::map<std::string, py::bytes> ret;
-                for (auto& kv : p.service_data()) {
-                    ret[kv.first] = py::bytes(kv.second);
-                }
-                return ret;
-            },
-            kDocsPeripheralServiceData)
         .def(
             "manufacturer_data",
             [](SimpleBLE::Peripheral& p) {

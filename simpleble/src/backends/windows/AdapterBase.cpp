@@ -124,7 +124,7 @@ AdapterBase::AdapterBase(std::string device_id)
             auto service_data = args.Advertisement().ServiceUuids();
             for (auto& service_guid : service_data) {
                 std::string service_uuid = guid_to_uuid(service_guid);
-                data.service_uuids.push_back(service_uuid);
+                data.service_data.emplace(std::make_pair(service_uuid, ByteArray()));
             }
 
             this->_scan_received_callback(data);

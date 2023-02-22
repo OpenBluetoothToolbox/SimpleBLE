@@ -58,17 +58,13 @@ fn main() {
         println!("    Address Type: {}", peripheral.address_type().unwrap());
 
         for service in peripheral.services().unwrap().iter() {
-            println!("    Service: {}", service.uuid());
+            println!("    Service UUID: {}", service.uuid());
+            println!("    Service Data: {:?}", service.data());
         }
 
         for (manufacturer_id, manufacturer_data) in peripheral.manufacturer_data().unwrap().iter() {
             println!("    Manufacturer ID: {}", manufacturer_id);
             println!("    Manufacturer Data: {:?}", manufacturer_data);
-        }
-
-        for (service_uuid, service_data) in peripheral.service_data().unwrap().iter() {
-            println!("    Service UUID: {}", service_uuid);
-            println!("    Service Data: {:?}", service_data);
         }
     }
 }
