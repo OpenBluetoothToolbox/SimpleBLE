@@ -3,7 +3,7 @@ Usage
 =====
 
 SimpleBluez should work on any Linux environment supporting DBus and Bluez.
-Please follow the instructions below to build and run Simplebluez in your specific environment.
+Please follow the instructions below to build and run SimpleBluez in your specific environment.
 
 System Requirements
 ===================
@@ -41,7 +41,7 @@ blindly following the instructions below.
 
 
 Building SimpleBluez
-------------------
+--------------------
 
 You can use the following commands to build SimpleBluez: ::
 
@@ -64,7 +64,7 @@ To force the usage of the DBus session bus, enable the ``SIMPLEBLUEZ_USE_SESSION
    cmake -H <path-to-simplebluez> -B build_simplebluez -DSIMPLEBLUEZ_USE_SESSION_DBUS=TRUE
 
 Installing SimpleBluez
---------------------
+----------------------
 
 To install SimpleBluez, you can use the following commands: ::
 

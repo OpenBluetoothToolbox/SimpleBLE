@@ -16,6 +16,8 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/epilogue.cmake)
 option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
 
 find_package(fmt REQUIRED)
+set_target_properties(fmt PROPERTIES EXCLUDE_FROM_ALL TRUE)
+
 find_package(DBus1 REQUIRED)
 
 # Load all variables that would eventually need to be exposed to downstream projects

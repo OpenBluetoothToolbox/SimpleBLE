@@ -219,9 +219,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
         ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux)
-    # target_include_directories(simpleble-c PRIVATE
-    #     ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
-    #     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include)
 
     set_property(TARGET simpleble PROPERTY INSTALL_RPATH $ORIGIN)
     set_property(TARGET simpleble-c PROPERTY INSTALL_RPATH $ORIGIN)
