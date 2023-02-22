@@ -28,8 +28,8 @@ If you want to use SimpleRsBLE and need help. **Please do not hesitate to reach 
 You can add SimpleRsBLE to your project by adding the following lines to your `Cargo.toml`:
 
 ```toml
-    [dependencies]
-    simplersble = "0.1.0"
+[dependencies]
+simplersble = "0.6.0"
 ```
 
 Please review our [code examples](https://github.com/OpenBluetoothToolbox/SimpleBLE/tree/main/examples/simplersble/src/bin)
