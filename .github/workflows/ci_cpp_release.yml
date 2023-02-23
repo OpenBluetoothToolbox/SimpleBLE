@@ -110,7 +110,7 @@ jobs:
             set BUILD_SHARED_LIBS=OFF
           )
 
-          cmake -B %GITHUB_WORKSPACE%\build -G "Visual Studio 17 2022" -A ${{ matrix.arch }} -DCMAKE_SYSTEM_VERSION="10.0.19041.0" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=%BUILS_SHARED_LIBS% -S %GITHUB_WORKSPACE%/simpleble
+          cmake -B %GITHUB_WORKSPACE%\build -G "Visual Studio 17 2022" -A ${{ matrix.arch }} -DCMAKE_SYSTEM_VERSION="10.0.19041.0" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=%BUILD_SHARED_LIBS% -S %GITHUB_WORKSPACE%/simpleble
           cmake --build %GITHUB_WORKSPACE%\build --config Release --parallel 4
           cmake --install %GITHUB_WORKSPACE%\build --prefix %GITHUB_WORKSPACE%\build\install
 
@@ -167,7 +167,7 @@ jobs:
             BUILD_SHARED_LIBS=OFF
           fi
 
-          cmake -B $GITHUB_WORKSPACE/build -DCMAKE_OSX_ARCHITECTURES="${{ matrix.arch }}" -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble -DBUILD_SHARED_LIBS=$BUILS_SHARED_LIBS
+          cmake -B $GITHUB_WORKSPACE/build -DCMAKE_OSX_ARCHITECTURES="${{ matrix.arch }}" -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble -DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS
           cmake --build $GITHUB_WORKSPACE/build --config Release --parallel 4
           cmake --install $GITHUB_WORKSPACE/build --prefix $GITHUB_WORKSPACE/build/install
 
