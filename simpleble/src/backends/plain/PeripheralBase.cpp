@@ -72,8 +72,6 @@ std::vector<Service> PeripheralBase::advertised_services() { return {}; }
 
 std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() { return {}; }
 
-std::map<BluetoothUUID, ByteArray> PeripheralBase::service_data() { return {}; }
-
 ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) { return {}; }
 
 void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic,

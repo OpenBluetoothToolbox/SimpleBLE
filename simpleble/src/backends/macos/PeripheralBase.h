@@ -36,7 +36,6 @@ class PeripheralBase {
     std::vector<Service> services();
     std::vector<Service> advertised_services();
     std::map<uint16_t, ByteArray> manufacturer_data();
-    std::map<BluetoothUUID, ByteArray> service_data();
 
     // clang-format off
     ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic);
@@ -71,7 +70,6 @@ class PeripheralBase {
 
     bool manual_disconnect_triggered_;
 
-    std::vector<BluetoothUUID> advertised_services_;
     std::map<uint16_t, ByteArray> manufacturer_data_;
     std::map<BluetoothUUID, ByteArray> service_data_;
 

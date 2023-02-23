@@ -32,7 +32,6 @@ class SIMPLEBLE_EXPORT Peripheral : public SimpleBLE::Peripheral {
 
     std::optional<std::vector<Service>> services() noexcept;
     std::optional<std::map<uint16_t, ByteArray>> manufacturer_data() noexcept;
-    std::optional<std::map<BluetoothUUID, ByteArray>> service_data() noexcept;
 
     // clang-format off
     std::optional<ByteArray> read(BluetoothUUID const& service, BluetoothUUID const& characteristic) noexcept;

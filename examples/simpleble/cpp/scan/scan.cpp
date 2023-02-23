@@ -48,20 +48,15 @@ int main() {
 
         std::vector<SimpleBLE::Service> services = peripherals[i].services();
         for (auto& service : services) {
-            std::cout << "    Service: " << service.uuid() << std::endl;
+            std::cout << "    Service UUID: " << service.uuid() << std::endl;
+            std::cout << "    Service data: ";
+            Utils::print_byte_array(service.data());
         }
 
         std::map<uint16_t, SimpleBLE::ByteArray> manufacturer_data = peripherals[i].manufacturer_data();
         for (auto& [manufacturer_id, data] : manufacturer_data) {
             std::cout << "    Manufacturer ID: " << manufacturer_id << std::endl;
             std::cout << "    Manufacturer data: ";
-            Utils::print_byte_array(data);
-        }
-
-        std::map<SimpleBLE::BluetoothUUID, SimpleBLE::ByteArray> service_data = peripherals[i].service_data();
-        for (auto& [service_uuid, data] : service_data) {
-            std::cout << "    Service UUID: " << service_uuid << std::endl;
-            std::cout << "    Service data: ";
             Utils::print_byte_array(data);
         }
     }
