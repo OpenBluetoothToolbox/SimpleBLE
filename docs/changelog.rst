@@ -45,6 +45,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 -  Missing function definition in C-bindings. *(Thanks eriklins!)*
 -  (Linux) Peripheral would still issue callbacks after deletion.
 -  (MacOS) Increased priority of the dispatch queue to prevent jitter in the incoming data.
+-  (MacOS) Incorrect listing of advertized services. *(Thanks eriklins & Symbitic!)*
 -  (Windows) Missing peripheral identifier data. *(Thanks eriklins!)*
 -  (Windows) Multiple initializations of the WinRT backend.
 -  (Windows) Incorrect initialization of the WinRT backend. *(Thanks ChatGPT & Andrey1994!)*
@@ -127,8 +128,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 
 -  Updated Linux implementation to use SimpleBluez v0.5.0.
 -  Added support for Windows SDK 10.0.22000.0
--  Updated libfmt to version 8.1.1.
--  Cleaned up dependency management for libfmt and SimpleBluez.
+-  Updated ``libfmt`` to version 8.1.1.
+-  Cleaned up dependency management for ``libfmt`` and SimpleBluez.
 -  ``Adapter::get_paired_peripherals`` will return an empty list on Windows and MacOS.
 -  (Linux) **(Experimental)** Exceptions thrown inside the Bluez async thread are now caught to prevent lockups.
 -  ``NotConnected`` exception will be thrown instead of ``OperationFailed`` when peripheral not connected.
