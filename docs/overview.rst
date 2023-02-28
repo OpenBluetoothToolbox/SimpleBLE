@@ -2,7 +2,7 @@ Overview
 --------
 
 The SimpleBLE project aims to provide fully cross-platform BLE libraries and bindings
-for Python, Rust and C++, designed for simplicity and ease of use with a licencing scheme
+for Python, Rust and C++, designed for simplicity and ease of use with a licensing scheme
 chosen to be friendly towards commercial use. All specific operating system quirks
 are handled internally to provide a consistent behavior across all platforms. The
 libraries also provide first-class support for vendorization of all third-party
