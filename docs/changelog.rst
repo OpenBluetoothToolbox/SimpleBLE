@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog`_, and this project adheres to `Semantic Versioning`_.
 
+[0.6.1] - XXXX-XX-XX
+--------------------
+
+**Added**
+
+-
+
+**Changed**
+
+- (Windows) Use the standard C++ exception handling model.
+
+**Fixed**
+
+-
+
 [0.6.0] - 2023-02-23
 --------------------
 
