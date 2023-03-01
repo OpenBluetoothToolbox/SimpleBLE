@@ -237,7 +237,9 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         list(APPEND PRIVATE_COMPILE_DEFINITIONS "/D_WIN32_WINNT=${WINVERSION_CODE}")
         # /D_USE_MATH_DEFINES -> Specifies that the math.h header file should be included.
         list(APPEND PRIVATE_COMPILE_DEFINITIONS "/D_USE_MATH_DEFINES")
-
+        
+        # /EHsc -> Allow building C++ code that follows the C++ standard for exception handling. https://learn.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-level-1-c4530?view=msvc-170
+        list(APPEND PRIVATE_COMPILE_OPTIONS "/EHsc")
         # /utf-8 -> Set source and executable character sets to utf-8. https://learn.microsoft.com/en-us/cpp/build/reference/utf-8-set-source-and-executable-character-sets-to-utf-8
         list(APPEND PRIVATE_COMPILE_OPTIONS "/utf-8")
         # /Gd -> Use __cdecl as the default calling convention. https://docs.microsoft.com/en-us/cpp/cpp/cdecl
