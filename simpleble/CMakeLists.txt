@@ -242,6 +242,8 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         list(APPEND PRIVATE_COMPILE_OPTIONS "/utf-8")
         # /Gd -> Use __cdecl as the default calling convention. https://docs.microsoft.com/en-us/cpp/cpp/cdecl
         list(APPEND PRIVATE_COMPILE_OPTIONS "/Gd")
+        # /EHsc -> Use the standard C++ exception handling model. https://learn.microsoft.com/en-us/cpp/build/reference/eh-exception-handling-model
+        list(APPEND PRIVATE_COMPILE_OPTIONS "/EHsc")
         # /WX -> Treats all warnings as errors.
         list(APPEND PRIVATE_COMPILE_OPTIONS "/WX")
         # /W1 -> Use the lowest level of warnings, as there are some unsafe functions that MSVC doesn't like.
