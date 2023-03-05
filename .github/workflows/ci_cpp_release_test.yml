@@ -33,6 +33,19 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
 
+      - name: Build DBus
+        run: |
+          GITHUB_WORKSPACE=$(pwd)
+
+          git clone https://gitlab.freedesktop.org/dbus/dbus.git /tmp/dbus
+          cd /tmp/dbus
+
+          git checkout 1.12.20
+
+          cmake -B /tmb/dbus/build -S /tmp/dbus
+          cmake --build /tmb/dbus/build --config Release --parallel 4
+          cmake --install /tmb/dbus/build --prefix /tmp/dbus/install
+
       - name: Build SimpleBLE
         run: |
           GITHUB_WORKSPACE=$(pwd)
@@ -42,6 +55,8 @@ jobs:
           else
             BUILD_SHARED_LIBS=OFF
           fi
+
+          export CMAKE_PREFIX_PATH=/tmp/dbus/install:$CMAKE_PREFIX_PATH
 
           cmake -B $GITHUB_WORKSPACE/build_simpleble -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble -DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS
           cmake --build $GITHUB_WORKSPACE/build_simpleble --config Release --parallel 4
