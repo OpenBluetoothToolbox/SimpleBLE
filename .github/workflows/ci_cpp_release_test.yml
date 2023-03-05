@@ -35,12 +35,8 @@ jobs:
 
       - name: Build DBus
         run: |
-          GITHUB_WORKSPACE=$(pwd)
-
           git clone https://gitlab.freedesktop.org/dbus/dbus.git /tmp/dbus
           cd /tmp/dbus
-
-          git checkout 1.12.20
 
           cmake -B /tmb/dbus/build -S /tmp/dbus
           cmake --build /tmb/dbus/build --config Release --parallel 4
