@@ -38,7 +38,7 @@ jobs:
           git clone https://gitlab.freedesktop.org/dbus/dbus.git /tmp/dbus
           cd /tmp/dbus
 
-          cmake -B /tmb/dbus/build -S /tmp/dbus -DDBUS_SESSION_SOCKET_DIR=/usr/local/var/run/dbus/system_bus_socket
+          cmake -B /tmb/dbus/build -S /tmp/dbus -DDBUS_SESSION_SOCKET_DIR=/usr/local/var/run/dbus/system_bus_socket -DDBUS_BUILD_TESTS=OFF
           cmake --build /tmb/dbus/build --config Release --parallel 4
           cmake --install /tmb/dbus/build --prefix /tmp/dbus/install
 
