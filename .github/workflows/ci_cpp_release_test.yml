@@ -31,13 +31,6 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: |
-          sudo -H apt-get update -y
-          sudo -H apt-get install -y libdbus-1-dev
-        env:
-          DEBIAN_FRONTEND: noninteractive
-
       - name: Build Expat
         run: |
           git clone https://github.com/libexpat/libexpat.git /tmp/libexpat
