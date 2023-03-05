@@ -96,13 +96,15 @@ jobs:
 
 
   py-release-crossbuild:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       max-parallel: 4
       matrix:
-        python-version: [3.8, 3.9, 3.10, 3.11]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
         options: [
           {container: dockcross/linux-armv6-lts, target: linux-armv6},
         ]
@@ -118,9 +120,16 @@ jobs:
           curl https://pyenv.run | bash
           export PYENV_ROOT="$HOME/.pyenv
           export PATH="$PYENV_ROOT/bin:$PATH
-          eval "$(pyenv init -)"
 
-          pyenv install ${{ matrix.python-version }}
+          echo "-------------------------------"
+          echo $PATH
+          echo "-------------------------------"
+          ls -al $HOME/.pyenv/bin
+          echo "-------------------------------"
+          eval "$(pyenv init -)"
+          echo "-------------------------------"
+
+          # pyenv install ${{ matrix.python-version }}
 
 
       - name: Install Python dependencies
