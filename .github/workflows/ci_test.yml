@@ -148,7 +148,6 @@ jobs:
 
       - name: Install SimplePyBLE with Plain flavor
         run: python setup.py install --plain
-        working-directory: ./simplepyble
 
       - name: Run PyTest
         run: pytest

@@ -17,8 +17,7 @@ argparser.add_argument('--plain',  help='Use Plain SimpleBLE', required=False, a
 args, unknown = argparser.parse_known_args()
 sys.argv = [sys.argv[0]] + unknown
 
-here = pathlib.Path(__file__).parent.resolve()
-root = here.parent.resolve()
+root = pathlib.Path(__file__).parent.resolve()
 
 # Generate the version string
 # TODO: Make the dev portion smarter by looking at tags.
@@ -26,7 +25,7 @@ version_str = (root / "VERSION").read_text(encoding="utf-8").strip()
 version_str += ".dev1" # ! Ensure it matches the intended release version!
 
 # Get the long description from the README file
-long_description = (here / "README.rst").read_text(encoding="utf-8")
+long_description = (root / "simplepyble" / "README.rst").read_text(encoding="utf-8")
 
 cmake_options = []
 cmake_options.append(f"-Dpybind11_DIR={pybind11.get_cmake_dir()}")
@@ -53,10 +52,11 @@ skbuild.setup(
     long_description_content_type='text/x-rst',
 
     packages=["simplepyble"],
-    package_dir={"": "src"},
+    package_dir={"": "simplepyble/src"},
+    cmake_source_dir="simplepyble",
     cmake_args=cmake_options,
     cmake_process_manifest_hook=exclude_unnecessary_files,
-    cmake_install_dir="src/simplepyble",
+    cmake_install_dir="simplepyble/src/simplepyble",
 
     setup_requires=[
         "setuptools>=42",
@@ -66,9 +66,6 @@ skbuild.setup(
         "pybind11",
     ],
     install_requires=[],
-    test_requires=[
-        "pytest",
-    ],
     extras_require={},
     platforms="Windows, macOS, Linux",
     python_requires=">=3.7",
