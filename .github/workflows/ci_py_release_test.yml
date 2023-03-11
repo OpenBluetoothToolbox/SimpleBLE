@@ -21,7 +21,7 @@ jobs:
             pip3 install build twine
             python3 -m build --sdist
 
-      - name: Upload wheels
+      - name: Upload files
         uses: actions/upload-artifact@v3
         with:
           name: simplepyble
@@ -75,8 +75,6 @@ jobs:
           CIBW_ARCHS_MACOS: x86_64 universal2 arm64
           CIBW_ARCHS_WINDOWS: AMD64 x86
           CIBW_SKIP: "*musllinux_* pp*"
-        with:
-            package-dir: simplepyble
 
       - name: Upload wheels
         uses: actions/upload-artifact@v3
