@@ -10,6 +10,39 @@ on:
         required: true
 
 jobs:
+  build_sdist:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+          cache: "pip"
+
+      - name: Build source distribution
+        run: |
+            pip3 install build twine
+            python3 -m build --sdist
+
+      - name: Upload files
+        uses: actions/upload-artifact@v3
+        with:
+          name: simplepyble
+          path: dist/*.tar.gz
+
+      - name: Check packages
+        run: twine check dist/*.tar.gz
+
+      - name: Publish packages
+        run: twine upload --skip-existing wheelhouse/*.tar.gz --verbose
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USER }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+
   build_wheels:
     runs-on: ${{ matrix.options.os }}
 
@@ -57,8 +90,6 @@ jobs:
           CIBW_ARCHS_MACOS: ${{ matrix.options.arch }}
           CIBW_ARCHS_WINDOWS: ${{ matrix.options.arch }}
           CIBW_SKIP: "*musllinux_* pp*"
-        with:
-            package-dir: simplepyble
 
       - name: Upload wheels to job
         uses: actions/upload-artifact@v3

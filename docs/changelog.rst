@@ -10,7 +10,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 
 **Added**
 
--
+- (Python) Generate source distribution sources.
 
 **Changed**
 
@@ -18,7 +18,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 
 **Fixed**
 
--
+- CI artifacts for non-standard architectures are now properly built.
 
 [0.6.0] - 2023-02-23
 --------------------
