@@ -7,7 +7,7 @@ on:
     inputs:
       tag:
         description: "The tag to upload artifacts"
-        required: true
+        required: false
 
 jobs:
   build_sdist:
@@ -16,6 +16,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        env:
+          TAG: ${{ inputs.tag || github.ref }}
+        with:
+          ref: ${{ env.TAG }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
