@@ -19,6 +19,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 **Fixed**
 
 - CI artifacts for non-standard architectures are now properly built.
+- (SimpleBluez) Fixed incorrect handling of invalidated children objects.
 
 [0.6.0] - 2023-02-23
 --------------------

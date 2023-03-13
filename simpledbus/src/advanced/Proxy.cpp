@@ -7,7 +7,7 @@
 using namespace SimpleDBus;
 
 Proxy::Proxy(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path)
-    : _conn(conn), _bus_name(bus_name), _path(path) {}
+    : _conn(conn), _bus_name(bus_name), _path(path), _valid(true) {}
 
 Proxy::~Proxy() {
     on_child_created.unload();
@@ -106,6 +106,10 @@ bool Proxy::interfaces_loaded() {
 
 // ----- CHILD HANDLING -----
 
+bool Proxy::valid() {
+    return _valid;
+}
+
 bool Proxy::path_exists(const std::string& path) {
     std::scoped_lock lock(_child_access_mutex);
     return _children.find(path) != _children.end();
@@ -168,6 +172,7 @@ bool Proxy::path_remove(const std::string& path, SimpleDBus::Holder options) {
     // `options` contains an array of strings of the interfaces that need to be removed.
 
     if (path == _path) {
+        _valid = false;
         interfaces_unload(options);
         return path_prune();
     }
