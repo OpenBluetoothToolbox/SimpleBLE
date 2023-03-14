@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog`_, and this project adheres to `Semantic Versioning`_.
 
+[0.6.2] - XXXX-XX-XX
+--------------------
+
+**Added**
+
+-
+
+**Changed**
+
+-
+
+**Fixed**
+
+-
+
+
 [0.6.1] - 2023-03-14
 --------------------
 
@@ -22,6 +38,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 
 - CI artifacts for non-standard architectures are now properly built.
 - (SimpleBluez) Fixed incorrect handling of invalidated children objects.
+
 
 [0.6.0] - 2023-02-23
 --------------------
