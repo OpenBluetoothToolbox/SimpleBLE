@@ -14,5 +14,5 @@ TEST(ProxyLifetime, Validity) {
     ASSERT_TRUE(p.path_remove("/", Holder::create_array()));
 
     // A proxy that has been removed is no longer valid.
-    ASSERT_TRUE(p.valid());
+    ASSERT_FALSE(p.valid());
 }
