@@ -111,6 +111,7 @@ if(SIMPLEDBUS_TEST)
         ${CMAKE_CURRENT_SOURCE_DIR}/test/src/test_message.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/test/src/test_proxy_interfaces.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/test/src/test_proxy_children.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/test/src/test_proxy_lifetime.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/test/src/test_path.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/test/src/helpers/PythonRunner.cpp)
 
