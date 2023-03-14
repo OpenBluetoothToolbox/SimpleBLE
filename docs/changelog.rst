@@ -5,16 +5,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog`_, and this project adheres to `Semantic Versioning`_.
 
-[0.6.1] - XXXX-XX-XX
+[0.6.1] - 2023-03-14
 --------------------
 
 **Added**
 
-- (Python) Generate source distribution sources.
+- (Python) Generate source distribution packages.
+- (SimpleDBus) Proxy objects keep track of their existence on the DBus object tree.
 
 **Changed**
 
-- (Windows) Use the standard C++ exception handling model.
+- Bluetooth enabled check was moved into the frontend modules. *(Thanks felixdollack!)*
+- (Windows) Use the standard C++ exception handling model. *(Thanks TheFrankyJoe!)*
 
 **Fixed**
 
