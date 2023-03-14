@@ -22,6 +22,8 @@ std::shared_ptr<Proxy> Proxy::path_create(const std::string& path) {
     return std::make_shared<Proxy>(_conn, _bus_name, path);
 }
 
+bool Proxy::valid() const { return _valid; }
+
 std::string Proxy::path() const { return _path; }
 
 const std::map<std::string, std::shared_ptr<Proxy>>& Proxy::children() { return _children; }
@@ -105,10 +107,6 @@ bool Proxy::interfaces_loaded() {
 }
 
 // ----- CHILD HANDLING -----
-
-bool Proxy::valid() {
-    return _valid;
-}
 
 bool Proxy::path_exists(const std::string& path) {
     std::scoped_lock lock(_child_access_mutex);
