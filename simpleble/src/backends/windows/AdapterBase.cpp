@@ -190,11 +190,6 @@ BluetoothAddress AdapterBase::address() { return _mac_address_to_str(adapter_.Bl
 void AdapterBase::scan_start() {
     this->seen_peripherals_.clear();
 
-    if (!bluetooth_enabled()) {
-        SIMPLEBLE_LOG_WARN(fmt::format("Bluetooth is not enabled."));
-        return;
-    }
-
     scanner_.ScanningMode(Advertisement::BluetoothLEScanningMode::Active);
     scan_is_active_ = true;
     scanner_.Start();
@@ -203,11 +198,6 @@ void AdapterBase::scan_start() {
 }
 
 void AdapterBase::scan_stop() {
-    if (!bluetooth_enabled()) {
-        SIMPLEBLE_LOG_WARN(fmt::format("Bluetooth is not enabled."));
-        return;
-    }
-
     scanner_.Stop();
 
     std::unique_lock<std::mutex> lock(scan_stop_mutex_);
@@ -220,11 +210,6 @@ void AdapterBase::scan_stop() {
 }
 
 void AdapterBase::scan_for(int timeout_ms) {
-    if (!bluetooth_enabled()) {
-        SIMPLEBLE_LOG_WARN(fmt::format("Bluetooth is not enabled."));
-        return;
-    }
-
     scan_start();
     std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
     scan_stop();
