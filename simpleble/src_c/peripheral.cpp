@@ -192,6 +192,9 @@ simpleble_err_t simpleble_peripheral_services_get(simpleble_peripheral_t handle,
         services->characteristics[i].can_write_command = characteristic.can_write_command();
         services->characteristics[i].can_notify = characteristic.can_notify();
         services->characteristics[i].can_indicate = characteristic.can_indicate();
+        services->characteristics[i].can_write_authenticated = characteristic.can_write_authenticated();
+        services->characteristics[i].can_broadcast = characteristic.can_broadcast();
+        services->characteristics[i].has_extended_properties = characteristic.has_extended_properties();
 
         memcpy(services->characteristics[i].uuid.value, characteristic.uuid().c_str(), SIMPLEBLE_UUID_STR_LEN);
         services->characteristics[i].descriptor_count = characteristic.descriptors().size();
@@ -206,6 +209,16 @@ simpleble_err_t simpleble_peripheral_services_get(simpleble_peripheral_t handle,
             memcpy(services->characteristics[i].descriptors[j].uuid.value, descriptor.uuid().c_str(),
                    SIMPLEBLE_UUID_STR_LEN);
         }
+    }
+
+    services->included_services_count = service.included_services().size();
+    if (services->included_services_count > SIMPLEBLE_INCLUDED_SERVICES_MAX_COUNT) {
+        services->included_services_count = SIMPLEBLE_INCLUDED_SERVICES_MAX_COUNT;
+    }
+
+    for (size_t i = 0; i < services->included_services_count; i++) {
+        SimpleBLE::BluetoothUUID included_service = service.included_services()[i];
+        memcpy(services->included_services[i].value, included_service.c_str(), SIMPLEBLE_UUID_STR_LEN);
     }
 
     return SIMPLEBLE_SUCCESS;

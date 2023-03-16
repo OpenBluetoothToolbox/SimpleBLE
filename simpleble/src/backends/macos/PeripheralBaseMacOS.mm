@@ -104,9 +104,11 @@ typedef struct {
         // For each service found, discover characteristics.
         for (CBService* service in self.peripheral.services) {
             [self.peripheral discoverCharacteristics:nil forService:service];
+            [self.peripheral discoverIncludedServices:nil forService:service];
 
-            // Wait for characteristics  to be discovered for up to 1 second.
+            // Wait for characteristics to be discovered for up to 1 second.
             // NOTE: This is a bit of a hack but avoids the need of having a dedicated flag.
+            // NOTE: discoverIncludedServices could take longer than one second.
             endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
             while (service.characteristics == nil && [NSDate.now compare:endDate] == NSOrderedAscending) {
                 [NSThread sleepForTimeInterval:0.01];
@@ -191,13 +193,23 @@ typedef struct {
             bool can_read = (characteristic.properties & CBCharacteristicPropertyRead) != 0;
             bool can_write_request = (characteristic.properties & CBCharacteristicPropertyWrite) != 0;
             bool can_write_command = (characteristic.properties & CBCharacteristicPropertyWriteWithoutResponse) != 0;
+            bool can_write_authenticated = (characteristic.properties & CBCharacteristicPropertyAuthenticatedSignedWrites) != 0;
             bool can_notify = (characteristic.properties & CBCharacteristicPropertyNotify) != 0;
             bool can_indicate = (characteristic.properties & CBCharacteristicPropertyIndicate) != 0;
+            bool can_broadcast = (characteristic.properties & CBCharacteristicPropertyBroadcast) != 0;
+            bool has_extended_properties = (characteristic.properties & CBCharacteristicPropertyExtendedProperties) != 0;
 
             characteristic_list.push_back(SimpleBLE::CharacteristicBuilder(uuidToSimpleBLE(characteristic.UUID), descriptor_list, can_read,
-                                                                           can_write_request, can_write_command, can_notify, can_indicate));
+                                                                           can_write_request, can_write_command, can_write_authenticated,
+                                                                           can_notify, can_indicate, can_broadcast, has_extended_properties));
         }
-        service_list.push_back(SimpleBLE::ServiceBuilder(uuidToSimpleBLE(service.UUID), characteristic_list));
+
+        // Build the list of included services.
+        std::vector<SimpleBLE::BluetoothUUID> includedServices;
+        for (CBService* includedService in service.includedServices) {
+            includedServices.push_back(uuidToSimpleBLE(includedService.UUID));
+        }
+        service_list.push_back(SimpleBLE::ServiceBuilder(uuidToSimpleBLE(service.UUID), characteristic_list, includedServices));
     }
 
     return service_list;
@@ -483,6 +495,14 @@ typedef struct {
     // but might be useful in the future.
     if (error != nil) {
         NSLog(@"Error while discovering services for peripheral %@: %@\n", peripheral.name, error);
+    }
+}
+
+- (void)peripheral:(CBPeripheral*)peripheral didDiscoverIncludedServicesForService:(CBService *)service error:(NSError *)error {
+    // NOTE: As we are currently polling the result of the discovery, this callback is not needed,
+    // but might be useful in the future.
+    if (error != nil) {
+        NSLog(@"Error while discovering included services for service %@: %@\n", service.UUID, error);
     }
 }
 

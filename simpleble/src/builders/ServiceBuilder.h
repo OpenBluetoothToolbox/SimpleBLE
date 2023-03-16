@@ -18,7 +18,7 @@ class ServiceBuilder : public Service {
   public:
     ServiceBuilder(const BluetoothUUID& uuid);
     ServiceBuilder(const BluetoothUUID& uuid, const ByteArray& data);
-    ServiceBuilder(const BluetoothUUID& uuid, std::vector<Characteristic> characteristics);
+    ServiceBuilder(const BluetoothUUID& uuid, std::vector<Characteristic> characteristics, std::vector<BluetoothUUID> included_services);
     virtual ~ServiceBuilder() = default;
 };
 

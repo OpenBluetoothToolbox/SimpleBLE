@@ -8,6 +8,7 @@
 extern "C" {
 #endif
 
+/** Returns the host operating system. */
 SIMPLEBLE_EXPORT simpleble_os_t get_operating_system(void);
 
 #ifdef __cplusplus

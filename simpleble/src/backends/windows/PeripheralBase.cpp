@@ -125,6 +125,13 @@ void PeripheralBase::unpair() { throw Exception::OperationNotSupported(); }
 std::vector<Service> PeripheralBase::services() {
     std::vector<Service> service_list;
     for (auto& [service_uuid, service] : gatt_map_) {
+        // Build the list of included services.
+        // NOTE: Is building another copy really needed?
+        std::vector<BluetoothUUID> included_services_list;
+        for (BluetoothUUID included_service : service.included_services) {
+            included_services_list.push_back(included_service);
+        }
+
         // Build the list of characteristics for the service.
         std::vector<Characteristic> characteristic_list;
         for (auto& [characteristic_uuid, characteristic] : service.characteristics) {
@@ -138,14 +145,17 @@ std::vector<Service> PeripheralBase::services() {
             bool can_read = (properties & (uint32_t)GattCharacteristicProperties::Read) != 0;
             bool can_write_request = (properties & (uint32_t)GattCharacteristicProperties::Write) != 0;
             bool can_write_command = (properties & (uint32_t)GattCharacteristicProperties::WriteWithoutResponse) != 0;
+            bool can_write_authenticated = (properties & (uint32_t)GattCharacteristicProperties::AuthenticatedSignedWrites) != 0;
             bool can_notify = (properties & (uint32_t)GattCharacteristicProperties::Notify) != 0;
             bool can_indicate = (properties & (uint32_t)GattCharacteristicProperties::Indicate) != 0;
+            bool can_broadcast = (properties & (uint32_t)GattCharacteristicProperties::Broadcast) != 0;
+            bool has_extended_properties = (properties & (uint32_t)GattCharacteristicProperties::ExtendedProperties) != 0;
 
             characteristic_list.push_back(CharacteristicBuilder(characteristic_uuid, descriptor_list, can_read,
-                                                                can_write_request, can_write_command, can_notify,
-                                                                can_indicate));
+                                                                can_write_request, can_write_command, can_write_authenticated,
+                                                                can_notify, can_indicate, can_broadcast, has_extended_properties));
         }
-        service_list.push_back(ServiceBuilder(service_uuid, characteristic_list));
+        service_list.push_back(ServiceBuilder(service_uuid, characteristic_list, included_services_list));
     }
 
     return service_list;
@@ -360,6 +370,17 @@ bool PeripheralBase::_attempt_connect() {
         auto characteristics_result = async_get(service.GetCharacteristicsAsync(BluetoothCacheMode::Uncached));
         if (characteristics_result.Status() != GattCommunicationStatus::Success) {
             return false;
+        }
+
+        // Fetch the included services
+        auto included_services_result = async_get(service.GetIncludedServicesAsync(BluetoothCacheMode::Uncached));
+        if (included_services_result.Status() == GattCommunicationStatus::Success) {
+            auto gatt_included_services = included_services_result.Services();
+            for (GattDeviceService&& included_service : gatt_included_services) {
+                // Fetch the service UUID
+                std::string included_service_uuid = guid_to_uuid(included_service.Uuid());
+                gatt_service.included_services.push_back(included_service_uuid);
+            }
         }
 
         // Load the characteristics into the service
