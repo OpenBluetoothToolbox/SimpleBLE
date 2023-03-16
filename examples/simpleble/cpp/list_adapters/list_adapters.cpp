@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "simpleble/Utils.h"
 #include "simpleble/Adapter.h"
+#include "simpleble/Utils.h"
 
 int main() {
     std::cout << "Using SimpleBLE version: " << SimpleBLE::get_simpleble_version() << std::endl;

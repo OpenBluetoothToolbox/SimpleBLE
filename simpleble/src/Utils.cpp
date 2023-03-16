@@ -12,8 +12,6 @@ OperatingSystem get_operating_system() {
 #endif
 }
 
-std::string get_simpleble_version() {
-    return SIMPLEBLE_VERSION;
-}
+std::string get_simpleble_version() { return SIMPLEBLE_VERSION; }
 
 }  // namespace SimpleBLE
