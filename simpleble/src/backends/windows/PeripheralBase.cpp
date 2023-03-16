@@ -92,6 +92,8 @@ void PeripheralBase::connect() {
             });
 
         SAFE_CALLBACK_CALL(this->callback_on_connected_);
+    } else {
+        throw SimpleBLE::Exception::OperationFailed("Failed to connect to device.");
     }
 }
 
