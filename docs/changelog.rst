@@ -18,7 +18,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 
 **Fixed**
 
--
+- (Windows) Failed connection attempt would not trigger an exception. *(Thanks eriklins!)*
 
 
 [0.6.1] - 2023-03-14
