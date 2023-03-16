@@ -182,6 +182,7 @@ mod ffi {
         fn uuid(self: &RustyService) -> String;
         fn data(self: &RustyService) -> Vec<u8>;
         fn characteristics(self: &RustyService) -> Vec<RustyCharacteristicWrapper>;
+        fn included_services(self: &RustyService) -> Vec<String>;
 
         // RustyCharacteristic functions
 
@@ -219,6 +220,9 @@ pub enum CharacteristicCapability {
     WriteCommand,
     Notify,
     Indicate,
+    Broadcast,
+    AuthenticatedSignedWrites,
+    ExtendedProperties,
 }
 
 pub struct Adapter {
@@ -691,6 +695,16 @@ impl Service {
 
         return characteristics;
     }
+
+    pub fn included_services(&self) -> Vec<Pin<Box<String>>> {
+        let mut included_services = Vec::<Pin<Box<String>>>::new();
+
+        for included_service in self.internal.included_services().iter_mut() {
+            included_services.push(included_service);
+        }
+
+        return included_services;
+    }
 }
 
 impl Characteristic {
@@ -744,6 +758,18 @@ impl Characteristic {
 
         if self.internal.can_indicate() {
             capabilities.push(CharacteristicCapability::Indicate);
+        }
+
+        if self.internal.can_broadcast() {
+            capabilities.push(CharacteristicCapability::Broadcast);
+        }
+
+        if self.internal.can_write_authenticated() {
+            capabilities.push(CharacteristicCapability::AuthenticatedSignedWrites);
+        }
+
+        if self.internal.has_extended_properties() {
+            capabilities.push(CharacteristicCapability::ExtendedProperties);
         }
 
         return capabilities;
@@ -831,6 +857,9 @@ impl fmt::Display for CharacteristicCapability {
             CharacteristicCapability::WriteCommand => write!(f, "WriteCommand"),
             CharacteristicCapability::Notify => write!(f, "Notify"),
             CharacteristicCapability::Indicate => write!(f, "Indicate"),
+            CharacteristicCapability::Broadcast => write!(f, "Broadcast"),
+            CharacteristicCapability::AuthenticatedSignedWrites => write!(f, "AuthenticatedSignedWrites"),
+            CharacteristicCapability::ExtendedProperties => write!(f, "ExtendedProperties"),
         }
     }
 }
