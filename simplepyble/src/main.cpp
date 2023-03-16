@@ -40,6 +40,10 @@ PYBIND11_MODULE(_simplepyble, m) {
         Returns the currently-running operating system.
     )pbdoc");
 
+    m.def("get_simpleble_version", &SimpleBLE::get_simpleble_version, R"pbdoc(
+        Returns the version of SimpleBLE.
+    )pbdoc");
+
     wrap_types(m);
     wrap_descriptor(m);
     wrap_characteristic(m);

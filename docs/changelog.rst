@@ -10,7 +10,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 
 **Added**
 
--
+- Function to query the version of SimpleBLE at runtime.
 
 **Changed**
 
