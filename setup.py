@@ -51,7 +51,6 @@ if args.plain:
     cmake_options.append("-DSIMPLEBLE_PLAIN=ON")
 
 if 'PIWHEELS_BUILD' in os.environ:
-    print("Building for PiWheels")
     cmake_options.append("-DLIBFMT_VENDORIZE=OFF")
 
 # The information here can also be placed in setup.cfg - better separation of
