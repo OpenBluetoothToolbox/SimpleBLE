@@ -1,19 +1,30 @@
+import argparse
+import os
 import pathlib
 import sys
-import skbuild
-import argparse
+
 import pybind11
+import skbuild
+
 
 def exclude_unnecessary_files(cmake_manifest):
     def is_necessary(name):
-        is_necessary = name.endswith(".so") or name.endswith(".dylib") or name.endswith("py") or name.endswith("pyd")
+        is_necessary = (
+            name.endswith(".so")
+            or name.endswith(".dylib")
+            or name.endswith("py")
+            or name.endswith("pyd")
+        )
         print(f"Parsing file: {name} - {is_necessary}")
         return is_necessary
 
     return list(filter(is_necessary, cmake_manifest))
 
+
 argparser = argparse.ArgumentParser(add_help=False)
-argparser.add_argument('--plain',  help='Use Plain SimpleBLE', required=False, action='store_true')
+argparser.add_argument(
+    "--plain", help="Use Plain SimpleBLE", required=False, action="store_true"
+)
 args, unknown = argparser.parse_known_args()
 sys.argv = [sys.argv[0]] + unknown
 
@@ -22,7 +33,7 @@ root = pathlib.Path(__file__).parent.resolve()
 # Generate the version string
 # TODO: Make the dev portion smarter by looking at tags.
 version_str = (root / "VERSION").read_text(encoding="utf-8").strip()
-version_str += ".dev1" # ! Ensure it matches the intended release version!
+version_str += ".dev1"  # ! Ensure it matches the intended release version!
 
 # Get the long description from the README file
 long_description = (root / "simplepyble" / "README.rst").read_text(encoding="utf-8")
@@ -39,6 +50,9 @@ cmake_options.append(f"-DSIMPLEPYBLE_VERSION={version_str}")
 if args.plain:
     cmake_options.append("-DSIMPLEBLE_PLAIN=ON")
 
+if 'PIWHEELS_BUILD' in os.environ:
+    cmake_options.append("-DLIBFMT_VENDORIZE=OFF")
+
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
 skbuild.setup(
@@ -49,15 +63,13 @@ skbuild.setup(
     url="https://github.com/OpenBluetoothToolbox/SimpleBLE",
     description="The ultimate fully-fledged cross-platform BLE library, designed for simplicity and ease of use.",
     long_description=long_description,
-    long_description_content_type='text/x-rst',
-
+    long_description_content_type="text/x-rst",
     packages=["simplepyble"],
     package_dir={"": "simplepyble/src"},
     cmake_source_dir="simplepyble",
     cmake_args=cmake_options,
     cmake_process_manifest_hook=exclude_unnecessary_files,
     cmake_install_dir="simplepyble/src/simplepyble",
-
     setup_requires=[
         "setuptools>=42",
         "scikit-build",
