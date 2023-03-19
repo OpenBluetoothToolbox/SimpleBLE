@@ -60,6 +60,7 @@ def workflow_run_list(auth_token, owner_repo_name, workflow_id):
             break
 
         for item in run_list:
+            print(f"Found run ID: {item['id']}")
             yield item["id"]
 
         # move to next page

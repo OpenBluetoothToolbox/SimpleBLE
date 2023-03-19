@@ -27,4 +27,4 @@ jobs:
       env:
         AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        python3 utils/clean_workflows.py --repository-name ${{ github.repository }} --workflow-id ${{ inputs.workflow_id }}
+        python3 utils/clean_workflows.py --repository-name "${{ github.repository }}" --workflow-id "${{ inputs.workflow_id }}"
