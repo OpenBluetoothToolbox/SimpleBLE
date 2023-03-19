@@ -1,0 +1,30 @@
+name: Clean up legacy runs
+
+on:
+  workflow_dispatch:
+    inputs:
+      workflow_id:
+        description: 'Workflow ID to clean up'
+        required: true
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11
+
+    - name: Install Python dependencies
+      run: |
+        pip install urllib3==1.26.7
+
+    - name: Run cleanup script
+      env:
+        AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        python3 utils/clean_workflows.py --repository-name ${{ github.repository }} --workflow-id ${{ inputs.workflow_id }}
