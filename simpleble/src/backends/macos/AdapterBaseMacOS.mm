@@ -25,7 +25,7 @@
     self = [super init];
     if (self) {
         _adapter = adapter;
-        _uuid = [[NSUUID UUID] UUIDString];
+        _uuid = @"39a76676-2788-46c9-afa0-f0c0c31e6fd9";
 
         // Use a high-priority queue to ensure that events are processed immediately.
         dispatch_queue_attr_t qos = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, -1);
