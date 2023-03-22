@@ -18,6 +18,14 @@ std::optional<SimpleBLE::BluetoothAddress> SimpleBLE::Safe::Adapter::address() n
     }
 }
 
+std::optional<SimpleBLE::PowerState> SimpleBLE::Safe::Adapter::power_state() noexcept {
+    try {
+        return SimpleBLE::Adapter::power_state();
+    } catch (...) {
+        return std::nullopt;
+    }
+}
+
 bool SimpleBLE::Safe::Adapter::scan_start() noexcept {
     try {
         SimpleBLE::Adapter::scan_start();
@@ -115,6 +123,17 @@ bool SimpleBLE::Safe::Adapter::set_callback_on_scan_found(
     try {
         SimpleBLE::Adapter::set_callback_on_scan_found(
             [=](SimpleBLE::Peripheral p) { on_scan_found(SimpleBLE::Safe::Peripheral(p)); });
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
+bool SimpleBLE::Safe::Adapter::set_callback_on_power_state_changed(
+    std::function<void(SimpleBLE::PowerState)> on_power_state_changed) noexcept {
+    try {
+        SimpleBLE::Adapter::set_callback_on_power_state_changed(
+            [=](SimpleBLE::PowerState state) { on_power_state_changed(state); });
         return true;
     } catch (...) {
         return false;

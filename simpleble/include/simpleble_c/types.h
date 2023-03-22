@@ -23,6 +23,15 @@ typedef enum {
 } simpleble_err_t;
 
 /**
+ * @brief Adapter state changes.
+ */
+typedef enum {
+    SIMPLEBLE_STATE_UNKNOWN = 0,
+    SIMPLEBLE_STATE_POWERED_OFF = 1,
+    SIMPLEBLE_STATE_POWERED_ON = 2,
+} simpleble_power_state_t;
+
+/**
  * @brief A type for representing a Bluetooth UUID.
  * @note This is a struct to allow easy extending in the future.
  */

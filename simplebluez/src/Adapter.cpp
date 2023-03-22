@@ -35,6 +35,8 @@ std::string Adapter::identifier() const {
 
 std::string Adapter::address() { return adapter1()->Address(); }
 
+std::string Adapter::power_state() { return adapter1()->PowerState(); }
+
 bool Adapter::discovering() { return adapter1()->Discovering(); }
 
 bool Adapter::powered() { return adapter1()->Powered(); }
@@ -85,3 +87,10 @@ void Adapter::clear_on_device_updated() {
     on_child_created.unload();
     on_child_signal_received.unload();
 }
+
+
+void Adapter::set_on_power_state_changed(std::function<void(const std::string& state)> callback) {
+    adapter1()->OnPowerStateChanged.load([this, callback]() { callback(adapter1()->PowerState()); });
+}
+
+void Adapter::clear_on_power_state_changed() { adapter1()->OnPowerStateChanged.unload(); }

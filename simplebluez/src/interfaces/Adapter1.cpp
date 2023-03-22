@@ -1,4 +1,5 @@
 #include "simplebluez/interfaces/Adapter1.h"
+#include <iostream>
 
 using namespace SimpleBluez;
 
@@ -111,4 +112,13 @@ std::string Adapter1::Address() {
     return _properties["Address"].get_string();
 }
 
-void Adapter1::property_changed(std::string option_name) {}
+std::string Adapter1::PowerState() {
+    std::scoped_lock lock(_property_update_mutex);
+    return _properties["PowerState"].get_string();
+}
+
+void Adapter1::property_changed(std::string option_name) {
+    if (option_name == "PowerState") {
+        OnPowerStateChanged();
+    }
+}

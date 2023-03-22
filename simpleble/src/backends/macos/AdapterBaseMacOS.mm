@@ -61,6 +61,21 @@
     return self.uuid;
 }
 
+- (PowerState)power_state {
+    switch (_centralManager.state) {
+        case CBManagerStatePoweredOff:
+            return PowerState::POWERED_OFF;
+        case CBManagerStatePoweredOn:
+            return PowerState::POWERED_ON;
+        case CBManagerStateUnknown:
+        case CBManagerStateResetting:
+        case CBManagerStateUnsupported:
+        case CBManagerStateUnauthorized:
+        default:
+            return PowerState::UNKNOWN;
+    }
+}
+
 #pragma mark - CBCentralManagerDelegate
 
 - (void)centralManagerDidUpdateState:(CBCentralManager*)central {
@@ -80,10 +95,12 @@
         case CBManagerStatePoweredOff:
             // NSLog(@"CBManagerStatePoweredOff!\n");
             // NOTE: Notify the user that the Bluetooth adapter is turned off.
+            _adapter->delegate_did_update_state(PowerState::POWERED_OFF);
             break;
         case CBManagerStatePoweredOn:
             // NSLog(@"CBManagerStatePoweredOn!\n");
             // NOTE: This state is required to be able to operate CoreBluetooth.
+            _adapter->delegate_did_update_state(PowerState::POWERED_ON);
             break;
     }
 }

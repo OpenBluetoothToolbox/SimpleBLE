@@ -62,6 +62,12 @@ BluetoothAddress AdapterBase::address() {
     return [[internal address] UTF8String];
 }
 
+PowerState AdapterBase::power_state() {
+    AdapterBase adapter;
+    AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)adapter.opaque_internal_;
+    return [internal power_state];
+}
+
 void AdapterBase::scan_start() {
     this->seen_peripherals_.clear();
 
@@ -173,4 +179,8 @@ void AdapterBase::delegate_did_disconnect_peripheral(void* opaque_peripheral) {
     // Load the existing PeripheralBase object
     std::shared_ptr<PeripheralBase> base_peripheral = this->peripherals_.at(opaque_peripheral);
     base_peripheral->delegate_did_disconnect();
+}
+
+void AdapterBase::delegate_did_update_state(PowerState state) {
+    SAFE_CALLBACK_CALL(this->callback_on_power_state_changed_, state);
 }
