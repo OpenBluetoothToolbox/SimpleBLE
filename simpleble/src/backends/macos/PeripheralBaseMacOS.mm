@@ -88,10 +88,9 @@ typedef struct {
 
         [self.peripheral discoverServices:nil];
 
-        // Wait for services to be discovered for up to 1 second.
+        // Wait for services to be discovered
         // NOTE: This is a bit of a hack but avoids the need of having a dedicated flag.
-        endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
-        while (self.peripheral.services == nil && [NSDate.now compare:endDate] == NSOrderedAscending) {
+        while (self.peripheral.services == nil && self.peripheral.state != CBPeripheralStateConnected) {
             [NSThread sleepForTimeInterval:0.01];
         }
 
