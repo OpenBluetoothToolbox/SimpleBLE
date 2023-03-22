@@ -90,7 +90,7 @@ typedef struct {
 
         // Wait for services to be discovered
         // NOTE: This is a bit of a hack but avoids the need of having a dedicated flag.
-        while (self.peripheral.services == nil && self.peripheral.state != CBPeripheralStateConnected) {
+        while (self.peripheral.services == nil && self.peripheral.state == CBPeripheralStateConnected) {
             [NSThread sleepForTimeInterval:0.01];
         }
 
