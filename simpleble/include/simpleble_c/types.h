@@ -35,12 +35,12 @@ typedef struct {
     bool can_write_request;
     /** Indicates if the characteristic supports write operations with a response. */
     bool can_write_command;
+    /** Indicates if the characteristic supports authenticated signed writes. */
+    bool can_write_authenticated;
     /** Indicates if the characteristic supports notifications. */
     bool can_notify;
     /** Indicates if the characteristic supports indications. */
     bool can_indicate;
-    /** Indicates if the characteristic supports authenticated signed writes. */
-    bool can_write_authenticated;
     /** Indicates if the characteristic supports broadcasting. */
     bool can_broadcast;
     /** Indicates if the characteristic has extended properties. */
