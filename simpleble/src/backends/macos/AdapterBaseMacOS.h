@@ -24,6 +24,4 @@
 
 - (NSString*)address;
 
-- (PowerState)power_state;
-
 @end

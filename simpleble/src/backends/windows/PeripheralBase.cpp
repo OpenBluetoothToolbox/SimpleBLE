@@ -147,15 +147,11 @@ std::vector<Service> PeripheralBase::services() {
             bool can_read = (properties & (uint32_t)GattCharacteristicProperties::Read) != 0;
             bool can_write_request = (properties & (uint32_t)GattCharacteristicProperties::Write) != 0;
             bool can_write_command = (properties & (uint32_t)GattCharacteristicProperties::WriteWithoutResponse) != 0;
-            bool can_write_authenticated = (properties & (uint32_t)GattCharacteristicProperties::AuthenticatedSignedWrites) != 0;
             bool can_notify = (properties & (uint32_t)GattCharacteristicProperties::Notify) != 0;
             bool can_indicate = (properties & (uint32_t)GattCharacteristicProperties::Indicate) != 0;
-            bool can_broadcast = (properties & (uint32_t)GattCharacteristicProperties::Broadcast) != 0;
-            bool has_extended_properties = (properties & (uint32_t)GattCharacteristicProperties::ExtendedProperties) != 0;
 
             characteristic_list.push_back(CharacteristicBuilder(characteristic_uuid, descriptor_list, can_read,
-                                                                can_write_request, can_write_command, can_write_authenticated,
-                                                                can_notify, can_indicate, can_broadcast, has_extended_properties));
+                                                                can_write_request, can_write_command, can_notify, can_indicate));
         }
         service_list.push_back(ServiceBuilder(service_uuid, characteristic_list, included_services_list));
     }

@@ -24,13 +24,4 @@ enum class OperatingSystem {
 
 enum BluetoothAddressType : int32_t { PUBLIC = 0, RANDOM = 1, UNSPECIFIED = 2 };
 
-/**
- * @brief Bluetooth adapter state.
- */
-enum PowerState : int32_t {
-    UNKNOWN = 0,
-    POWERED_OFF = 1,
-    POWERED_ON = 2,
-};
-
 }  // namespace SimpleBLE

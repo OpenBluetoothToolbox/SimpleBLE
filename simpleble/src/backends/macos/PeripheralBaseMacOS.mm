@@ -192,15 +192,11 @@ typedef struct {
             bool can_read = (characteristic.properties & CBCharacteristicPropertyRead) != 0;
             bool can_write_request = (characteristic.properties & CBCharacteristicPropertyWrite) != 0;
             bool can_write_command = (characteristic.properties & CBCharacteristicPropertyWriteWithoutResponse) != 0;
-            bool can_write_authenticated = (characteristic.properties & CBCharacteristicPropertyAuthenticatedSignedWrites) != 0;
             bool can_notify = (characteristic.properties & CBCharacteristicPropertyNotify) != 0;
             bool can_indicate = (characteristic.properties & CBCharacteristicPropertyIndicate) != 0;
-            bool can_broadcast = (characteristic.properties & CBCharacteristicPropertyBroadcast) != 0;
-            bool has_extended_properties = (characteristic.properties & CBCharacteristicPropertyExtendedProperties) != 0;
 
             characteristic_list.push_back(SimpleBLE::CharacteristicBuilder(uuidToSimpleBLE(characteristic.UUID), descriptor_list, can_read,
-                                                                           can_write_request, can_write_command, can_write_authenticated,
-                                                                           can_notify, can_indicate, can_broadcast, has_extended_properties));
+                                                                           can_write_request, can_write_command, can_notify, can_indicate));
         }
 
         // Build the list of included services.

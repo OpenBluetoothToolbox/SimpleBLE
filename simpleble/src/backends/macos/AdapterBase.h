@@ -29,7 +29,6 @@ class AdapterBase {
 
     std::string identifier();
     BluetoothAddress address();
-    PowerState power_state;
 
     void scan_start();
     void scan_stop();
@@ -41,7 +40,6 @@ class AdapterBase {
     void set_callback_on_scan_stop(std::function<void()> on_scan_stop);
     void set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated);
     void set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found);
-    void set_callback_on_power_state_changed(std::function<void(PowerState)> on_state_changed);
 
     std::vector<Peripheral> get_paired_peripherals();
 
@@ -52,7 +50,6 @@ class AdapterBase {
                                           advertising_data_t advertising_data);
     void delegate_did_connect_peripheral(void* opaque_peripheral);
     void delegate_did_disconnect_peripheral(void* opaque_peripheral);
-    void delegate_did_update_state(PowerState state);
 
   protected:
     /**
@@ -64,7 +61,6 @@ class AdapterBase {
     kvn::safe_callback<void()> callback_on_scan_stop_;
     kvn::safe_callback<void(Peripheral)> callback_on_scan_updated_;
     kvn::safe_callback<void(Peripheral)> callback_on_scan_found_;
-    kvn::safe_callback<void(PowerState)> callback_on_power_state_changed_;
 
     /**
      * Holds a map of objective-c peripheral objects to their corresponding C++ objects.

@@ -62,14 +62,6 @@ SIMPLEBLE_EXPORT char* simpleble_adapter_identifier(simpleble_adapter_t handle);
 SIMPLEBLE_EXPORT char* simpleble_adapter_address(simpleble_adapter_t handle);
 
 /**
- * @brief Returns the current power status of a given adapter.
- *
- * @param handle SimpleBLE Adapter
- * @return Power state.
- */
-SIMPLEBLE_EXPORT simpleble_power_state_t simpleble_adapter_power_state(simpleble_adapter_t handle);
-
-/**
  * @brief
  *
  * @param handle
@@ -186,17 +178,6 @@ SIMPLEBLE_EXPORT simpleble_err_t simpleble_adapter_set_callback_on_scan_updated(
 SIMPLEBLE_EXPORT simpleble_err_t simpleble_adapter_set_callback_on_scan_found(
     simpleble_adapter_t handle,
     void (*callback)(simpleble_adapter_t adapter, simpleble_peripheral_t peripheral, void* userdata), void* userdata);
-
-/**
- * @brief Register a callback for when the power state changes.
- *
- * @param handle SimpleBLE Adapter.
- * @param callback Callback function invoked.
- * @return simpleble_err_t
- */
-SIMPLEBLE_EXPORT simpleble_err_t simpleble_adapter_set_callback_on_power_state_changed(
-    simpleble_adapter_t handle,
-    void (*callback)(simpleble_adapter_t adapter, simpleble_power_state_t power_state, void* userdata), void* userdata);
 
 #ifdef __cplusplus
 }

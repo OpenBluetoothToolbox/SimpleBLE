@@ -12,7 +12,6 @@ struct advertising_data_t {
     std::string identifier;
     BluetoothAddressType address_type;
     BluetoothAddress mac_address;
-    PowerState power_state;
 
     bool connectable;
     int16_t rssi;

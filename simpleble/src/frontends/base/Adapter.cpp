@@ -40,12 +40,6 @@ BluetoothAddress Adapter::address() {
     return internal_->address();
 }
 
-PowerState Adapter::power_state() {
-    if (!initialized()) throw Exception::NotInitialized();
-
-    return internal_->power_state();
-}
-
 void Adapter::scan_start() {
     if (!initialized()) throw Exception::NotInitialized();
     if (!bluetooth_enabled()) {
@@ -113,10 +107,4 @@ void Adapter::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan
     if (!initialized()) throw Exception::NotInitialized();
 
     internal_->set_callback_on_scan_found(std::move(on_scan_found));
-}
-
-void Adapter::set_callback_on_power_state_changed(std::function<void(PowerState)> on_power_state_changed) {
-    if (!initialized()) throw Exception::NotInitialized();
-
-    internal_->set_callback_on_power_state_changed(std::move(on_power_state_changed));
 }

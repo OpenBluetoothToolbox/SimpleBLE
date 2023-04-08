@@ -26,34 +26,10 @@ using namespace SimpleBLE;
 using namespace std::chrono_literals;
 
 AdapterBase::AdapterBase(std::string device_id)
-    : adapter_(async_get(BluetoothAdapter::FromIdAsync(winrt::to_hstring(device_id))))
-    , power_state_(PowerState::UNKNOWN) {
+    : adapter_(async_get(BluetoothAdapter::FromIdAsync(winrt::to_hstring(device_id)))) {
     auto device_information = async_get(
         Devices::Enumeration::DeviceInformation::CreateFromIdAsync(winrt::to_hstring(device_id)));
     identifier_ = winrt::to_string(device_information.Name());
-
-    // Listen for state changes.
-    auto radio = async_get(adapter_.GetRadioAsync());
-    radio.StateChanged([this](Radio radio, auto&&) {
-        auto state = radio.State();
-        std::lock_guard<std::mutex> lock(this->state_mutex_);
-        switch (state) {
-            case RadioState::On:
-                this->power_state_ = PowerState::POWERED_ON;
-                SAFE_CALLBACK_CALL(this->callback_on_power_state_changed_, PowerState::POWERED_ON);
-                break;
-            case RadioState::Off:
-                this->power_state_ = PowerState::POWERED_OFF;
-                SAFE_CALLBACK_CALL(this->callback_on_power_state_changed_, PowerState::POWERED_OFF);
-                break;
-            case RadioState::Disabled:
-                this->power_state_ = PowerState::POWERED_OFF;
-                SAFE_CALLBACK_CALL(this->callback_on_power_state_changed_, PowerState::POWERED_OFF);
-                break;
-            default:
-                break;
-        }
-    });
 
     // Configure the scanner object
     scanner_ = Advertisement::BluetoothLEAdvertisementWatcher();
@@ -208,8 +184,6 @@ std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
 void* AdapterBase::underlying() const { return reinterpret_cast<void*>(const_cast<BluetoothAdapter*>(&adapter_)); }
 
 std::string AdapterBase::identifier() { return identifier_; }
-
-PowerState AdapterBase::power_state() { return power_state_; }
 
 BluetoothAddress AdapterBase::address() { return _mac_address_to_str(adapter_.BluetoothAddress()); }
 

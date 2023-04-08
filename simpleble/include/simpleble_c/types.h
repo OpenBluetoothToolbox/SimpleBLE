@@ -23,15 +23,6 @@ typedef enum {
 } simpleble_err_t;
 
 /**
- * @brief Adapter state changes.
- */
-typedef enum {
-    SIMPLEBLE_STATE_UNKNOWN = 0,
-    SIMPLEBLE_STATE_POWERED_OFF = 1,
-    SIMPLEBLE_STATE_POWERED_ON = 2,
-} simpleble_power_state_t;
-
-/**
  * @brief A type for representing a Bluetooth UUID.
  * @note This is a struct to allow easy extending in the future.
  */
@@ -66,12 +57,6 @@ typedef struct {
     bool can_notify;
     /** Indicates if the characteristic supports indications. */
     bool can_indicate;
-    /** Indicates if the characteristic supports authenticated signed writes. */
-    bool can_write_authenticated;
-    /** Indicates if the characteristic supports broadcasting. */
-    bool can_broadcast;
-    /** Indicates if the characteristic has extended properties. */
-    bool has_extended_properties;
     /** The actual number of descriptors the characteristic has.*/
     size_t descriptor_count;
     /** Every descriptor owned by the characteristic. */

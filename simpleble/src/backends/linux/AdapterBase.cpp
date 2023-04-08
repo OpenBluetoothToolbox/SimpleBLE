@@ -29,25 +29,10 @@ bool AdapterBase::bluetooth_enabled() {
     return enabled;
 }
 
-AdapterBase::AdapterBase(std::shared_ptr<SimpleBluez::Adapter> adapter) : adapter_(adapter) {
-    adapter_->set_on_power_state_changed([this](std::string power_state) {
-        if (power_state == "on") {
-            SAFE_CALLBACK_CALL(this->callback_on_power_state_changed_, PowerState::POWERED_ON);
-        } else if (power_state == "off") {
-            SAFE_CALLBACK_CALL(this->callback_on_power_state_changed_, PowerState::POWERED_OFF);
-        } else if (power_state == "off-blocked") {
-            // rfkill
-            SAFE_CALLBACK_CALL(this->callback_on_power_state_changed_, PowerState::POWERED_OFF);
-        } else {
-            // Only handle cross-platform events.
-            SIMPLEBLE_LOG_DEBUG(fmt::format("Power state change: {}", power_state));
-        }
-    });
-}
+AdapterBase::AdapterBase(std::shared_ptr<SimpleBluez::Adapter> adapter) : adapter_(adapter) {}
 
 AdapterBase::~AdapterBase() {
     adapter_->clear_on_device_updated();
-    adapter_->clear_on_power_state_changed();
 }
 
 void* AdapterBase::underlying() const { return adapter_.get(); }
@@ -55,19 +40,6 @@ void* AdapterBase::underlying() const { return adapter_.get(); }
 std::string AdapterBase::identifier() { return adapter_->identifier(); }
 
 BluetoothAddress AdapterBase::address() { return adapter_->address(); }
-
-PowerState AdapterBase::power_state() {
-    auto state = adapter_->power_state();
-    if (state == "on") {
-        return PowerState::POWERED_ON;
-    } else if (state == "off") {
-        return PowerState::POWERED_OFF;
-    } else if (state == "off-blocked") {
-        // Blocked by rfkill.
-        return PowerState::POWERED_OFF;
-    }
-    return PowerState::UNKNOWN;
-}
 
 void AdapterBase::scan_start() {
     seen_peripherals_.clear();
@@ -173,13 +145,5 @@ void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_
         callback_on_scan_found_.load(std::move(on_scan_found));
     } else {
         callback_on_scan_found_.unload();
-    }
-}
-
-void AdapterBase::set_callback_on_power_state_changed(std::function<void(PowerState)> on_power_state_changed) {
-    if (on_power_state_changed) {
-        callback_on_power_state_changed_.load(std::move(on_power_state_changed));
-    } else {
-        callback_on_power_state_changed_.unload();
     }
 }

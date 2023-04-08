@@ -192,9 +192,6 @@ simpleble_err_t simpleble_peripheral_services_get(simpleble_peripheral_t handle,
         services->characteristics[i].can_write_command = characteristic.can_write_command();
         services->characteristics[i].can_notify = characteristic.can_notify();
         services->characteristics[i].can_indicate = characteristic.can_indicate();
-        services->characteristics[i].can_write_authenticated = characteristic.can_write_authenticated();
-        services->characteristics[i].can_broadcast = characteristic.can_broadcast();
-        services->characteristics[i].has_extended_properties = characteristic.has_extended_properties();
 
         memcpy(services->characteristics[i].uuid.value, characteristic.uuid().c_str(), SIMPLEBLE_UUID_STR_LEN);
         services->characteristics[i].descriptor_count = characteristic.descriptors().size();
