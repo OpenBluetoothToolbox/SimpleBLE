@@ -31,9 +31,7 @@ bool AdapterBase::bluetooth_enabled() {
 
 AdapterBase::AdapterBase(std::shared_ptr<SimpleBluez::Adapter> adapter) : adapter_(adapter) {}
 
-AdapterBase::~AdapterBase() {
-    adapter_->clear_on_device_updated();
-}
+AdapterBase::~AdapterBase() { adapter_->clear_on_device_updated(); }
 
 void* AdapterBase::underlying() const { return adapter_.get(); }
 

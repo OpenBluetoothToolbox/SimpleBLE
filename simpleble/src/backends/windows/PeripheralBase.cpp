@@ -151,7 +151,8 @@ std::vector<Service> PeripheralBase::services() {
             bool can_indicate = (properties & (uint32_t)GattCharacteristicProperties::Indicate) != 0;
 
             characteristic_list.push_back(CharacteristicBuilder(characteristic_uuid, descriptor_list, can_read,
-                                                                can_write_request, can_write_command, can_notify, can_indicate));
+                                                                can_write_request, can_write_command, can_notify,
+                                                                can_indicate));
         }
         service_list.push_back(ServiceBuilder(service_uuid, characteristic_list, included_services_list));
     }

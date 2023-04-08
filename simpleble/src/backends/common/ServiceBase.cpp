@@ -9,7 +9,8 @@ ServiceBase::ServiceBase(const BluetoothUUID& uuid) : uuid_(uuid) {}
 
 ServiceBase::ServiceBase(const BluetoothUUID& uuid, const ByteArray& data) : uuid_(uuid), data_(data) {}
 
-ServiceBase::ServiceBase(const BluetoothUUID& uuid, std::vector<Characteristic>& characteristics, std::vector<BluetoothUUID>& included_services)
+ServiceBase::ServiceBase(const BluetoothUUID& uuid, std::vector<Characteristic>& characteristics,
+                         std::vector<BluetoothUUID>& included_services)
     : uuid_(uuid), characteristics_(characteristics), included_services_(included_services) {}
 
 BluetoothUUID ServiceBase::uuid() { return uuid_; }
