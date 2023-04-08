@@ -147,12 +147,16 @@ std::vector<Service> PeripheralBase::services() {
             bool can_read = std::find(flags.begin(), flags.end(), "read") != flags.end();
             bool can_write_request = std::find(flags.begin(), flags.end(), "write") != flags.end();
             bool can_write_command = std::find(flags.begin(), flags.end(), "write-without-response") != flags.end();
+            bool can_write_authenticated = std::find(flags.begin(), flags.end(), "authenticated-signed-writes") !=
+                                           flags.end();
             bool can_notify = std::find(flags.begin(), flags.end(), "notify") != flags.end();
             bool can_indicate = std::find(flags.begin(), flags.end(), "indicate") != flags.end();
+            bool can_broadcast = std::find(flags.begin(), flags.end(), "broadcast") != flags.end();
+            bool has_extended_properties = std::find(flags.begin(), flags.end(), "extended-properties") != flags.end();
 
-            characteristic_list.push_back(CharacteristicBuilder(bluez_characteristic->uuid(), descriptor_list, can_read,
-                                                                can_write_request, can_write_command, can_notify,
-                                                                can_indicate));
+            characteristic_list.push_back(CharacteristicBuilder(
+                bluez_characteristic->uuid(), descriptor_list, can_read, can_write_request, can_write_command,
+                can_write_authenticated, can_notify, can_indicate, can_broadcast, has_extended_properties));
         }
 
         service_list.push_back(ServiceBuilder(bluez_service->uuid(), characteristic_list));
@@ -163,7 +167,7 @@ std::vector<Service> PeripheralBase::services() {
         // Emulate the battery service through the Battery1 interface.
         service_list.push_back(
             ServiceBuilder(BATTERY_SERVICE_UUID,
-                           {CharacteristicBuilder(BATTERY_CHARACTERISTIC_UUID, {}, true, false, false, true, false)}));
+                        {CharacteristicBuilder(BATTERY_CHARACTERISTIC_UUID, {}, true, false, false, false, true, false, false, false)}));
     }
 
     return service_list;
