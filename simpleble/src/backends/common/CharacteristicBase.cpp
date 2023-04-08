@@ -7,7 +7,8 @@ using namespace SimpleBLE;
 
 CharacteristicBase::CharacteristicBase(const BluetoothUUID& uuid, std::vector<Descriptor>& descriptors, bool can_read,
                                        bool can_write_request, bool can_write_command, bool can_write_authenticated,
-                                       bool can_notify, bool can_indicate, bool can_broadcast, bool has_extended_properties)
+                                       bool can_notify, bool can_indicate, bool can_broadcast,
+                                       bool has_extended_properties)
     : uuid_(uuid),
       descriptors_(descriptors),
       can_read_(can_read),

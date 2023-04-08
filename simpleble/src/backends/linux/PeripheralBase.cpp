@@ -166,8 +166,8 @@ std::vector<Service> PeripheralBase::services() {
     if (!is_battery_service_available && device_->has_battery_interface()) {
         // Emulate the battery service through the Battery1 interface.
         service_list.push_back(
-            ServiceBuilder(BATTERY_SERVICE_UUID,
-                        {CharacteristicBuilder(BATTERY_CHARACTERISTIC_UUID, {}, true, false, false, false, true, false, false, false)}));
+            ServiceBuilder(BATTERY_SERVICE_UUID, {CharacteristicBuilder(BATTERY_CHARACTERISTIC_UUID, {}, true, false,
+                                                                        false, false, true, false, false, false)}));
     }
 
     return service_list;
