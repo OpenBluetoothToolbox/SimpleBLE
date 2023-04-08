@@ -14,10 +14,11 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 
 **Changed**
 
--
+- (MacOS) Main adapter address is now hardcoded to allow caching based on adapter address. *(Thanks BlissChapman!)*
 
 **Fixed**
 
+- (MacOS) Remove unnecessary timeout during service discovery. *(Thanks BlissChapman!)*
 - (Windows) Failed connection attempt would not trigger an exception. *(Thanks eriklins!)*
 
 

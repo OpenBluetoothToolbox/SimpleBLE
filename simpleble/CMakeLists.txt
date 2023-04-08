@@ -21,7 +21,10 @@ option(SIMPLEBLE_PLAIN "Use plain version of SimpleBLE" OFF)
 if(NOT TARGET fmt::fmt-header-only)
     option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
     find_package(fmt REQUIRED)
-    set_target_properties(fmt PROPERTIES EXCLUDE_FROM_ALL TRUE)
+
+    if(TARGET fmt)
+        set_target_properties(fmt PROPERTIES EXCLUDE_FROM_ALL TRUE)
+    endif()
 endif()
 
 if(SIMPLEBLE_TEST)
