@@ -223,7 +223,8 @@ simpleble_err_t simpleble_adapter_set_callback_on_scan_found(
 }
 
 simpleble_err_t simpleble_adapter_set_callback_on_power_state_changed(
-    simpleble_adapter_t handle, void (*callback)(simpleble_adapter_t adapter, simpleble_power_state_t power_state, void* userdata),
+    simpleble_adapter_t handle,
+    void (*callback)(simpleble_adapter_t adapter, simpleble_power_state_t power_state, void* userdata),
     void* userdata) {
     if (handle == nullptr) {
         return SIMPLEBLE_FAILURE;
@@ -235,8 +236,7 @@ simpleble_err_t simpleble_adapter_set_callback_on_power_state_changed(
         simpleble_power_state_t state = SIMPLEBLE_STATE_UNKNOWN;
         if (power_state == SimpleBLE::PowerState::POWERED_OFF) {
             state = SIMPLEBLE_STATE_POWERED_OFF;
-        }
-        else if (power_state == SimpleBLE::PowerState::POWERED_ON) {
+        } else if (power_state == SimpleBLE::PowerState::POWERED_ON) {
             state = SIMPLEBLE_STATE_POWERED_ON;
         }
         callback(handle, state, userdata);
