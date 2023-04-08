@@ -56,6 +56,25 @@ char* simpleble_adapter_address(simpleble_adapter_t handle) {
     return c_address;
 }
 
+simpleble_power_state_t simpleble_adapter_power_state(simpleble_adapter_t handle) {
+    if (handle == nullptr) {
+        return SIMPLEBLE_STATE_UNKNOWN;
+    }
+
+    SimpleBLE::Safe::Adapter* adapter = (SimpleBLE::Safe::Adapter*)handle;
+    SimpleBLE::PowerState power_state = adapter->power_state().value_or(SimpleBLE::PowerState::UNKNOWN);
+    switch (power_state) {
+        case SimpleBLE::PowerState::POWERED_OFF:
+            return SIMPLEBLE_STATE_POWERED_OFF;
+        case SimpleBLE::PowerState::POWERED_ON:
+            return SIMPLEBLE_STATE_POWERED_ON;
+        case SimpleBLE::PowerState::UNKNOWN:
+            return SIMPLEBLE_STATE_UNKNOWN;
+    }
+
+    return SIMPLEBLE_STATE_UNKNOWN;
+}
+
 simpleble_err_t simpleble_adapter_scan_start(simpleble_adapter_t handle) {
     if (handle == nullptr) {
         return SIMPLEBLE_FAILURE;
@@ -199,6 +218,28 @@ simpleble_err_t simpleble_adapter_set_callback_on_scan_found(
         // Create a peripheral handle
         SimpleBLE::Safe::Peripheral* peripheral_handle = new SimpleBLE::Safe::Peripheral(peripheral);
         callback(handle, peripheral_handle, userdata);
+    });
+    return success ? SIMPLEBLE_SUCCESS : SIMPLEBLE_FAILURE;
+}
+
+simpleble_err_t simpleble_adapter_set_callback_on_power_state_changed(
+    simpleble_adapter_t handle, void (*callback)(simpleble_adapter_t adapter, simpleble_power_state_t power_state, void* userdata),
+    void* userdata) {
+    if (handle == nullptr) {
+        return SIMPLEBLE_FAILURE;
+    }
+
+    SimpleBLE::Safe::Adapter* adapter = (SimpleBLE::Safe::Adapter*)handle;
+
+    bool success = adapter->set_callback_on_power_state_changed([=](SimpleBLE::PowerState power_state) {
+        simpleble_power_state_t state = SIMPLEBLE_STATE_UNKNOWN;
+        if (power_state == SimpleBLE::PowerState::POWERED_OFF) {
+            state = SIMPLEBLE_STATE_POWERED_OFF;
+        }
+        else if (power_state == SimpleBLE::PowerState::POWERED_ON) {
+            state = SIMPLEBLE_STATE_POWERED_ON;
+        }
+        callback(handle, state, userdata);
     });
     return success ? SIMPLEBLE_SUCCESS : SIMPLEBLE_FAILURE;
 }
