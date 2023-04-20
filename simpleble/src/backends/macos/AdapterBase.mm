@@ -91,7 +91,7 @@ bool AdapterBase::scan_is_active() {
 
 std::vector<Peripheral> AdapterBase::scan_get_results() {
     std::vector<Peripheral> peripherals;
-    for (auto& [opaque_peripheral, base_peripheral] : this->peripherals_) {
+    for (auto& [opaque_peripheral, base_peripheral] : this->seen_peripherals_) {
         PeripheralBuilder peripheral_builder(base_peripheral);
         peripherals.push_back(peripheral_builder);
     }
