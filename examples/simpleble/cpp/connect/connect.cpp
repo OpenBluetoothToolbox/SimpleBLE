@@ -36,6 +36,8 @@ int main() {
 
     auto peripheral = peripherals[selection.value()];
     std::cout << "Connecting to " << peripheral.identifier() << " [" << peripheral.address() << "]" << std::endl;
+
+    adapter.scan_start();
     peripheral.connect();
 
     std::cout << "Successfully connected." << std::endl;

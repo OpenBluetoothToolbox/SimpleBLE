@@ -20,23 +20,23 @@ fn main() {
         println!("Scan stopped.");
     }));
 
-    adapter.set_callback_on_scan_found(Box::new(|peripheral| {
-        println!(
-            "Found device: {} [{}] {} dBm",
-            peripheral.identifier().unwrap(),
-            peripheral.address().unwrap(),
-            peripheral.rssi().unwrap()
-        );
-    }));
+    // adapter.set_callback_on_scan_found(Box::new(|peripheral| {
+    //     println!(
+    //         "Found device: {} [{}] {} dBm",
+    //         peripheral.identifier().unwrap(),
+    //         peripheral.address().unwrap(),
+    //         peripheral.rssi().unwrap()
+    //     );
+    // }));
 
-    adapter.set_callback_on_scan_updated(Box::new(|peripheral| {
-        println!(
-            "Updated device: {} [{}] {} dBm",
-            peripheral.identifier().unwrap(),
-            peripheral.address().unwrap(),
-            peripheral.rssi().unwrap()
-        );
-    }));
+    // adapter.set_callback_on_scan_updated(Box::new(|peripheral| {
+    //     println!(
+    //         "Updated device: {} [{}] {} dBm",
+    //         peripheral.identifier().unwrap(),
+    //         peripheral.address().unwrap(),
+    //         peripheral.rssi().unwrap()
+    //     );
+    // }));
 
     adapter.scan_for(5000).unwrap();
     println!("Scan complete.");
@@ -73,6 +73,8 @@ fn main() {
         println!("Disconnected from device.");
     }));
 
+    adapter.scan_start().unwrap();
+
     // Connect to the device
     println!("Connecting to device...");
     peripheral.connect().unwrap();
@@ -91,6 +93,8 @@ fn main() {
             }
         }
     }
+
+    std::thread::sleep(std::time::Duration::from_secs(5));
 
     peripheral.disconnect().unwrap();
 }
