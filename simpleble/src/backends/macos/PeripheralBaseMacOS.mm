@@ -14,6 +14,7 @@ typedef struct {
 typedef struct {
     BOOL readPending;
     BOOL writePending;
+    BOOL notifyPending;
     std::map<std::string, descriptor_extras_t> descriptor_extras;
     std::function<void(SimpleBLE::ByteArray)> valueChangedCallback;
 } characteristic_extras_t;
@@ -136,6 +137,7 @@ typedef struct {
                 characteristic_extras_t characteristic_extra;
                 characteristic_extra.readPending = NO;
                 characteristic_extra.writePending = NO;
+                characteristic_extra.notifyPending = NO;
 
                 for (CBDescriptor* descriptor in characteristic.descriptors) {
                     descriptor_extras_t descriptor_extra;
@@ -297,17 +299,20 @@ typedef struct {
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
 
     @synchronized(self) {
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending = YES;
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback = callback;
         [self.peripheral setNotifyValue:YES forCharacteristic:characteristic];
     }
 
-    // Wait for the update to complete for up to 1 second.
-    NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
-    while (!characteristic.isNotifying && [NSDate.now compare:endDate] == NSOrderedAscending) {
+    BOOL notifyPending = YES;
+    while (notifyPending) {
         [NSThread sleepForTimeInterval:0.01];
+        @synchronized(self) {
+            notifyPending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending;
+        }
     }
 
-    if (!characteristic.isNotifying) {
+    if (!characteristic.isNotifying || notifyPending) {
         NSLog(@"Could not enable notifications for characteristic %@", characteristic.UUID);
         throw SimpleBLE::Exception::OperationFailed("Characteristic Notify/Indicate");
     }
@@ -539,6 +544,11 @@ typedef struct {
                                           error:(NSError*)error {
     if (error != nil) {
         NSLog(@"Notification state update error: %@\n", error);
+        return;
+    }
+
+    @synchronized(self) {
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending = NO;
     }
 }
 
