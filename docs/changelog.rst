@@ -23,6 +23,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 
 - (MacOS) Remove unnecessary timeout during service discovery. *(Thanks BlissChapman!)*
 - (MacOS) Return correct list of devices when scanning. *(Thanks roozmahdavian!)*
+- (MacOS) Remove unnecessary timeout during characteristic notification. *(Thanks BlissChapman!)*
 - (Windows) Failed connection attempt would not trigger an exception. *(Thanks eriklins!)*
 
 
