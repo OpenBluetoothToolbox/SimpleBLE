@@ -313,6 +313,16 @@ rust::Vec<Bindings::RustyCharacteristicWrapper> Bindings::RustyService::characte
     return result;
 }
 
+rust::Vec<rust::String> Bindings::RustyService::included_services() const {
+    rust::Vec<rust::String> result;
+
+    for (auto& included_service : _internal->included_services()) {
+        result.push_back(rust::String(included_service));
+    }
+
+    return result;
+}
+
 // Characteristic Bindings
 
 rust::Vec<Bindings::RustyDescriptorWrapper> Bindings::RustyCharacteristic::descriptors() const {

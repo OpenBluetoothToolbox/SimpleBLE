@@ -13,21 +13,17 @@ extern "C" {
 #endif
 
 /**
- * @brief
- *
- * @return bool
+ * @brief Returns if Bluetooth is enabled.
  */
 SIMPLEBLE_EXPORT bool simpleble_adapter_is_bluetooth_enabled(void);
 
 /**
- * @brief
- *
- * @return size_t
+ * @brief Returns the number of enabled Bluetooth adapters.
  */
 SIMPLEBLE_EXPORT size_t simpleble_adapter_get_count(void);
 
 /**
- * @brief
+ * @brief Returns a handle to a Bluetooth adapter.
  *
  * @note The user is responsible for freeing the returned adapter object
  *       by calling `simpleble_adapter_release_handle`.
