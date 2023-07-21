@@ -66,7 +66,7 @@ typedef struct {
     return [self.peripheral.identifier UUIDString];
 }
 
-- (uint16_t) mtu {
+- (uint16_t)mtu {
     return [self.peripheral maximumWriteValueLengthForType:CBCharacteristicWriteWithoutResponse];
 }
 
@@ -221,10 +221,8 @@ typedef struct {
         [self.peripheral readValueForCharacteristic:characteristic];
     }
 
-    // Wait for the read to complete for up to 1 second.
-    NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
     BOOL readPending = YES;
-    while (readPending && [NSDate.now compare:endDate] == NSOrderedAscending) {
+    while (readPending) {
         [NSThread sleepForTimeInterval:0.01];
         @synchronized(self) {
             readPending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending;
@@ -256,10 +254,8 @@ typedef struct {
         [self.peripheral writeValue:payload forCharacteristic:characteristic type:CBCharacteristicWriteWithResponse];
     }
 
-    // Wait for the read to complete for up to 1 second.
-    NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
     BOOL writePending = YES;
-    while (writePending && [NSDate.now compare:endDate] == NSOrderedAscending) {
+    while (writePending) {
         [NSThread sleepForTimeInterval:0.01];
         @synchronized(self) {
             writePending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending;
@@ -328,24 +324,25 @@ typedef struct {
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
+    CBCharacteristic* characteristic = serviceAndCharacteristic.second;
+
     @synchronized(self) {
-        CBCharacteristic* characteristic = serviceAndCharacteristic.second;
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending = YES;
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback = nil;
         [self.peripheral setNotifyValue:NO forCharacteristic:characteristic];
+    }
 
-        // Wait for the update to complete for up to 1 second.
-        NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
-        while (characteristic.isNotifying && [NSDate.now compare:endDate] == NSOrderedAscending) {
-            [NSThread sleepForTimeInterval:0.01];
+    BOOL notifyPending = YES;
+    while (notifyPending) {
+        [NSThread sleepForTimeInterval:0.01];
+        @synchronized(self) {
+            notifyPending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending;
         }
+    }
 
-        if (characteristic.isNotifying) {
-            NSLog(@"Could not disable notifications for characteristic %@", characteristic.UUID);
-            throw SimpleBLE::Exception::OperationFailed("Characteristic Unsubscribe");
-        } else {
-            // Only delete the callback if the characteristic is no longer notifying, to
-            // prevent triggering a segfault.
-            characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback = nil;
-        }
+    if (characteristic.isNotifying || notifyPending) {
+        NSLog(@"Could not disable notifications for characteristic %@", characteristic.UUID);
+        throw SimpleBLE::Exception::OperationFailed("Characteristic Unsubscribe");
     }
 }
 
@@ -364,10 +361,8 @@ typedef struct {
         [self.peripheral readValueForDescriptor:descriptor];
     }
 
-    // Wait for the read to complete for up to 1 second.
-    NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
     BOOL readPending = YES;
-    while (readPending && [NSDate.now compare:endDate] == NSOrderedAscending) {
+    while (readPending) {
         [NSThread sleepForTimeInterval:0.01];
         @synchronized(self) {
             readPending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)]
@@ -402,10 +397,8 @@ typedef struct {
         [self.peripheral writeValue:payload forDescriptor:descriptor];
     }
 
-    // Wait for the read to complete for up to 1 second.
-    NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
     BOOL writePending = YES;
-    while (writePending && [NSDate.now compare:endDate] == NSOrderedAscending) {
+    while (writePending) {
         [NSThread sleepForTimeInterval:0.01];
         @synchronized(self) {
             writePending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)]

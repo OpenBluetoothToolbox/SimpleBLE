@@ -13,7 +13,6 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 - Function to query the version of SimpleBLE at runtime.
 - (Python) Missing API from SimpleBLE::Characteristic.
 
-
 **Changed**
 
 - (MacOS) Main adapter address is now hardcoded to allow caching based on adapter address. *(Thanks BlissChapman!)*
@@ -24,6 +23,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 - (MacOS) Remove unnecessary timeout during service discovery. *(Thanks BlissChapman!)*
 - (MacOS) Return correct list of devices when scanning. *(Thanks roozmahdavian!)*
 - (MacOS) Remove unnecessary timeout during characteristic notification. *(Thanks BlissChapman!)*
+- (MacOS) Remove unnecessary timeout during operations on characteristics.
 - (Windows) Failed connection attempt would not trigger an exception. *(Thanks eriklins!)*
 
 
