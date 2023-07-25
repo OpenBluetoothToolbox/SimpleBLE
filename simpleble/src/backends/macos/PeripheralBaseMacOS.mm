@@ -474,9 +474,9 @@ typedef struct {
 #pragma mark - CBCentralManagerDelegate
 
 - (void)delegateDidConnect {
-    @synchronized(self) {
-        self->connectionPending_ = NO;
-    }
+    // @synchronized(self) {
+    //     self->connectionPending_ = NO;
+    // }
 }
 
 - (void)delegateDidDisconnect {
