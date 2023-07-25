@@ -20,6 +20,9 @@ typedef struct {
 } characteristic_extras_t;
 
 @interface PeripheralBaseMacOS () {
+    BOOL connectionPending_;
+    BOOL disconnectionPending_;
+
     // NOTE: This dictionary assumes that all characteristic UUIDs are unique, which could not always be the case.
     std::map<std::string, characteristic_extras_t> characteristic_extras_;
 }
@@ -86,6 +89,11 @@ typedef struct {
         if (self.peripheral.state != CBPeripheralStateConnected) {
             throw SimpleBLE::Exception::OperationFailed("Peripheral Connection");
         }
+
+    // }
+
+    // @synchronized(self) {
+    //     NSDate* endDate = nil;
 
         [self.peripheral discoverServices:nil];
 
@@ -155,21 +163,22 @@ typedef struct {
 - (void)disconnect {
     @synchronized(self) {
         // NSLog(@"Disconnecting peripheral: %@ - State was %ld", self.peripheral.name, self.peripheral.state);
+        self->disconnectionPending_ = YES;
         [self.centralManager cancelPeripheralConnection:self.peripheral];
+    }
 
-        NSDate* endDate = nil;
-
-        // Wait for the connection to be established for up to 5 seconds.
-        endDate = [NSDate dateWithTimeInterval:5.0 sinceDate:NSDate.now];
-        while (self.peripheral.state == CBPeripheralStateDisconnecting && [NSDate.now compare:endDate] == NSOrderedAscending) {
-            [NSThread sleepForTimeInterval:0.01];
+    BOOL disconnectionPending = YES;
+    while (disconnectionPending) {
+        [NSThread sleepForTimeInterval:0.01];
+        @synchronized(self) {
+            disconnectionPending = self->disconnectionPending_;
         }
+    }
 
-        if (self.peripheral.state != CBPeripheralStateDisconnected) {
-            // If the disconnection failed, raise an exception.
-            NSLog(@"Disconnection failed.");
-            throw SimpleBLE::Exception::OperationFailed("Peripheral Disconnection");
-        }
+    if (self.peripheral.state != CBPeripheralStateDisconnected || disconnectionPending) {
+        // If the disconnection failed, raise an exception.
+        NSLog(@"Disconnection failed.");
+        throw SimpleBLE::Exception::OperationFailed("Peripheral Disconnection");
     }
 }
 
@@ -465,12 +474,15 @@ typedef struct {
 #pragma mark - CBCentralManagerDelegate
 
 - (void)delegateDidConnect {
-    // NOTE: As the connection process is polling-based, this callback is not needed,
-    // but might be useful in the future.
+    @synchronized(self) {
+        self->connectionPending_ = NO;
+    }
 }
 
 - (void)delegateDidDisconnect {
-    // NOTE: We're keeping this callback for potential future use.
+    @synchronized(self) {
+        self->disconnectionPending_ = NO;
+    }
 }
 
 #pragma mark - CBPeripheralDelegate
