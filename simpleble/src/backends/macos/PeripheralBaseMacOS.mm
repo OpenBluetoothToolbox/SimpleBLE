@@ -90,10 +90,10 @@ typedef struct {
             throw SimpleBLE::Exception::OperationFailed("Peripheral Connection");
         }
 
-    // }
+    }
 
-    // @synchronized(self) {
-    //     NSDate* endDate = nil;
+    @synchronized(self) {
+        NSDate* endDate = nil;
 
         [self.peripheral discoverServices:nil];
 
