@@ -543,7 +543,6 @@ typedef struct {
     // NSLog(@"Updated value for characteristic: %@", characteristic.UUID);
     if (error != nil) {
         NSLog(@"Characteristic value update error: %@\n", error);
-        return;
     }
 
     @synchronized(self) {
@@ -565,7 +564,6 @@ typedef struct {
     // NSLog(@"Wrote value for characteristic: %@", characteristic.UUID);
     if (error != nil) {
         NSLog(@"Error: %@\n", error);
-        return;
     }
     @synchronized(self) {
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending = NO;
@@ -577,7 +575,6 @@ typedef struct {
                                           error:(NSError*)error {
     if (error != nil) {
         NSLog(@"Notification state update error: %@\n", error);
-        return;
     }
 
     @synchronized(self) {
@@ -592,7 +589,6 @@ typedef struct {
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
     if (error != nil) {
         NSLog(@"Descriptor value update error: %@\n", error);
-        return;
     }
 
     std::string characteristic_uuid = uuidToSimpleBLE(descriptor.characteristic.UUID);
@@ -610,7 +606,6 @@ typedef struct {
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
     if (error != nil) {
         NSLog(@"Descriptor value write error: %@\n", error);
-        return;
     }
 
     std::string characteristic_uuid = uuidToSimpleBLE(descriptor.characteristic.UUID);
