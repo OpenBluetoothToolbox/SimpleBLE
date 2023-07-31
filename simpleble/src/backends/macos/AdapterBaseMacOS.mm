@@ -150,16 +150,11 @@
 }
 
 - (void)centralManager:(CBCentralManager*)central didDisconnectPeripheral:(CBPeripheral*)peripheral error:(NSError*)error {
-    if (error != nil) {
-        NSLog(@"Peripheral %@ disconnected: %@\n", peripheral.name, error);
-    }
-    _adapter->delegate_did_disconnect_peripheral((__bridge void*)peripheral);
+    _adapter->delegate_did_disconnect_peripheral((__bridge void*)peripheral, (__bridge void*)error);
 }
 
 - (void)centralManager:(CBCentralManager*)central didFailToConnectPeripheral:(CBPeripheral*)peripheral error:(NSError*)error {
-    if (error != nil) {
-        NSLog(@"Failed to connect to peripheral %@: %@\n", peripheral.name, error);
-    }
+    _adapter->delegate_did_fail_to_connect_peripheral((__bridge void*)peripheral, (__bridge void*)error);
 }
 
 @end

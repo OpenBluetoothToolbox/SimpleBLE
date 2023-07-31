@@ -76,20 +76,20 @@ typedef struct {
 - (void)connect {
     @synchronized(self) {
         // NSLog(@"Connecting to peripheral: %@", self.peripheral.name);
+        self->connectionPending_ = YES;
         [self.centralManager connectPeripheral:self.peripheral options:@{}];  // TODO: Do we need to pass any options?
+    }
 
-        NSDate* endDate = nil;
-
-        // Wait for the connection to be established for up to 5 seconds.
-        endDate = [NSDate dateWithTimeInterval:5.0 sinceDate:NSDate.now];
-        while (self.peripheral.state == CBPeripheralStateConnecting && [NSDate.now compare:endDate] == NSOrderedAscending) {
-            [NSThread sleepForTimeInterval:0.01];
+    BOOL connectionPending = YES;
+    while (connectionPending) {
+        [NSThread sleepForTimeInterval:0.01];
+        @synchronized(self) {
+            connectionPending = self->connectionPending_;
         }
+    }
 
-        if (self.peripheral.state != CBPeripheralStateConnected) {
-            throw SimpleBLE::Exception::OperationFailed("Peripheral Connection");
-        }
-
+    if (self.peripheral.state != CBPeripheralStateConnected || connectionPending) {
+        throw SimpleBLE::Exception::OperationFailed("Peripheral Connection");
     }
 
     @synchronized(self) {
@@ -474,14 +474,42 @@ typedef struct {
 #pragma mark - CBCentralManagerDelegate
 
 - (void)delegateDidConnect {
-    // @synchronized(self) {
-    //     self->connectionPending_ = NO;
-    // }
+    @synchronized(self) {
+        self->connectionPending_ = NO;
+    }
 }
 
-- (void)delegateDidDisconnect {
+- (void)delegateDidFailToConnect:(NSError*)error {
+    if (error != nil) {
+        NSLog(@"Failed to connect to peripheral %@: %@\n", self.peripheral.name, error);
+    }
+
+    @synchronized(self) {
+        self->connectionPending_ = NO;
+    }
+}
+
+- (void)delegateDidDisconnect:(NSError*)error {
+    if (error != nil) {
+        NSLog(@"Peripheral %@ disconnected: %@\n", self.peripheral.name, error);
+    }
+
     @synchronized(self) {
         self->disconnectionPending_ = NO;
+
+        for (auto& characteristic_entry : self->characteristic_extras_) {
+            characteristic_extras_t& characteristic_extra = characteristic_entry.second;
+
+            characteristic_extra.readPending = NO;
+            characteristic_extra.writePending = NO;
+            characteristic_extra.notifyPending = NO;
+
+            for (auto& descriptor_entry : characteristic_extra.descriptor_extras) {
+                descriptor_extras_t descriptor_extra = descriptor_entry.second;
+                descriptor_extra.readPending = NO;
+                descriptor_extra.writePending = NO;
+            }
+        }
     }
 }
 
