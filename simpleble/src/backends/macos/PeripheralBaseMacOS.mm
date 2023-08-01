@@ -569,7 +569,7 @@ typedef struct {
     }
 
     @synchronized(self) {
-        self->serviceDiscoveryPending_ = NO;
+        self->characteristicDiscoveryPending_ = NO;
     }
 }
 
@@ -584,7 +584,7 @@ typedef struct {
     }
 
     @synchronized(self) {
-        self->serviceDiscoveryPending_ = NO;
+        self->descriptorDiscoveryPending_ = NO;
     }
 }
 
