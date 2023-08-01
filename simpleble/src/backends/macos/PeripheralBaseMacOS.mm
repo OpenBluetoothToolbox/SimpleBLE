@@ -23,6 +23,8 @@ typedef struct {
     BOOL connectionPending_;
     BOOL disconnectionPending_;
     BOOL serviceDiscoveryPending_;
+    BOOL characteristicDiscoveryPending_;
+    BOOL descriptorDiscoveryPending_;
 
     // NOTE: This dictionary assumes that all characteristic UUIDs are unique, which could not always be the case.
     std::map<std::string, characteristic_extras_t> characteristic_extras_;
@@ -119,39 +121,46 @@ typedef struct {
     // For each service found, discover characteristics.
     for (CBService* service in self.peripheral.services) {
         @synchronized(self) {
+            self->characteristicDiscoveryPending_ = YES;
             [self.peripheral discoverCharacteristics:nil forService:service];
+        }
 
-            // Wait for characteristics  to be discovered for up to 1 second.
-            // NOTE: This is a bit of a hack but avoids the need of having a dedicated flag.
-            NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
-            while (service.characteristics == nil && [NSDate.now compare:endDate] == NSOrderedAscending) {
-                [NSThread sleepForTimeInterval:0.01];
+        BOOL characteristicDiscoveryPending = YES;
+        while (characteristicDiscoveryPending) {
+            [NSThread sleepForTimeInterval:0.01];
+            @synchronized(self) {
+                characteristicDiscoveryPending = self->characteristicDiscoveryPending_;
             }
+        }
 
-            if (service.characteristics == nil) {
-                // If characteristics could not be discovered, raise an exception.
-                NSLog(@"Characteristics could not be discovered for service %@", service.UUID);
-                throw SimpleBLE::Exception::OperationFailed("Characteristic Discovery");
-            }
+        if (service.characteristics == nil || self.peripheral.state != CBPeripheralStateConnected) {
+            // If characteristics could not be discovered, raise an exception.
+            NSLog(@"Characteristics could not be discovered for service %@", service.UUID);
+            throw SimpleBLE::Exception::OperationFailed("Characteristic Discovery");
         }
 
         // For each characteristic, create the associated extra properties and discover descriptors.
         for (CBCharacteristic* characteristic in service.characteristics) {
             @synchronized(self) {
+                self->descriptorDiscoveryPending_ = YES;
                 [self.peripheral discoverDescriptorsForCharacteristic:characteristic];
+            }
 
-                // Wait for descriptors to be discovered for up to 1 second.
-                NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
-                while (characteristic.descriptors == nil && [NSDate.now compare:endDate] == NSOrderedAscending) {
-                    [NSThread sleepForTimeInterval:0.01];
+            BOOL descriptorDiscoveryPending = YES;
+            while (descriptorDiscoveryPending) {
+                [NSThread sleepForTimeInterval:0.01];
+                @synchronized(self) {
+                    descriptorDiscoveryPending = self->descriptorDiscoveryPending_;
                 }
+            }
 
-                if (characteristic.descriptors == nil) {
-                    // If characteristics could not be discovered, raise an exception.
-                    NSLog(@"Descriptors could not be discovered for characteristic %@", characteristic.UUID);
-                    throw SimpleBLE::Exception::OperationFailed("Descriptor Discovery");
-                }
+            if (characteristic.descriptors == nil || self.peripheral.state != CBPeripheralStateConnected) {
+                // If characteristics could not be discovered, raise an exception.
+                NSLog(@"Descriptors could not be discovered for characteristic %@", characteristic.UUID);
+                throw SimpleBLE::Exception::OperationFailed("Descriptor Discovery");
+            }
 
+            @synchronized(self) {
                 characteristic_extras_t characteristic_extra;
                 characteristic_extra.readPending = NO;
                 characteristic_extra.writePending = NO;
@@ -512,6 +521,8 @@ typedef struct {
 
     @synchronized(self) {
         self->serviceDiscoveryPending_ = NO;
+        self->characteristicDiscoveryPending_ = NO;
+        self->descriptorDiscoveryPending_ = NO;
         self->disconnectionPending_ = NO;
 
         for (auto& characteristic_entry : self->characteristic_extras_) {
@@ -556,6 +567,10 @@ typedef struct {
             self.lastError = error;
         }
     }
+
+    @synchronized(self) {
+        self->serviceDiscoveryPending_ = NO;
+    }
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral
@@ -566,6 +581,10 @@ typedef struct {
         @synchronized(self) {
             self.lastError = error;
         }
+    }
+
+    @synchronized(self) {
+        self->serviceDiscoveryPending_ = NO;
     }
 }
 
