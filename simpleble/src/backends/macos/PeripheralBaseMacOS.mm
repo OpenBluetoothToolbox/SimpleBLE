@@ -76,6 +76,8 @@ typedef struct {
 }
 
 - (void)connect {
+
+    // --- Connect to the peripheral ---
     @synchronized(self) {
         // NSLog(@"Connecting to peripheral: %@", self.peripheral.name);
         self->connectionPending_ = YES;
@@ -92,6 +94,13 @@ typedef struct {
 
     if (self.peripheral.state != CBPeripheralStateConnected || connectionPending) {
         throw SimpleBLE::Exception::OperationFailed("Peripheral Connection");
+    }
+
+    // --- Discover services and characteristics ---
+
+    @synchronized(self) {
+        self->serviceDiscoveryPending_ = YES;
+        [self.peripheral discoverServices:nil];
     }
 
     BOOL serviceDiscoveryPending = YES;
