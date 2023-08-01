@@ -506,7 +506,6 @@ typedef struct {
     // NOTE: As we are currently polling the result of the discovery, this callback is not needed,
     // but might be useful in the future.
     if (error != nil) {
-        NSLog(@"Error while discovering services for peripheral %@: %@\n", peripheral.name, error);
         @synchronized(self) {
             self.lastError_ = error;
         }
@@ -521,7 +520,6 @@ typedef struct {
     // NOTE: As we are currently polling the result of the discovery, this callback is not needed,
     // but might be useful in the future.
     if (error != nil) {
-        NSLog(@"Error while discovering characteristics for service %@: %@\n", service.UUID, error);
         @synchronized(self) {
             self.lastError_ = error;
         }
@@ -536,7 +534,6 @@ typedef struct {
     didDiscoverDescriptorsForCharacteristic:(CBCharacteristic*)characteristic
                                       error:(NSError*)error {
     if (error != nil) {
-        NSLog(@"Error while discovering descriptors for characteristic %@: %@\n", characteristic.UUID, error);
         @synchronized(self) {
             self.lastError_ = error;
         }
@@ -548,9 +545,7 @@ typedef struct {
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    // NSLog(@"Updated value for characteristic: %@", characteristic.UUID);
     if (error != nil) {
-        NSLog(@"Characteristic value update error: %@\n", error);
         @synchronized(self) {
             self.lastError_ = error;
         }
@@ -572,9 +567,7 @@ typedef struct {
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    // NSLog(@"Wrote value for characteristic: %@", characteristic.UUID);
     if (error != nil) {
-        NSLog(@"Error: %@\n", error);
         @synchronized(self) {
             self.lastError_ = error;
         }
@@ -588,7 +581,6 @@ typedef struct {
     didUpdateNotificationStateForCharacteristic:(CBCharacteristic*)characteristic
                                           error:(NSError*)error {
     if (error != nil) {
-        NSLog(@"Notification state update error: %@\n", error);
         @synchronized(self) {
             self.lastError_ = error;
         }
@@ -605,7 +597,6 @@ typedef struct {
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
     if (error != nil) {
-        NSLog(@"Descriptor value update error: %@\n", error);
         @synchronized(self) {
             self.lastError_ = error;
         }
@@ -625,7 +616,6 @@ typedef struct {
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
     if (error != nil) {
-        NSLog(@"Descriptor value write error: %@\n", error);
         @synchronized(self) {
             self.lastError_ = error;
         }
