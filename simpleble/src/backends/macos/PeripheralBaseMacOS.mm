@@ -6,6 +6,17 @@
 
 #import <simpleble/Exceptions.h>
 
+#define WAIT_UNTIL_FALSE(obj, var)                \
+    do {                                          \
+        BOOL _tmpVar = YES;                       \
+        while (_tmpVar) {                         \
+            [NSThread sleepForTimeInterval:0.01]; \
+            @synchronized(obj) {                  \
+                _tmpVar = (obj->var);             \
+            }                                     \
+        }                                         \
+    } while (0)
+
 typedef struct {
     BOOL readPending;
     BOOL writePending;
@@ -20,11 +31,18 @@ typedef struct {
 } characteristic_extras_t;
 
 @interface PeripheralBaseMacOS () {
+    BOOL connectionPending_;
+    BOOL disconnectionPending_;
+    BOOL serviceDiscoveryPending_;
+    BOOL characteristicDiscoveryPending_;
+    BOOL descriptorDiscoveryPending_;
+
     // NOTE: This dictionary assumes that all characteristic UUIDs are unique, which could not always be the case.
     std::map<std::string, characteristic_extras_t> characteristic_extras_;
 }
 
 // Private properties
+@property(strong) NSError* lastError_;
 @property(strong) CBPeripheral* peripheral;
 @property(strong) CBCentralManager* centralManager;
 
@@ -32,6 +50,7 @@ typedef struct {
 - (CBCharacteristic*)findCharacteristic:(NSString*)uuid service:(CBService*)service;
 - (std::pair<CBService*, CBCharacteristic*>)findServiceAndCharacteristic:(NSString*)service_uuid
                                                      characteristic_uuid:(NSString*)characteristic_uuid;
+- (void)throwBasedOnError:(NSString*)format, ...;
 
 @end
 
@@ -66,74 +85,67 @@ typedef struct {
     return [self.peripheral.identifier UUIDString];
 }
 
-- (uint16_t) mtu {
+- (uint16_t)mtu {
     return [self.peripheral maximumWriteValueLengthForType:CBCharacteristicWriteWithoutResponse];
 }
 
 - (void)connect {
+    // --- Connect to the peripheral ---
     @synchronized(self) {
-        // NSLog(@"Connecting to peripheral: %@", self.peripheral.name);
+        self.lastError_ = nil;
+        self->connectionPending_ = YES;
         [self.centralManager connectPeripheral:self.peripheral options:@{}];  // TODO: Do we need to pass any options?
+    }
 
-        NSDate* endDate = nil;
+    WAIT_UNTIL_FALSE(self, connectionPending_);
 
-        // Wait for the connection to be established for up to 5 seconds.
-        endDate = [NSDate dateWithTimeInterval:5.0 sinceDate:NSDate.now];
-        while (self.peripheral.state == CBPeripheralStateConnecting && [NSDate.now compare:endDate] == NSOrderedAscending) {
-            [NSThread sleepForTimeInterval:0.01];
-        }
+    if (self.peripheral.state != CBPeripheralStateConnected) {
+        [self throwBasedOnError:@"Peripheral Connection"];
+    }
 
-        if (self.peripheral.state != CBPeripheralStateConnected) {
-            throw SimpleBLE::Exception::OperationFailed("Peripheral Connection");
-        }
+    // --- Discover services and characteristics ---
 
+    @synchronized(self) {
+        self.lastError_ = nil;
+        self->serviceDiscoveryPending_ = YES;
         [self.peripheral discoverServices:nil];
+    }
 
-        // Wait for services to be discovered
-        // NOTE: This is a bit of a hack but avoids the need of having a dedicated flag.
-        while (self.peripheral.services == nil && self.peripheral.state == CBPeripheralStateConnected) {
-            [NSThread sleepForTimeInterval:0.01];
-        }
+    WAIT_UNTIL_FALSE(self, serviceDiscoveryPending_);
 
-        if (self.peripheral.services == nil) {
-            // If services could not be discovered, raise an exception.
-            NSLog(@"Services could not be discovered.");
-            throw SimpleBLE::Exception::OperationFailed("Service Discovery");
-        }
+    if (self.peripheral.services == nil || self.peripheral.state != CBPeripheralStateConnected) {
+        [self throwBasedOnError:@"Service Discovery"];
+    }
 
-        // For each service found, discover characteristics.
-        for (CBService* service in self.peripheral.services) {
+    // For each service found, discover characteristics.
+    for (CBService* service in self.peripheral.services) {
+        @synchronized(self) {
+            self.lastError_ = nil;
+            self->characteristicDiscoveryPending_ = YES;
             [self.peripheral discoverCharacteristics:nil forService:service];
+        }
 
-            // Wait for characteristics  to be discovered for up to 1 second.
-            // NOTE: This is a bit of a hack but avoids the need of having a dedicated flag.
-            endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
-            while (service.characteristics == nil && [NSDate.now compare:endDate] == NSOrderedAscending) {
-                [NSThread sleepForTimeInterval:0.01];
-            }
+        WAIT_UNTIL_FALSE(self, characteristicDiscoveryPending_);
 
-            if (service.characteristics == nil) {
-                // If characteristics could not be discovered, raise an exception.
-                NSLog(@"Characteristics could not be discovered for service %@", service.UUID);
-                throw SimpleBLE::Exception::OperationFailed("Characteristic Discovery");
-            }
+        if (service.characteristics == nil || self.peripheral.state != CBPeripheralStateConnected) {
+            [self throwBasedOnError:@"Characteristic Discovery for service %@", service.UUID];
+        }
 
-            // For each characteristic, create the associated extra properties and discover descriptors.
-            for (CBCharacteristic* characteristic in service.characteristics) {
+        // For each characteristic, create the associated extra properties and discover descriptors.
+        for (CBCharacteristic* characteristic in service.characteristics) {
+            @synchronized(self) {
+                self.lastError_ = nil;
+                self->descriptorDiscoveryPending_ = YES;
                 [self.peripheral discoverDescriptorsForCharacteristic:characteristic];
+            }
 
-                // Wait for descriptors to be discovered for up to 1 second.
-                endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
-                while (characteristic.descriptors == nil && [NSDate.now compare:endDate] == NSOrderedAscending) {
-                    [NSThread sleepForTimeInterval:0.01];
-                }
+            WAIT_UNTIL_FALSE(self, descriptorDiscoveryPending_);
 
-                if (characteristic.descriptors == nil) {
-                    // If characteristics could not be discovered, raise an exception.
-                    NSLog(@"Descriptors could not be discovered for characteristic %@", characteristic.UUID);
-                    throw SimpleBLE::Exception::OperationFailed("Descriptor Discovery");
-                }
+            if (characteristic.descriptors == nil || self.peripheral.state != CBPeripheralStateConnected) {
+                [self throwBasedOnError:@"Descriptor Discovery for characteristic %@", characteristic.UUID];
+            }
 
+            @synchronized(self) {
                 characteristic_extras_t characteristic_extra;
                 characteristic_extra.readPending = NO;
                 characteristic_extra.writePending = NO;
@@ -154,22 +166,15 @@ typedef struct {
 
 - (void)disconnect {
     @synchronized(self) {
-        // NSLog(@"Disconnecting peripheral: %@ - State was %ld", self.peripheral.name, self.peripheral.state);
+        self.lastError_ = nil;
+        self->disconnectionPending_ = YES;
         [self.centralManager cancelPeripheralConnection:self.peripheral];
+    }
 
-        NSDate* endDate = nil;
+    WAIT_UNTIL_FALSE(self, disconnectionPending_);
 
-        // Wait for the connection to be established for up to 5 seconds.
-        endDate = [NSDate dateWithTimeInterval:5.0 sinceDate:NSDate.now];
-        while (self.peripheral.state == CBPeripheralStateDisconnecting && [NSDate.now compare:endDate] == NSOrderedAscending) {
-            [NSThread sleepForTimeInterval:0.01];
-        }
-
-        if (self.peripheral.state != CBPeripheralStateDisconnected) {
-            // If the disconnection failed, raise an exception.
-            NSLog(@"Disconnection failed.");
-            throw SimpleBLE::Exception::OperationFailed("Peripheral Disconnection");
-        }
+    if (self.peripheral.state != CBPeripheralStateDisconnected) {
+        [self throwBasedOnError:@"Peripheral Disconnection"];
     }
 }
 
@@ -217,23 +222,15 @@ typedef struct {
     }
 
     @synchronized(self) {
+        self.lastError_ = nil;
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending = YES;
         [self.peripheral readValueForCharacteristic:characteristic];
     }
 
-    // Wait for the read to complete for up to 1 second.
-    NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
-    BOOL readPending = YES;
-    while (readPending && [NSDate.now compare:endDate] == NSOrderedAscending) {
-        [NSThread sleepForTimeInterval:0.01];
-        @synchronized(self) {
-            readPending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending;
-        }
-    }
+    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending);
 
-    if (readPending) {
-        NSLog(@"Characteristic %@ could not be read", characteristic.UUID);
-        throw SimpleBLE::Exception::OperationFailed("Characteristic Read");
+    if (self.lastError_ != nil) {
+        [self throwBasedOnError:@"Characteristic %@ Read", characteristic.UUID];
     }
 
     return SimpleBLE::ByteArray((const char*)characteristic.value.bytes, characteristic.value.length);
@@ -252,23 +249,15 @@ typedef struct {
     }
 
     @synchronized(self) {
+        self.lastError_ = nil;
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending = YES;
         [self.peripheral writeValue:payload forCharacteristic:characteristic type:CBCharacteristicWriteWithResponse];
     }
 
-    // Wait for the read to complete for up to 1 second.
-    NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
-    BOOL writePending = YES;
-    while (writePending && [NSDate.now compare:endDate] == NSOrderedAscending) {
-        [NSThread sleepForTimeInterval:0.01];
-        @synchronized(self) {
-            writePending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending;
-        }
-    }
+    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending);
 
-    if (writePending) {
-        NSLog(@"Characteristic %@ could not be written", characteristic.UUID);
-        throw SimpleBLE::Exception::OperationFailed("Characteristic Write Request");
+    if (self.lastError_ != nil) {
+        [self throwBasedOnError:@"Characteristic %@ Write Request", characteristic.UUID];
     }
 }
 
@@ -286,6 +275,7 @@ typedef struct {
 
     // NOTE: This write is unacknowledged.
     @synchronized(self) {
+        self.lastError_ = nil;
         [self.peripheral writeValue:payload forCharacteristic:characteristic type:CBCharacteristicWriteWithoutResponse];
     }
 }
@@ -299,22 +289,16 @@ typedef struct {
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
 
     @synchronized(self) {
+        self.lastError_ = nil;
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending = YES;
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback = callback;
         [self.peripheral setNotifyValue:YES forCharacteristic:characteristic];
     }
 
-    BOOL notifyPending = YES;
-    while (notifyPending) {
-        [NSThread sleepForTimeInterval:0.01];
-        @synchronized(self) {
-            notifyPending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending;
-        }
-    }
+    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending);
 
-    if (!characteristic.isNotifying || notifyPending) {
-        NSLog(@"Could not enable notifications for characteristic %@", characteristic.UUID);
-        throw SimpleBLE::Exception::OperationFailed("Characteristic Notify/Indicate");
+    if (!characteristic.isNotifying || self.lastError_ != nil) {
+        [self throwBasedOnError:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
     }
 }
 
@@ -328,24 +312,19 @@ typedef struct {
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
+    CBCharacteristic* characteristic = serviceAndCharacteristic.second;
+
     @synchronized(self) {
-        CBCharacteristic* characteristic = serviceAndCharacteristic.second;
+        self.lastError_ = nil;
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending = YES;
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback = nil;
         [self.peripheral setNotifyValue:NO forCharacteristic:characteristic];
+    }
 
-        // Wait for the update to complete for up to 1 second.
-        NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
-        while (characteristic.isNotifying && [NSDate.now compare:endDate] == NSOrderedAscending) {
-            [NSThread sleepForTimeInterval:0.01];
-        }
+    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending);
 
-        if (characteristic.isNotifying) {
-            NSLog(@"Could not disable notifications for characteristic %@", characteristic.UUID);
-            throw SimpleBLE::Exception::OperationFailed("Characteristic Unsubscribe");
-        } else {
-            // Only delete the callback if the characteristic is no longer notifying, to
-            // prevent triggering a segfault.
-            characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback = nil;
-        }
+    if (characteristic.isNotifying || self.lastError_ != nil) {
+        [self throwBasedOnError:@"Characteristic %@ Unsubscribe", characteristic.UUID];
     }
 }
 
@@ -360,25 +339,16 @@ typedef struct {
     CBDescriptor* descriptor = [self findDescriptor:descriptor_uuid characteristic:characteristic];
 
     @synchronized(self) {
+        self.lastError_ = nil;
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].readPending = YES;
         [self.peripheral readValueForDescriptor:descriptor];
     }
 
-    // Wait for the read to complete for up to 1 second.
-    NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
-    BOOL readPending = YES;
-    while (readPending && [NSDate.now compare:endDate] == NSOrderedAscending) {
-        [NSThread sleepForTimeInterval:0.01];
-        @synchronized(self) {
-            readPending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)]
-                              .descriptor_extras[uuidToSimpleBLE(descriptor.UUID)]
-                              .readPending;
-        }
-    }
+    WAIT_UNTIL_FALSE(
+        self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].readPending);
 
-    if (readPending) {
-        NSLog(@"Descriptor %@ could not be read", descriptor.UUID);
-        throw SimpleBLE::Exception::OperationFailed("Descriptor Read");
+    if (self.lastError_ != nil) {
+        [self throwBasedOnError:@"Descriptor %@ Read", descriptor.UUID];
     }
 
     const char* bytes = (const char*)[descriptor.value bytes];
@@ -398,25 +368,17 @@ typedef struct {
     CBDescriptor* descriptor = [self findDescriptor:descriptor_uuid characteristic:characteristic];
 
     @synchronized(self) {
+        self.lastError_ = nil;
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].writePending = YES;
         [self.peripheral writeValue:payload forDescriptor:descriptor];
     }
 
-    // Wait for the read to complete for up to 1 second.
-    NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
-    BOOL writePending = YES;
-    while (writePending && [NSDate.now compare:endDate] == NSOrderedAscending) {
-        [NSThread sleepForTimeInterval:0.01];
-        @synchronized(self) {
-            writePending = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)]
-                               .descriptor_extras[uuidToSimpleBLE(descriptor.UUID)]
-                               .writePending;
-        }
-    }
+    WAIT_UNTIL_FALSE(
+        self,
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].writePending);
 
-    if (writePending) {
-        NSLog(@"Descriptor %@ could not be written", descriptor.UUID);
-        throw SimpleBLE::Exception::OperationFailed("Descriptor Write");
+    if (self.lastError_ != nil) {
+        [self throwBasedOnError:@"Descriptor %@ Write", descriptor.UUID];
     }
 }
 
@@ -469,15 +431,73 @@ typedef struct {
     return std::pair<CBService*, CBCharacteristic*>(service, characteristic);
 }
 
+- (void)throwBasedOnError:(NSString*)format, ... {
+    va_list argList;
+    va_start(argList, format);
+    NSString* formattedString = [[NSString alloc] initWithFormat:format arguments:argList];
+    va_end(argList);
+
+    if (self.lastError_ == nil) {
+        NSString *exceptionMessage = [NSString stringWithFormat:@"%@ failed", formattedString];
+        NSLog(@"%@", exceptionMessage);
+        throw SimpleBLE::Exception::OperationFailed([exceptionMessage UTF8String]);
+    } else {
+        NSString *errorMessage = [self.lastError_ localizedDescription];
+        NSString *exceptionMessage = [NSString stringWithFormat:@"%@ failed: %@", formattedString, errorMessage];
+        NSLog(@"%@", exceptionMessage);
+        throw SimpleBLE::Exception::OperationFailed([exceptionMessage UTF8String]);
+    }
+}
+
 #pragma mark - CBCentralManagerDelegate
 
 - (void)delegateDidConnect {
-    // NOTE: As the connection process is polling-based, this callback is not needed,
-    // but might be useful in the future.
+    @synchronized(self) {
+        self->connectionPending_ = NO;
+    }
 }
 
-- (void)delegateDidDisconnect {
-    // NOTE: We're keeping this callback for potential future use.
+- (void)delegateDidFailToConnect:(NSError*)error {
+    if (error != nil) {
+        NSLog(@"Failed to connect to peripheral %@: %@\n", self.peripheral.name, error);
+        @synchronized(self) {
+            self.lastError_ = error;
+        }
+    }
+
+    @synchronized(self) {
+        self->connectionPending_ = NO;
+    }
+}
+
+- (void)delegateDidDisconnect:(NSError*)error {
+    if (error != nil) {
+        NSLog(@"Peripheral %@ disconnected: %@\n", self.peripheral.name, error);
+        @synchronized(self) {
+            self.lastError_ = error;
+        }
+    }
+
+    @synchronized(self) {
+        self->serviceDiscoveryPending_ = NO;
+        self->characteristicDiscoveryPending_ = NO;
+        self->descriptorDiscoveryPending_ = NO;
+        self->disconnectionPending_ = NO;
+
+        for (auto& characteristic_entry : self->characteristic_extras_) {
+            characteristic_extras_t& characteristic_extra = characteristic_entry.second;
+
+            characteristic_extra.readPending = NO;
+            characteristic_extra.writePending = NO;
+            characteristic_extra.notifyPending = NO;
+
+            for (auto& descriptor_entry : characteristic_extra.descriptor_extras) {
+                descriptor_extras_t descriptor_extra = descriptor_entry.second;
+                descriptor_extra.readPending = NO;
+                descriptor_extra.writePending = NO;
+            }
+        }
+    }
 }
 
 #pragma mark - CBPeripheralDelegate
@@ -486,7 +506,13 @@ typedef struct {
     // NOTE: As we are currently polling the result of the discovery, this callback is not needed,
     // but might be useful in the future.
     if (error != nil) {
-        NSLog(@"Error while discovering services for peripheral %@: %@\n", peripheral.name, error);
+        @synchronized(self) {
+            self.lastError_ = error;
+        }
+    }
+
+    @synchronized(self) {
+        self->serviceDiscoveryPending_ = NO;
     }
 }
 
@@ -494,7 +520,13 @@ typedef struct {
     // NOTE: As we are currently polling the result of the discovery, this callback is not needed,
     // but might be useful in the future.
     if (error != nil) {
-        NSLog(@"Error while discovering characteristics for service %@: %@\n", service.UUID, error);
+        @synchronized(self) {
+            self.lastError_ = error;
+        }
+    }
+
+    @synchronized(self) {
+        self->characteristicDiscoveryPending_ = NO;
     }
 }
 
@@ -502,15 +534,21 @@ typedef struct {
     didDiscoverDescriptorsForCharacteristic:(CBCharacteristic*)characteristic
                                       error:(NSError*)error {
     if (error != nil) {
-        NSLog(@"Error while discovering descriptors for characteristic %@: %@\n", characteristic.UUID, error);
+        @synchronized(self) {
+            self.lastError_ = error;
+        }
+    }
+
+    @synchronized(self) {
+        self->descriptorDiscoveryPending_ = NO;
     }
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    // NSLog(@"Updated value for characteristic: %@", characteristic.UUID);
     if (error != nil) {
-        NSLog(@"Characteristic value update error: %@\n", error);
-        return;
+        @synchronized(self) {
+            self.lastError_ = error;
+        }
     }
 
     @synchronized(self) {
@@ -529,10 +567,10 @@ typedef struct {
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    // NSLog(@"Wrote value for characteristic: %@", characteristic.UUID);
     if (error != nil) {
-        NSLog(@"Error: %@\n", error);
-        return;
+        @synchronized(self) {
+            self.lastError_ = error;
+        }
     }
     @synchronized(self) {
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending = NO;
@@ -543,8 +581,9 @@ typedef struct {
     didUpdateNotificationStateForCharacteristic:(CBCharacteristic*)characteristic
                                           error:(NSError*)error {
     if (error != nil) {
-        NSLog(@"Notification state update error: %@\n", error);
-        return;
+        @synchronized(self) {
+            self.lastError_ = error;
+        }
     }
 
     @synchronized(self) {
@@ -558,8 +597,9 @@ typedef struct {
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
     if (error != nil) {
-        NSLog(@"Descriptor value update error: %@\n", error);
-        return;
+        @synchronized(self) {
+            self.lastError_ = error;
+        }
     }
 
     std::string characteristic_uuid = uuidToSimpleBLE(descriptor.characteristic.UUID);
@@ -576,8 +616,9 @@ typedef struct {
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
     if (error != nil) {
-        NSLog(@"Descriptor value write error: %@\n", error);
-        return;
+        @synchronized(self) {
+            self.lastError_ = error;
+        }
     }
 
     std::string characteristic_uuid = uuidToSimpleBLE(descriptor.characteristic.UUID);
