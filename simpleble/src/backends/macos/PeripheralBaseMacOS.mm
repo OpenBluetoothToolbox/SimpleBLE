@@ -50,6 +50,7 @@ typedef struct {
 - (CBCharacteristic*)findCharacteristic:(NSString*)uuid service:(CBService*)service;
 - (std::pair<CBService*, CBCharacteristic*>)findServiceAndCharacteristic:(NSString*)service_uuid
                                                      characteristic_uuid:(NSString*)characteristic_uuid;
+- (void)throwBasedOnError:(NSString*)format, ...;
 
 @end
 
@@ -99,7 +100,7 @@ typedef struct {
     WAIT_UNTIL_FALSE(self, connectionPending_);
 
     if (self.peripheral.state != CBPeripheralStateConnected) {
-        throw SimpleBLE::Exception::OperationFailed("Peripheral Connection");
+        [self throwBasedOnError:@"Peripheral Connection"];
     }
 
     // --- Discover services and characteristics ---
@@ -113,9 +114,7 @@ typedef struct {
     WAIT_UNTIL_FALSE(self, serviceDiscoveryPending_);
 
     if (self.peripheral.services == nil || self.peripheral.state != CBPeripheralStateConnected) {
-        // If services could not be discovered, raise an exception.
-        NSLog(@"Services could not be discovered.");
-        throw SimpleBLE::Exception::OperationFailed("Service Discovery");
+        [self throwBasedOnError:@"Service Discovery"];
     }
 
     // For each service found, discover characteristics.
@@ -129,9 +128,7 @@ typedef struct {
         WAIT_UNTIL_FALSE(self, characteristicDiscoveryPending_);
 
         if (service.characteristics == nil || self.peripheral.state != CBPeripheralStateConnected) {
-            // If characteristics could not be discovered, raise an exception.
-            NSLog(@"Characteristics could not be discovered for service %@", service.UUID);
-            throw SimpleBLE::Exception::OperationFailed("Characteristic Discovery");
+            [self throwBasedOnError:@"Characteristic Discovery for service %@", service.UUID];
         }
 
         // For each characteristic, create the associated extra properties and discover descriptors.
@@ -145,9 +142,7 @@ typedef struct {
             WAIT_UNTIL_FALSE(self, descriptorDiscoveryPending_);
 
             if (characteristic.descriptors == nil || self.peripheral.state != CBPeripheralStateConnected) {
-                // If characteristics could not be discovered, raise an exception.
-                NSLog(@"Descriptors could not be discovered for characteristic %@", characteristic.UUID);
-                throw SimpleBLE::Exception::OperationFailed("Descriptor Discovery");
+                [self throwBasedOnError:@"Descriptor Discovery for characteristic %@", characteristic.UUID];
             }
 
             @synchronized(self) {
@@ -179,8 +174,7 @@ typedef struct {
     WAIT_UNTIL_FALSE(self, disconnectionPending_);
 
     if (self.peripheral.state != CBPeripheralStateDisconnected) {
-        NSLog(@"Disconnection failed.");
-        throw SimpleBLE::Exception::OperationFailed("Peripheral Disconnection");
+        [self throwBasedOnError:@"Peripheral Disconnection"];
     }
 }
 
@@ -236,8 +230,7 @@ typedef struct {
     WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending);
 
     if (self.lastError_ != nil) {
-        NSLog(@"Characteristic %@ could not be read", characteristic.UUID);
-        throw SimpleBLE::Exception::OperationFailed("Characteristic Read");
+        [self throwBasedOnError:@"Characteristic %@ Read", characteristic.UUID];
     }
 
     return SimpleBLE::ByteArray((const char*)characteristic.value.bytes, characteristic.value.length);
@@ -264,8 +257,7 @@ typedef struct {
     WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending);
 
     if (self.lastError_ != nil) {
-        NSLog(@"Characteristic %@ could not be written", characteristic.UUID);
-        throw SimpleBLE::Exception::OperationFailed("Characteristic Write Request");
+        [self throwBasedOnError:@"Characteristic %@ Write Request", characteristic.UUID];
     }
 }
 
@@ -306,8 +298,7 @@ typedef struct {
     WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending);
 
     if (!characteristic.isNotifying || self.lastError_ != nil) {
-        NSLog(@"Could not enable notifications for characteristic %@", characteristic.UUID);
-        throw SimpleBLE::Exception::OperationFailed("Characteristic Notify/Indicate");
+        [self throwBasedOnError:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
     }
 }
 
@@ -333,8 +324,7 @@ typedef struct {
     WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending);
 
     if (characteristic.isNotifying || self.lastError_ != nil) {
-        NSLog(@"Could not disable notifications for characteristic %@", characteristic.UUID);
-        throw SimpleBLE::Exception::OperationFailed("Characteristic Unsubscribe");
+        [self throwBasedOnError:@"Characteristic %@ Unsubscribe", characteristic.UUID];
     }
 }
 
@@ -358,8 +348,7 @@ typedef struct {
         self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].readPending);
 
     if (self.lastError_ != nil) {
-        NSLog(@"Descriptor %@ could not be read", descriptor.UUID);
-        throw SimpleBLE::Exception::OperationFailed("Descriptor Read");
+        [self throwBasedOnError:@"Descriptor %@ Read", descriptor.UUID];
     }
 
     const char* bytes = (const char*)[descriptor.value bytes];
@@ -389,8 +378,7 @@ typedef struct {
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].writePending);
 
     if (self.lastError_ != nil) {
-        NSLog(@"Descriptor %@ could not be written", descriptor.UUID);
-        throw SimpleBLE::Exception::OperationFailed("Descriptor Write");
+        [self throwBasedOnError:@"Descriptor %@ Write", descriptor.UUID];
     }
 }
 
@@ -443,10 +431,21 @@ typedef struct {
     return std::pair<CBService*, CBCharacteristic*>(service, characteristic);
 }
 
-- (void)throwBasedOnError:(NSError*)error operation:(NSString*)operation {
-    if (error != nil) {
-        NSLog(@"%@ failed: %@\n", operation, error);
-        throw SimpleBLE::Exception::OperationFailed([operation UTF8String]);
+- (void)throwBasedOnError:(NSString*)format, ... {
+    va_list argList;
+    va_start(argList, format);
+    NSString* formattedString = [[NSString alloc] initWithFormat:format arguments:argList];
+    va_end(argList);
+
+    if (self.lastError_ == nil) {
+        NSString *exceptionMessage = [NSString stringWithFormat:@"%@ failed", formattedString];
+        NSLog(@"%@", exceptionMessage);
+        throw SimpleBLE::Exception::OperationFailed([exceptionMessage UTF8String]);
+    } else {
+        NSString *errorMessage = [self.lastError_ localizedDescription];
+        NSString *exceptionMessage = [NSString stringWithFormat:@"%@ failed: %@", formattedString, errorMessage];
+        NSLog(@"%@", exceptionMessage);
+        throw SimpleBLE::Exception::OperationFailed([exceptionMessage UTF8String]);
     }
 }
 

@@ -46,7 +46,4 @@
 - (void)delegateDidFailToConnect:(NSError*)error;
 - (void)delegateDidDisconnect:(NSError*)error;
 
-- (void)throwBasedOnError:(NSError*)error
-                operation:(NSString*)operation;
-
 @end
