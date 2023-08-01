@@ -76,7 +76,6 @@ typedef struct {
 }
 
 - (void)connect {
-
     // --- Connect to the peripheral ---
     @synchronized(self) {
         // NSLog(@"Connecting to peripheral: %@", self.peripheral.name);
@@ -117,16 +116,14 @@ typedef struct {
         throw SimpleBLE::Exception::OperationFailed("Service Discovery");
     }
 
-    @synchronized(self) {
-        NSDate* endDate = nil;
-
-        // For each service found, discover characteristics.
-        for (CBService* service in self.peripheral.services) {
+    // For each service found, discover characteristics.
+    for (CBService* service in self.peripheral.services) {
+        @synchronized(self) {
             [self.peripheral discoverCharacteristics:nil forService:service];
 
             // Wait for characteristics  to be discovered for up to 1 second.
             // NOTE: This is a bit of a hack but avoids the need of having a dedicated flag.
-            endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
+            NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
             while (service.characteristics == nil && [NSDate.now compare:endDate] == NSOrderedAscending) {
                 [NSThread sleepForTimeInterval:0.01];
             }
@@ -136,13 +133,15 @@ typedef struct {
                 NSLog(@"Characteristics could not be discovered for service %@", service.UUID);
                 throw SimpleBLE::Exception::OperationFailed("Characteristic Discovery");
             }
+        }
 
-            // For each characteristic, create the associated extra properties and discover descriptors.
-            for (CBCharacteristic* characteristic in service.characteristics) {
+        // For each characteristic, create the associated extra properties and discover descriptors.
+        for (CBCharacteristic* characteristic in service.characteristics) {
+            @synchronized(self) {
                 [self.peripheral discoverDescriptorsForCharacteristic:characteristic];
 
                 // Wait for descriptors to be discovered for up to 1 second.
-                endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
+                NSDate* endDate = [NSDate dateWithTimeInterval:1.0 sinceDate:NSDate.now];
                 while (characteristic.descriptors == nil && [NSDate.now compare:endDate] == NSOrderedAscending) {
                     [NSThread sleepForTimeInterval:0.01];
                 }
