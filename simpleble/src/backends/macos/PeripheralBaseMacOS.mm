@@ -3,6 +3,7 @@
 #import "DescriptorBuilder.h"
 #import "ServiceBuilder.h"
 #import "Utils.h"
+#import "LoggingInternal.h"
 
 #import <simpleble/Exceptions.h>
 
@@ -288,6 +289,9 @@ typedef struct {
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
 
+    NSString *message = [NSString stringWithFormat:@"Notify Characteristic %@ START", characteristic.UUID];
+    SIMPLEBLE_LOG_ERROR([message UTF8String]);
+
     @synchronized(self) {
         self.lastError_ = nil;
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending = YES;
@@ -300,6 +304,9 @@ typedef struct {
     if (!characteristic.isNotifying || self.lastError_ != nil) {
         [self throwBasedOnError:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
     }
+
+    message = [NSString stringWithFormat:@"Notify Characteristic %@ START", characteristic.UUID];
+    SIMPLEBLE_LOG_ERROR([message UTF8String]);
 }
 
 - (void)indicate:(NSString*)service_uuid
@@ -492,7 +499,7 @@ typedef struct {
             characteristic_extra.notifyPending = NO;
 
             for (auto& descriptor_entry : characteristic_extra.descriptor_extras) {
-                descriptor_extras_t descriptor_extra = descriptor_entry.second;
+                descriptor_extras_t& descriptor_extra = descriptor_entry.second;
                 descriptor_extra.readPending = NO;
                 descriptor_extra.writePending = NO;
             }
@@ -580,6 +587,11 @@ typedef struct {
 - (void)peripheral:(CBPeripheral*)peripheral
     didUpdateNotificationStateForCharacteristic:(CBCharacteristic*)characteristic
                                           error:(NSError*)error {
+
+    NSString *message = [NSString stringWithFormat:@"Peripheral %@ didUpdateNotificationStateForCharacteristic %@: %@\n",
+                         peripheral.name, characteristic.UUID, error];
+    SIMPLEBLE_LOG_ERROR([message UTF8String]);
+
     if (error != nil) {
         @synchronized(self) {
             self.lastError_ = error;
