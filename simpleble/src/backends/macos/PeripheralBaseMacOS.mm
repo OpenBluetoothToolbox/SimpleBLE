@@ -305,7 +305,7 @@ typedef struct {
         [self throwBasedOnError:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
     }
 
-    message = [NSString stringWithFormat:@"Notify Characteristic %@ START", characteristic.UUID];
+    message = [NSString stringWithFormat:@"Notify Characteristic %@ END", characteristic.UUID];
     SIMPLEBLE_LOG_ERROR([message UTF8String]);
 }
 
