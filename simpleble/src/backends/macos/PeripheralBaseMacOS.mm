@@ -520,7 +520,7 @@ typedef struct {
 
 - (void)peripheral:(CBPeripheral *)peripheral
  didModifyServices:(NSArray<CBService *> *)invalidatedServices {
-    NSLog(@"Peripheral %@ did modify services: %@\n", self.peripheral.name, invalidatedServices);
+    NSLog(@"Peripheral %@ did modify services: %@ START\n", self.peripheral.name, invalidatedServices);
 
     for (CBService* service in invalidatedServices) {
         for (CBCharacteristic* characteristic in service.characteristics) {
@@ -536,6 +536,8 @@ typedef struct {
             }
         }
     }
+
+    NSLog(@"Peripheral %@ did modify services: %@ END\n", self.peripheral.name, invalidatedServices);
  }
 
 
