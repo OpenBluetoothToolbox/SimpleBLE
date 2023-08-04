@@ -529,25 +529,24 @@ typedef struct {
 #pragma mark - CBPeripheralDelegate
 
 - (void)peripheral:(CBPeripheral*)peripheral didModifyServices:(NSArray<CBService*>*)invalidatedServices {
+    // NOTE: Whenever this method is called, any pending operations are cancelled. In addition to that,
+    //       the provided list of services does NOT include any characteristics or descriptors, so need to
+    //       clear pending flags for those as well.
+
     NSLog(@"Peripheral %@ did modify services: %@ START\n", self.peripheral.name, invalidatedServices);
 
-    for (CBService* service in invalidatedServices) {
-        for (CBCharacteristic* characteristic in service.characteristics) {
-            @synchronized(self) {
-                NSLog(@"Clearing pending flags for characteristic %@\n", characteristic.UUID);
+    @synchronized(self) {
+        for (auto& characteristic_entry : self->characteristic_extras_) {
+            characteristic_extras_t& characteristic_extra = characteristic_entry.second;
 
-                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending = NO;
-                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending = NO;
-                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending = NO;
+            characteristic_extra.readPending = NO;
+            characteristic_extra.writePending = NO;
+            characteristic_extra.notifyPending = NO;
 
-                for (CBDescriptor* descriptor in characteristic.descriptors) {
-                    characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)]
-                        .descriptor_extras[uuidToSimpleBLE(descriptor.UUID)]
-                        .writePending = NO;
-                    characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)]
-                        .descriptor_extras[uuidToSimpleBLE(descriptor.UUID)]
-                        .readPending = NO;
-                }
+            for (auto& descriptor_entry : characteristic_extra.descriptor_extras) {
+                descriptor_extras_t& descriptor_extra = descriptor_entry.second;
+                descriptor_extra.readPending = NO;
+                descriptor_extra.writePending = NO;
             }
         }
     }
