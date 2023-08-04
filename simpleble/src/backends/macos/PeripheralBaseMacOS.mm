@@ -1,9 +1,9 @@
 #import "PeripheralBaseMacOS.h"
 #import "CharacteristicBuilder.h"
 #import "DescriptorBuilder.h"
+#import "LoggingInternal.h"
 #import "ServiceBuilder.h"
 #import "Utils.h"
-#import "LoggingInternal.h"
 
 #import <simpleble/Exceptions.h>
 #import <iostream>
@@ -294,7 +294,7 @@ typedef struct {
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
 
-    NSString *message = [NSString stringWithFormat:@"Notify Characteristic %@ START", characteristic.UUID];
+    NSString* message = [NSString stringWithFormat:@"Notify Characteristic %@ START", characteristic.UUID];
     SIMPLEBLE_LOG_ERROR([message UTF8String]);
 
     @synchronized(self) {
@@ -304,9 +304,18 @@ typedef struct {
         [self.peripheral setNotifyValue:YES forCharacteristic:characteristic];
     }
 
-    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending);
+    do {
+        BOOL _tmpVar = YES;
+        while (_tmpVar) {
+            [NSThread sleepForTimeInterval:0.01];
+            @synchronized(self) {
+                _tmpVar = (self->characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending);
+            }
+            NSLog(@"Waiting for notify to be enabled");
+        }
+    } while (0)
 
-    if (!characteristic.isNotifying || self.lastError_ != nil) {
+        if (!characteristic.isNotifying || self.lastError_ != nil) {
         [self throwBasedOnError:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
     }
 
@@ -450,12 +459,12 @@ typedef struct {
     va_end(argList);
 
     if (self.lastError_ == nil) {
-        NSString *exceptionMessage = [NSString stringWithFormat:@"%@ failed", formattedString];
+        NSString* exceptionMessage = [NSString stringWithFormat:@"%@ failed", formattedString];
         NSLog(@"%@", exceptionMessage);
         throw SimpleBLE::Exception::OperationFailed([exceptionMessage UTF8String]);
     } else {
-        NSString *errorMessage = [self.lastError_ localizedDescription];
-        NSString *exceptionMessage = [NSString stringWithFormat:@"%@ failed: %@", formattedString, errorMessage];
+        NSString* errorMessage = [self.lastError_ localizedDescription];
+        NSString* exceptionMessage = [NSString stringWithFormat:@"%@ failed: %@", formattedString, errorMessage];
         NSLog(@"%@", exceptionMessage);
         throw SimpleBLE::Exception::OperationFailed([exceptionMessage UTF8String]);
     }
@@ -483,7 +492,8 @@ typedef struct {
 }
 
 - (void)delegateDidDisconnect:(NSError*)error {
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ disconnected: %@ START\n", self.peripheral.name, error] UTF8String] << std::endl;
+    std::cout << [[NSString stringWithFormat:@"Peripheral %@ disconnected: %@ START\n", self.peripheral.name, error] UTF8String]
+              << std::endl;
 
     if (error != nil) {
         NSLog(@"Peripheral %@ disconnected: %@\n", self.peripheral.name, error);
@@ -518,8 +528,7 @@ typedef struct {
 
 #pragma mark - CBPeripheralDelegate
 
-- (void)peripheral:(CBPeripheral *)peripheral
- didModifyServices:(NSArray<CBService *> *)invalidatedServices {
+- (void)peripheral:(CBPeripheral*)peripheral didModifyServices:(NSArray<CBService*>*)invalidatedServices {
     NSLog(@"Peripheral %@ did modify services: %@ START\n", self.peripheral.name, invalidatedServices);
 
     for (CBService* service in invalidatedServices) {
@@ -530,16 +539,19 @@ typedef struct {
                 characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending = NO;
 
                 for (CBDescriptor* descriptor in characteristic.descriptors) {
-                    characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].writePending = NO;
-                    characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].readPending = NO;
+                    characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)]
+                        .descriptor_extras[uuidToSimpleBLE(descriptor.UUID)]
+                        .writePending = NO;
+                    characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)]
+                        .descriptor_extras[uuidToSimpleBLE(descriptor.UUID)]
+                        .readPending = NO;
                 }
             }
         }
     }
 
     NSLog(@"Peripheral %@ did modify services: %@ END\n", self.peripheral.name, invalidatedServices);
- }
-
+}
 
 - (void)peripheral:(CBPeripheral*)peripheral didDiscoverServices:(NSError*)error {
     // NOTE: As we are currently polling the result of the discovery, this callback is not needed,
@@ -584,8 +596,9 @@ typedef struct {
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didUpdateValueForCharacteristic %@: %@ START\n",
-                   peripheral.name, characteristic.UUID, error] UTF8String] << std::endl;
+    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didUpdateValueForCharacteristic %@: %@ START\n", peripheral.name,
+                                             characteristic.UUID, error] UTF8String]
+              << std::endl;
 
     if (error != nil) {
         @synchronized(self) {
@@ -607,13 +620,15 @@ typedef struct {
         }
     }
 
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didUpdateValueForCharacteristic %@: %@ END\n",
-                   peripheral.name, characteristic.UUID, error] UTF8String] << std::endl;
+    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didUpdateValueForCharacteristic %@: %@ END\n", peripheral.name,
+                                             characteristic.UUID, error] UTF8String]
+              << std::endl;
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didWriteValueForCharacteristic %@: %@ START\n",
-                   peripheral.name, characteristic.UUID, error] UTF8String] << std::endl;
+    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didWriteValueForCharacteristic %@: %@ START\n", peripheral.name,
+                                             characteristic.UUID, error] UTF8String]
+              << std::endl;
 
     if (error != nil) {
         @synchronized(self) {
@@ -624,16 +639,17 @@ typedef struct {
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending = NO;
     }
 
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didWriteValueForCharacteristic %@: %@ END\n",
-                   peripheral.name, characteristic.UUID, error] UTF8String] << std::endl;
+    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didWriteValueForCharacteristic %@: %@ END\n", peripheral.name,
+                                             characteristic.UUID, error] UTF8String]
+              << std::endl;
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral
     didUpdateNotificationStateForCharacteristic:(CBCharacteristic*)characteristic
                                           error:(NSError*)error {
-
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didUpdateNotificationStateForCharacteristic %@: %@ START\n",
-                   peripheral.name, characteristic.UUID, error] UTF8String] << std::endl;
+    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didUpdateNotificationStateForCharacteristic %@: %@ START\n", peripheral.name,
+                                             characteristic.UUID, error] UTF8String]
+              << std::endl;
 
     if (error != nil) {
         @synchronized(self) {
@@ -645,8 +661,9 @@ typedef struct {
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending = NO;
     }
 
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didUpdateNotificationStateForCharacteristic %@: %@ END\n",
-                   peripheral.name, characteristic.UUID, error] UTF8String] << std::endl;
+    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didUpdateNotificationStateForCharacteristic %@: %@ END\n", peripheral.name,
+                                             characteristic.UUID, error] UTF8String]
+              << std::endl;
 }
 
 - (void)peripheralIsReadyToSendWriteWithoutResponse:(CBPeripheral*)peripheral {
@@ -654,8 +671,9 @@ typedef struct {
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didUpdateValueForDescriptor %@: %@ START\n",
-                   peripheral.name, descriptor.UUID, error] UTF8String] << std::endl;
+    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didUpdateValueForDescriptor %@: %@ START\n", peripheral.name, descriptor.UUID,
+                                             error] UTF8String]
+              << std::endl;
 
     if (error != nil) {
         @synchronized(self) {
@@ -674,13 +692,15 @@ typedef struct {
         }
     }
 
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didUpdateValueForDescriptor %@: END\n",
-                   peripheral.name, descriptor.UUID] UTF8String] << std::endl;
+    std::cout <<
+        [[NSString stringWithFormat:@"Peripheral %@ didUpdateValueForDescriptor %@: END\n", peripheral.name, descriptor.UUID] UTF8String]
+              << std::endl;
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didWriteValueForDescriptor %@: %@ START\n",
-                   peripheral.name, descriptor.UUID, error] UTF8String] << std::endl;
+    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didWriteValueForDescriptor %@: %@ START\n", peripheral.name, descriptor.UUID,
+                                             error] UTF8String]
+              << std::endl;
 
     if (error != nil) {
         @synchronized(self) {
@@ -695,8 +715,9 @@ typedef struct {
         characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].writePending = NO;
     }
 
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didWriteValueForDescriptor %@: END\n",
-                   peripheral.name, descriptor.UUID] UTF8String] << std::endl;
+    std::cout <<
+        [[NSString stringWithFormat:@"Peripheral %@ didWriteValueForDescriptor %@: END\n", peripheral.name, descriptor.UUID] UTF8String]
+              << std::endl;
 }
 
 @end
