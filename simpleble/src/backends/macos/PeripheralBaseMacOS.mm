@@ -304,7 +304,7 @@ typedef struct {
         [self.peripheral setNotifyValue:YES forCharacteristic:characteristic];
     }
 
-    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending);
+    WAIT_UNTIL_FALSE(self, self.characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending);
 
     if (!characteristic.isNotifying || self.lastError_ != nil) {
         [self throwBasedOnError:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
