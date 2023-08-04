@@ -510,6 +510,8 @@ typedef struct {
     //       the provided list of services does NOT include any characteristics or descriptors, so need to
     //       clear pending flags for those as well.
 
+    NSLog(@"\n\n\ndidModifyServices: %@\n\n\n", invalidatedServices);
+
     @synchronized(self) {
         for (auto& characteristic_entry : self->characteristic_extras_) {
             characteristic_extras_t& characteristic_extra = characteristic_entry.second;
