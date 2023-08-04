@@ -313,7 +313,7 @@ typedef struct {
             }
             NSLog(@"Waiting for notify to be enabled");
         }
-    } while (0)
+    } while (0);
 
         if (!characteristic.isNotifying || self.lastError_ != nil) {
         [self throwBasedOnError:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
