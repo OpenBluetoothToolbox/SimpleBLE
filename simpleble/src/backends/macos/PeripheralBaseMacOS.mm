@@ -311,7 +311,7 @@ typedef struct {
             @synchronized(self) {
                 _tmpVar = (self->characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending);
             }
-            NSLog(@"Waiting for notify to be enabled");
+            NSLog(@"Waiting for notify of %@ to be enabled %d" ,characteristic.UUID,  (self->characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending));
         }
     } while (0);
 
@@ -534,6 +534,8 @@ typedef struct {
     for (CBService* service in invalidatedServices) {
         for (CBCharacteristic* characteristic in service.characteristics) {
             @synchronized(self) {
+                NSLog(@"Clearing pending flags for characteristic %@\n", characteristic.UUID);
+
                 characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending = NO;
                 characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending = NO;
                 characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending = NO;
