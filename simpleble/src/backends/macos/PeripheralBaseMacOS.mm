@@ -239,8 +239,6 @@ typedef struct {
 }
 
 - (void)writeRequest:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid payload:(NSData*)payload {
-    std::cout << [[NSString stringWithFormat:@"WriteRequest %@ %@", service_uuid, characteristic_uuid] UTF8String] << std::endl;
-
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
@@ -287,8 +285,6 @@ typedef struct {
 - (void)notify:(NSString*)service_uuid
     characteristic_uuid:(NSString*)characteristic_uuid
                callback:(std::function<void(SimpleBLE::ByteArray)>)callback {
-    std::cout << [[NSString stringWithFormat:@"Notify %@ %@", service_uuid, characteristic_uuid] UTF8String] << std::endl;
-
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
@@ -304,20 +300,11 @@ typedef struct {
         [self.peripheral setNotifyValue:YES forCharacteristic:characteristic];
     }
 
-    do {
-        BOOL _tmpVar = YES;
-        while (_tmpVar) {
-            [NSThread sleepForTimeInterval:0.01];
-            @synchronized(self) {
-                _tmpVar = (self->characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending);
-            }
-            NSLog(@"Waiting for notify of %@ to be enabled %d" ,characteristic.UUID,  (self->characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending));
-        }
-    } while (0);
+    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending);
 
-    //     if (!characteristic.isNotifying || self.lastError_ != nil) {
-    //     [self throwBasedOnError:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
-    // }
+    if (!characteristic.isNotifying || self.lastError_ != nil) {
+        [self throwBasedOnError:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
+    }
 }
 
 - (void)indicate:(NSString*)service_uuid
@@ -477,7 +464,6 @@ typedef struct {
 
 - (void)delegateDidFailToConnect:(NSError*)error {
     if (error != nil) {
-        NSLog(@"Failed to connect to peripheral %@: %@\n", self.peripheral.name, error);
         @synchronized(self) {
             self.lastError_ = error;
         }
@@ -489,11 +475,7 @@ typedef struct {
 }
 
 - (void)delegateDidDisconnect:(NSError*)error {
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ disconnected: %@ START\n", self.peripheral.name, error] UTF8String]
-              << std::endl;
-
     if (error != nil) {
-        NSLog(@"Peripheral %@ disconnected: %@\n", self.peripheral.name, error);
         @synchronized(self) {
             self.lastError_ = error;
         }
@@ -519,8 +501,6 @@ typedef struct {
             }
         }
     }
-
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ disconnected: %@ END\n", self.peripheral.name, error] UTF8String] << std::endl;
 }
 
 #pragma mark - CBPeripheralDelegate
@@ -529,8 +509,6 @@ typedef struct {
     // NOTE: Whenever this method is called, any pending operations are cancelled. In addition to that,
     //       the provided list of services does NOT include any characteristics or descriptors, so need to
     //       clear pending flags for those as well.
-
-    NSLog(@"Peripheral %@ did modify services: %@ START\n", self.peripheral.name, invalidatedServices);
 
     @synchronized(self) {
         for (auto& characteristic_entry : self->characteristic_extras_) {
@@ -547,8 +525,6 @@ typedef struct {
             }
         }
     }
-
-    NSLog(@"Peripheral %@ did modify services: %@ END\n", self.peripheral.name, invalidatedServices);
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didDiscoverServices:(NSError*)error {
@@ -594,10 +570,6 @@ typedef struct {
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didUpdateValueForCharacteristic %@: %@ START\n", peripheral.name,
-                                             characteristic.UUID, error] UTF8String]
-              << std::endl;
-
     if (error != nil) {
         @synchronized(self) {
             self.lastError_ = error;
@@ -617,17 +589,9 @@ typedef struct {
             characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback(received_data);
         }
     }
-
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didUpdateValueForCharacteristic %@: %@ END\n", peripheral.name,
-                                             characteristic.UUID, error] UTF8String]
-              << std::endl;
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didWriteValueForCharacteristic %@: %@ START\n", peripheral.name,
-                                             characteristic.UUID, error] UTF8String]
-              << std::endl;
-
     if (error != nil) {
         @synchronized(self) {
             self.lastError_ = error;
@@ -636,19 +600,11 @@ typedef struct {
     @synchronized(self) {
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending = NO;
     }
-
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didWriteValueForCharacteristic %@: %@ END\n", peripheral.name,
-                                             characteristic.UUID, error] UTF8String]
-              << std::endl;
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral
     didUpdateNotificationStateForCharacteristic:(CBCharacteristic*)characteristic
                                           error:(NSError*)error {
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didUpdateNotificationStateForCharacteristic %@: %@ START\n", peripheral.name,
-                                             characteristic.UUID, error] UTF8String]
-              << std::endl;
-
     if (error != nil) {
         @synchronized(self) {
             self.lastError_ = error;
@@ -658,10 +614,6 @@ typedef struct {
     @synchronized(self) {
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending = NO;
     }
-
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didUpdateNotificationStateForCharacteristic %@: %@ END\n", peripheral.name,
-                                             characteristic.UUID, error] UTF8String]
-              << std::endl;
 }
 
 - (void)peripheralIsReadyToSendWriteWithoutResponse:(CBPeripheral*)peripheral {
@@ -669,10 +621,6 @@ typedef struct {
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didUpdateValueForDescriptor %@: %@ START\n", peripheral.name, descriptor.UUID,
-                                             error] UTF8String]
-              << std::endl;
-
     if (error != nil) {
         @synchronized(self) {
             self.lastError_ = error;
@@ -686,20 +634,11 @@ typedef struct {
         // If the descriptor still had a pending read, clear the flag and return
         if (characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].readPending) {
             characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].readPending = NO;
-            return;
         }
     }
-
-    std::cout <<
-        [[NSString stringWithFormat:@"Peripheral %@ didUpdateValueForDescriptor %@: END\n", peripheral.name, descriptor.UUID] UTF8String]
-              << std::endl;
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
-    std::cout << [[NSString stringWithFormat:@"Peripheral %@ didWriteValueForDescriptor %@: %@ START\n", peripheral.name, descriptor.UUID,
-                                             error] UTF8String]
-              << std::endl;
-
     if (error != nil) {
         @synchronized(self) {
             self.lastError_ = error;
@@ -712,10 +651,6 @@ typedef struct {
     @synchronized(self) {
         characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].writePending = NO;
     }
-
-    std::cout <<
-        [[NSString stringWithFormat:@"Peripheral %@ didWriteValueForDescriptor %@: END\n", peripheral.name, descriptor.UUID] UTF8String]
-              << std::endl;
 }
 
 @end
