@@ -315,12 +315,9 @@ typedef struct {
         }
     } while (0);
 
-        if (!characteristic.isNotifying || self.lastError_ != nil) {
-        [self throwBasedOnError:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
-    }
-
-    message = [NSString stringWithFormat:@"Notify Characteristic %@ END", characteristic.UUID];
-    SIMPLEBLE_LOG_ERROR([message UTF8String]);
+    //     if (!characteristic.isNotifying || self.lastError_ != nil) {
+    //     [self throwBasedOnError:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
+    // }
 }
 
 - (void)indicate:(NSString*)service_uuid
