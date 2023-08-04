@@ -518,6 +518,12 @@ typedef struct {
 
 #pragma mark - CBPeripheralDelegate
 
+- (void)peripheral:(CBPeripheral *)peripheral
+ didModifyServices:(NSArray<CBService *> *)invalidatedServices {
+    NSLog(@"Peripheral %@ did modify services: %@\n", self.peripheral.name, invalidatedServices);
+ }
+
+
 - (void)peripheral:(CBPeripheral*)peripheral didDiscoverServices:(NSError*)error {
     // NOTE: As we are currently polling the result of the discovery, this callback is not needed,
     // but might be useful in the future.
