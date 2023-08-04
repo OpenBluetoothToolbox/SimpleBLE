@@ -521,6 +521,21 @@ typedef struct {
 - (void)peripheral:(CBPeripheral *)peripheral
  didModifyServices:(NSArray<CBService *> *)invalidatedServices {
     NSLog(@"Peripheral %@ did modify services: %@\n", self.peripheral.name, invalidatedServices);
+
+    for (CBService* invalidatedService in invalidatedServices) {
+        for (CBCharacteristic* characteristic in service.characteristics) {
+            @synchronized(self) {
+                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending = NO;
+                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending = NO;
+                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending = NO;
+
+                for (CBDescriptor* descriptor in characteristic.descriptors) {
+                    descriptor_extras_[uuidToSimpleBLE(descriptor.UUID)].writePending = NO;
+                    descriptor_extras_[uuidToSimpleBLE(descriptor.UUID)].readPending = NO;
+                }
+            }
+        }
+    }
  }
 
 
