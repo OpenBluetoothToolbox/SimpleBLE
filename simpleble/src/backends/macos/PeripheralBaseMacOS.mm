@@ -50,7 +50,6 @@ struct characteristic_extras_t {
 }
 
 // Private properties
-@property(strong) NSError* lastError_;
 @property(strong) CBPeripheral* peripheral;
 @property(strong) CBCentralManager* centralManager;
 
@@ -110,7 +109,7 @@ struct characteristic_extras_t {
     WAIT_UNTIL_FALSE(self, task_.pending);
 
     if (self.peripheral.state != CBPeripheralStateConnected) {
-        [self throwBasedOnError:self.lastError_ withFormat:@"Peripheral Connection"];
+        [self throwBasedOnError:task_.error withFormat:@"Peripheral Connection"];
     }
 
     // --- Discover services and characteristics ---
@@ -124,7 +123,7 @@ struct characteristic_extras_t {
     WAIT_UNTIL_FALSE(self, task_.pending);
 
     if (self.peripheral.services == nil || self.peripheral.state != CBPeripheralStateConnected) {
-        [self throwBasedOnError:self.lastError_ withFormat:@"Service Discovery"];
+        [self throwBasedOnError:task_.error withFormat:@"Service Discovery"];
     }
 
     // For each service found, discover characteristics.
@@ -138,7 +137,7 @@ struct characteristic_extras_t {
         WAIT_UNTIL_FALSE(self, task_.pending);
 
         if (service.characteristics == nil || self.peripheral.state != CBPeripheralStateConnected) {
-            [self throwBasedOnError:self.lastError_ withFormat:@"Characteristic Discovery for service %@", service.UUID];
+            [self throwBasedOnError:task_.error withFormat:@"Characteristic Discovery for service %@", service.UUID];
         }
 
         // For each characteristic, create the associated extra properties and discover descriptors.
@@ -152,7 +151,7 @@ struct characteristic_extras_t {
             WAIT_UNTIL_FALSE(self, task_.pending);
 
             if (characteristic.descriptors == nil || self.peripheral.state != CBPeripheralStateConnected) {
-                [self throwBasedOnError:self.lastError_ withFormat:@"Descriptor Discovery for characteristic %@", characteristic.UUID];
+                [self throwBasedOnError:task_.error withFormat:@"Descriptor Discovery for characteristic %@", characteristic.UUID];
             }
         }
     }
@@ -170,7 +169,7 @@ struct characteristic_extras_t {
     WAIT_UNTIL_FALSE(self, task_.pending);
 
     if (self.peripheral.state != CBPeripheralStateDisconnected) {
-        [self throwBasedOnError:self.lastError_ withFormat:@"Peripheral Disconnection"];
+        [self throwBasedOnError:task_.error withFormat:@"Peripheral Disconnection"];
     }
 }
 
