@@ -6,6 +6,7 @@
 #import "Utils.h"
 
 #import <simpleble/Exceptions.h>
+
 #import <iostream>
 
 #define WAIT_UNTIL_FALSE(obj, var)                \
@@ -49,6 +50,8 @@ struct characteristic_extras_t {
     BOOL serviceDiscoveryPending_;
     BOOL characteristicDiscoveryPending_;
     BOOL descriptorDiscoveryPending_;
+
+    std::mutex ble_task_lock_;
 
     // NOTE: This dictionary assumes that all characteristic UUIDs are unique, which could not always be the case.
     std::map<std::string, characteristic_extras_t> characteristic_extras_;
@@ -103,6 +106,8 @@ struct characteristic_extras_t {
 }
 
 - (void)connect {
+    std::lock_guard<std::mutex> lg(ble_task_lock_);
+
     // --- Connect to the peripheral ---
     @synchronized(self) {
         self.lastError_ = nil;
@@ -170,6 +175,8 @@ struct characteristic_extras_t {
 }
 
 - (void)disconnect {
+    std::lock_guard<std::mutex> lg(ble_task_lock_);
+
     @synchronized(self) {
         self.lastError_ = nil;
         self->disconnectionPending_ = YES;
@@ -215,6 +222,8 @@ struct characteristic_extras_t {
 }
 
 - (SimpleBLE::ByteArray)read:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid {
+    std::lock_guard<std::mutex> lg(ble_task_lock_);
+
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
@@ -244,6 +253,8 @@ struct characteristic_extras_t {
 }
 
 - (void)writeRequest:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid payload:(NSData*)payload {
+    std::lock_guard<std::mutex> lg(ble_task_lock_);
+
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
@@ -271,6 +282,8 @@ struct characteristic_extras_t {
 }
 
 - (void)writeCommand:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid payload:(NSData*)payload {
+    std::lock_guard<std::mutex> lg(ble_task_lock_);
+
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
@@ -291,6 +304,8 @@ struct characteristic_extras_t {
 - (void)notify:(NSString*)service_uuid
     characteristic_uuid:(NSString*)characteristic_uuid
                callback:(std::function<void(SimpleBLE::ByteArray)>)callback {
+    std::lock_guard<std::mutex> lg(ble_task_lock_);
+
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
@@ -319,6 +334,8 @@ struct characteristic_extras_t {
 }
 
 - (void)unsubscribe:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid {
+    std::lock_guard<std::mutex> lg(ble_task_lock_);
+
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
@@ -343,6 +360,7 @@ struct characteristic_extras_t {
 - (SimpleBLE::ByteArray)read:(NSString*)service_uuid
          characteristic_uuid:(NSString*)characteristic_uuid
              descriptor_uuid:(NSString*)descriptor_uuid {
+    std::lock_guard<std::mutex> lg(ble_task_lock_);
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
@@ -374,6 +392,7 @@ struct characteristic_extras_t {
     characteristic_uuid:(NSString*)characteristic_uuid
         descriptor_uuid:(NSString*)descriptor_uuid
                 payload:(NSData*)payload {
+    std::lock_guard<std::mutex> lg(ble_task_lock_);
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
