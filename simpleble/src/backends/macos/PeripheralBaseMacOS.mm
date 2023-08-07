@@ -7,8 +7,6 @@
 
 #import <simpleble/Exceptions.h>
 
-#import <iostream>
-
 #define WAIT_UNTIL_FALSE(obj, var)                \
     do {                                          \
         BOOL _tmpVar = YES;                       \
@@ -35,9 +33,12 @@ struct descriptor_extras_t {
 };
 
 struct characteristic_extras_t {
-    ble_task_t readTask;
-    ble_task_t writeTask;
-    ble_task_t notifyTask;
+    // ble_task_t readTask;
+    // ble_task_t writeTask;
+    // ble_task_t notifyTask;
+
+    ble_task_t task;
+
     std::map<std::string, descriptor_extras_t> descriptor_extras;
     std::function<void(SimpleBLE::ByteArray)> valueChangedCallback;
 
@@ -235,7 +236,7 @@ struct characteristic_extras_t {
         throw SimpleBLE::Exception::OperationNotSupported();
     }
 
-    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readTask;
+    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
 
     @synchronized(self) {
         task.error = nil;
@@ -243,7 +244,7 @@ struct characteristic_extras_t {
         [self.peripheral readValueForCharacteristic:characteristic];
     }
 
-    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readTask.pending);
+    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task.pending);
 
     if (task.error != nil) {
         [self throwBasedOnError:task.error withFormat:@"Characteristic %@ Read", characteristic.UUID];
@@ -266,7 +267,7 @@ struct characteristic_extras_t {
         throw SimpleBLE::Exception::OperationNotSupported();
     }
 
-    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writeTask;
+    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
 
     @synchronized(self) {
         task.error = nil;
@@ -274,7 +275,7 @@ struct characteristic_extras_t {
         [self.peripheral writeValue:payload forCharacteristic:characteristic type:CBCharacteristicWriteWithResponse];
     }
 
-    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writeTask.pending);
+    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task.pending);
 
     if (task.error != nil) {
         [self throwBasedOnError:task.error withFormat:@"Characteristic %@ Write Request", characteristic.UUID];
@@ -311,7 +312,7 @@ struct characteristic_extras_t {
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
 
-    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyTask;
+    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
 
     @synchronized(self) {
         task.error = nil;
@@ -320,7 +321,7 @@ struct characteristic_extras_t {
         [self.peripheral setNotifyValue:YES forCharacteristic:characteristic];
     }
 
-    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyTask.pending);
+    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task.pending);
 
     if (!characteristic.isNotifying || task.error != nil) {
         [self throwBasedOnError:task.error withFormat:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
@@ -341,7 +342,7 @@ struct characteristic_extras_t {
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
 
-    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyTask;
+    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
 
     @synchronized(self) {
         task.error = nil;
@@ -350,7 +351,7 @@ struct characteristic_extras_t {
         [self.peripheral setNotifyValue:NO forCharacteristic:characteristic];
     }
 
-    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyTask.pending);
+    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task.pending);
 
     if (characteristic.isNotifying || task.error != nil) {
         [self throwBasedOnError:task.error withFormat:@"Characteristic %@ Unsubscribe", characteristic.UUID];
@@ -519,9 +520,7 @@ struct characteristic_extras_t {
         for (auto& characteristic_entry : self->characteristic_extras_) {
             characteristic_extras_t& characteristic_extra = characteristic_entry.second;
 
-            characteristic_extra.readTask.pending = NO;
-            characteristic_extra.writeTask.pending = NO;
-            characteristic_extra.notifyTask.pending = NO;
+            characteristic_extra.task.pending = NO;
 
             for (auto& descriptor_entry : characteristic_extra.descriptor_extras) {
                 descriptor_extras_t& descriptor_extra = descriptor_entry.second;
@@ -545,9 +544,7 @@ struct characteristic_extras_t {
         for (auto& characteristic_entry : self->characteristic_extras_) {
             characteristic_extras_t& characteristic_extra = characteristic_entry.second;
 
-            characteristic_extra.readTask.pending = NO;
-            characteristic_extra.writeTask.pending = NO;
-            characteristic_extra.notifyTask.pending = NO;
+            characteristic_extra.task.pending = NO;
 
             for (auto& descriptor_entry : characteristic_extra.descriptor_extras) {
                 descriptor_extras_t& descriptor_extra = descriptor_entry.second;
@@ -601,7 +598,7 @@ struct characteristic_extras_t {
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writeTask;
+    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
 
     @synchronized(self) {
         @synchronized(self) {
@@ -620,7 +617,7 @@ struct characteristic_extras_t {
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writeTask;
+    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
 
     @synchronized(self) {
         task.error = error;
@@ -633,7 +630,7 @@ struct characteristic_extras_t {
 - (void)peripheral:(CBPeripheral*)peripheral
     didUpdateNotificationStateForCharacteristic:(CBCharacteristic*)characteristic
                                           error:(NSError*)error {
-    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyTask;
+    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
 
     @synchronized(self) {
         task.error = error;
