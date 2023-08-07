@@ -6,6 +6,7 @@
 #import "Utils.h"
 
 #import <simpleble/Exceptions.h>
+#import <optional>
 
 #define WAIT_UNTIL_FALSE(obj, var)                \
     do {                                          \
@@ -13,7 +14,7 @@
         while (_tmpVar) {                         \
             [NSThread sleepForTimeInterval:0.01]; \
             @synchronized(obj) {                  \
-                _tmpVar = (obj->var);             \
+                _tmpVar = (var);                  \
             }                                     \
         }                                         \
     } while (0)
@@ -35,6 +36,7 @@ struct descriptor_extras_t {
 struct characteristic_extras_t {
     ble_task_t task;
 
+    std::optional<SimpleBLE::ByteArray> value;
     std::map<std::string, descriptor_extras_t> descriptor_extras;
     std::function<void(SimpleBLE::ByteArray)> valueChangedCallback;
 
@@ -216,22 +218,35 @@ struct characteristic_extras_t {
         throw SimpleBLE::Exception::OperationNotSupported();
     }
 
-    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
+    characteristic_extras_t& characteristic_extras = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)];
+    ble_task_t& task = characteristic_extras.task;
     std::lock_guard<std::mutex> lg(task.lock);
 
-    @synchronized(self) {
-        task.error = nil;
-        task.pending = YES;
-        [self.peripheral readValueForCharacteristic:characteristic];
+    if (characteristic.isNotifying) {
+        // If the characteristic is already notifying, we'll just wait for the next notification.
+        @synchronized(self) {
+            characteristic_extras.value.reset();
+        }
+
+        WAIT_UNTIL_FALSE(self, !characteristic_extras.value.has_value());
+        return characteristic_extras.value.value();
+
+    } else {
+        // Otherwise, we'll trigger a value read and wait for the response.
+        @synchronized(self) {
+            task.error = nil;
+            task.pending = YES;
+            [self.peripheral readValueForCharacteristic:characteristic];
+        }
+
+        WAIT_UNTIL_FALSE(self, task.pending);
+
+        if (task.error != nil) {
+            [self throwBasedOnError:task.error withFormat:@"Characteristic %@ Read", characteristic.UUID];
+        }
+
+        return SimpleBLE::ByteArray((const char*)characteristic.value.bytes, characteristic.value.length);
     }
-
-    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task.pending);
-
-    if (task.error != nil) {
-        [self throwBasedOnError:task.error withFormat:@"Characteristic %@ Read", characteristic.UUID];
-    }
-
-    return SimpleBLE::ByteArray((const char*)characteristic.value.bytes, characteristic.value.length);
 }
 
 - (void)writeRequest:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid payload:(NSData*)payload {
@@ -255,7 +270,7 @@ struct characteristic_extras_t {
         [self.peripheral writeValue:payload forCharacteristic:characteristic type:CBCharacteristicWriteWithResponse];
     }
 
-    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task.pending);
+    WAIT_UNTIL_FALSE(self, task.pending);
 
     if (task.error != nil) {
         [self throwBasedOnError:task.error withFormat:@"Characteristic %@ Write Request", characteristic.UUID];
@@ -274,6 +289,9 @@ struct characteristic_extras_t {
         throw SimpleBLE::Exception::OperationNotSupported();
     }
 
+    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
+    std::lock_guard<std::mutex> lg(task.lock);
+
     // NOTE: This write is unacknowledged.
     @synchronized(self) {
         [self.peripheral writeValue:payload forCharacteristic:characteristic type:CBCharacteristicWriteWithoutResponse];
@@ -288,17 +306,18 @@ struct characteristic_extras_t {
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
 
-    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
+    characteristic_extras_t& characteristic_extras = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)];
+    ble_task_t& task = characteristic_extras.task;
     std::lock_guard<std::mutex> lg(task.lock);
 
     @synchronized(self) {
         task.error = nil;
         task.pending = YES;
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback = callback;
+        characteristic_extras.valueChangedCallback = callback;
         [self.peripheral setNotifyValue:YES forCharacteristic:characteristic];
     }
 
-    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task.pending);
+    WAIT_UNTIL_FALSE(self, task.pending);
 
     if (!characteristic.isNotifying || task.error != nil) {
         [self throwBasedOnError:task.error withFormat:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
@@ -317,17 +336,18 @@ struct characteristic_extras_t {
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
 
-    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
+    characteristic_extras_t& characteristic_extras = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)];
+    ble_task_t& task = characteristic_extras.task;
     std::lock_guard<std::mutex> lg(task.lock);
 
     @synchronized(self) {
         task.error = nil;
         task.pending = YES;
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback = nil;
+        characteristic_extras.valueChangedCallback = nil;
         [self.peripheral setNotifyValue:NO forCharacteristic:characteristic];
     }
 
-    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task.pending);
+    WAIT_UNTIL_FALSE(self, task.pending);
 
     if (characteristic.isNotifying || task.error != nil) {
         [self throwBasedOnError:task.error withFormat:@"Characteristic %@ Unsubscribe", characteristic.UUID];
@@ -342,8 +362,10 @@ struct characteristic_extras_t {
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
     CBDescriptor* descriptor = [self findDescriptor:descriptor_uuid characteristic:characteristic];
-    ble_task_t& task =
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].task;
+
+    characteristic_extras_t& characteristic_extras = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)];
+    descriptor_extras_t& descriptor_extras = characteristic_extras.descriptor_extras[uuidToSimpleBLE(descriptor.UUID)];
+    ble_task_t& task = descriptor_extras.task;
     std::lock_guard<std::mutex> lg(task.lock);
 
     @synchronized(self) {
@@ -352,9 +374,7 @@ struct characteristic_extras_t {
         [self.peripheral readValueForDescriptor:descriptor];
     }
 
-    WAIT_UNTIL_FALSE(
-        self,
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].task.pending);
+    WAIT_UNTIL_FALSE(self, task.pending);
 
     if (task.error != nil) {
         [self throwBasedOnError:task.error withFormat:@"Descriptor %@ Read", descriptor.UUID];
@@ -374,8 +394,10 @@ struct characteristic_extras_t {
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
     CBDescriptor* descriptor = [self findDescriptor:descriptor_uuid characteristic:characteristic];
-    ble_task_t& task =
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].task;
+
+    characteristic_extras_t& characteristic_extras = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)];
+    descriptor_extras_t& descriptor_extras = characteristic_extras.descriptor_extras[uuidToSimpleBLE(descriptor.UUID)];
+    ble_task_t& task = descriptor_extras.task;
     std::lock_guard<std::mutex> lg(task.lock);
 
     @synchronized(self) {
@@ -384,9 +406,7 @@ struct characteristic_extras_t {
         [self.peripheral writeValue:payload forDescriptor:descriptor];
     }
 
-    WAIT_UNTIL_FALSE(
-        self,
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].task.pending);
+    WAIT_UNTIL_FALSE(self, task.pending);
 
     if (task.error) {
         [self throwBasedOnError:task.error withFormat:@"Descriptor %@ Write", descriptor.UUID];
@@ -535,20 +555,24 @@ struct characteristic_extras_t {
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
+    characteristic_extras_t& characteristic_extra = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)];
 
-    @synchronized(self) {
+    if (characteristic.isNotifying) {
+        // If the characteristic is notifying, just save the value and trigger the callback.
+        characteristic_extra.value = SimpleBLE::ByteArray((const char*)characteristic.value.bytes, characteristic.value.length);
+
+        if (characteristic_extra.valueChangedCallback != nil) {
+            characteristic_extra.valueChangedCallback(characteristic_extra.value.value());
+        }
+
+    } else {
+        // If the characteristic is not notifying, then this is a response to a read request.
+        ble_task_t& task = characteristic_extra.task;
         @synchronized(self) {
             task.error = error;
             if (task.pending) {
                 task.pending = NO;
             }
-        }
-
-        // Check if the characteristic has a callback and call it
-        if (characteristic.isNotifying && characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback != nil) {
-            SimpleBLE::ByteArray received_data((const char*)characteristic.value.bytes, characteristic.value.length);
-            characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback(received_data);
         }
     }
 }
