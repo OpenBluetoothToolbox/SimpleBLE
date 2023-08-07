@@ -608,8 +608,8 @@ struct characteristic_extras_t {
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
-    std::string characteristic_uuid = uuidToSimpleBLE(descriptor.characteristic.UUID);
-    std::string descriptor_uuid = uuidToSimpleBLE(descriptor.UUID);
+    const std::string characteristic_uuid = uuidToSimpleBLE(descriptor.characteristic.UUID);
+    const std::string descriptor_uuid = uuidToSimpleBLE(descriptor.UUID);
     ble_task_t& task = characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].task;
 
     @synchronized(self) {
@@ -621,8 +621,8 @@ struct characteristic_extras_t {
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
-    std::string characteristic_uuid = uuidToSimpleBLE(descriptor.characteristic.UUID);
-    std::string descriptor_uuid = uuidToSimpleBLE(descriptor.UUID);
+    const std::string characteristic_uuid = uuidToSimpleBLE(descriptor.characteristic.UUID);
+    const std::string descriptor_uuid = uuidToSimpleBLE(descriptor.UUID);
     ble_task_t& task = characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].task;
 
     @synchronized(self) {
