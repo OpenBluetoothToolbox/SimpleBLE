@@ -19,10 +19,19 @@
         }                                         \
     } while (0)
 
-typedef struct {
-    BOOL readPending;
-    BOOL writePending;
-} descriptor_extras_t;
+struct ble_task_t {
+    BOOL pending;
+    NSError* error;
+
+    ble_task_t() : pending(false), error(nil) {}
+};
+
+struct descriptor_extras_t {
+    ble_task_t readTask;
+    ble_task_t writeTask;
+
+    descriptor_extras_t() : readTask(), writeTask() {}
+};
 
 typedef struct {
     BOOL readPending;
@@ -52,7 +61,7 @@ typedef struct {
 - (CBCharacteristic*)findCharacteristic:(NSString*)uuid service:(CBService*)service;
 - (std::pair<CBService*, CBCharacteristic*>)findServiceAndCharacteristic:(NSString*)service_uuid
                                                      characteristic_uuid:(NSString*)characteristic_uuid;
-- (void)throwBasedOnError:(NSString*)format, ...;
+- (void)throwBasedOnError:(NSError*)error withFormat:(NSString*)format, ...;
 
 @end
 
@@ -102,7 +111,7 @@ typedef struct {
     WAIT_UNTIL_FALSE(self, connectionPending_);
 
     if (self.peripheral.state != CBPeripheralStateConnected) {
-        [self throwBasedOnError:@"Peripheral Connection"];
+        [self throwBasedOnError:self.lastError_ withFormat:@"Peripheral Connection"];
     }
 
     // --- Discover services and characteristics ---
@@ -116,7 +125,7 @@ typedef struct {
     WAIT_UNTIL_FALSE(self, serviceDiscoveryPending_);
 
     if (self.peripheral.services == nil || self.peripheral.state != CBPeripheralStateConnected) {
-        [self throwBasedOnError:@"Service Discovery"];
+        [self throwBasedOnError:self.lastError_ withFormat:@"Service Discovery"];
     }
 
     // For each service found, discover characteristics.
@@ -130,7 +139,7 @@ typedef struct {
         WAIT_UNTIL_FALSE(self, characteristicDiscoveryPending_);
 
         if (service.characteristics == nil || self.peripheral.state != CBPeripheralStateConnected) {
-            [self throwBasedOnError:@"Characteristic Discovery for service %@", service.UUID];
+            [self throwBasedOnError:self.lastError_ withFormat:@"Characteristic Discovery for service %@", service.UUID];
         }
 
         // For each characteristic, create the associated extra properties and discover descriptors.
@@ -144,7 +153,7 @@ typedef struct {
             WAIT_UNTIL_FALSE(self, descriptorDiscoveryPending_);
 
             if (characteristic.descriptors == nil || self.peripheral.state != CBPeripheralStateConnected) {
-                [self throwBasedOnError:@"Descriptor Discovery for characteristic %@", characteristic.UUID];
+                [self throwBasedOnError:self.lastError_ withFormat:@"Descriptor Discovery for characteristic %@", characteristic.UUID];
             }
 
             @synchronized(self) {
@@ -154,10 +163,7 @@ typedef struct {
                 characteristic_extra.notifyPending = NO;
 
                 for (CBDescriptor* descriptor in characteristic.descriptors) {
-                    descriptor_extras_t descriptor_extra;
-                    descriptor_extra.readPending = NO;
-                    descriptor_extra.writePending = NO;
-                    characteristic_extra.descriptor_extras[uuidToSimpleBLE(descriptor.UUID)] = descriptor_extra;
+                    characteristic_extra.descriptor_extras[uuidToSimpleBLE(descriptor.UUID)] = {};
                 }
 
                 characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)] = characteristic_extra;
@@ -176,7 +182,7 @@ typedef struct {
     WAIT_UNTIL_FALSE(self, disconnectionPending_);
 
     if (self.peripheral.state != CBPeripheralStateDisconnected) {
-        [self throwBasedOnError:@"Peripheral Disconnection"];
+        [self throwBasedOnError:self.lastError_ withFormat:@"Peripheral Disconnection"];
     }
 }
 
@@ -232,7 +238,7 @@ typedef struct {
     WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending);
 
     if (self.lastError_ != nil) {
-        [self throwBasedOnError:@"Characteristic %@ Read", characteristic.UUID];
+        [self throwBasedOnError:self.lastError_ withFormat:@"Characteristic %@ Read", characteristic.UUID];
     }
 
     return SimpleBLE::ByteArray((const char*)characteristic.value.bytes, characteristic.value.length);
@@ -259,7 +265,7 @@ typedef struct {
     WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending);
 
     if (self.lastError_ != nil) {
-        [self throwBasedOnError:@"Characteristic %@ Write Request", characteristic.UUID];
+        [self throwBasedOnError:self.lastError_ withFormat:@"Characteristic %@ Write Request", characteristic.UUID];
     }
 }
 
@@ -290,9 +296,6 @@ typedef struct {
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
 
-    NSString* message = [NSString stringWithFormat:@"Notify Characteristic %@ START", characteristic.UUID];
-    SIMPLEBLE_LOG_ERROR([message UTF8String]);
-
     @synchronized(self) {
         self.lastError_ = nil;
         characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending = YES;
@@ -303,7 +306,7 @@ typedef struct {
     WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending);
 
     if (!characteristic.isNotifying || self.lastError_ != nil) {
-        [self throwBasedOnError:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
+        [self throwBasedOnError:self.lastError_ withFormat:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
     }
 }
 
@@ -329,7 +332,7 @@ typedef struct {
     WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending);
 
     if (characteristic.isNotifying || self.lastError_ != nil) {
-        [self throwBasedOnError:@"Characteristic %@ Unsubscribe", characteristic.UUID];
+        [self throwBasedOnError:self.lastError_ withFormat:@"Characteristic %@ Unsubscribe", characteristic.UUID];
     }
 }
 
@@ -340,20 +343,20 @@ typedef struct {
                                                                                        characteristic_uuid:characteristic_uuid];
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
-
     CBDescriptor* descriptor = [self findDescriptor:descriptor_uuid characteristic:characteristic];
+    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].readTask;
 
     @synchronized(self) {
-        self.lastError_ = nil;
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].readPending = YES;
+        task.error = nil;
+        task.pending = YES;
         [self.peripheral readValueForDescriptor:descriptor];
     }
 
     WAIT_UNTIL_FALSE(
-        self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].readPending);
+        self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].readTask.pending);
 
-    if (self.lastError_ != nil) {
-        [self throwBasedOnError:@"Descriptor %@ Read", descriptor.UUID];
+    if (task.error != nil) {
+        [self throwBasedOnError:task.error withFormat:@"Descriptor %@ Read", descriptor.UUID];
     }
 
     const char* bytes = (const char*)[descriptor.value bytes];
@@ -369,21 +372,21 @@ typedef struct {
                                                                                        characteristic_uuid:characteristic_uuid];
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
-
     CBDescriptor* descriptor = [self findDescriptor:descriptor_uuid characteristic:characteristic];
+    ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].writeTask;
 
     @synchronized(self) {
-        self.lastError_ = nil;
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].writePending = YES;
+        task.error = nil;
+        task.pending = YES;
         [self.peripheral writeValue:payload forDescriptor:descriptor];
     }
 
     WAIT_UNTIL_FALSE(
         self,
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].writePending);
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].writeTask.pending);
 
-    if (self.lastError_ != nil) {
-        [self throwBasedOnError:@"Descriptor %@ Write", descriptor.UUID];
+    if (task.error) {
+        [self throwBasedOnError:task.error withFormat:@"Descriptor %@ Write", descriptor.UUID];
     }
 }
 
@@ -436,18 +439,18 @@ typedef struct {
     return std::pair<CBService*, CBCharacteristic*>(service, characteristic);
 }
 
-- (void)throwBasedOnError:(NSString*)format, ... {
+- (void)throwBasedOnError:(NSError*)error withFormat:(NSString*)format, ... {
     va_list argList;
     va_start(argList, format);
     NSString* formattedString = [[NSString alloc] initWithFormat:format arguments:argList];
     va_end(argList);
 
-    if (self.lastError_ == nil) {
+    if (error == nil) {
         NSString* exceptionMessage = [NSString stringWithFormat:@"%@ failed", formattedString];
         NSLog(@"%@", exceptionMessage);
         throw SimpleBLE::Exception::OperationFailed([exceptionMessage UTF8String]);
     } else {
-        NSString* errorMessage = [self.lastError_ localizedDescription];
+        NSString* errorMessage = [error localizedDescription];
         NSString* exceptionMessage = [NSString stringWithFormat:@"%@ failed: %@", formattedString, errorMessage];
         NSLog(@"%@", exceptionMessage);
         throw SimpleBLE::Exception::OperationFailed([exceptionMessage UTF8String]);
@@ -496,8 +499,8 @@ typedef struct {
 
             for (auto& descriptor_entry : characteristic_extra.descriptor_extras) {
                 descriptor_extras_t& descriptor_extra = descriptor_entry.second;
-                descriptor_extra.readPending = NO;
-                descriptor_extra.writePending = NO;
+                descriptor_extra.readTask.pending = NO;
+                descriptor_extra.writeTask.pending = NO;
             }
         }
     }
@@ -522,8 +525,8 @@ typedef struct {
 
             for (auto& descriptor_entry : characteristic_extra.descriptor_extras) {
                 descriptor_extras_t& descriptor_extra = descriptor_entry.second;
-                descriptor_extra.readPending = NO;
-                descriptor_extra.writePending = NO;
+                descriptor_extra.readTask.pending = NO;
+                descriptor_extra.writeTask.pending = NO;
             }
         }
     }
@@ -623,35 +626,28 @@ typedef struct {
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
-    if (error != nil) {
-        @synchronized(self) {
-            self.lastError_ = error;
-        }
-    }
-
     std::string characteristic_uuid = uuidToSimpleBLE(descriptor.characteristic.UUID);
     std::string descriptor_uuid = uuidToSimpleBLE(descriptor.UUID);
+    ble_task_t& task = characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].readTask;
 
     @synchronized(self) {
-        // If the descriptor still had a pending read, clear the flag and return
-        if (characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].readPending) {
-            characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].readPending = NO;
+        task.error = error;
+        if (task.pending) {
+            task.pending = NO;
         }
     }
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
-    if (error != nil) {
-        @synchronized(self) {
-            self.lastError_ = error;
-        }
-    }
-
     std::string characteristic_uuid = uuidToSimpleBLE(descriptor.characteristic.UUID);
     std::string descriptor_uuid = uuidToSimpleBLE(descriptor.UUID);
+    ble_task_t& task = characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].writeTask;
 
     @synchronized(self) {
-        characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].writePending = NO;
+        task.error = error;
+        if (task.pending) {
+            task.pending = NO;
+        }
     }
 }
 
