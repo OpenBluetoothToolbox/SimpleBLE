@@ -559,7 +559,9 @@ struct characteristic_extras_t {
 
     if (characteristic.isNotifying) {
         // If the characteristic is notifying, just save the value and trigger the callback.
-        characteristic_extra.value = SimpleBLE::ByteArray((const char*)characteristic.value.bytes, characteristic.value.length);
+        @synchronized(self) {
+            characteristic_extra.value = SimpleBLE::ByteArray((const char*)characteristic.value.bytes, characteristic.value.length);
+        }
 
         if (characteristic_extra.valueChangedCallback != nil) {
             characteristic_extra.valueChangedCallback(characteristic_extra.value.value());
