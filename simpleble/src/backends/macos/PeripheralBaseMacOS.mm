@@ -19,6 +19,7 @@
     } while (0)
 
 struct ble_task_t {
+    std::mutex lock;
     BOOL pending;
     NSError* error;
 
@@ -33,10 +34,6 @@ struct descriptor_extras_t {
 };
 
 struct characteristic_extras_t {
-    // ble_task_t readTask;
-    // ble_task_t writeTask;
-    // ble_task_t notifyTask;
-
     ble_task_t task;
 
     std::map<std::string, descriptor_extras_t> descriptor_extras;
@@ -163,14 +160,6 @@ struct characteristic_extras_t {
             if (characteristic.descriptors == nil || self.peripheral.state != CBPeripheralStateConnected) {
                 [self throwBasedOnError:self.lastError_ withFormat:@"Descriptor Discovery for characteristic %@", characteristic.UUID];
             }
-
-            @synchronized(self) {
-                characteristic_extras_t characteristic_extra;
-                for (CBDescriptor* descriptor in characteristic.descriptors) {
-                    characteristic_extra.descriptor_extras[uuidToSimpleBLE(descriptor.UUID)] = {};
-                }
-                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)] = characteristic_extra;
-            }
         }
     }
 }
@@ -223,8 +212,6 @@ struct characteristic_extras_t {
 }
 
 - (SimpleBLE::ByteArray)read:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid {
-    std::lock_guard<std::mutex> lg(ble_task_lock_);
-
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
@@ -237,6 +224,7 @@ struct characteristic_extras_t {
     }
 
     ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
+    std::lock_guard<std::mutex> lg(task.lock);
 
     @synchronized(self) {
         task.error = nil;
@@ -254,8 +242,6 @@ struct characteristic_extras_t {
 }
 
 - (void)writeRequest:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid payload:(NSData*)payload {
-    std::lock_guard<std::mutex> lg(ble_task_lock_);
-
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
@@ -268,6 +254,7 @@ struct characteristic_extras_t {
     }
 
     ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
+    std::lock_guard<std::mutex> lg(task.lock);
 
     @synchronized(self) {
         task.error = nil;
@@ -283,8 +270,6 @@ struct characteristic_extras_t {
 }
 
 - (void)writeCommand:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid payload:(NSData*)payload {
-    std::lock_guard<std::mutex> lg(ble_task_lock_);
-
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
@@ -305,14 +290,13 @@ struct characteristic_extras_t {
 - (void)notify:(NSString*)service_uuid
     characteristic_uuid:(NSString*)characteristic_uuid
                callback:(std::function<void(SimpleBLE::ByteArray)>)callback {
-    std::lock_guard<std::mutex> lg(ble_task_lock_);
-
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
 
     ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
+    std::lock_guard<std::mutex> lg(task.lock);
 
     @synchronized(self) {
         task.error = nil;
@@ -335,14 +319,13 @@ struct characteristic_extras_t {
 }
 
 - (void)unsubscribe:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid {
-    std::lock_guard<std::mutex> lg(ble_task_lock_);
-
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
 
     ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
+    std::lock_guard<std::mutex> lg(task.lock);
 
     @synchronized(self) {
         task.error = nil;
