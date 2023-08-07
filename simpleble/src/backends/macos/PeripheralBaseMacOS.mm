@@ -27,8 +27,7 @@ struct ble_task_t {
 };
 
 struct descriptor_extras_t {
-    ble_task_t readTask;
-    ble_task_t writeTask;
+    ble_task_t task;
 
     descriptor_extras_t() {}
 };
@@ -43,13 +42,8 @@ struct characteristic_extras_t {
 };
 
 @interface PeripheralBaseMacOS () {
-    BOOL connectionPending_;
-    BOOL disconnectionPending_;
-    BOOL serviceDiscoveryPending_;
-    BOOL characteristicDiscoveryPending_;
-    BOOL descriptorDiscoveryPending_;
-
-    std::mutex ble_task_lock_;
+    ble_task_t task_;
+    NSError* disconnectionError_;
 
     // NOTE: This dictionary assumes that all characteristic UUIDs are unique, which could not always be the case.
     std::map<std::string, characteristic_extras_t> characteristic_extras_;
@@ -104,16 +98,16 @@ struct characteristic_extras_t {
 }
 
 - (void)connect {
-    std::lock_guard<std::mutex> lg(ble_task_lock_);
+    std::lock_guard<std::mutex> lg(task_.lock);
 
     // --- Connect to the peripheral ---
     @synchronized(self) {
-        self.lastError_ = nil;
-        self->connectionPending_ = YES;
+        task_.error = nil;
+        task_.pending = YES;
         [self.centralManager connectPeripheral:self.peripheral options:@{}];  // TODO: Do we need to pass any options?
     }
 
-    WAIT_UNTIL_FALSE(self, connectionPending_);
+    WAIT_UNTIL_FALSE(self, task_.pending);
 
     if (self.peripheral.state != CBPeripheralStateConnected) {
         [self throwBasedOnError:self.lastError_ withFormat:@"Peripheral Connection"];
@@ -122,12 +116,12 @@ struct characteristic_extras_t {
     // --- Discover services and characteristics ---
 
     @synchronized(self) {
-        self.lastError_ = nil;
-        self->serviceDiscoveryPending_ = YES;
+        task_.error = nil;
+        task_.pending = YES;
         [self.peripheral discoverServices:nil];
     }
 
-    WAIT_UNTIL_FALSE(self, serviceDiscoveryPending_);
+    WAIT_UNTIL_FALSE(self, task_.pending);
 
     if (self.peripheral.services == nil || self.peripheral.state != CBPeripheralStateConnected) {
         [self throwBasedOnError:self.lastError_ withFormat:@"Service Discovery"];
@@ -136,12 +130,12 @@ struct characteristic_extras_t {
     // For each service found, discover characteristics.
     for (CBService* service in self.peripheral.services) {
         @synchronized(self) {
-            self.lastError_ = nil;
-            self->characteristicDiscoveryPending_ = YES;
+            task_.error = nil;
+            task_.pending = YES;
             [self.peripheral discoverCharacteristics:nil forService:service];
         }
 
-        WAIT_UNTIL_FALSE(self, characteristicDiscoveryPending_);
+        WAIT_UNTIL_FALSE(self, task_.pending);
 
         if (service.characteristics == nil || self.peripheral.state != CBPeripheralStateConnected) {
             [self throwBasedOnError:self.lastError_ withFormat:@"Characteristic Discovery for service %@", service.UUID];
@@ -150,12 +144,12 @@ struct characteristic_extras_t {
         // For each characteristic, create the associated extra properties and discover descriptors.
         for (CBCharacteristic* characteristic in service.characteristics) {
             @synchronized(self) {
-                self.lastError_ = nil;
-                self->descriptorDiscoveryPending_ = YES;
+                task_.error = nil;
+                task_.pending = YES;
                 [self.peripheral discoverDescriptorsForCharacteristic:characteristic];
             }
 
-            WAIT_UNTIL_FALSE(self, descriptorDiscoveryPending_);
+            WAIT_UNTIL_FALSE(self, task_.pending);
 
             if (characteristic.descriptors == nil || self.peripheral.state != CBPeripheralStateConnected) {
                 [self throwBasedOnError:self.lastError_ withFormat:@"Descriptor Discovery for characteristic %@", characteristic.UUID];
@@ -165,15 +159,15 @@ struct characteristic_extras_t {
 }
 
 - (void)disconnect {
-    std::lock_guard<std::mutex> lg(ble_task_lock_);
+    std::lock_guard<std::mutex> lg(task_.lock);
 
     @synchronized(self) {
-        self.lastError_ = nil;
-        self->disconnectionPending_ = YES;
+        task_.error = nil;
+        task_.pending = YES;
         [self.centralManager cancelPeripheralConnection:self.peripheral];
     }
 
-    WAIT_UNTIL_FALSE(self, disconnectionPending_);
+    WAIT_UNTIL_FALSE(self, task_.pending);
 
     if (self.peripheral.state != CBPeripheralStateDisconnected) {
         [self throwBasedOnError:self.lastError_ withFormat:@"Peripheral Disconnection"];
@@ -344,14 +338,14 @@ struct characteristic_extras_t {
 - (SimpleBLE::ByteArray)read:(NSString*)service_uuid
          characteristic_uuid:(NSString*)characteristic_uuid
              descriptor_uuid:(NSString*)descriptor_uuid {
-    std::lock_guard<std::mutex> lg(ble_task_lock_);
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
     CBDescriptor* descriptor = [self findDescriptor:descriptor_uuid characteristic:characteristic];
     ble_task_t& task =
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].readTask;
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].task;
+    std::lock_guard<std::mutex> lg(task.lock);
 
     @synchronized(self) {
         task.error = nil;
@@ -361,7 +355,7 @@ struct characteristic_extras_t {
 
     WAIT_UNTIL_FALSE(
         self,
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].readTask.pending);
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].task.pending);
 
     if (task.error != nil) {
         [self throwBasedOnError:task.error withFormat:@"Descriptor %@ Read", descriptor.UUID];
@@ -376,14 +370,14 @@ struct characteristic_extras_t {
     characteristic_uuid:(NSString*)characteristic_uuid
         descriptor_uuid:(NSString*)descriptor_uuid
                 payload:(NSData*)payload {
-    std::lock_guard<std::mutex> lg(ble_task_lock_);
     std::pair<CBService*, CBCharacteristic*> serviceAndCharacteristic = [self findServiceAndCharacteristic:service_uuid
                                                                                        characteristic_uuid:characteristic_uuid];
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
     CBDescriptor* descriptor = [self findDescriptor:descriptor_uuid characteristic:characteristic];
     ble_task_t& task =
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].writeTask;
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].task;
+    std::lock_guard<std::mutex> lg(task.lock);
 
     @synchronized(self) {
         task.error = nil;
@@ -393,7 +387,7 @@ struct characteristic_extras_t {
 
     WAIT_UNTIL_FALSE(
         self,
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].writeTask.pending);
+        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].task.pending);
 
     if (task.error) {
         [self throwBasedOnError:task.error withFormat:@"Descriptor %@ Write", descriptor.UUID];
@@ -471,44 +465,29 @@ struct characteristic_extras_t {
 
 - (void)delegateDidConnect {
     @synchronized(self) {
-        self->connectionPending_ = NO;
+        self->task_.pending = NO;
     }
 }
 
 - (void)delegateDidFailToConnect:(NSError*)error {
-    if (error != nil) {
-        @synchronized(self) {
-            self.lastError_ = error;
-        }
-    }
-
     @synchronized(self) {
-        self->connectionPending_ = NO;
+        self->task_.error = error;
+        self->task_.pending = NO;
     }
 }
 
 - (void)delegateDidDisconnect:(NSError*)error {
-    if (error != nil) {
-        @synchronized(self) {
-            self.lastError_ = error;
-        }
-    }
-
     @synchronized(self) {
-        self->serviceDiscoveryPending_ = NO;
-        self->characteristicDiscoveryPending_ = NO;
-        self->descriptorDiscoveryPending_ = NO;
-        self->disconnectionPending_ = NO;
+        self->disconnectionError_ = error;
+        self->task_.pending = NO;
 
         for (auto& characteristic_entry : self->characteristic_extras_) {
             characteristic_extras_t& characteristic_extra = characteristic_entry.second;
-
             characteristic_extra.task.pending = NO;
 
             for (auto& descriptor_entry : characteristic_extra.descriptor_extras) {
                 descriptor_extras_t& descriptor_extra = descriptor_entry.second;
-                descriptor_extra.readTask.pending = NO;
-                descriptor_extra.writeTask.pending = NO;
+                descriptor_extra.task.pending = NO;
             }
         }
     }
@@ -520,63 +499,39 @@ struct characteristic_extras_t {
     // NOTE: Whenever this method is called, any pending operations are cancelled. In addition to that,
     //       the provided list of services does NOT include any characteristics or descriptors, so need to
     //       clear pending flags for those as well.
-
-    NSLog(@"\n\n\ndidModifyServices: %@\n\n\n", invalidatedServices);
-
     @synchronized(self) {
         for (auto& characteristic_entry : self->characteristic_extras_) {
             characteristic_extras_t& characteristic_extra = characteristic_entry.second;
-
             characteristic_extra.task.pending = NO;
 
             for (auto& descriptor_entry : characteristic_extra.descriptor_extras) {
                 descriptor_extras_t& descriptor_extra = descriptor_entry.second;
-                descriptor_extra.readTask.pending = NO;
-                descriptor_extra.writeTask.pending = NO;
+                descriptor_extra.task.pending = NO;
             }
         }
     }
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didDiscoverServices:(NSError*)error {
-    // NOTE: As we are currently polling the result of the discovery, this callback is not needed,
-    // but might be useful in the future.
-    if (error != nil) {
-        @synchronized(self) {
-            self.lastError_ = error;
-        }
-    }
-
     @synchronized(self) {
-        self->serviceDiscoveryPending_ = NO;
+        self->task_.error = error;
+        self->task_.pending = NO;
     }
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didDiscoverCharacteristicsForService:(CBService*)service error:(NSError*)error {
-    // NOTE: As we are currently polling the result of the discovery, this callback is not needed,
-    // but might be useful in the future.
-    if (error != nil) {
-        @synchronized(self) {
-            self.lastError_ = error;
-        }
-    }
-
     @synchronized(self) {
-        self->characteristicDiscoveryPending_ = NO;
+        self->task_.error = error;
+        self->task_.pending = NO;
     }
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral
     didDiscoverDescriptorsForCharacteristic:(CBCharacteristic*)characteristic
                                       error:(NSError*)error {
-    if (error != nil) {
-        @synchronized(self) {
-            self.lastError_ = error;
-        }
-    }
-
     @synchronized(self) {
-        self->descriptorDiscoveryPending_ = NO;
+        self->task_.error = error;
+        self->task_.pending = NO;
     }
 }
 
@@ -630,7 +585,7 @@ struct characteristic_extras_t {
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
     std::string characteristic_uuid = uuidToSimpleBLE(descriptor.characteristic.UUID);
     std::string descriptor_uuid = uuidToSimpleBLE(descriptor.UUID);
-    ble_task_t& task = characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].readTask;
+    ble_task_t& task = characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].task;
 
     @synchronized(self) {
         task.error = error;
@@ -643,7 +598,7 @@ struct characteristic_extras_t {
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
     std::string characteristic_uuid = uuidToSimpleBLE(descriptor.characteristic.UUID);
     std::string descriptor_uuid = uuidToSimpleBLE(descriptor.UUID);
-    ble_task_t& task = characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].writeTask;
+    ble_task_t& task = characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].task;
 
     @synchronized(self) {
         task.error = error;
