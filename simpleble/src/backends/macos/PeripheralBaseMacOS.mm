@@ -519,6 +519,8 @@ struct characteristic_extras_t {
     //       the provided list of services does NOT include any characteristics or descriptors, so need to
     //       clear pending flags for those as well.
     @synchronized(self) {
+        task_.pending = NO;
+
         for (auto& characteristic_entry : self->characteristic_extras_) {
             characteristic_extras_t& characteristic_extra = characteristic_entry.second;
             characteristic_extra.task.pending = NO;
