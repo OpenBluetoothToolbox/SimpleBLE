@@ -280,6 +280,9 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
     set_property(TARGET simpleble PROPERTY INSTALL_RPATH @loader_path)
     set_property(TARGET simpleble-c PROPERTY INSTALL_RPATH @loader_path)
 
+    # TODO -g3 is only for debugging purposes, remove this later
+    target_compile_options(simpleble PRIVATE "-g3")
+
 else()
     message(FATAL_ERROR "-- [ERROR] UNSUPPORTED SYSTEM: ${CMAKE_HOST_SYSTEM_NAME} ${CMAKE_SYSTEM_NAME}")
 endif()
