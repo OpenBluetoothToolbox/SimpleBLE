@@ -26,6 +26,16 @@
 @property(atomic) BOOL pending;
 @end
 
+@implementation BleTask
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _pending = NO;
+    }
+    return self;
+}
+@end
+
 @interface DescriptorExtras : NSObject
 @property(strong) BleTask* task;
 @end
