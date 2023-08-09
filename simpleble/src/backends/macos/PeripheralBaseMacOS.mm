@@ -490,14 +490,14 @@ struct characteristic_extras_t {
 
 - (void)delegateDidFailToConnect:(NSError*)error {
     @synchronized(self) {
-        self->task_.error = error;
+        self->task_.error = [error copy];
         self->task_.pending = NO;
     }
 }
 
 - (void)delegateDidDisconnect:(NSError*)error {
     @synchronized(self) {
-        self->disconnectionError_ = error;
+        self->disconnectionError_ = [error copy];
         self->task_.pending = NO;
 
         for (auto& characteristic_entry : self->characteristic_extras_) {
@@ -535,14 +535,14 @@ struct characteristic_extras_t {
 
 - (void)peripheral:(CBPeripheral*)peripheral didDiscoverServices:(NSError*)error {
     @synchronized(self) {
-        self->task_.error = error;
+        self->task_.error = [error copy];
         self->task_.pending = NO;
     }
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didDiscoverCharacteristicsForService:(CBService*)service error:(NSError*)error {
     @synchronized(self) {
-        self->task_.error = error;
+        self->task_.error = [error copy];
         self->task_.pending = NO;
     }
 }
@@ -551,7 +551,7 @@ struct characteristic_extras_t {
     didDiscoverDescriptorsForCharacteristic:(CBCharacteristic*)characteristic
                                       error:(NSError*)error {
     @synchronized(self) {
-        self->task_.error = error;
+        self->task_.error = [error copy];
         self->task_.pending = NO;
     }
 }
@@ -573,7 +573,7 @@ struct characteristic_extras_t {
         // If the characteristic is not notifying, then this is a response to a read request.
         ble_task_t& task = characteristic_extra.task;
         @synchronized(self) {
-            task.error = error;
+            task.error = [error copy];
             if (task.pending) {
                 task.pending = NO;
             }
@@ -585,7 +585,7 @@ struct characteristic_extras_t {
     ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
 
     @synchronized(self) {
-        task.error = error;
+        task.error = [error copy];
         if (task.pending) {
             task.pending = NO;
         }
@@ -598,7 +598,7 @@ struct characteristic_extras_t {
     ble_task_t& task = characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].task;
 
     @synchronized(self) {
-        task.error = error;
+        task.error = [error copy];
         if (task.pending) {
             task.pending = NO;
         }
@@ -615,7 +615,7 @@ struct characteristic_extras_t {
     ble_task_t& task = characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].task;
 
     @synchronized(self) {
-        task.error = error;
+        task.error = [error copy];
         if (task.pending) {
             task.pending = NO;
         }
@@ -628,7 +628,7 @@ struct characteristic_extras_t {
     ble_task_t& task = characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].task;
 
     @synchronized(self) {
-        task.error = error;
+        task.error = [error copy];
         if (task.pending) {
             task.pending = NO;
         }
