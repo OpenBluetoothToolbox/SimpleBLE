@@ -201,12 +201,12 @@
                 for (CBDescriptor* descriptor in characteristic.descriptors) {
                     @synchronized(self) {
                         [characteristicExtras.descriptorExtras setObject:[[DescriptorExtras alloc] init]
-                                                                  forKey:[descriptor.UUID UUIDString]];
+                                                                  forKey:[[descriptor.UUID UUIDString] lowercaseString]];
                     }
                 }
 
                 @synchronized(self) {
-                    [self.characteristicExtras setObject:characteristicExtras forKey:[characteristic.UUID UUIDString]];
+                    [self.characteristicExtras setObject:characteristicExtras forKey:[[characteristic.UUID UUIDString] lowercaseString]];
                 }
             }
         }
@@ -615,7 +615,7 @@
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[characteristic.UUID UUIDString]];
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[[characteristic.UUID UUIDString] lowercaseString]];
 
     if (characteristic.isNotifying) {
         // If the characteristic is notifying, just save the value and trigger the callback.
@@ -639,7 +639,7 @@
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[characteristic.UUID UUIDString]];
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[[characteristic.UUID UUIDString] lowercaseString]];
     BleTask* task = characteristicExtras.task;
 
     @synchronized(self) {
@@ -651,7 +651,7 @@
 - (void)peripheral:(CBPeripheral*)peripheral
     didUpdateNotificationStateForCharacteristic:(CBCharacteristic*)characteristic
                                           error:(NSError*)error {
-    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[characteristic.UUID UUIDString]];
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[[characteristic.UUID UUIDString] lowercaseString]];
     BleTask* task = characteristicExtras.task;
 
     @synchronized(self) {
@@ -665,8 +665,8 @@
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
-    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[descriptor.characteristic.UUID UUIDString]];
-    DescriptorExtras* descriptorExtras = [characteristicExtras.descriptorExtras objectForKey:[descriptor.UUID UUIDString]];
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[[descriptor.characteristic.UUID UUIDString] lowercaseString]];
+    DescriptorExtras* descriptorExtras = [characteristicExtras.descriptorExtras objectForKey:[[descriptor.UUID UUIDString] lowercaseString]];
     BleTask* task = descriptorExtras.task;
 
     @synchronized(self) {
@@ -676,8 +676,8 @@
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
-    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[descriptor.characteristic.UUID UUIDString]];
-    DescriptorExtras* descriptorExtras = [characteristicExtras.descriptorExtras objectForKey:[descriptor.UUID UUIDString]];
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[[descriptor.characteristic.UUID UUIDString] lowercaseString]];
+    DescriptorExtras* descriptorExtras = [characteristicExtras.descriptorExtras objectForKey:[[descriptor.UUID UUIDString] lowercaseString]];
     BleTask* task = descriptorExtras.task;
 
     @synchronized(self) {
