@@ -1,10 +1,12 @@
 #import "PeripheralBaseMacOS.h"
 #import "CharacteristicBuilder.h"
 #import "DescriptorBuilder.h"
+#import "LoggingInternal.h"
 #import "ServiceBuilder.h"
 #import "Utils.h"
 
 #import <simpleble/Exceptions.h>
+#import <optional>
 
 #define WAIT_UNTIL_FALSE(obj, var)                \
     do {                                          \
@@ -12,45 +14,77 @@
         while (_tmpVar) {                         \
             [NSThread sleepForTimeInterval:0.01]; \
             @synchronized(obj) {                  \
-                _tmpVar = (obj->var);             \
+                _tmpVar = (var);                  \
             }                                     \
         }                                         \
     } while (0)
 
-typedef struct {
-    BOOL readPending;
-    BOOL writePending;
-} descriptor_extras_t;
+// --------------------------------------------------
 
-typedef struct {
-    BOOL readPending;
-    BOOL writePending;
-    BOOL notifyPending;
-    std::map<std::string, descriptor_extras_t> descriptor_extras;
-    std::function<void(SimpleBLE::ByteArray)> valueChangedCallback;
-} characteristic_extras_t;
+@interface BleTask : NSObject
+@property(strong, atomic) NSError* error;
+@property(atomic) BOOL pending;
+@end
 
-@interface PeripheralBaseMacOS () {
-    BOOL connectionPending_;
-    BOOL disconnectionPending_;
-    BOOL serviceDiscoveryPending_;
-    BOOL characteristicDiscoveryPending_;
-    BOOL descriptorDiscoveryPending_;
-
-    // NOTE: This dictionary assumes that all characteristic UUIDs are unique, which could not always be the case.
-    std::map<std::string, characteristic_extras_t> characteristic_extras_;
+@implementation BleTask
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _pending = NO;
+    }
+    return self;
 }
+@end
 
-// Private properties
-@property(strong) NSError* lastError_;
+@interface DescriptorExtras : NSObject
+@property(strong) BleTask* task;
+@end
+
+@implementation DescriptorExtras
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _task = [[BleTask alloc] init];
+    }
+    return self;
+}
+@end
+
+@interface CharacteristicExtras : NSObject {
+  @public
+    std::function<void(SimpleBLE::ByteArray)> valueChangedCallback;
+}
+@property(strong) BleTask* task;
+@property(strong) NSData* value;
+@property(strong) NSMutableDictionary<NSString*, DescriptorExtras*>* descriptorExtras;
+@end
+
+@implementation CharacteristicExtras
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _task = [[BleTask alloc] init];
+        _descriptorExtras = [[NSMutableDictionary alloc] init];
+    }
+    return self;
+}
+@end
+
+// --------------------------------------------------
+
+@interface PeripheralBaseMacOS () {}
+
 @property(strong) CBPeripheral* peripheral;
 @property(strong) CBCentralManager* centralManager;
+@property(strong, atomic) BleTask* task;
+@property(strong, atomic) NSError* disconnectionError;
+@property(strong) NSMutableDictionary<NSString*, CharacteristicExtras*>* characteristicExtras;
 
 - (CBService*)findService:(NSString*)uuid;
 - (CBCharacteristic*)findCharacteristic:(NSString*)uuid service:(CBService*)service;
 - (std::pair<CBService*, CBCharacteristic*>)findServiceAndCharacteristic:(NSString*)service_uuid
                                                      characteristic_uuid:(NSString*)characteristic_uuid;
-- (void)throwBasedOnError:(NSString*)format, ...;
+- (void)throwBasedOnError:(NSError*)error withFormat:(NSString*)format, ...;
 
 @end
 
@@ -65,6 +99,8 @@ typedef struct {
         _centralManager = centralManager;
 
         _peripheral.delegate = self;
+        _characteristicExtras = [[NSMutableDictionary alloc] init];
+        _task = [[BleTask alloc] init];
     }
     return self;
 }
@@ -90,91 +126,106 @@ typedef struct {
 }
 
 - (void)connect {
-    // --- Connect to the peripheral ---
-    @synchronized(self) {
-        self.lastError_ = nil;
-        self->connectionPending_ = YES;
-        [self.centralManager connectPeripheral:self.peripheral options:@{}];  // TODO: Do we need to pass any options?
-    }
-
-    WAIT_UNTIL_FALSE(self, connectionPending_);
-
-    if (self.peripheral.state != CBPeripheralStateConnected) {
-        [self throwBasedOnError:@"Peripheral Connection"];
-    }
-
-    // --- Discover services and characteristics ---
-
-    @synchronized(self) {
-        self.lastError_ = nil;
-        self->serviceDiscoveryPending_ = YES;
-        [self.peripheral discoverServices:nil];
-    }
-
-    WAIT_UNTIL_FALSE(self, serviceDiscoveryPending_);
-
-    if (self.peripheral.services == nil || self.peripheral.state != CBPeripheralStateConnected) {
-        [self throwBasedOnError:@"Service Discovery"];
-    }
-
-    // For each service found, discover characteristics.
-    for (CBService* service in self.peripheral.services) {
+    @synchronized(_task) {
+        // --- Connect to the peripheral ---
         @synchronized(self) {
-            self.lastError_ = nil;
-            self->characteristicDiscoveryPending_ = YES;
-            [self.peripheral discoverCharacteristics:nil forService:service];
+            _task.error = nil;
+            _task.pending = YES;
+            [self.centralManager connectPeripheral:self.peripheral options:@{}];  // TODO: Do we need to pass any options?
         }
 
-        WAIT_UNTIL_FALSE(self, characteristicDiscoveryPending_);
+        WAIT_UNTIL_FALSE(self, _task.pending);
 
-        if (service.characteristics == nil || self.peripheral.state != CBPeripheralStateConnected) {
-            [self throwBasedOnError:@"Characteristic Discovery for service %@", service.UUID];
+        if (self.peripheral.state != CBPeripheralStateConnected || _task.error != nil) {
+            [self throwBasedOnError:_task.error withFormat:@"Peripheral Connection"];
         }
 
-        // For each characteristic, create the associated extra properties and discover descriptors.
-        for (CBCharacteristic* characteristic in service.characteristics) {
+        // --- Discover services and characteristics ---
+
+        @synchronized(self) {
+            _task.error = nil;
+            _task.pending = YES;
+            [self.peripheral discoverServices:nil];
+        }
+
+        WAIT_UNTIL_FALSE(self, _task.pending);
+
+        if (self.peripheral.state != CBPeripheralStateConnected) {
+            [self throwBasedOnError:_disconnectionError withFormat:@"Service Discovery"];
+        }
+
+        if (self.peripheral.services == nil || _task.error != nil) {
+            [self throwBasedOnError:_task.error withFormat:@"Service Discovery"];
+        }
+
+        // For each service found, discover characteristics.
+        for (CBService* service in self.peripheral.services) {
             @synchronized(self) {
-                self.lastError_ = nil;
-                self->descriptorDiscoveryPending_ = YES;
-                [self.peripheral discoverDescriptorsForCharacteristic:characteristic];
+                _task.error = nil;
+                _task.pending = YES;
+                [self.peripheral discoverCharacteristics:nil forService:service];
             }
 
-            WAIT_UNTIL_FALSE(self, descriptorDiscoveryPending_);
+            WAIT_UNTIL_FALSE(self, _task.pending);
 
-            if (characteristic.descriptors == nil || self.peripheral.state != CBPeripheralStateConnected) {
-                [self throwBasedOnError:@"Descriptor Discovery for characteristic %@", characteristic.UUID];
+            if (self.peripheral.state != CBPeripheralStateConnected) {
+                [self throwBasedOnError:_disconnectionError withFormat:@"Characteristic Discovery for service %@", service.UUID];
             }
 
-            @synchronized(self) {
-                characteristic_extras_t characteristic_extra;
-                characteristic_extra.readPending = NO;
-                characteristic_extra.writePending = NO;
-                characteristic_extra.notifyPending = NO;
+            if (service.characteristics == nil || _task.error != nil) {
+                [self throwBasedOnError:_task.error withFormat:@"Characteristic Discovery for service %@", service.UUID];
+            }
 
-                for (CBDescriptor* descriptor in characteristic.descriptors) {
-                    descriptor_extras_t descriptor_extra;
-                    descriptor_extra.readPending = NO;
-                    descriptor_extra.writePending = NO;
-                    characteristic_extra.descriptor_extras[uuidToSimpleBLE(descriptor.UUID)] = descriptor_extra;
+            // For each characteristic, create the associated extra properties and discover descriptors.
+            for (CBCharacteristic* characteristic in service.characteristics) {
+                CharacteristicExtras* characteristicExtras = [[CharacteristicExtras alloc] init];
+
+                @synchronized(self) {
+                    _task.error = nil;
+                    _task.pending = YES;
+                    [self.peripheral discoverDescriptorsForCharacteristic:characteristic];
                 }
 
-                characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)] = characteristic_extra;
+                WAIT_UNTIL_FALSE(self, _task.pending);
+
+                if (self.peripheral.state != CBPeripheralStateConnected) {
+                    [self throwBasedOnError:_disconnectionError
+                                 withFormat:@"Descriptor Discovery for characteristic %@", characteristic.UUID];
+                }
+
+                if (characteristic.descriptors == nil || _task.error != nil) {
+                    [self throwBasedOnError:_task.error withFormat:@"Descriptor Discovery for characteristic %@", characteristic.UUID];
+                }
+
+                // For each descriptor, create the associated extra properties.
+                for (CBDescriptor* descriptor in characteristic.descriptors) {
+                    @synchronized(self) {
+                        [characteristicExtras.descriptorExtras setObject:[[DescriptorExtras alloc] init]
+                                                                  forKey:[[descriptor.UUID UUIDString] lowercaseString]];
+                    }
+                }
+
+                @synchronized(self) {
+                    [self.characteristicExtras setObject:characteristicExtras forKey:[[characteristic.UUID UUIDString] lowercaseString]];
+                }
             }
         }
     }
 }
 
 - (void)disconnect {
-    @synchronized(self) {
-        self.lastError_ = nil;
-        self->disconnectionPending_ = YES;
-        [self.centralManager cancelPeripheralConnection:self.peripheral];
-    }
+    @synchronized(_task) {
+        @synchronized(self) {
+            _task.error = nil;
+            _task.pending = YES;
+            [self.centralManager cancelPeripheralConnection:self.peripheral];
+        }
 
-    WAIT_UNTIL_FALSE(self, disconnectionPending_);
+        WAIT_UNTIL_FALSE(self, _task.pending);
 
-    if (self.peripheral.state != CBPeripheralStateDisconnected) {
-        [self throwBasedOnError:@"Peripheral Disconnection"];
+        if (self.peripheral.state != CBPeripheralStateDisconnected) {
+            [self throwBasedOnError:_task.error withFormat:@"Peripheral Disconnection"];
+        }
     }
 }
 
@@ -221,19 +272,37 @@ typedef struct {
         throw SimpleBLE::Exception::OperationNotSupported();
     }
 
-    @synchronized(self) {
-        self.lastError_ = nil;
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending = YES;
-        [self.peripheral readValueForCharacteristic:characteristic];
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:characteristic_uuid];
+    BleTask* task = characteristicExtras.task;
+
+    @synchronized(task) {
+        if (characteristic.isNotifying) {
+            // If the characteristic is already notifying, we'll just wait for the next notification.
+            @synchronized(self) {
+                characteristicExtras.value = nil;
+            }
+
+            WAIT_UNTIL_FALSE(self, (characteristicExtras.value == nil));
+
+            return SimpleBLE::ByteArray((const char*)characteristicExtras.value.bytes, characteristicExtras.value.length);
+
+        } else {
+            // Otherwise, we'll trigger a value read and wait for the response.
+            @synchronized(self) {
+                task.error = nil;
+                task.pending = YES;
+                [self.peripheral readValueForCharacteristic:characteristic];
+            }
+
+            WAIT_UNTIL_FALSE(self, task.pending);
+
+            if (task.error != nil) {
+                [self throwBasedOnError:task.error withFormat:@"Characteristic %@ Read", characteristic.UUID];
+            }
+
+            return SimpleBLE::ByteArray((const char*)characteristic.value.bytes, characteristic.value.length);
+        }
     }
-
-    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending);
-
-    if (self.lastError_ != nil) {
-        [self throwBasedOnError:@"Characteristic %@ Read", characteristic.UUID];
-    }
-
-    return SimpleBLE::ByteArray((const char*)characteristic.value.bytes, characteristic.value.length);
 }
 
 - (void)writeRequest:(NSString*)service_uuid characteristic_uuid:(NSString*)characteristic_uuid payload:(NSData*)payload {
@@ -248,16 +317,21 @@ typedef struct {
         throw SimpleBLE::Exception::OperationNotSupported();
     }
 
-    @synchronized(self) {
-        self.lastError_ = nil;
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending = YES;
-        [self.peripheral writeValue:payload forCharacteristic:characteristic type:CBCharacteristicWriteWithResponse];
-    }
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:characteristic_uuid];
+    BleTask* task = characteristicExtras.task;
 
-    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending);
+    @synchronized(task) {
+        @synchronized(self) {
+            task.error = nil;
+            task.pending = YES;
+            [self.peripheral writeValue:payload forCharacteristic:characteristic type:CBCharacteristicWriteWithResponse];
+        }
 
-    if (self.lastError_ != nil) {
-        [self throwBasedOnError:@"Characteristic %@ Write Request", characteristic.UUID];
+        WAIT_UNTIL_FALSE(self, task.pending);
+
+        if (task.error != nil) {
+            [self throwBasedOnError:task.error withFormat:@"Characteristic %@ Write Request", characteristic.UUID];
+        }
     }
 }
 
@@ -273,10 +347,14 @@ typedef struct {
         throw SimpleBLE::Exception::OperationNotSupported();
     }
 
-    // NOTE: This write is unacknowledged.
-    @synchronized(self) {
-        self.lastError_ = nil;
-        [self.peripheral writeValue:payload forCharacteristic:characteristic type:CBCharacteristicWriteWithoutResponse];
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:characteristic_uuid];
+    BleTask* task = characteristicExtras.task;
+
+    @synchronized(task) {
+        // NOTE: This write is unacknowledged.
+        @synchronized(self) {
+            [self.peripheral writeValue:payload forCharacteristic:characteristic type:CBCharacteristicWriteWithoutResponse];
+        }
     }
 }
 
@@ -288,17 +366,22 @@ typedef struct {
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
 
-    @synchronized(self) {
-        self.lastError_ = nil;
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending = YES;
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback = callback;
-        [self.peripheral setNotifyValue:YES forCharacteristic:characteristic];
-    }
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:characteristic_uuid];
+    BleTask* task = characteristicExtras.task;
 
-    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending);
+    @synchronized(task) {
+        @synchronized(self) {
+            task.error = nil;
+            task.pending = YES;
+            characteristicExtras->valueChangedCallback = callback;
+            [self.peripheral setNotifyValue:YES forCharacteristic:characteristic];
+        }
 
-    if (!characteristic.isNotifying || self.lastError_ != nil) {
-        [self throwBasedOnError:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
+        WAIT_UNTIL_FALSE(self, task.pending);
+
+        if (!characteristic.isNotifying || task.error != nil) {
+            [self throwBasedOnError:task.error withFormat:@"Characteristic %@ Notify/Indicate", characteristic.UUID];
+        }
     }
 }
 
@@ -314,17 +397,22 @@ typedef struct {
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
 
-    @synchronized(self) {
-        self.lastError_ = nil;
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending = YES;
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback = nil;
-        [self.peripheral setNotifyValue:NO forCharacteristic:characteristic];
-    }
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:characteristic_uuid];
+    BleTask* task = characteristicExtras.task;
 
-    WAIT_UNTIL_FALSE(self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending);
+    @synchronized(task) {
+        @synchronized(self) {
+            task.error = nil;
+            task.pending = YES;
+            characteristicExtras->valueChangedCallback = nil;
+            [self.peripheral setNotifyValue:NO forCharacteristic:characteristic];
+        }
 
-    if (characteristic.isNotifying || self.lastError_ != nil) {
-        [self throwBasedOnError:@"Characteristic %@ Unsubscribe", characteristic.UUID];
+        WAIT_UNTIL_FALSE(self, task.pending);
+
+        if (characteristic.isNotifying || task.error != nil) {
+            [self throwBasedOnError:task.error withFormat:@"Characteristic %@ Unsubscribe", characteristic.UUID];
+        }
     }
 }
 
@@ -335,25 +423,29 @@ typedef struct {
                                                                                        characteristic_uuid:characteristic_uuid];
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
-
     CBDescriptor* descriptor = [self findDescriptor:descriptor_uuid characteristic:characteristic];
 
-    @synchronized(self) {
-        self.lastError_ = nil;
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].readPending = YES;
-        [self.peripheral readValueForDescriptor:descriptor];
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:characteristic_uuid];
+    DescriptorExtras* descriptorExtras = [characteristicExtras.descriptorExtras objectForKey:descriptor_uuid];
+    BleTask* task = descriptorExtras.task;
+
+    @synchronized(task) {
+        @synchronized(self) {
+            task.error = nil;
+            task.pending = YES;
+            [self.peripheral readValueForDescriptor:descriptor];
+        }
+
+        WAIT_UNTIL_FALSE(self, task.pending);
+
+        if (task.error != nil) {
+            [self throwBasedOnError:task.error withFormat:@"Descriptor %@ Read", descriptor.UUID];
+        }
+
+        const char* bytes = (const char*)[descriptor.value bytes];
+
+        return SimpleBLE::ByteArray(bytes, [descriptor.value length]);
     }
-
-    WAIT_UNTIL_FALSE(
-        self, characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].readPending);
-
-    if (self.lastError_ != nil) {
-        [self throwBasedOnError:@"Descriptor %@ Read", descriptor.UUID];
-    }
-
-    const char* bytes = (const char*)[descriptor.value bytes];
-
-    return SimpleBLE::ByteArray(bytes, [descriptor.value length]);
 }
 
 - (void)write:(NSString*)service_uuid
@@ -364,21 +456,24 @@ typedef struct {
                                                                                        characteristic_uuid:characteristic_uuid];
 
     CBCharacteristic* characteristic = serviceAndCharacteristic.second;
-
     CBDescriptor* descriptor = [self findDescriptor:descriptor_uuid characteristic:characteristic];
 
-    @synchronized(self) {
-        self.lastError_ = nil;
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].writePending = YES;
-        [self.peripheral writeValue:payload forDescriptor:descriptor];
-    }
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:characteristic_uuid];
+    DescriptorExtras* descriptorExtras = [characteristicExtras.descriptorExtras objectForKey:descriptor_uuid];
+    BleTask* task = descriptorExtras.task;
 
-    WAIT_UNTIL_FALSE(
-        self,
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].descriptor_extras[uuidToSimpleBLE(descriptor.UUID)].writePending);
+    @synchronized(task) {
+        @synchronized(self) {
+            task.error = nil;
+            task.pending = YES;
+            [self.peripheral writeValue:payload forDescriptor:descriptor];
+        }
 
-    if (self.lastError_ != nil) {
-        [self throwBasedOnError:@"Descriptor %@ Write", descriptor.UUID];
+        WAIT_UNTIL_FALSE(self, task.pending);
+
+        if (task.error) {
+            [self throwBasedOnError:task.error withFormat:@"Descriptor %@ Write", descriptor.UUID];
+        }
     }
 }
 
@@ -431,19 +526,19 @@ typedef struct {
     return std::pair<CBService*, CBCharacteristic*>(service, characteristic);
 }
 
-- (void)throwBasedOnError:(NSString*)format, ... {
+- (void)throwBasedOnError:(NSError*)error withFormat:(NSString*)format, ... {
     va_list argList;
     va_start(argList, format);
     NSString* formattedString = [[NSString alloc] initWithFormat:format arguments:argList];
     va_end(argList);
 
-    if (self.lastError_ == nil) {
-        NSString *exceptionMessage = [NSString stringWithFormat:@"%@ failed", formattedString];
+    if (error == nil) {
+        NSString* exceptionMessage = [NSString stringWithFormat:@"%@ failed", formattedString];
         NSLog(@"%@", exceptionMessage);
         throw SimpleBLE::Exception::OperationFailed([exceptionMessage UTF8String]);
     } else {
-        NSString *errorMessage = [self.lastError_ localizedDescription];
-        NSString *exceptionMessage = [NSString stringWithFormat:@"%@ failed: %@", formattedString, errorMessage];
+        NSString* errorMessage = [error localizedDescription];
+        NSString* exceptionMessage = [NSString stringWithFormat:@"%@ failed: %@", formattedString, errorMessage];
         NSLog(@"%@", exceptionMessage);
         throw SimpleBLE::Exception::OperationFailed([exceptionMessage UTF8String]);
     }
@@ -453,48 +548,26 @@ typedef struct {
 
 - (void)delegateDidConnect {
     @synchronized(self) {
-        self->connectionPending_ = NO;
+        _task.pending = NO;
     }
 }
 
 - (void)delegateDidFailToConnect:(NSError*)error {
-    if (error != nil) {
-        NSLog(@"Failed to connect to peripheral %@: %@\n", self.peripheral.name, error);
-        @synchronized(self) {
-            self.lastError_ = error;
-        }
-    }
-
     @synchronized(self) {
-        self->connectionPending_ = NO;
+        _task.error = error;
+        _task.pending = NO;
     }
 }
 
 - (void)delegateDidDisconnect:(NSError*)error {
-    if (error != nil) {
-        NSLog(@"Peripheral %@ disconnected: %@\n", self.peripheral.name, error);
-        @synchronized(self) {
-            self.lastError_ = error;
-        }
-    }
-
     @synchronized(self) {
-        self->serviceDiscoveryPending_ = NO;
-        self->characteristicDiscoveryPending_ = NO;
-        self->descriptorDiscoveryPending_ = NO;
-        self->disconnectionPending_ = NO;
+        self->_disconnectionError = error;
+        _task.pending = NO;
 
-        for (auto& characteristic_entry : self->characteristic_extras_) {
-            characteristic_extras_t& characteristic_extra = characteristic_entry.second;
-
-            characteristic_extra.readPending = NO;
-            characteristic_extra.writePending = NO;
-            characteristic_extra.notifyPending = NO;
-
-            for (auto& descriptor_entry : characteristic_extra.descriptor_extras) {
-                descriptor_extras_t descriptor_extra = descriptor_entry.second;
-                descriptor_extra.readPending = NO;
-                descriptor_extra.writePending = NO;
+        for (CharacteristicExtras* characteristicExtras in self.characteristicExtras.allValues) {
+            characteristicExtras.task.pending = NO;
+            for (DescriptorExtras* descriptorExtras in characteristicExtras.descriptorExtras.allValues) {
+                descriptorExtras.task.pending = NO;
             }
         }
     }
@@ -502,92 +575,88 @@ typedef struct {
 
 #pragma mark - CBPeripheralDelegate
 
-- (void)peripheral:(CBPeripheral*)peripheral didDiscoverServices:(NSError*)error {
-    // NOTE: As we are currently polling the result of the discovery, this callback is not needed,
-    // but might be useful in the future.
-    if (error != nil) {
-        @synchronized(self) {
-            self.lastError_ = error;
+- (void)peripheral:(CBPeripheral*)peripheral didModifyServices:(NSArray<CBService*>*)invalidatedServices {
+    // NOTE: Whenever this method is called, any pending operations are cancelled. In addition to that,
+    //       the provided list of services does NOT include any characteristics or descriptors, so need to
+    //       clear pending flags for those as well.
+    @synchronized(self) {
+        _task.pending = NO;
+
+        for (CharacteristicExtras* characteristicExtras in self.characteristicExtras.allValues) {
+            characteristicExtras.task.pending = NO;
+            for (DescriptorExtras* descriptorExtras in characteristicExtras.descriptorExtras.allValues) {
+                descriptorExtras.task.pending = NO;
+            }
         }
     }
+}
 
+- (void)peripheral:(CBPeripheral*)peripheral didDiscoverServices:(NSError*)error {
     @synchronized(self) {
-        self->serviceDiscoveryPending_ = NO;
+        _task.error = error;
+        _task.pending = NO;
     }
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didDiscoverCharacteristicsForService:(CBService*)service error:(NSError*)error {
-    // NOTE: As we are currently polling the result of the discovery, this callback is not needed,
-    // but might be useful in the future.
-    if (error != nil) {
-        @synchronized(self) {
-            self.lastError_ = error;
-        }
-    }
-
     @synchronized(self) {
-        self->characteristicDiscoveryPending_ = NO;
+        _task.error = error;
+        _task.pending = NO;
     }
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral
     didDiscoverDescriptorsForCharacteristic:(CBCharacteristic*)characteristic
                                       error:(NSError*)error {
-    if (error != nil) {
-        @synchronized(self) {
-            self.lastError_ = error;
-        }
-    }
-
     @synchronized(self) {
-        self->descriptorDiscoveryPending_ = NO;
+        _task.error = error;
+        _task.pending = NO;
     }
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    if (error != nil) {
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[[characteristic.UUID UUIDString] lowercaseString]];
+
+    if (characteristic.isNotifying) {
+        // If the characteristic is notifying, just save the value and trigger the callback.
         @synchronized(self) {
-            self.lastError_ = error;
-        }
-    }
-
-    @synchronized(self) {
-        // If the characteristic still had a pending read, clear the flag and return
-        if (characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending) {
-            characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].readPending = NO;
-            return;
+            characteristicExtras.value = characteristic.value;
         }
 
-        // Check if the characteristic has a callback and call it
-        if (characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback != nil) {
-            SimpleBLE::ByteArray received_data((const char*)characteristic.value.bytes, characteristic.value.length);
-            characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].valueChangedCallback(received_data);
+        if (characteristicExtras->valueChangedCallback != nil) {
+            characteristicExtras->valueChangedCallback(
+                SimpleBLE::ByteArray((const char*)characteristic.value.bytes, characteristic.value.length));
+        }
+
+    } else {
+        // If the characteristic is not notifying, then this is a response to a read request.
+        BleTask* task = characteristicExtras.task;
+        @synchronized(self) {
+            task.error = error;
+            task.pending = NO;
         }
     }
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    if (error != nil) {
-        @synchronized(self) {
-            self.lastError_ = error;
-        }
-    }
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[[characteristic.UUID UUIDString] lowercaseString]];
+    BleTask* task = characteristicExtras.task;
+
     @synchronized(self) {
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].writePending = NO;
+        task.error = error;
+        task.pending = NO;
     }
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral
     didUpdateNotificationStateForCharacteristic:(CBCharacteristic*)characteristic
                                           error:(NSError*)error {
-    if (error != nil) {
-        @synchronized(self) {
-            self.lastError_ = error;
-        }
-    }
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[[characteristic.UUID UUIDString] lowercaseString]];
+    BleTask* task = characteristicExtras.task;
 
     @synchronized(self) {
-        characteristic_extras_[uuidToSimpleBLE(characteristic.UUID)].notifyPending = NO;
+        task.error = error;
+        task.pending = NO;
     }
 }
 
@@ -596,36 +665,24 @@ typedef struct {
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
-    if (error != nil) {
-        @synchronized(self) {
-            self.lastError_ = error;
-        }
-    }
-
-    std::string characteristic_uuid = uuidToSimpleBLE(descriptor.characteristic.UUID);
-    std::string descriptor_uuid = uuidToSimpleBLE(descriptor.UUID);
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[[descriptor.characteristic.UUID UUIDString] lowercaseString]];
+    DescriptorExtras* descriptorExtras = [characteristicExtras.descriptorExtras objectForKey:[[descriptor.UUID UUIDString] lowercaseString]];
+    BleTask* task = descriptorExtras.task;
 
     @synchronized(self) {
-        // If the descriptor still had a pending read, clear the flag and return
-        if (characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].readPending) {
-            characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].readPending = NO;
-            return;
-        }
+        task.error = error;
+        task.pending = NO;
     }
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
-    if (error != nil) {
-        @synchronized(self) {
-            self.lastError_ = error;
-        }
-    }
-
-    std::string characteristic_uuid = uuidToSimpleBLE(descriptor.characteristic.UUID);
-    std::string descriptor_uuid = uuidToSimpleBLE(descriptor.UUID);
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[[descriptor.characteristic.UUID UUIDString] lowercaseString]];
+    DescriptorExtras* descriptorExtras = [characteristicExtras.descriptorExtras objectForKey:[[descriptor.UUID UUIDString] lowercaseString]];
+    BleTask* task = descriptorExtras.task;
 
     @synchronized(self) {
-        characteristic_extras_[characteristic_uuid].descriptor_extras[descriptor_uuid].writePending = NO;
+        task.error = error;
+        task.pending = NO;
     }
 }
 

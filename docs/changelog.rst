@@ -17,7 +17,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 
 - (MacOS) Main adapter address is now hardcoded to allow caching based on adapter address. *(Thanks BlissChapman!)*
 - (Python) Release GIL when calling ``Peripheral.write_request`` and ``Peripheral.write_command``.
-- (MacOS) Operations are now event-based.
+- (MacOS) Rewrote the entire backend.
 - (MacOS) OperationFailed exception now contains the error message provided by the OS.
 
 **Fixed**
