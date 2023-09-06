@@ -19,6 +19,7 @@
 - (uint16_t)mtu;
 
 - (void)connect;
+- (void)connectWithTimeout:(NSTimeInterval)timeout;
 - (void)disconnect;
 - (bool)isConnected;
 - (std::vector<SimpleBLE::Service>)getServices;

@@ -19,6 +19,23 @@
         }                                         \
     } while (0)
 
+#define WAIT_UNTIL_FALSE_WITH_TIMEOUT(obj, var, timeout)                                      \
+    do {                                                                                      \
+        BOOL _tmpVar = YES;                                                                   \
+        auto _timeout = std::chrono::duration<double>(timeout);                               \
+        auto _start = std::chrono::steady_clock::now();                                       \
+        while (_tmpVar) {                                                                     \
+            [NSThread sleepForTimeInterval:0.01];                                             \
+            @synchronized(obj) {                                                              \
+                _tmpVar = (var);                                                              \
+            }                                                                                 \
+            auto _duration = std::chrono::steady_clock::now() - _start;                       \
+            if (_duration > _timeout) {                                                       \
+                break;                                                                        \
+            }                                                                                 \
+        }                                                                                     \
+    } while (0)
+
 // --------------------------------------------------
 
 @interface BleTask : NSObject
@@ -126,6 +143,10 @@
 }
 
 - (void)connect {
+    [self connectWithTimeout:5];
+}
+
+- (void)connectWithTimeout:(NSTimeInterval)timeout {
     @synchronized(_task) {
         // --- Connect to the peripheral ---
         @synchronized(self) {
@@ -134,7 +155,7 @@
             [self.centralManager connectPeripheral:self.peripheral options:@{}];  // TODO: Do we need to pass any options?
         }
 
-        WAIT_UNTIL_FALSE(self, _task.pending);
+        WAIT_UNTIL_FALSE_WITH_TIMEOUT(self, _task.pending, timeout);
 
         if (self.peripheral.state != CBPeripheralStateConnected || _task.error != nil) {
             [self throwBasedOnError:_task.error withFormat:@"Peripheral Connection"];
