@@ -3,7 +3,7 @@
 #import "DescriptorBuilder.h"
 #import "LoggingInternal.h"
 #import "ServiceBuilder.h"
-#import "Utils.h"
+#import "UtilsMacOS.h"
 
 #import <simpleble/Exceptions.h>
 #import <optional>

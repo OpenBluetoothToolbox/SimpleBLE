@@ -53,8 +53,8 @@ include simpleble/src/backends/macos/PeripheralBase.h
 include simpleble/src/backends/macos/PeripheralBase.mm
 include simpleble/src/backends/macos/PeripheralBaseMacOS.h
 include simpleble/src/backends/macos/PeripheralBaseMacOS.mm
-include simpleble/src/backends/macos/Utils.h
-include simpleble/src/backends/macos/Utils.mm
+include simpleble/src/backends/macos/UtilsMacOS.h
+include simpleble/src/backends/macos/UtilsMacOS.mm
 include simpleble/src/backends/plain/AdapterBase.cpp
 include simpleble/src/backends/plain/AdapterBase.h
 include simpleble/src/backends/plain/PeripheralBase.cpp

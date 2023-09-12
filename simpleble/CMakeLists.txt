@@ -271,7 +271,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos)
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/Utils.mm
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/UtilsMacOS.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/AdapterBase.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/AdapterBaseMacOS.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/PeripheralBase.mm
