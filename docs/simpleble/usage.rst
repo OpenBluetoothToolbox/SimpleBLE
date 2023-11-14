@@ -185,7 +185,7 @@ Navigate to your target.
 Under the **General** tab, **Frameworks and Libraries** section, add the following frameworks:
   - Foundation
   - CoreBluetooth
-Under the **Build Settings** tab, Search Paths section, update the following settings:
+Under the **Build Settings** tab, **Search Paths** section, update the following settings:
   - Header Search Paths (add <path-to-simpleble>/include)
   - Library Search Paths (add <path-to-simpleble>/lib)
 
