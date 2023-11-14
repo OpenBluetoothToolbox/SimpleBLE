@@ -177,6 +177,19 @@ the following CMake options available:
   - ``LIBFMT_LOCAL_PATH``: The local path to use for fmtlib. *(Default: None)*
 
 
+Usage with Xcode **(macOS only)** 
+=================================
+
+Create Xcode C++ project.
+Navigate to your target.
+Under the **General** tab, **Frameworks and Libraries** section, add the following frameworks:
+  - Foundation
+  - CoreBluetooth
+Under the **Build Settings** tab, Search Paths section, update the following settings:
+  - Header Search Paths (add <path-to-simpleble>/include)
+  - Library Search Paths (add <path-to-simpleble>/lib)
+
+
 Build Examples
 ==============
 
