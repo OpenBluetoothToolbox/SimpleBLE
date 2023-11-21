@@ -26,6 +26,7 @@ class Device1 : public SimpleDBus::Interface {
     std::string AddressType();
     std::string Alias();
     std::string Name();
+    std::vector<std::string> UUIDs();
     std::map<uint16_t, std::vector<uint8_t>> ManufacturerData(bool refresh = true);
     std::map<std::string, std::vector<uint8_t>> ServiceData(bool refresh = true);
     bool Paired(bool refresh = true);
