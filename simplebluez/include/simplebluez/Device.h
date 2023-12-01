@@ -20,6 +20,7 @@ class Device : public SimpleDBus::Proxy {
 
     // ----- PROPERTIES -----
     std::vector<std::shared_ptr<Service>> services();
+    std::vector<std::string> uuids();
 
     std::string address();
     std::string address_type();

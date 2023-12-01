@@ -171,9 +171,8 @@ std::vector<Service> PeripheralBase::services() {
 
 std::vector<Service> PeripheralBase::advertised_services() {
     std::vector<Service> service_list;
-    for (auto& [service_uuid, value_array] : device_->service_data()) {
-        service_list.push_back(
-            ServiceBuilder(service_uuid, ByteArray((const char*)value_array.data(), value_array.size())));
+    for (auto& service_uuid : device_->uuids()) {
+        service_list.push_back(ServiceBuilder(service_uuid));
     }
 
     return service_list;
