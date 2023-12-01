@@ -27,6 +27,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 - (MacOS) Remove unnecessary timeout during characteristic notification. *(Thanks BlissChapman!)*
 - (MacOS) Remove unnecessary timeout during operations on characteristics.
 - (Windows) Failed connection attempt would not trigger an exception. *(Thanks eriklins!)*
+- (Linux) Use correct UUIDs for advertized services. *(Thanks Symbitic!)*
 
 
 [0.6.1] - 2023-03-14
