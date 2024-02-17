@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog`_, and this project adheres to `Semantic Versioning`_.
 
+[0.7.1] - 2024-02-16
+--------------------
+
+Bumped version to fix missing new license information in the Python and Rust packages.
+
+
 [0.7.0] - 2024-02-15
 --------------------
 

@@ -21,6 +21,10 @@ Release checklist
 Before releasing a new version of the project, the following steps should be
 performed:
 
+#. Ensure content parity between all readmes and the documentation.
+   - ``README.rst``
+   - ``simplepyble/README.rst``
+
 #. Review/update the version number in the following files:
 
    - ``VERSION``
