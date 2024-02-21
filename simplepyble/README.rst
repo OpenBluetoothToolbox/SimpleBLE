@@ -170,3 +170,9 @@ You can find the full text of the BSD 3-Clause license at https://opensource.org
    :target: http://simpleble.readthedocs.org/en/latest
 
 .. |PyPI Licence| image:: https://img.shields.io/pypi/l/simplepyble
+
+.. Other projects using SimpleBLE
+
+.. _BrainFlow: https://github.com/brainflow-dev/brainflow
+.. _InsideBlue: https://github.com/eriklins/InsideBlue-BLE-Tool
+.. _NodeWebBluetooth: https://github.com/thegecko/webbluetooth
