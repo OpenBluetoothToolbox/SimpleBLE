@@ -22,7 +22,9 @@ Before releasing a new version of the project, the following steps should be
 performed:
 
 #. Ensure content parity between all readmes and the documentation.
+
    - ``README.rst``
+   - ``LICENSE.md``
    - ``simplepyble/README.rst``
    - ``simplersble/README.md``
 
