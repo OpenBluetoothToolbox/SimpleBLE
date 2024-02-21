@@ -60,18 +60,14 @@ License
 =======
 
 Since February 15th 2024, SimpleBLE is now available under a dual-licensing scheme.
+
 **Update (February 20th, 2024):** The open-source terms have been clarified to ensure that
 no license conflicts occur when using SimpleBLE in derivative work of other open-source projects.
 
 **For open-source projects**, SimpleBLE is currently available under the BSD 3-Clause License
-only for the projects listed below:
-
-   `BrainFlow`_
-   `InsideBlue`_
-   `NodeWebBluetooth`_
-
-In order to request to be added to the list of authorized open-source projects, please reach
-out at ``contact at simpleble dot org``.
+only for the following projects: `BrainFlow`_, `InsideBlue`_ and `NodeWebBluetooth`_. In order
+to request to be added to the list of authorized open-source projects, please reach out
+at ``contact at simpleble dot org``.
 
 **For commercial usage**, the library is licensed under the GNU General Public License version 3 (GPLv3),
 with the option for a commercial license without the GPLv3 restrictions available for a fee. To obtain
