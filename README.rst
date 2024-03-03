@@ -69,11 +69,8 @@ available soon.)
 
 To enquire about a commercial license, please contact us at ``contact at simpleble dot org``.
 
-**NOTICE:** The projects listed below are allowed to use SimpleBLE under a GNU Lesser General Public
-License version 3 (LGPLv3), due to their past contributions:
-- `BrainFlow`_
-- `InsideBlue`_
-- `NodeWebBluetooth`_
+**NOTICE:** The following projects are allowed to use SimpleBLE under a GNU Lesser General Public
+License version 3 (LGPLv3), due to their past contributions: `BrainFlow`_, `InsideBlue`_, `NodeWebBluetooth`_.
 
 Likewise, if you are using SimpleBLE in an open-source project and would like to request an exception
 to the GPLv3 license, please reach out at ``contact at simpleble dot org``.
