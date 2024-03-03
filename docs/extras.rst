@@ -22,15 +22,18 @@ Before releasing a new version of the project, the following steps should be
 performed:
 
 #. Ensure content parity between all readmes and the documentation.
+
    - ``README.rst``
+   - ``LICENSE.md``
    - ``simplepyble/README.rst``
+   - ``simplersble/README.md``
 
 #. Review/update the version number in the following files:
 
    - ``VERSION``
    - ``Cargo.toml``
    - ``docs/changelog.rst``
-   - ``simplepyble/setup.py``
+   - ``simplepyble/setup.py`` (Add or remove the ``.devX`` suffix as needed.)
 
 #. Commit the changes to the repository.
 

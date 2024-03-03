@@ -2,7 +2,7 @@
 edition = "2021"
 
 name = "simplersble"
-version = "0.7.1"
+version = "0.7.2"
 license = "BSD-3-Clause OR GPL-3.0-only"
 description = "The all-in-one Bluetooth library that makes it easy to add wireless connectivity to your projects."
 readme = "simplersble/README.md"

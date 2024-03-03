@@ -1,12 +1,8 @@
 # SimpleBLE License
 
-**For non-commercial or open-source projects**, SimpleBLE is available under the BSD 3-Clause License,
-allowing free use and modification. However, if derivatives of these projects are used commercially,
-a commercial license for SimpleBLE is required by the entity selling the software containing SimpleBLE.
+**For open-source projects**, SimpleBLE is currently available under the BSD 3-Clause License only for the following projects: [BrainFlow](https://github.com/brainflow-dev/brainflow), [InsideBlue](https://github.com/eriklins/InsideBlue-BLE-Tool), and [NodeWebBluetooth](https://github.com/thegecko/webbluetooth). In order to request to be added to the list of authorized open-source projects, please reach out at `contact at simpleble dot org`.
 
-**For commercial usage**, the library is licensed under the GNU General Public License version 3 (GPLv3),
-with the option for a commercial license without the GPLv3 restrictions available for a fee. To obtain
-commercial license, please contact me at ``contact at simpleble dot org``.
+**For closed-source or commercial usage**, SimpleBLE is licensed under the GNU General Public License version 3 (GPLv3), with the option for a commercial license without the GPLv3 restrictions available for a fee. To obtain a commercial license, please contact me at `contact at simpleble dot org`.
 
 -------------------------------------------------------------------------------
 
