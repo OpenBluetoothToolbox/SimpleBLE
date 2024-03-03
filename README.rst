@@ -59,7 +59,7 @@ what you would like to change.
 License
 =======
 
-**Update (February 20th, 2024):** The open-source terms have been clarified to ensure that
+**Update (March 3rd, 2024):** The open-source terms have been clarified to ensure that
 no license conflicts occur when using SimpleBLE in derivative work of other open-source projects.
 
 Since February 15th 2024, SimpleBLE is now available under the GNU General Public License
