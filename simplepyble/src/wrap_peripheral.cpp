@@ -162,14 +162,20 @@ void wrap_peripheral(py::module& m) {
             "notify",
             [](SimpleBLE::Peripheral& p, std::string service, std::string characteristic,
                std::function<void(py::bytes payload)> cb) {
-                p.notify(service, characteristic, [cb](SimpleBLE::ByteArray payload) { cb(py::bytes(payload)); });
+                p.notify(service, characteristic, [cb](SimpleBLE::ByteArray payload) {
+                    py::gil_scoped_acquire x;
+                    cb(py::bytes(payload));
+                });
             },
             kDocsPeripheralNotify)
         .def(
             "indicate",
             [](SimpleBLE::Peripheral& p, std::string service, std::string characteristic,
                std::function<void(py::bytes payload)> cb) {
-                p.indicate(service, characteristic, [cb](SimpleBLE::ByteArray payload) { cb(py::bytes(payload)); });
+                p.indicate(service, characteristic, [cb](SimpleBLE::ByteArray payload) {
+                    py::gil_scoped_acquire x;
+                    cb(py::bytes(payload));
+                });
             },
             kDocsPeripheralIndicate)
         .def("unsubscribe", &SimpleBLE::Peripheral::unsubscribe, kDocsPeripheralUnsubscribe)
