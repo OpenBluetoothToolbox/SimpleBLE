@@ -46,7 +46,6 @@ Projects using SimpleBLE
 ------------------------
 Don't forget to check out the following projects using SimpleBLE:
 
-* `GDSimpleBLE`_
 * `BrainFlow`_
 * `InsideBlue`_
 * `NodeWebBluetooth`_
@@ -59,22 +58,19 @@ what you would like to change.
 License
 =======
 
-**Update (March 3rd, 2024):** The open-source terms have been clarified to ensure that
-no license conflicts occur when using SimpleBLE in derivative work of other open-source projects.
-
 Since February 15th 2024, SimpleBLE is now available under the GNU General Public License
 version 3 (GPLv3), with the option for a commercial license without the GPLv3 restrictions
-available for a fee. (More information on pricing and commercial terms of service will be
-available soon.)
+available for a fee.
+
+**More information on pricing and commercial terms of service will be available soon.**
 
 To enquire about a commercial license, please contact us at ``contact at simpleble dot org``.
 
 **NOTICE:** The following projects are allowed to use SimpleBLE under a GNU Lesser General Public
 License version 3 (LGPLv3), due to their past contributions: `BrainFlow`_, `InsideBlue`_, `NodeWebBluetooth`_.
 
-Likewise, if you are using SimpleBLE in an open-source project and would like to request an exception
-to the GPLv3 license, please reach out at ``contact at simpleble dot org``.
-
+Likewise, if you are using SimpleBLE in an open-source project and would like to request
+a free commercial license or if you have any other questions, please reach out at ``contact at simpleble dot org``.
 
 Licensing FAQ
 -------------
@@ -97,11 +93,12 @@ enhance SimpleBLE. Some of the things on the roadmap include:
 
 Despite this transition, I remain firmly committed to the open-source philosophy. SimpleBLE was grown
 a lot thanks to the feedback of the open-source community, and that foundation will always be a part
-of the project. The BSD 3-Clause license option ensures continued accessibility for non-commercial and
-open-source projects, and I pledge to actively contribute to and collaborate with the community whenever
-possible. Ultimately, the success of SimpleBLE has been fueled by its open nature, and I believe this
-dual-licensing model strengthens that success by enabling both community-driven growth and targeted
-enhancements that benefit everyone.
+of the project. The GPLv3 license option ensures continued accessibility for open-source projects,
+and I pledge to actively contribute to and collaborate with the community whenever possible.
+
+Ultimately, the success of SimpleBLE has been fueled by its open nature, and I believe this
+dual-licensing model strengthens that success by enabling both community-driven growth and
+targeted enhancements that benefit everyone.
 
 
 I'm already using SimpleBLE. What happens to my project?
@@ -112,38 +109,17 @@ situation. It is my intention to make this transition as smooth as possible for 
 and I'm open to finding a solution that works for everyone.
 
 
-What is offered as part of the commercial license?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* **Prioritized Support:** Your feature requests and bug fixes receive top priority.
-* **Company Spotlight:**  Showcase your company logo on our documentation and website.
-* **Dedicated Assistance:** Get personalized guidance with a few hours of one-on-one support for in-depth implementation or debugging challenges.
-
-
 What do you consider "commercial use"?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Commercial use in the context of SimpleBLE refers to any usage of the library or its derivatives
-in a commercial setting where it contributes, either directly or indirectly, to financial gain.
-This includes, but is not limited to, incorporating SimpleBLE into commercial software products,
-using it in the development of services offered for a fee, or deploying it within internal tools
-or software in a for-profit organization where it adds business value. The key factor is the use
-of the library as a component in a revenue-generating or business-advancing context, irrespective
-of whether the library itself is sold or offered as a standalone product.
-
-
-What do you consider "derivative work"?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-A derivative work, in relation to SimpleBLE, refers to any software or application that includes,
-builds upon, or modifies any part of the SimpleBLE library. This encompasses not only direct
-modifications of the library's source code but also software that incorporates the library as a
-significant functional element. For instance, an application that uses SimpleBLE as a foundational
-component for Bluetooth connectivity would be considered a derivative work. The commercial use
-clause applies when such a derivative work is used for commercial purposes, as previously defined.
-It's important to note that mere usage of SimpleBLE as an incidental component does not necessarily
-constitute a derivative work, especially if it does not form a significant part of the application's
-overall functionality or value proposition.
+Commercial use in the context of SimpleBLE refers to any usage of the SimpleBLE or any of its
+language bindings in a commercial setting where it contributes, either directly or indirectly,
+to financial gain. This includes, but is not limited to, incorporating SimpleBLE into commercial
+software products, using it in the development of services offered for a fee, or deploying it
+within internal tools or software in a for-profit organization where it adds business value.
+The key factor is the use of the library as a component in a revenue-generating or
+business-advancing context, irrespective of whether the library itself is sold or offered as
+a standalone product.
 
 
 What does the GPLv3 license imply for my commercial project?
@@ -154,17 +130,6 @@ distributed under the GPLv3. Essentially, if your project incorporates SimpleBLE
 the entire codebase must be open-source under the GPLv3.
 
 You can find the full text of the GPLv3 license at https://www.gnu.org/licenses/gpl-3.0.html.
-
-
-What does the BSD 3-Clause license imply for my project?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The BSD 3-Clause license is a permissive open-source license that allows you to use, modify, and
-redistribute SimpleBLE in your project, whether it's open-source or proprietary. It does not require
-that your project be open-source, and it does not impose any restrictions on how you use SimpleBLE
-in your project. The only requirement is that you include the original copyright notice and license
-text in any distribution of SimpleBLE or its derivatives.
-
-You can find the full text of the BSD 3-Clause license at https://opensource.org/licenses/BSD-3-Clause.
 
 .. Links
 

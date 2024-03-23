@@ -33,7 +33,7 @@ performed:
    - ``VERSION``
    - ``Cargo.toml``
    - ``docs/changelog.rst``
-   - ``simplepyble/setup.py`` (Add or remove the ``.devX`` suffix as needed.)
+   - ``setup.py`` (Add or remove the ``.devX`` suffix as needed.)
 
 #. Commit the changes to the repository.
 
@@ -54,4 +54,4 @@ performed:
    - ``VERSION``
    - ``Cargo.toml``
    - ``docs/changelog.rst``
-   - ``simplepyble/setup.py``
+   - ``setup.py`` (Add or remove the ``.devX`` suffix as needed.)

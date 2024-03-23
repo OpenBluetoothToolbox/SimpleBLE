@@ -1,24 +1,25 @@
 # SimpleBLE License
 
-**For open-source projects**, SimpleBLE is currently available under the BSD 3-Clause License only for the following projects: [BrainFlow](https://github.com/brainflow-dev/brainflow), [InsideBlue](https://github.com/eriklins/InsideBlue-BLE-Tool), and [NodeWebBluetooth](https://github.com/thegecko/webbluetooth). In order to request to be added to the list of authorized open-source projects, please reach out at `contact at simpleble dot org`.
+Since February 15th 2024, SimpleBLE is now available under the GNU General Public License
+version 3 (GPLv3), with the option for a commercial license without the GPLv3 restrictions
+available for a fee.
 
-**For closed-source or commercial usage**, SimpleBLE is licensed under the GNU General Public License version 3 (GPLv3), with the option for a commercial license without the GPLv3 restrictions available for a fee. To obtain a commercial license, please contact me at `contact at simpleble dot org`.
+To enquire about a commercial license, please contact us at ``contact at simpleble dot org``.
 
--------------------------------------------------------------------------------
+Likewise, if you are using SimpleBLE in an open-source project and would like to request
+a free commercial license or if you have any other questions, please reach out at ``contact at simpleble dot org``.
 
-# The 3-Clause BSD License
+## What do you consider "commercial use"?
 
-Copyright 2024, Kevin Dewald
+Commercial use in the context of SimpleBLE refers to any usage of the SimpleBLE or any of its
+language bindings in a commercial setting where it contributes, either directly or indirectly,
+to financial gain. This includes, but is not limited to, incorporating SimpleBLE into commercial
+software products, using it in the development of services offered for a fee, or deploying it
+within internal tools or software in a for-profit organization where it adds business value.
+The key factor is the use of the library as a component in a revenue-generating or
+business-advancing context, irrespective of whether the library itself is sold or offered as
+a standalone product.
 
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -------------------------------------------------------------------------------
 
