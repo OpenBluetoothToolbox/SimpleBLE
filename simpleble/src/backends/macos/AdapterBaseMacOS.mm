@@ -3,7 +3,7 @@
 #import <fmt/core.h>
 #import <simpleble/Exceptions.h>
 #import "LoggingInternal.h"
-#import "Utils.h"
+#import "UtilsMacOS.h"
 
 @interface AdapterBaseMacOS () {
 }
