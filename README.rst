@@ -41,6 +41,7 @@ Windows 10+ Ubuntu 20.04+ 10.15+ (except 12.0, 12.1 and 12.2) 15.0+
 =========== ============= =================================== =====
 
 **NOTE:** WSL does not support Bluetooth.
+**NOTE:** Android is not currently supported as NDK does not provide BLE Api (https://github.com/OpenBluetoothToolbox/SimpleBLE/issues/121)
 
 Projects using SimpleBLE
 ------------------------
