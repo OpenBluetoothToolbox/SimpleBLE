@@ -10,7 +10,7 @@ std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
 }
 
 bool AdapterBase::bluetooth_enabled() {
-    return false;
+    return true;
 }
 
 AdapterBase::AdapterBase() {}
@@ -46,3 +46,19 @@ void AdapterBase::set_callback_on_scan_stop(std::function<void()> on_scan_stop) 
 void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) {}
 
 void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {}
+
+
+#include <jni.h>
+#include <android/log.h>
+#include <iostream>
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+    // jvm = vm;
+    // log(DebugLevel::INFO, "OnLoad");
+
+    int value = 42;
+    __android_log_print(ANDROID_LOG_INFO, "SimpleBLE", "The answer is: %d", value);
+
+    std::cout << "JNI_OnLoad: Hello Potato!" << std::endl;
+    return JNI_VERSION_1_6;
+}

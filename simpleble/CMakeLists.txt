@@ -296,6 +296,10 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
     target_sources(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android/AdapterBase.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android/PeripheralBase.cpp)
+
+    target_link_libraries(simpleble PUBLIC
+        android
+        log)
 endif()
 
 apply_build_options(simpleble
