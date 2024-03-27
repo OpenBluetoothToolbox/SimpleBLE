@@ -1,32 +1,35 @@
 package org.simpleble.android_examples
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.TextView
-import org.simpleble.android_examples.databinding.ActivityMainBinding
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 
-class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
-
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        // Example of a call to a native method
-        binding.sampleText.text = stringFromJNI()
+        setContent {
+            MaterialTheme {
+                Surface {
+                    Greeting(stringFromJNI())
+                }
+            }
+        }
     }
 
-    /**
-     * A native method that is implemented by the 'android_examples' native library,
-     * which is packaged with this application.
-     */
+    @Composable
+    fun Greeting(text: String) {
+        Text(text = text)
+    }
+
     external fun stringFromJNI(): String
 
     companion object {
-        // Used to load the 'android_examples' library on application startup.
         init {
             System.loadLibrary("android_examples")
         }
