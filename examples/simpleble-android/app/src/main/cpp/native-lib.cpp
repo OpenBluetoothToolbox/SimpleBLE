@@ -6,7 +6,7 @@
 extern "C" JNIEXPORT jstring
 
 JNICALL
-Java_org_simpleble_android_1examples_MainActivity_stringFromJNI(
+Java_org_simpleble_android_1examples_SimpleAndroidBLE_stringFromJNI(
         JNIEnv *env,
         jobject /* this */) {
     bool enabled = SimpleBLE::Adapter::bluetooth_enabled();
