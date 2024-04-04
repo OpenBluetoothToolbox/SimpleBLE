@@ -35,6 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
+import org.simpleble.android.SimpleDroidBle
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -146,7 +148,7 @@ fun ListAdaptersContent() {
             modifier = Modifier.padding(16.dp)
         )
         // SimpleDroidBle().stringFromJNI()
-        // Text("List Adapters" + SimpleAndroidBLE().stringFromJNI())
+         Text("List Adapters" + SimpleDroidBle().stringFromJNI())
 
         if (adapterList.isEmpty()) {
             Text(

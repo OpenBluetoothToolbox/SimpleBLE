@@ -54,5 +54,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity.ktx)
     implementation(libs.activity.compose)
-    implementation(project(":simpledroidble"))
+
+    //noinspection UseTomlInstead
+    implementation("org.simpleble.android:simpledroidble")
+
 }

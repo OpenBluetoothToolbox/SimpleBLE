@@ -11,7 +11,7 @@ class SimpleDroidBle {
     companion object {
         // Used to load the 'android' library on application startup.
         init {
-            System.loadLibrary("android")
+            System.loadLibrary("simpleble-jni")
         }
     }
 }
