@@ -22,6 +22,7 @@ dependencyResolutionManagement {
 rootProject.name = "SimpleBLE Example"
 include(":app")
 includeBuild("../../simpledroidble") {
-    name = "simpledroidble"
+    // dependencySubstitution {
+    //     substitute module("com.simpledroidble:simpledroidble") with project(":simpledroidble")
+    // }
 }
- 

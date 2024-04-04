@@ -34,6 +34,10 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.11"
     }
 }
 
@@ -50,6 +54,5 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity.ktx)
     implementation(libs.activity.compose)
-
     implementation(project(":simpledroidble"))
 }

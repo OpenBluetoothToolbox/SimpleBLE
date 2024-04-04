@@ -1,4 +1,4 @@
-package org.simpleble.android_examples
+package org.simpleble.examples.android;
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -23,7 +23,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -147,7 +145,7 @@ fun ListAdaptersContent() {
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(16.dp)
         )
-        SimpleDroidBle().stringFromJNI()
+        // SimpleDroidBle().stringFromJNI()
         // Text("List Adapters" + SimpleAndroidBLE().stringFromJNI())
 
         if (adapterList.isEmpty()) {
