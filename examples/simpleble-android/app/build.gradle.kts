@@ -57,5 +57,4 @@ dependencies {
 
     //noinspection UseTomlInstead
     implementation("org.simpleble.android:simpledroidble")
-
 }
