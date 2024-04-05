@@ -10,7 +10,6 @@ project(
     LANGUAGES CXX
 )
 
-# Run prelude script to set up environment
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/epilogue.cmake)
 
 include(GenerateExportHeader)
@@ -291,11 +290,19 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
     add_compile_options(-DANDROID -D__ANDROID_API__=${ANDROID_NATIVE_API_LEVEL})
 
     # Specify the source files for the Android backend
-    target_include_directories(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android)
+    # NOTE: These files have been commented out and replaced by the PLAIN version in order to develop the Android wrapper code.
+    # target_include_directories(simpleble PRIVATE
+    #     ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android)
+    # target_sources(simpleble PRIVATE
+    #     ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android/AdapterBase.cpp
+    #     ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android/PeripheralBase.cpp)
+
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android/AdapterBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android/PeripheralBase.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/AdapterBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/PeripheralBase.cpp)
+
+    target_include_directories(simpleble PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain)
 
     target_link_libraries(simpleble PUBLIC
         android

@@ -4,6 +4,18 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/../../simpledroidble" name="SimpleDroidBle">
+                <projects>
+                  <project path="$PROJECT_DIR$/../../simpledroidble" />
+                  <project path="$PROJECT_DIR$/../../simpledroidble/simpledroidble" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleJvm" value="#GRADLE_LOCAL_JAVA_HOME" />
         <option name="modules">
@@ -11,6 +23,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/../../simpledroidble" />
+            <option value="$PROJECT_DIR$/../../simpledroidble/simpledroidble" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

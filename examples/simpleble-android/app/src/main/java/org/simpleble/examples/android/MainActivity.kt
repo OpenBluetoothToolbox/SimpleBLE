@@ -147,8 +147,6 @@ fun ListAdaptersContent() {
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(16.dp)
         )
-        // SimpleDroidBle().stringFromJNI()
-         Text("List Adapters" + SimpleDroidBle().stringFromJNI())
 
         if (adapterList.isEmpty()) {
             Text(
