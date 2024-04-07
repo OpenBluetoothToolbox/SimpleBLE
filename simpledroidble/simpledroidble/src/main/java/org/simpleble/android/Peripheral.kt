@@ -5,32 +5,35 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class Peripheral private constructor() {
+class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
+
+    private var instanceId: Long = newInstanceId
+    private var adapterId: Long = newAdapterId
 
     private val _onConnected = MutableSharedFlow<Unit>()
     private val _onDisconnected = MutableSharedFlow<Unit>()
 
-    fun identifier(): String {
-        return ""
+    val identifier: String get() {
+        return "Peripheral $instanceId"
     }
 
-    fun address(): BluetoothAddress {
-        return BluetoothAddress()
+    val address: BluetoothAddress get() {
+        return BluetoothAddress("")
     }
 
-    fun address_type(): BluetoothAddressType {
+    val addressType: BluetoothAddressType get() {
         return BluetoothAddressType()
     }
 
-    fun rssi(): Int {
+    val rssi: Int get() {
         return 0
     }
 
-    fun tx_power(): Int {
+    val txPower: Int get() {
         return 0
     }
 
-    fun mtu(): Int {
+    val mtu: Int get() {
         return 0
     }
 
@@ -40,15 +43,15 @@ class Peripheral private constructor() {
     fun disconnect() {
     }
 
-    fun is_connected(): Boolean {
+    val isConnected: Boolean get() {
         return false
     }
 
-    fun is_connectable(): Boolean {
+    val isConnectable: Boolean get() {
         return false
     }
 
-    fun is_paired(): Boolean {
+    val isPaired: Boolean get() {
         return false
     }
 
@@ -135,12 +138,8 @@ class Peripheral private constructor() {
     /// ----------------------------------------------------------------------------
 
 
-    private var instanceId: Long = -1
-    private var adapterId: Long = -1
 
-//    constructor(newAdapterId: Long, newInstanceId: Long) {
-//        this.adapterId = newAdapterId
-//        this.instanceId = newInstanceId
-//    }
+
+
 
 }

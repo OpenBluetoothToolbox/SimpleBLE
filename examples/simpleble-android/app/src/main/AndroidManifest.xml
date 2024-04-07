@@ -5,7 +5,7 @@
     <application
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:exported="true"
             android:label="SimpleBLE Example">
             <intent-filter>

@@ -8,3 +8,5 @@ void log_info(const std::string& msg);
 void log_debug(const std::string& msg);
 
 jstring to_jstring(JNIEnv* env, const std::string& str);
+
+void throw_exception(JNIEnv* env, const std::string& msg);

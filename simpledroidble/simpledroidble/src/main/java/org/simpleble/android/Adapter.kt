@@ -1,44 +1,53 @@
 package org.simpleble.android
 
+import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class Adapter private constructor() {
+class Adapter private constructor(newInstanceId: Long) {
     private val _onScanStart = MutableSharedFlow<Unit>()
     private val _onScanStop = MutableSharedFlow<Unit>()
     private val _onScanUpdated = MutableSharedFlow<Peripheral>(extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     private val _onScanFound = MutableSharedFlow<Peripheral>(extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
-//    private var instanceId: Long = -1
-//
-//    constructor(newInstanceId: Long) {
-//        this.instanceId = newInstanceId
-//
-//    }
+    private var instanceId: Long = newInstanceId
 
-    fun identifier(): String {
-        return ""
+    init {
+        Log.d("SimpleBLE","Adapter($instanceId) created")
     }
 
-    fun address(): BluetoothAddress {
-        return BluetoothAddress()
+    val identifier: String get() {
+        return nativeAdapterIdentifier(instanceId) ?: ""
+    }
+
+    val address: BluetoothAddress get() {
+        return BluetoothAddress(nativeAdapterAddress(instanceId) ?: "")
     }
 
     fun scanStart() {
+        nativeAdapterScanStart(instanceId)
     }
 
     fun scanStop() {
+        nativeAdapterScanStop(instanceId)
     }
 
-    fun scanFor(timeoutMs: Int) {
+    suspend fun scanFor(timeoutMs: Int) {
+        withContext(Dispatchers.IO) {
+            nativeAdapterScanFor(instanceId, timeoutMs)
+        }
     }
 
-    fun scanIsActive(): Boolean {
-        return false
+    val scanIsActive: Boolean get() {
+        return nativeAdapterScanIsActive(instanceId)
     }
 
     fun scanGetResults(): List<Peripheral> {
-        return emptyList()
+        return nativeAdapterScanGetResults(instanceId).map { Peripheral(instanceId, it) }
     }
 
     val onScanStart get() = _onScanStart
@@ -54,29 +63,27 @@ class Adapter private constructor() {
     }
 
     companion object {
-        fun getAdapters(): List<Adapter> {
-            return emptyList()
-        }
 
+        @JvmStatic
         fun isBluetoothEnabled(): Boolean {
             return false
         }
 
-        // What is JvmStatic?
-//        @JvmStatic
-//        fun getAdapters(): List<Adapter> {
-//            val nativeAdapterIds = nativeGetAdapters()
-//            val adapters = ArrayList<Adapter>()
-//
-//            for (native_adapter_id in nativeAdapterIds) {
-//                adapters.add(Adapter(native_adapter_id))
-//            }
-//
-//            return adapters
-//        }
-//
-//        @JvmStatic
-//        private external fun nativeGetAdapters(): LongArray
+        @JvmStatic
+        fun getAdapters(): List<Adapter> {
+            val nativeAdapterIds = nativeGetAdapters()
+            val adapters = ArrayList<Adapter>()
+
+            for (nativeAdapterId in nativeAdapterIds) {
+                Log.d("SimpleBLE", "Adapter found: $nativeAdapterId")
+                adapters.add(Adapter(nativeAdapterId))
+            }
+
+            return adapters
+        }
+
+        @JvmStatic
+        private external fun nativeGetAdapters(): LongArray
     }
 
     // ----------------------------------------------------------------------------
@@ -92,25 +99,25 @@ class Adapter private constructor() {
 //        return peripherals
 //    }
 
-    external fun nativeAdapterIdentifier(adapter_id: Long): String?
+    external fun nativeAdapterIdentifier(adapterId: Long): String?
 
-    external fun nativeAdapterAddress(adapter_id: Long): String?
+    external fun nativeAdapterAddress(adapterId: Long): String?
 
-    external fun nativeAdapterScanStart(adapter_id: Long)
+    external fun nativeAdapterScanStart(adapterId: Long)
 
-    external fun nativeAdapterScanStop(adapter_id: Long)
+    external fun nativeAdapterScanStop(adapterId: Long)
 
-    external fun nativeAdapterScanFor(adapter_id: Long, timeout: Int)
+    external fun nativeAdapterScanFor(adapterId: Long, timeout: Int)
 
-    external fun nativeAdapterScanIsActive(adapter_id: Long): Boolean
+    external fun nativeAdapterScanIsActive(adapterId: Long): Boolean
 
-    external fun nativeAdapterScanGetResults(adapter_id: Long) : LongArray
+    external fun nativeAdapterScanGetResults(adapterId: Long) : LongArray
 
-    fun incomingOnScanUpdated(adapter_id: Long, peripheral_id: Long) {
+    fun incomingOnScanUpdated(adapterId: Long, peripheralId: Long) {
         println("incomingOnScanUpdated")
     }
 
-    private fun incomingOnScanFound(adapter_id: Long, peripheral_id: Long) {
+    private fun incomingOnScanFound(adapterId: Long, peripheralId: Long) {
         println("incomingOnScanUpdated")
     }
 }

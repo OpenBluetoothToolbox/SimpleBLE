@@ -31,7 +31,6 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 }
 
 extern "C" JNIEXPORT jlongArray JNICALL Java_org_simpleble_android_Adapter_nativeGetAdapters(JNIEnv *env, jclass clazz) {
-
     auto adapters = SimpleBLE::Safe::Adapter::get_adapters();
 
     // If an error occurred, return an empty list.
@@ -73,35 +72,33 @@ extern "C" JNIEXPORT jstring JNICALL Java_org_simpleble_android_Adapter_nativeAd
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_simpleble_android_Adapter_nativeAdapterScanStart(JNIEnv *env, jobject thiz, jlong adapter_id) {
+    log_debug(fmt::format("Starting scan for adapter {}", adapter_id));
     auto adapter = cached_adapters.at(adapter_id);
     bool success = adapter.scan_start();
 
     if (!success) {
-        // Throw an exception
-        jclass Exception = env->FindClass("java/lang/Exception");
-        env->ThrowNew(Exception, "Failed to start scan");
+        throw_exception(env, "Failed to start scan");
     }
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_simpleble_android_Adapter_nativeAdapterScanStop(JNIEnv *env, jobject thiz, jlong adapter_id) {
+    log_debug(fmt::format("Stopping scan for adapter {}", adapter_id));
     auto adapter = cached_adapters.at(adapter_id);
     bool success = adapter.scan_stop();
 
     if (!success) {
-        // Throw an exception
-        jclass Exception = env->FindClass("java/lang/Exception");
-        env->ThrowNew(Exception, "Failed to stop scan");
+        throw_exception(env, "Failed to stop scan");
     }
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_simpleble_android_Adapter_nativeAdapterScanFor(JNIEnv *env, jobject thiz, jlong adapter_id, jint timeout) {
+    log_debug(fmt::format("Scanning for adapter {} with timeout {}", adapter_id, timeout));
     auto adapter = cached_adapters.at(adapter_id);
     bool success = adapter.scan_for(timeout);
+    log_debug(fmt::format("Scanning for adapter {} with timeout {} finished", adapter_id, timeout));
 
     if (!success) {
-        // Throw an exception
-        jclass Exception = env->FindClass("java/lang/Exception");
-        env->ThrowNew(Exception, "Failed to scan");
+        throw_exception(env, "Failed to scan for");
     }
 }
 
