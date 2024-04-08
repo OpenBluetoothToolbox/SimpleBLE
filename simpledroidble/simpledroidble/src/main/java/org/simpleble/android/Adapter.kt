@@ -1,11 +1,9 @@
 package org.simpleble.android
 
 import android.util.Log
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class Adapter private constructor(newInstanceId: Long) {
@@ -15,9 +13,29 @@ class Adapter private constructor(newInstanceId: Long) {
     private val _onScanFound = MutableSharedFlow<Peripheral>(extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     private var instanceId: Long = newInstanceId
+    private val callbacks = object : Callback {
+        override fun onScanStart() {
+            Log.d("SimpleBLE", "incomingOnScanStart")
+            _onScanStart.tryEmit(Unit)
+        }
+
+        override fun onScanStop() {
+            Log.d("SimpleBLE", "incomingOnScanStop")
+            _onScanStop.tryEmit(Unit)
+        }
+
+        override fun onScanUpdated(peripheralId: Long) {
+            _onScanUpdated.tryEmit(Peripheral(instanceId, peripheralId))
+        }
+
+        override fun onScanFound(peripheralId: Long) {
+            Log.d("SimpleBLE", "incomingOnScanFound $peripheralId")
+            _onScanFound.tryEmit(Peripheral(instanceId, peripheralId))
+        }
+    }
 
     init {
-        Log.d("SimpleBLE","Adapter($instanceId) created")
+        nativeAdapterRegister(instanceId, callbacks)
     }
 
     val identifier: String get() {
@@ -88,36 +106,29 @@ class Adapter private constructor(newInstanceId: Long) {
 
     // ----------------------------------------------------------------------------
 
-//    fun ScanGetResults(): ArrayList<Peripheral> {
-//        val nativePeripheralIds = nativeAdapterScanGetResults(instanceId)
-//        val peripherals = ArrayList<Peripheral>()
-//
-//        for (nativePeripheralId in nativePeripheralIds) {
-//            peripherals.add(Peripheral(instanceId, nativePeripheralId))
-//        }
-//
-//        return peripherals
-//    }
+    private external fun nativeAdapterRegister(adapterId: Long, callback: Callback)
 
-    external fun nativeAdapterIdentifier(adapterId: Long): String?
+    private external fun nativeAdapterIdentifier(adapterId: Long): String?
 
-    external fun nativeAdapterAddress(adapterId: Long): String?
+    private external fun nativeAdapterAddress(adapterId: Long): String?
 
-    external fun nativeAdapterScanStart(adapterId: Long)
+    private external fun nativeAdapterScanStart(adapterId: Long)
 
-    external fun nativeAdapterScanStop(adapterId: Long)
+    private external fun nativeAdapterScanStop(adapterId: Long)
 
-    external fun nativeAdapterScanFor(adapterId: Long, timeout: Int)
+    private external fun nativeAdapterScanFor(adapterId: Long, timeout: Int)
 
-    external fun nativeAdapterScanIsActive(adapterId: Long): Boolean
+    private external fun nativeAdapterScanIsActive(adapterId: Long): Boolean
 
-    external fun nativeAdapterScanGetResults(adapterId: Long) : LongArray
+    private external fun nativeAdapterScanGetResults(adapterId: Long) : LongArray
 
-    fun incomingOnScanUpdated(adapterId: Long, peripheralId: Long) {
-        println("incomingOnScanUpdated")
+    // ----------------------------------------------------------------------------
+
+    private interface Callback {
+        fun onScanStart()
+        fun onScanStop()
+        fun onScanUpdated(peripheralId: Long)
+        fun onScanFound(peripheralId: Long)
     }
 
-    private fun incomingOnScanFound(adapterId: Long, peripheralId: Long) {
-        println("incomingOnScanUpdated")
-    }
 }

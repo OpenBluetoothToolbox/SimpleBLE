@@ -53,7 +53,7 @@ void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_
 #include <iostream>
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
-    // jvm = vm;
+    // _jvm = vm;
     // log(DebugLevel::INFO, "OnLoad");
 
     int value = 42;
