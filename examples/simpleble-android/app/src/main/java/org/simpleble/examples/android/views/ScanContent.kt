@@ -1,5 +1,6 @@
 package org.simpleble.examples.android.views
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,66 +34,41 @@ import org.simpleble.android.Peripheral
 @Composable
 fun ScanContent() {
     val adapter = Adapter.getAdapters()[0]
+    var scanActive by remember { mutableStateOf(false) }
     var scanResults by remember { mutableStateOf(emptyList<Peripheral>()) }
-
 
     LaunchedEffect(Unit) {
         CoroutineScope(Dispatchers.Main).launch {
             adapter.onScanStart.collect {
-                println("Scan started.")
+                Log.d("SimpleBLE", "Scan started.")
             }
         }
 
         CoroutineScope(Dispatchers.Main).launch {
             adapter.onScanStop.collect {
-                println("Scan stopped.")
-                scanResults = adapter.scanGetResults()
+                Log.d("SimpleBLE", "Scan stopped.")
+            }
+        }
+
+        CoroutineScope(Dispatchers.Main).launch {
+            adapter.onScanActive.collect {
+                Log.d("SimpleBLE", "Scan active: $it")
+                scanActive = it
             }
         }
 
         CoroutineScope(Dispatchers.Main).launch {
             adapter.onScanFound.collect {
-                println("Found device: ${it.identifier} [${it.address}] ${it.rssi} dBm")
+                Log.d("SimpleBLE", "Found device: ${it.identifier} [${it.address}] ${it.rssi} dBm")
+                scanResults = scanResults + it
             }
         }
 
         CoroutineScope(Dispatchers.Main).launch {
             adapter.onScanUpdated.collect {
-                println("Updated device: ${it.identifier} [${it.address}] ${it.rssi} dBm")
+                Log.d("SimpleBLE", "Updated device: ${it.identifier} [${it.address}] ${it.rssi} dBm")
             }
         }
-
-
-
-
-
-
-//        adapter.setCallbackOnScanFound { peripheral ->
-//            println("Found device: ${peripheral.identifier} [${peripheral.address}] ${peripheral.rssi} dBm")
-//        }
-//        adapter.setCallbackOnScanUpdated { peripheral ->
-//            println("Updated device: ${peripheral.identifier} [${peripheral.address}] ${peripheral.rssi} dBm")
-//        }
-//        adapter.setCallbackOnScanStart {
-//            println("Scan started.")
-//            isScanning = true
-//        }
-//        adapter.setCallbackOnScanStop {
-//            println("Scan stopped.")
-//            isScanning = false
-//            scanResults = adapter.scanGetResults().map { peripheral ->
-//                PeripheralInfo(
-//                    identifier = peripheral.identifier,
-//                    address = peripheral.address,
-//                    rssi = peripheral.rssi,
-//                    isConnectable = peripheral.isConnectable,
-//                    txPower = peripheral.txPower,
-//                    addressType = peripheral.addressType,
-//                    services = peripheral.services.map { ServiceInfo(it.uuid, it.data) },
-//                    manufacturerData = peripheral.manufacturerData.mapValues { it.value.toList() }
-//                )
-//            }
-//        }
     }
 
     Column(
@@ -104,14 +80,14 @@ fun ScanContent() {
             onClick = {
                 if (!adapter.scanIsActive) {
                     CoroutineScope(Dispatchers.Main).launch {
+                        scanResults = emptyList()
                         adapter.scanFor(5000)
-                        scanResults = adapter.scanGetResults() // TODO: Switch to using the callback instead.
                     }
                 }
             },
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(text = if (adapter.scanIsActive) "Scanning..." else "Start Scan")
+            Text(text = if (scanActive) "Scanning..." else "Start Scan")
         }
 
         if (scanResults.isNotEmpty()) {

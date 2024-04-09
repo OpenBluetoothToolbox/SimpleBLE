@@ -44,8 +44,6 @@ Java_org_simpleble_android_Adapter_nativeAdapterRegister(JNIEnv *env, jobject th
     // Store the weak reference in the cached_adapter_references map
     cached_adapter_references[adapter_id].push_back(weakCallbackRef);
 
-    log_debug(fmt::format("Registered adapter {} with callback {}", adapter_id, (void*)weakCallbackRef));
-
     // Retrieve the adapter from the cached_adapters map
     auto adapter = cached_adapters.at(adapter_id);
 
@@ -60,12 +58,9 @@ Java_org_simpleble_android_Adapter_nativeAdapterRegister(JNIEnv *env, jobject th
 
             // Iterate over the weak references
             for (jweak weakCallbackRef : weakCallbackRefs) {
-                log_debug(fmt::format("Callback for adapter {} is {}", adapter_id, (void*)weakCallbackRef));
 
                 // Check if the weak reference is still valid
                 if (env->IsSameObject(weakCallbackRef, nullptr) == JNI_FALSE) {
-                    log_debug(fmt::format("Callback for adapter {} is valid", adapter_id));
-
                     // Retrieve the strong reference from the weak reference
                     jobject callbackRef = env->NewLocalRef(weakCallbackRef);
 
@@ -93,12 +88,8 @@ Java_org_simpleble_android_Adapter_nativeAdapterRegister(JNIEnv *env, jobject th
 
             // Iterate over the weak references
             for (jweak weakCallbackRef : weakCallbackRefs) {
-                log_debug(fmt::format("Callback for adapter {} is {}", adapter_id, (void*)weakCallbackRef));
-
                 // Check if the weak reference is still valid
                 if (env->IsSameObject(weakCallbackRef, nullptr) == JNI_FALSE) {
-                    log_debug(fmt::format("Callback for adapter {} is valid", adapter_id));
-
                     // Retrieve the strong reference from the weak reference
                     jobject callbackRef = env->NewLocalRef(weakCallbackRef);
 
@@ -133,12 +124,8 @@ Java_org_simpleble_android_Adapter_nativeAdapterRegister(JNIEnv *env, jobject th
 
             // Iterate over the weak references
             for (jweak weakCallbackRef : weakCallbackRefs) {
-                log_debug(fmt::format("Callback for adapter {} is {}", adapter_id,
-                                      (void *) weakCallbackRef));
-
                 // Check if the weak reference is still valid
                 if (env->IsSameObject(weakCallbackRef, nullptr) == JNI_FALSE) {
-                    log_debug(fmt::format("Callback for adapter {} is valid", adapter_id));
 
                     // Retrieve the strong reference from the weak reference
                     jobject callbackRef = env->NewLocalRef(weakCallbackRef);
@@ -176,12 +163,8 @@ Java_org_simpleble_android_Adapter_nativeAdapterRegister(JNIEnv *env, jobject th
 
             // Iterate over the weak references
             for (jweak weakCallbackRef : weakCallbackRefs) {
-                log_debug(fmt::format("Callback for adapter {} is {}", adapter_id,
-                                      (void *) weakCallbackRef));
-
                 // Check if the weak reference is still valid
                 if (env->IsSameObject(weakCallbackRef, nullptr) == JNI_FALSE) {
-                    log_debug(fmt::format("Callback for adapter {} is valid", adapter_id));
 
                     // Retrieve the strong reference from the weak reference
                     jobject callbackRef = env->NewLocalRef(weakCallbackRef);
@@ -228,8 +211,6 @@ extern "C" JNIEXPORT jlongArray JNICALL Java_org_simpleble_android_Adapter_nativ
 
     }
 
-    log_info(fmt::format("Found {} adapters. Total cached is {}", adapters.value().size(), cached_adapters.size()));
-
     return j_adapter_result;
 }
 
@@ -246,7 +227,6 @@ extern "C" JNIEXPORT jstring JNICALL Java_org_simpleble_android_Adapter_nativeAd
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_simpleble_android_Adapter_nativeAdapterScanStart(JNIEnv *env, jobject thiz, jlong adapter_id) {
-    log_debug(fmt::format("Starting scan for adapter {}", adapter_id));
     auto adapter = cached_adapters.at(adapter_id);
     bool success = adapter.scan_start();
 
@@ -256,7 +236,6 @@ extern "C" JNIEXPORT void JNICALL Java_org_simpleble_android_Adapter_nativeAdapt
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_simpleble_android_Adapter_nativeAdapterScanStop(JNIEnv *env, jobject thiz, jlong adapter_id) {
-    log_debug(fmt::format("Stopping scan for adapter {}", adapter_id));
     auto adapter = cached_adapters.at(adapter_id);
     bool success = adapter.scan_stop();
 
@@ -266,10 +245,8 @@ extern "C" JNIEXPORT void JNICALL Java_org_simpleble_android_Adapter_nativeAdapt
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_simpleble_android_Adapter_nativeAdapterScanFor(JNIEnv *env, jobject thiz, jlong adapter_id, jint timeout) {
-    log_debug(fmt::format("Scanning for adapter {} with timeout {}", adapter_id, timeout));
     auto adapter = cached_adapters.at(adapter_id);
     bool success = adapter.scan_for(timeout);
-    log_debug(fmt::format("Scanning for adapter {} with timeout {} finished", adapter_id, timeout));
 
     if (!success) {
         throw_exception(env, "Failed to scan for");

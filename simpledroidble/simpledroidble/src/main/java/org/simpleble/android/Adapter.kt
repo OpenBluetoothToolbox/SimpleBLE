@@ -1,40 +1,56 @@
 package org.simpleble.android
 
 import android.util.Log
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class Adapter private constructor(newInstanceId: Long) {
     private val _onScanStart = MutableSharedFlow<Unit>()
     private val _onScanStop = MutableSharedFlow<Unit>()
-    private val _onScanUpdated = MutableSharedFlow<Peripheral>(extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    private val _onScanFound = MutableSharedFlow<Peripheral>(extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _onScanActive = MutableSharedFlow<Boolean>()
+    private val _onScanUpdated = MutableSharedFlow<Peripheral>()
+    private val _onScanFound = MutableSharedFlow<Peripheral>()
 
     private var instanceId: Long = newInstanceId
+
     private val callbacks = object : Callback {
         override fun onScanStart() {
-            Log.d("SimpleBLE", "incomingOnScanStart")
-            _onScanStart.tryEmit(Unit)
+            CoroutineScope(Dispatchers.Main).launch {
+                _onScanStart.emit(Unit)
+            }
+            CoroutineScope(Dispatchers.Main).launch {
+                _onScanActive.emit(true)
+            }
         }
 
         override fun onScanStop() {
-            Log.d("SimpleBLE", "incomingOnScanStop")
-            _onScanStop.tryEmit(Unit)
+            CoroutineScope(Dispatchers.Main).launch {
+                _onScanStop.emit(Unit)
+            }
+            CoroutineScope(Dispatchers.Main).launch {
+                _onScanActive.emit(false)
+            }
         }
 
         override fun onScanUpdated(peripheralId: Long) {
-            _onScanUpdated.tryEmit(Peripheral(instanceId, peripheralId))
+            CoroutineScope(Dispatchers.Main).launch {
+                _onScanUpdated.emit(Peripheral(instanceId, peripheralId))
+            }
         }
 
         override fun onScanFound(peripheralId: Long) {
-            Log.d("SimpleBLE", "incomingOnScanFound $peripheralId")
-            _onScanFound.tryEmit(Peripheral(instanceId, peripheralId))
+            CoroutineScope(Dispatchers.Main).launch {
+                _onScanFound.emit(Peripheral(instanceId, peripheralId))
+            }
         }
     }
 
     init {
+        Log.d("SimpleBLE", "Adapter ${this.hashCode()}.init")
         nativeAdapterRegister(instanceId, callbacks)
     }
 
@@ -72,6 +88,8 @@ class Adapter private constructor(newInstanceId: Long) {
 
     val onScanStop get() = _onScanStop
 
+    val onScanActive get() = _onScanActive
+
     val onScanUpdated get() = _onScanUpdated
 
     val onScanFound get() = _onScanFound
@@ -93,7 +111,6 @@ class Adapter private constructor(newInstanceId: Long) {
             val adapters = ArrayList<Adapter>()
 
             for (nativeAdapterId in nativeAdapterIds) {
-                Log.d("SimpleBLE", "Adapter found: $nativeAdapterId")
                 adapters.add(Adapter(nativeAdapterId))
             }
 
