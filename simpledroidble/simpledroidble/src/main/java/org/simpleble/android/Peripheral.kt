@@ -1,9 +1,13 @@
 package org.simpleble.android
 
+import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
 
@@ -38,6 +42,7 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
     }
 
     fun connect() {
+        nativePeripheralConnect(adapterId, instanceId)
     }
 
     fun disconnect() {
@@ -79,19 +84,22 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
     fun notify(
         service: BluetoothUUID,
         characteristic: BluetoothUUID
-    ): StateFlow<ByteArray> {
-        val payloadFlow = MutableStateFlow(ByteArray(0))
+    ): MutableSharedFlow<ByteArray> {
+        val payloadFlow = MutableSharedFlow<ByteArray>()
 
         // Create a callback that emits the received payload to the StateFlow
-        val callback = { payload: ByteArray ->
-            payloadFlow.value = payload
+        val callback = object : Callback {
+            override fun onDataReceived(data: ByteArray) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    payloadFlow.emit(data)
+                }
+            }
         }
 
-        // Register the callback with the Bluetooth stack
-        // (assuming you have a function to do that)
-        //registerBluetoothCallback(service, characteristic, callback)
+        // Register the callback
+        nativePeripheralNotify(adapterId, instanceId, service.toString(), characteristic.toString(), callback)
 
-        return payloadFlow.asStateFlow()
+        return payloadFlow
     }
 
     fun indicate(
@@ -101,8 +109,12 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
         val payloadFlow = MutableStateFlow(ByteArray(0))
 
         // Create a callback that emits the received payload to the StateFlow
-        val callback = { payload: ByteArray ->
-            payloadFlow.value = payload
+        val callback = object : Callback {
+            override fun onDataReceived(data: ByteArray) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    payloadFlow.emit(data)
+                }
+            }
         }
 
         // Register the callback with the Bluetooth stack
@@ -137,9 +149,25 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
 
     /// ----------------------------------------------------------------------------
 
+    private external fun nativePeripheralIdentifier(adapterId: Long, instanceId: Long): String?
+
+    private external fun nativePeripheralAddress(adapterId: Long, instanceId: Long): String?
+
+    private external fun nativePeripheralConnect(adapterId: Long, instanceId: Long)
+
+    private external fun nativePeripheralDisconnect(adapterId: Long, instanceId: Long)
+
+    private external fun nativePeripheralNotify(
+        adapterId: Long,
+        instanceId: Long,
+        service: String,
+        characteristic: String,
+        callback: Callback
+    )
 
 
-
-
+    private interface Callback {
+        fun onDataReceived(data: ByteArray)
+    }
 
 }

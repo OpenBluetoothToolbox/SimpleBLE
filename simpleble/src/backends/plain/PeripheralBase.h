@@ -5,6 +5,7 @@
 #include <simpleble/Types.h>
 
 #include <kvn_safe_callback.hpp>
+#include <TaskRunner.hpp>
 
 #include <atomic>
 #include <condition_variable>
@@ -59,6 +60,9 @@ class PeripheralBase {
 
     kvn::safe_callback<void()> callback_on_connected_;
     kvn::safe_callback<void()> callback_on_disconnected_;
+
+    TaskRunner task_runner_;
+
 };
 
 }  // namespace SimpleBLE

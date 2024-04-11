@@ -81,7 +81,15 @@ void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID c
                                    ByteArray const& data) {}
 
 void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                            std::function<void(ByteArray payload)> callback) {}
+                            std::function<void(ByteArray payload)> callback) {
+    if (callback) {
+        task_runner_.dispatch([callback]() {
+            callback("Hello from notify");
+            return 1s;
+        }, 1s);
+
+    }
+}
 
 void PeripheralBase::indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                               std::function<void(ByteArray payload)> callback) {}

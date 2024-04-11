@@ -3,6 +3,7 @@
 
 #include "android_utils.h"
 #include <simpleble/SimpleBLE.h>
+#include <simpleble/Logging.h>
 #include <fmt/core.h>
 #include <vector>
 #include <map>
@@ -12,9 +13,10 @@
 #include "ThreadRunner.h"
 
 static std::map<size_t, SimpleBLE::Safe::Adapter> cached_adapters;
-static std::map<size_t, std::vector<jweak>> cached_adapter_references;
+static std::map<size_t, std::vector<jweak>> cached_adapter_callbacks;
 
 static std::map<size_t, std::map<size_t, SimpleBLE::Safe::Peripheral>> cached_peripherals;
+static std::map<size_t, std::map<size_t, std::map<size_t, jobject>>> cached_peripheral_callbacks;
 static ThreadRunner threadRunner;
 static JavaVM *jvm;
 
@@ -32,17 +34,27 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 //    jclass c = env->FindClass("com/example/app/package/MyClass");
 //    if (c == nullptr) return JNI_ERR;
 
+    SimpleBLE::Logging::Logger::get()->set_callback(
+        [](SimpleBLE::Logging::Level level, const std::string& module, const std::string& file, uint32_t line, const std::string& function, const std::string& message) {
+            std::string log_message = fmt::format("[{}] {}:{}:{}: {}", module, file, line, function, message);
+            log_info(log_message);
+        }
+    );
+
     return JNI_VERSION_1_6;
 }
 
 extern "C"
 JNIEXPORT void JNICALL
 Java_org_simpleble_android_Adapter_nativeAdapterRegister(JNIEnv *env, jobject thiz, jlong adapter_id, jobject callback) {
+    // TODO: IDEA. We could store the callback object whenever the scan starts and then remove it when the scan stops,
+    //             to avoid having extra references lying around.
+
     // Create a weak global reference to the Java callback object
     jweak weakCallbackRef = env->NewWeakGlobalRef(callback);
 
-    // Store the weak reference in the cached_adapter_references map
-    cached_adapter_references[adapter_id].push_back(weakCallbackRef);
+    // Store the weak reference in the cached_adapter_callbacks map
+    cached_adapter_callbacks[adapter_id].push_back(weakCallbackRef);
 
     // Retrieve the adapter from the cached_adapters map
     auto adapter = cached_adapters.at(adapter_id);
@@ -53,8 +65,8 @@ Java_org_simpleble_android_Adapter_nativeAdapterRegister(JNIEnv *env, jobject th
         threadRunner.enqueue([adapter_id](){
             JNIEnv *env = get_env();
 
-            // Retrieve the weak references from the cached_adapter_references map
-            std::vector<jweak> weakCallbackRefs = cached_adapter_references[adapter_id];
+            // Retrieve the weak references from the cached_adapter_callbacks map
+            std::vector<jweak> weakCallbackRefs = cached_adapter_callbacks[adapter_id];
 
             // Iterate over the weak references
             for (jweak weakCallbackRef : weakCallbackRefs) {
@@ -83,8 +95,8 @@ Java_org_simpleble_android_Adapter_nativeAdapterRegister(JNIEnv *env, jobject th
         threadRunner.enqueue([adapter_id](){
             JNIEnv *env = get_env();
 
-            // Retrieve the weak references from the cached_adapter_references map
-            std::vector<jweak> weakCallbackRefs = cached_adapter_references[adapter_id];
+            // Retrieve the weak references from the cached_adapter_callbacks map
+            std::vector<jweak> weakCallbackRefs = cached_adapter_callbacks[adapter_id];
 
             // Iterate over the weak references
             for (jweak weakCallbackRef : weakCallbackRefs) {
@@ -119,8 +131,8 @@ Java_org_simpleble_android_Adapter_nativeAdapterRegister(JNIEnv *env, jobject th
         threadRunner.enqueue([adapter_id, peripheral_hash](){
             JNIEnv *env = get_env();
 
-            // Retrieve the weak references from the cached_adapter_references map
-            std::vector<jweak> weakCallbackRefs = cached_adapter_references[adapter_id];
+            // Retrieve the weak references from the cached_adapter_callbacks map
+            std::vector<jweak> weakCallbackRefs = cached_adapter_callbacks[adapter_id];
 
             // Iterate over the weak references
             for (jweak weakCallbackRef : weakCallbackRefs) {
@@ -158,8 +170,8 @@ Java_org_simpleble_android_Adapter_nativeAdapterRegister(JNIEnv *env, jobject th
         threadRunner.enqueue([adapter_id, peripheral_hash](){
             JNIEnv *env = get_env();
 
-            // Retrieve the weak references from the cached_adapter_references map
-            std::vector<jweak> weakCallbackRefs = cached_adapter_references[adapter_id];
+            // Retrieve the weak references from the cached_adapter_callbacks map
+            std::vector<jweak> weakCallbackRefs = cached_adapter_callbacks[adapter_id];
 
             // Iterate over the weak references
             for (jweak weakCallbackRef : weakCallbackRefs) {
@@ -285,3 +297,84 @@ extern "C" JNIEXPORT jlongArray JNICALL Java_org_simpleble_android_Adapter_nativ
 
     return j_peripheral_result;
 }
+
+// PERIPHERAL
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralIdentifier(JNIEnv *env, jobject thiz,
+                                                                 jlong adapter_id,
+                                                                 jlong peripheral_id) {
+    // TODO: implement nativePeripheralIdentifier()
+}
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralAddress(JNIEnv *env, jobject thiz,
+                                                              jlong adapter_id, jlong peripheral_id) {
+    // TODO: implement nativePeripheralAddress()
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralConnect(JNIEnv *env, jobject thiz,
+                                                              jlong adapter_id, jlong peripheral_id) {
+    auto peripheral = cached_peripherals[adapter_id].at(peripheral_id);
+
+    bool success = peripheral.connect();
+    if (!success) {
+        throw_exception(env, "Failed to connect");
+    }
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralDisconnect(JNIEnv *env, jobject thiz,
+                                                                 jlong adapter_id,
+                                                                 jlong peripheral_id) {
+    // TODO: implement nativePeripheralDisconnect()
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralNotify(JNIEnv *env, jobject thiz,
+                                                             jlong adapter_id, jlong peripheral_id,
+                                                             jstring j_service,
+                                                             jstring j_characteristic,
+                                                             jobject callback) {
+
+    std::string service = from_jstring(env, j_service);
+    std::string characteristic = from_jstring(env, j_characteristic);
+    std::string service_characteristic = service + "_" + characteristic;
+    size_t service_characteristic_hash = std::hash<std::string>{}(service_characteristic);
+
+    jobject callbackRef = env->NewGlobalRef(callback);
+    // TODO: Check if there is a callback already registered for this service_characteristic_hash
+    cached_peripheral_callbacks[adapter_id][peripheral_id].insert({service_characteristic_hash, callbackRef});
+
+    auto peripheral = cached_peripherals[adapter_id].at(peripheral_id);
+    bool success = peripheral.notify(service, characteristic, [adapter_id, peripheral_id, service_characteristic_hash](SimpleBLE::ByteArray payload){
+
+        log_info("Received payload");
+
+        threadRunner.enqueue([adapter_id, peripheral_id, service_characteristic_hash, payload]() {
+            JNIEnv *env = get_env();
+
+            log_info("Forwarding payload to Java callback");
+
+            // Retrieve the weak references from the cached_adapter_callbacks map
+            jobject callbackRef = cached_peripheral_callbacks[adapter_id][peripheral_id].at(service_characteristic_hash);
+            jbyteArray j_payload = to_jbyteArray(env, payload);
+
+            // TODO: We should cache the class and method IDs
+            jclass callbackClass = env->GetObjectClass(callbackRef);
+            jmethodID onDataReceivedMethod = env->GetMethodID(callbackClass, "onDataReceived", "([B)V");
+
+            // Invoke the Java callback method
+            env->CallVoidMethod(callbackRef, onDataReceivedMethod, j_payload);
+
+        });
+    });
+
+    if (!success) {
+        throw_exception(env, "Failed to notify");
+    }
+
+}
+
