@@ -4,10 +4,8 @@ import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
 
@@ -15,37 +13,68 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
     private var adapterId: Long = newAdapterId
 
     private val _onConnected = MutableSharedFlow<Unit>()
+    private val _onConnectionActive = MutableSharedFlow<Boolean>()
     private val _onDisconnected = MutableSharedFlow<Unit>()
 
+    private val callbacks = object : Callback {
+        override fun onConnected() {
+            CoroutineScope(Dispatchers.Main).launch {
+                _onConnected.emit(Unit)
+            }
+            CoroutineScope(Dispatchers.Main).launch {
+                _onConnectionActive.emit(true)
+            }
+        }
+
+        override fun onDisconnected() {
+            CoroutineScope(Dispatchers.Main).launch {
+                _onDisconnected.emit(Unit)
+            }
+            CoroutineScope(Dispatchers.Main).launch {
+                _onConnectionActive.emit(false)
+            }
+        }
+    }
+
+    init {
+        Log.d("SimpleBLE", "Peripheral ${this.hashCode()}.init")
+        nativePeripheralRegister(adapterId, instanceId, callbacks)
+    }
+
     val identifier: String get() {
-        return "Peripheral $instanceId"
+        return nativePeripheralIdentifier(adapterId, instanceId) ?: ""
     }
 
     val address: BluetoothAddress get() {
-        return BluetoothAddress("")
+        return BluetoothAddress(nativePeripheralAddress(adapterId, instanceId) ?: "")
     }
 
     val addressType: BluetoothAddressType get() {
-        return BluetoothAddressType()
+        return BluetoothAddressType.fromInt(nativePeripheralAddressType(adapterId, instanceId))
     }
 
     val rssi: Int get() {
-        return 0
+        return nativePeripheralRssi(adapterId, instanceId)
     }
 
     val txPower: Int get() {
-        return 0
+        return nativePeripheralTxPower(adapterId, instanceId)
     }
 
     val mtu: Int get() {
-        return 0
+        return nativePeripheralMtu(adapterId, instanceId)
     }
 
-    fun connect() {
-        nativePeripheralConnect(adapterId, instanceId)
+    suspend fun connect() {
+        withContext(Dispatchers.IO) {
+            nativePeripheralConnect(adapterId, instanceId)
+        }
     }
 
-    fun disconnect() {
+    suspend fun disconnect() {
+        withContext(Dispatchers.IO) {
+            nativePeripheralDisconnect(adapterId, instanceId)
+        }
     }
 
     val isConnected: Boolean get() {
@@ -86,9 +115,7 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
         characteristic: BluetoothUUID
     ): MutableSharedFlow<ByteArray> {
         val payloadFlow = MutableSharedFlow<ByteArray>()
-
-        // Create a callback that emits the received payload to the StateFlow
-        val callback = object : Callback {
+        val dataCallback = object : DataCallback {
             override fun onDataReceived(data: ByteArray) {
                 CoroutineScope(Dispatchers.Main).launch {
                     payloadFlow.emit(data)
@@ -96,20 +123,16 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
             }
         }
 
-        // Register the callback
-        nativePeripheralNotify(adapterId, instanceId, service.toString(), characteristic.toString(), callback)
-
+        nativePeripheralNotify(adapterId, instanceId, service.toString(), characteristic.toString(), dataCallback)
         return payloadFlow
     }
 
     fun indicate(
         service: BluetoothUUID,
         characteristic: BluetoothUUID
-    ): StateFlow<ByteArray> {
-        val payloadFlow = MutableStateFlow(ByteArray(0))
-
-        // Create a callback that emits the received payload to the StateFlow
-        val callback = object : Callback {
+    ): MutableSharedFlow<ByteArray> {
+        val payloadFlow = MutableSharedFlow<ByteArray>()
+        val dataCallback = object : DataCallback {
             override fun onDataReceived(data: ByteArray) {
                 CoroutineScope(Dispatchers.Main).launch {
                     payloadFlow.emit(data)
@@ -117,11 +140,8 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
             }
         }
 
-        // Register the callback with the Bluetooth stack
-        // (assuming you have a function to do that)
-        //registerBluetoothCallback(service, characteristic, callback)
-
-        return payloadFlow.asStateFlow()
+        nativePeripheralIndicate(adapterId, instanceId, service.toString(), characteristic.toString(), dataCallback)
+        return payloadFlow
     }
 
     fun unsubscribe(service: BluetoothUUID, characteristic: BluetoothUUID) {
@@ -148,11 +168,23 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
 
     val onDisconnected get() = _onDisconnected
 
+    val onConnectionActive get() = _onConnectionActive
+
     /// ----------------------------------------------------------------------------
+
+    private external fun nativePeripheralRegister(adapterId: Long, instanceId: Long, callback: Callback)
 
     private external fun nativePeripheralIdentifier(adapterId: Long, instanceId: Long): String?
 
     private external fun nativePeripheralAddress(adapterId: Long, instanceId: Long): String?
+
+    private external fun nativePeripheralAddressType(adapterId: Long, instanceId: Long): Int
+
+    private external fun nativePeripheralRssi(adapterId: Long, instanceId: Long): Int
+
+    private external fun nativePeripheralTxPower(adapterId: Long, instanceId: Long): Int
+
+    private external fun nativePeripheralMtu(adapterId: Long, instanceId: Long): Int
 
     private external fun nativePeripheralConnect(adapterId: Long, instanceId: Long)
 
@@ -163,7 +195,7 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
         instanceId: Long,
         service: String,
         characteristic: String,
-        callback: Callback
+        dataCallback: DataCallback
     )
 
     private external fun nativePeripheralIndicate(
@@ -171,7 +203,7 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
         instanceId: Long,
         service: String,
         characteristic: String,
-        callback: Callback
+        dataCallback: DataCallback
     )
 
     private external fun nativePeripheralUnsubscribe(
@@ -180,9 +212,16 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
         service: String,
         characteristic: String)
 
+    // ----------------------------------------------------------------------------
+
+    private interface DataCallback {
+        fun onDataReceived(data: ByteArray)
+    }
+
 
     private interface Callback {
-        fun onDataReceived(data: ByteArray)
+        fun onConnected()
+        fun onDisconnected()
     }
 
 }

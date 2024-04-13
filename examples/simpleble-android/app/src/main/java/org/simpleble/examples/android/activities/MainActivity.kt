@@ -36,6 +36,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.simpleble.examples.android.views.ConnectContent
 import org.simpleble.examples.android.views.ListAdaptersContent
+import org.simpleble.examples.android.views.NotifyContent
+import org.simpleble.examples.android.views.ReadContent
 import org.simpleble.examples.android.views.ScanContent
 
 class MainActivity : ComponentActivity() {
@@ -106,19 +108,4 @@ fun ExampleView() {
         }
     }
 }
-
-// ---------------------------- Composable functions ----------------------------
-
-
-
-@Composable
-fun ReadContent() {
-    Text("Read")
-}
-
-@Composable
-fun NotifyContent() {
-    Text("Notify")
-}
-
 

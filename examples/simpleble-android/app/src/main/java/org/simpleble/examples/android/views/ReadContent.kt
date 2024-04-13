@@ -25,26 +25,26 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.simpleble.android.Adapter
 import org.simpleble.android.BluetoothUUID
 import org.simpleble.android.Peripheral
 
-
 @Composable
-fun ConnectContent() {
+fun ReadContent() {
     val adapter = Adapter.getAdapters()[0]
     var scanResults by remember { mutableStateOf(emptyList<Peripheral>()) }
     var isScanning by remember { mutableStateOf(false) }
-
     var selectedDevice by remember { mutableStateOf<Peripheral?>(null) }
     var isConnected by remember { mutableStateOf(false) }
-    var mtu by remember { mutableStateOf(0) }
+    var characteristics by remember { mutableStateOf(emptyList<Pair<BluetoothUUID, BluetoothUUID>>()) }
+    var selectedCharacteristic by remember { mutableStateOf<Pair<BluetoothUUID, BluetoothUUID>?>(null) }
+    var characteristicContent by remember { mutableStateOf<ByteArray?>(null) }
 
-    LaunchedEffect(Unit, selectedDevice) {
+    LaunchedEffect(Unit) {
         CoroutineScope(Dispatchers.Main).launch {
             adapter.onScanActive.collect {
+                Log.d("SimpleBLE", "Scan active: $it")
                 isScanning = it
             }
         }
@@ -55,35 +55,6 @@ fun ConnectContent() {
                 scanResults = scanResults + it
             }
         }
-
-
-        selectedDevice?.let { peripheral ->
-            CoroutineScope(Dispatchers.Main).launch {
-                peripheral.onConnectionActive.collectLatest { active ->
-                    isConnected = active
-
-                    mtu = if (active) {
-                        peripheral.mtu
-                    } else {
-                        0
-                    }
-                }
-            }
-
-            CoroutineScope(Dispatchers.Main).launch {
-                peripheral.onConnected.collectLatest {
-                    Log.d("SimpleBLE", "Connected to ${peripheral.identifier} [${peripheral.address}]")
-                }
-            }
-
-            CoroutineScope(Dispatchers.Main).launch {
-                peripheral.onDisconnected.collectLatest {
-                    Log.d("SimpleBLE", "Disconnected from ${peripheral.identifier} [${peripheral.address}]")
-                }
-            }
-        }
-
-
     }
 
     Column(
@@ -91,30 +62,18 @@ fun ConnectContent() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        if (isScanning) {
-            Text(
-                text = "Scanning...",
-                style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-
         Button(
             onClick = {
                 if (!isScanning) {
                     CoroutineScope(Dispatchers.Main).launch {
                         scanResults = emptyList()
-                        adapter.scanStart()
-                    }
-                } else {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        adapter.scanStop()
+                        adapter.scanFor(5000)
                     }
                 }
             },
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(text = if (isScanning) "Stop Scan" else "Start Scan")
+            Text(text = if (isScanning) "Scanning..." else "Start Scan")
         }
 
         if (scanResults.isNotEmpty()) {
@@ -157,14 +116,24 @@ fun ConnectContent() {
 
             Button(
                 onClick = {
-
                     if (!isConnected) {
                         CoroutineScope(Dispatchers.Main).launch {
                             peripheral.connect()
+                            isConnected = true
+
+//                            characteristics = peripheral.services.flatMap { service ->
+//                                service.characteristics.map { characteristic ->
+//                                    Pair(service.uuid, characteristic.uuid)
+//                                }
+//                            }
                         }
                     } else {
                         CoroutineScope(Dispatchers.Main).launch {
                             peripheral.disconnect()
+                            isConnected = false
+                            characteristics = emptyList()
+                            selectedCharacteristic = null
+                            characteristicContent = null
                         }
                     }
                 },
@@ -175,46 +144,53 @@ fun ConnectContent() {
 
             if (isConnected) {
                 Text(
-                    text = "Successfully connected.",
+                    text = "Successfully connected, printing services and characteristics..",
                     style = MaterialTheme.typography.body1,
                     modifier = Modifier.padding(16.dp)
                 )
 
-                Text(
-                    text = "MTU: ${peripheral.mtu}",
-                    style = MaterialTheme.typography.body1,
-                    modifier = Modifier.padding(16.dp)
-                )
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(16.dp)
+                ) {
+                    items(characteristics.withIndex().toList()) { (index, characteristic) ->
+                        Text(
+                            text = "[$index] ${characteristic.first} ${characteristic.second}",
+                            style = MaterialTheme.typography.body1,
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .clickable {
+                                    selectedCharacteristic = characteristic
+                                }
+                        )
+                    }
+                }
 
-//                peripheral.services.forEach { service ->
-//                    Text(
-//                        text = "Service: ${service.uuid}",
-//                        style = MaterialTheme.typography.body1,
-//                        modifier = Modifier.padding(16.dp)
-//                    )
-//
-//                    service.characteristics.forEach { characteristic ->
-//                        Text(
-//                            text = "Characteristic: ${characteristic.uuid}",
-//                            style = MaterialTheme.typography.body2,
-//                            modifier = Modifier.padding(start = 32.dp)
-//                        )
-//
-//                        Text(
-//                            text = "Capabilities: ${characteristic.capabilities.joinToString(", ")}",
-//                            style = MaterialTheme.typography.body2,
-//                            modifier = Modifier.padding(start = 32.dp)
-//                        )
-//
-//                        characteristic.descriptors.forEach { descriptor ->
-//                            Text(
-//                                text = "Descriptor: ${descriptor.uuid}",
-//                                style = MaterialTheme.typography.body2,
-//                                modifier = Modifier.padding(start = 48.dp)
-//                            )
-//                        }
-//                    }
-//                }
+                selectedCharacteristic?.let { characteristic ->
+                    Button(
+                        onClick = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                repeat(5) {
+                                    val content = peripheral.read(characteristic.first, characteristic.second)
+                                    characteristicContent = content
+                                    Log.d("SimpleBLE", "Characteristic content: ${content.joinToString(separator = " ") { "%02x".format(it) }}")
+                                    delay(1000)
+                                }
+                            }
+                        },
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(text = "Read Characteristic")
+                    }
+
+                    characteristicContent?.let { content ->
+                        Text(
+                            text = "Characteristic content: ${content.joinToString(separator = " ") { "%02x".format(it) }}",
+                            style = MaterialTheme.typography.body1,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
             }
         }
     }
