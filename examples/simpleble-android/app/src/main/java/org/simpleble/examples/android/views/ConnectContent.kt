@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.simpleble.android.Adapter
 import org.simpleble.android.BluetoothUUID
@@ -118,9 +119,14 @@ fun ConnectContent() {
                 onClick = {
                     CoroutineScope(Dispatchers.Main).launch {
                         peripheral.connect()
-                        peripheral.notify(BluetoothUUID("0000180f-0000-1000-8000-00805f9b34fb"), BluetoothUUID("00002a19-0000-1000-8000-00805f9b34fb")).collect {
-                            Log.d("SimpleBLE", "Received notification: ${it.joinToString("")}")
+                        peripheral.notify(BluetoothUUID("0000180f-0000-1000-8000-00805f9b34fb"), BluetoothUUID("00002a19-0000-1000-8000-00805f9b34fb")).collect { it ->
+                            val hexString = it.joinToString(separator = " ") { "%02x".format(it) }
+                            Log.d("SimpleBLE", "Received notification: $hexString")
                         }
+                    }
+                    CoroutineScope(Dispatchers.Main).launch {
+                        delay(5000)
+                        peripheral.unsubscribe(BluetoothUUID("0000180f-0000-1000-8000-00805f9b34fb"), BluetoothUUID("00002a19-0000-1000-8000-00805f9b34fb"))
                     }
 //                    if (!isConnected) {
 //                        peripheral.connect()

@@ -91,7 +91,7 @@ class TaskRunner {
             lock.unlock();
 
             auto result = task();
-            if (result) {
+            if (result.has_value()) {
                 dispatch(std::move(task), *result);
             }
         }

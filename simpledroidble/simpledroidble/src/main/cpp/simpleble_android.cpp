@@ -351,12 +351,15 @@ Java_org_simpleble_android_Peripheral_nativePeripheralNotify(JNIEnv *env, jobjec
     auto peripheral = cached_peripherals[adapter_id].at(peripheral_id);
     bool success = peripheral.notify(service, characteristic, [adapter_id, peripheral_id, service_characteristic_hash](SimpleBLE::ByteArray payload){
 
-        log_info("Received payload");
+        std::string payload_contents;
+        for (int i = 0; i < payload.size(); i++) {
+            payload_contents += fmt::format("{:02X}", (int)(payload[i]));
+        }
+
+        log_info("Received payload: " + payload_contents);
 
         threadRunner.enqueue([adapter_id, peripheral_id, service_characteristic_hash, payload]() {
             JNIEnv *env = get_env();
-
-            log_info("Forwarding payload to Java callback");
 
             // Retrieve the weak references from the cached_adapter_callbacks map
             jobject callbackRef = cached_peripheral_callbacks[adapter_id][peripheral_id].at(service_characteristic_hash);
@@ -378,3 +381,38 @@ Java_org_simpleble_android_Peripheral_nativePeripheralNotify(JNIEnv *env, jobjec
 
 }
 
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralIndicate(JNIEnv *env, jobject thiz,
+                                                               jlong adapter_id, jlong peripheral_id,
+                                                               jstring service,
+                                                               jstring characteristic,
+                                                               jobject callback) {
+    // TODO: implement nativePeripheralIndicate()
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralUnsubscribe(JNIEnv *env, jobject thiz,
+                                                                  jlong adapter_id,
+                                                                  jlong peripheral_id,
+                                                                  jstring j_service,
+                                                                  jstring j_characteristic) {
+    std::string service = from_jstring(env, j_service);
+    std::string characteristic = from_jstring(env, j_characteristic);
+    std::string service_characteristic = service + "_" + characteristic;
+    size_t service_characteristic_hash = std::hash<std::string>{}(service_characteristic);
+
+    auto peripheral = cached_peripherals[adapter_id].at(peripheral_id);
+    bool success = peripheral.unsubscribe(service, characteristic);
+
+    if (!success) {
+        throw_exception(env, "Failed to unsubscribe");
+    }
+
+    jobject callbackRef = cached_peripheral_callbacks[adapter_id][peripheral_id].at(service_characteristic_hash);
+
+    // TODO: Should some check be done here to see if the callbackRef is still valid?
+    env->DeleteGlobalRef(callbackRef);
+    cached_peripheral_callbacks[adapter_id][peripheral_id].erase(service_characteristic_hash);
+}

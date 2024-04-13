@@ -125,6 +125,7 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
     }
 
     fun unsubscribe(service: BluetoothUUID, characteristic: BluetoothUUID) {
+        nativePeripheralUnsubscribe(adapterId, instanceId, service.toString(), characteristic.toString())
     }
 
     fun read(
@@ -164,6 +165,20 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
         characteristic: String,
         callback: Callback
     )
+
+    private external fun nativePeripheralIndicate(
+        adapterId: Long,
+        instanceId: Long,
+        service: String,
+        characteristic: String,
+        callback: Callback
+    )
+
+    private external fun nativePeripheralUnsubscribe(
+        adapterId: Long,
+        instanceId: Long,
+        service: String,
+        characteristic: String)
 
 
     private interface Callback {

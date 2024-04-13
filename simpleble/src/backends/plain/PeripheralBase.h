@@ -11,6 +11,7 @@
 #include <condition_variable>
 #include <map>
 #include <memory>
+#include <mutex>
 
 namespace SimpleBLE {
 
@@ -60,6 +61,9 @@ class PeripheralBase {
 
     kvn::safe_callback<void()> callback_on_connected_;
     kvn::safe_callback<void()> callback_on_disconnected_;
+
+    std::mutex callback_mutex_;
+    std::map<std::pair<BluetoothUUID, BluetoothUUID>, std::function<void(ByteArray payload)>> callbacks_;
 
     TaskRunner task_runner_;
 

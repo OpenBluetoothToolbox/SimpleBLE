@@ -83,18 +83,49 @@ void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID c
 void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                             std::function<void(ByteArray payload)> callback) {
     if (callback) {
-        task_runner_.dispatch([callback]() {
-            callback("Hello from notify");
+        callback_mutex_.lock();
+        callbacks_[{service, characteristic}] = std::move(callback);
+        callback_mutex_.unlock();
+
+        task_runner_.dispatch([this, service, characteristic]() -> std::optional<std::chrono::seconds> {
+            std::lock_guard<std::mutex> lock(callback_mutex_);
+            auto it = this->callbacks_.find({service, characteristic});
+
+            if (it == this->callbacks_.end()) {
+                return std::nullopt;
+            }
+
+            it->second("Hello from notify");
             return 1s;
         }, 1s);
-
     }
 }
 
 void PeripheralBase::indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                              std::function<void(ByteArray payload)> callback) {}
+                              std::function<void(ByteArray payload)> callback) {
+    if (callback) {
+        callback_mutex_.lock();
+        callbacks_[{service, characteristic}] = std::move(callback);
+        callback_mutex_.unlock();
 
-void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) {}
+        task_runner_.dispatch([this, service, characteristic]() -> std::optional<std::chrono::seconds> {
+            std::lock_guard<std::mutex> lock(callback_mutex_);
+            auto it = this->callbacks_.find({service, characteristic});
+
+            if (it == this->callbacks_.end()) {
+                return std::nullopt;
+            }
+
+            it->second("Hello from notify");
+            return 1s;
+        }, 1s);
+    }
+}
+
+void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
+    std::lock_guard<std::mutex> lock(callback_mutex_);
+    callbacks_.erase({service, characteristic});
+}
 
 ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                                BluetoothUUID const& descriptor) {

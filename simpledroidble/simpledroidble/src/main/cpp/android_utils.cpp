@@ -27,6 +27,19 @@ std::string from_jstring(JNIEnv* env, jstring str){
 jbyteArray to_jbyteArray(JNIEnv* env, const std::string& data) {
     jbyteArray result = env->NewByteArray(data.size());
     env->SetByteArrayRegion(result, 0, data.size(), reinterpret_cast<const jbyte*>(data.data()));
+
+    jsize length = env->GetArrayLength(result);
+    jbyte* bytes = env->GetByteArrayElements(result, NULL);
+
+    std::string arrayOut = "Array: ";
+    for (jsize i = 0; i < length; i++) {
+        arrayOut += fmt::format("{:02x} ", bytes[i]);
+    }
+    log_debug(arrayOut);
+
+    env->ReleaseByteArrayElements(result, bytes, JNI_ABORT);
+
+
     return result;
 }
 
