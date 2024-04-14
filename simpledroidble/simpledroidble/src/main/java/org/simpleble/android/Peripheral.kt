@@ -78,22 +78,23 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
     }
 
     val isConnected: Boolean get() {
-        return false
+        return nativePeripheralIsConnected(adapterId, instanceId)
     }
 
     val isConnectable: Boolean get() {
-        return false
+        return nativePeripheralIsConnectable(adapterId, instanceId)
     }
 
     val isPaired: Boolean get() {
-        return false
+        return nativePeripheralIsPaired(adapterId, instanceId)
     }
 
     fun unpair() {
+        nativePeripheralUnpair(adapterId, instanceId)
     }
 
     fun services(): List<Service> {
-        return emptyList()
+        return nativePeripheralServices(adapterId, instanceId)
     }
 
     fun manufacturer_data(): Map<Int, ByteArray> {
@@ -189,6 +190,17 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
     private external fun nativePeripheralConnect(adapterId: Long, instanceId: Long)
 
     private external fun nativePeripheralDisconnect(adapterId: Long, instanceId: Long)
+
+    private external fun nativePeripheralIsConnected(adapterId: Long, instanceId: Long): Boolean
+
+    private external fun nativePeripheralIsConnectable(adapterId: Long, instanceId: Long): Boolean
+
+    private external fun nativePeripheralIsPaired(adapterId: Long, instanceId: Long): Boolean
+
+    private external fun nativePeripheralUnpair(adapterId: Long, instanceId: Long)
+
+    private external fun nativePeripheralServices(adapterId: Long, instanceId: Long): List<Service>
+
 
     private external fun nativePeripheralNotify(
         adapterId: Long,

@@ -573,3 +573,87 @@ Java_org_simpleble_android_Peripheral_nativePeripheralUnsubscribe(JNIEnv *env, j
     env->DeleteGlobalRef(callbackRef);
     cached_peripheral_data_callbacks[adapter_id][peripheral_id].erase(service_characteristic_hash);
 }
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralIsConnected(JNIEnv *env, jobject thiz,
+                                                                  jlong adapter_id,
+                                                                  jlong instance_id) {
+    auto& peripheral = cached_peripherals[adapter_id].at(instance_id);
+    return peripheral.is_connected().value_or(false);
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralIsConnectable(JNIEnv *env, jobject thiz,
+                                                                    jlong adapter_id,
+                                                                    jlong instance_id) {
+    auto& peripheral = cached_peripherals[adapter_id].at(instance_id);
+    return peripheral.is_connectable().value_or(false);
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralIsPaired(JNIEnv *env, jobject thiz,
+                                                               jlong adapter_id,
+                                                               jlong instance_id) {
+    auto& peripheral = cached_peripherals[adapter_id].at(instance_id);
+    return peripheral.is_paired().value_or(false);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralUnpair(JNIEnv *env, jobject thiz,
+                                                             jlong adapter_id, jlong instance_id) {
+    auto& peripheral = cached_peripherals[adapter_id].at(instance_id);
+    peripheral.unpair();
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralServices(JNIEnv* env, jobject thiz,
+                                                               jlong adapter_id,
+                                                               jlong peripheral_id) {
+    auto& peripheral = cached_peripherals[adapter_id].at(peripheral_id);
+    auto services = peripheral.services().value_or(std::vector<SimpleBLE::Service>{});
+
+    jclass serviceClass = env->FindClass("org/simpleble/android/Service");
+    jclass characteristicClass = env->FindClass("org/simpleble/android/Characteristic");
+    jclass descriptorClass = env->FindClass("org/simpleble/android/Descriptor");
+
+    jmethodID serviceConstructor = env->GetMethodID(serviceClass, "<init>", "(Ljava/lang/String;Ljava/util/List;)V");
+    jmethodID characteristicConstructor = env->GetMethodID(characteristicClass, "<init>", "(Ljava/lang/String;Ljava/util/List;ZZZZZ)V");
+    jmethodID descriptorConstructor = env->GetMethodID(descriptorClass, "<init>", "(Ljava/lang/String;)V");
+
+    jobject serviceArray = jarraylist_new(env);
+
+    for (auto service : services) {
+        jstring serviceUUID = to_jstring(env, service.uuid());
+        jobject charList = jarraylist_new(env);
+
+        for (auto characteristic : service.characteristics()) {
+            jstring charUUID = to_jstring(env, characteristic.uuid());
+            jobject descList = jarraylist_new(env);
+
+            for (auto descriptor : characteristic.descriptors()) {
+                jstring descUUID = to_jstring(env, descriptor.uuid());
+                jobject jDescriptor = env->NewObject(descriptorClass, descriptorConstructor, descUUID);
+                jarraylist_add(env, descList, jDescriptor);
+            }
+
+            jobject jCharacteristic = env->NewObject(characteristicClass, characteristicConstructor,
+                                                     charUUID, descList,
+                                                     characteristic.can_read(),
+                                                     characteristic.can_write_request(),
+                                                     characteristic.can_write_command(),
+                                                     characteristic.can_notify(),
+                                                     characteristic.can_indicate());
+            jarraylist_add(env, charList, jCharacteristic);
+        }
+
+        jobject jService = env->NewObject(serviceClass, serviceConstructor, serviceUUID, charList);
+        jarraylist_add(env, serviceArray, jService);
+    }
+
+    return serviceArray;
+}

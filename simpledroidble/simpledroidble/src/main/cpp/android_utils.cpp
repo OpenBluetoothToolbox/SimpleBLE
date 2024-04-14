@@ -43,6 +43,19 @@ jbyteArray to_jbyteArray(JNIEnv* env, const std::string& data) {
     return result;
 }
 
+jobject jarraylist_new(JNIEnv* env) {
+    jclass arrayListClass = env->FindClass("java/util/ArrayList");
+    jmethodID arrayListConstructor = env->GetMethodID(arrayListClass, "<init>", "()V");
+    jobject arrayList = env->NewObject(arrayListClass, arrayListConstructor);
+    return arrayList;
+}
+
+void jarraylist_add(JNIEnv* env, jobject arrayList, jobject element) {
+    jclass arrayListClass = env->GetObjectClass(arrayList);
+    jmethodID arrayListAdd = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
+    env->CallBooleanMethod(arrayList, arrayListAdd, element);
+}
+
 void throw_exception(JNIEnv* env, const std::string& msg) {
     log_error(fmt::format("Throwing exception: {}", msg));
 

@@ -12,4 +12,7 @@ std::string from_jstring(JNIEnv* env, jstring str);
 
 jbyteArray to_jbyteArray(JNIEnv* env, const std::string& data);
 
+jobject jarraylist_new(JNIEnv* env);
+void jarraylist_add(JNIEnv* env, jobject arrayList, jobject element);
+
 void throw_exception(JNIEnv* env, const std::string& msg);
