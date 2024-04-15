@@ -12,6 +12,8 @@
 #include <memory>
 #include "ThreadRunner.h"
 
+// TODO: Switch to using regular SimpleBLE classes with try/catch blocks.
+
 static std::map<size_t, SimpleBLE::Safe::Adapter> cached_adapters;
 static std::map<size_t, std::vector<jweak>> cached_adapter_callbacks;
 
@@ -656,4 +658,117 @@ Java_org_simpleble_android_Peripheral_nativePeripheralServices(JNIEnv* env, jobj
     }
 
     return serviceArray;
+}
+
+// Utility function to create a new HashMap and return it
+jobject NewHashMap(JNIEnv* env) {
+    jclass hashMapClass = env->FindClass("java/util/HashMap");
+    if (hashMapClass == nullptr) {
+        return nullptr; // Class not found
+    }
+    jmethodID hashMapConstructor = env->GetMethodID(hashMapClass, "<init>", "()V");
+    if (hashMapConstructor == nullptr) {
+        return nullptr; // Constructor method not found
+    }
+    jobject hashMap = env->NewObject(hashMapClass, hashMapConstructor);
+    return hashMap;
+}
+
+// Utility function to add an entry to a HashMap
+void HashMapPut(JNIEnv* env, jobject hashMap, jobject key, jobject value) {
+    jclass hashMapClass = env->GetObjectClass(hashMap);
+    if (hashMapClass == nullptr) {
+        return; // Class not found
+    }
+    jmethodID hashMapPut = env->GetMethodID(hashMapClass, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+    if (hashMapPut == nullptr) {
+        return; // Method not found
+    }
+    env->CallObjectMethod(hashMap, hashMapPut, key, value);
+}
+
+
+// Convert a C++ int to a Java Integer
+jobject to_jInteger(JNIEnv* env, jint value) {
+    jclass integerClass = env->FindClass("java/lang/Integer");
+    if (!integerClass) return nullptr;  // Class not found
+
+    jmethodID integerConstructor = env->GetMethodID(integerClass, "<init>", "(I)V");
+    if (!integerConstructor) return nullptr;  // Constructor method not found
+
+    jobject integerObject = env->NewObject(integerClass, integerConstructor, value);
+    return integerObject;
+}
+
+// JNI function implementation
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralManufacturerData(JNIEnv* env, jobject thiz, jlong adapter_id, jlong instance_id) {
+    auto& peripheral = cached_peripherals[adapter_id].at(instance_id);
+    auto manufacturer_data = peripheral.manufacturer_data().value();
+
+    jobject hashMap = NewHashMap(env);
+    if (!hashMap) return nullptr;  // Error creating HashMap
+
+    for (const auto& data : manufacturer_data) {
+        jobject key = to_jInteger(env, static_cast<jint>(data.first));
+        jbyteArray value = to_jbyteArray(env, data.second);
+
+        HashMapPut(env, hashMap, key, value);
+
+        env->DeleteLocalRef(key);
+        env->DeleteLocalRef(value);
+    }
+
+    return hashMap;
+}
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralRead(JNIEnv *env, jobject thiz,
+                                                           jlong adapter_id, jlong instance_id,
+                                                           jstring service,
+                                                           jstring characteristic) {
+    // TODO: implement nativePeripheralRead()
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralWriteRequest(JNIEnv *env, jobject thiz,
+                                                                   jlong adapter_id,
+                                                                   jlong instance_id,
+                                                                   jstring service,
+                                                                   jstring characteristic,
+                                                                   jbyteArray data) {
+    // TODO: implement nativePeripheralWriteRequest()
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralWriteCommand(JNIEnv *env, jobject thiz,
+                                                                   jlong adapter_id,
+                                                                   jlong instance_id,
+                                                                   jstring service,
+                                                                   jstring characteristic,
+                                                                   jbyteArray data) {
+    // TODO: implement nativePeripheralWriteCommand()
+}
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralDescriptorRead(JNIEnv *env, jobject thiz,
+                                                                     jlong adapter_id,
+                                                                     jlong instance_id,
+                                                                     jstring service,
+                                                                     jstring characteristic,
+                                                                     jstring descriptor) {
+    // TODO: implement nativePeripheralDescriptorRead()
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_simpleble_android_Peripheral_nativePeripheralDescriptorWrite(JNIEnv *env, jobject thiz,
+                                                                      jlong adapter_id,
+                                                                      jlong instance_id,
+                                                                      jstring service,
+                                                                      jstring characteristic,
+                                                                      jstring descriptor,
+                                                                      jbyteArray data) {
+    // TODO: implement nativePeripheralDescriptorWrite()
 }

@@ -97,18 +97,18 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
         return nativePeripheralServices(adapterId, instanceId)
     }
 
-    fun manufacturer_data(): Map<Int, ByteArray> {
-        return emptyMap()
+    fun manufacturerData(): Map<Int, ByteArray> {
+        return nativePeripheralManufacturerData(adapterId, instanceId)
     }
 
     fun read(service: BluetoothUUID, characteristic: BluetoothUUID): ByteArray {
         return ByteArray(0)
     }
 
-    fun write_request(service: BluetoothUUID, characteristic: BluetoothUUID, data: ByteArray) {
+    fun writeRequest(service: BluetoothUUID, characteristic: BluetoothUUID, data: ByteArray) {
     }
 
-    fun write_command(service: BluetoothUUID, characteristic: BluetoothUUID, data: ByteArray) {
+    fun writeCommand(service: BluetoothUUID, characteristic: BluetoothUUID, data: ByteArray) {
     }
 
     fun notify(
@@ -201,6 +201,30 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
 
     private external fun nativePeripheralServices(adapterId: Long, instanceId: Long): List<Service>
 
+    private external fun nativePeripheralManufacturerData(adapterId: Long, instanceId: Long): Map<Int, ByteArray>
+
+    private external fun nativePeripheralRead(
+        adapterId: Long,
+        instanceId: Long,
+        service: String,
+        characteristic: String
+    ): ByteArray
+
+    private external fun nativePeripheralWriteRequest(
+        adapterId: Long,
+        instanceId: Long,
+        service: String,
+        characteristic: String,
+        data: ByteArray
+    )
+
+    private external fun nativePeripheralWriteCommand(
+        adapterId: Long,
+        instanceId: Long,
+        service: String,
+        characteristic: String,
+        data: ByteArray
+    )
 
     private external fun nativePeripheralNotify(
         adapterId: Long,
@@ -223,6 +247,23 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
         instanceId: Long,
         service: String,
         characteristic: String)
+
+    private external fun nativePeripheralDescriptorRead(
+        adapterId: Long,
+        instanceId: Long,
+        service: String,
+        characteristic: String,
+        descriptor: String
+    ): ByteArray
+
+    private external fun nativePeripheralDescriptorWrite(
+        adapterId: Long,
+        instanceId: Long,
+        service: String,
+        characteristic: String,
+        descriptor: String,
+        data: ByteArray
+    )
 
     // ----------------------------------------------------------------------------
 

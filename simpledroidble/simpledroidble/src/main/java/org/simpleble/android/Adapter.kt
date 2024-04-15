@@ -139,6 +139,8 @@ class Adapter private constructor(newInstanceId: Long) {
 
     private external fun nativeAdapterScanGetResults(adapterId: Long) : LongArray
 
+    private external fun nativeAdapterGetPairedPeripherals(adapterId: Long): LongArray
+
     // ----------------------------------------------------------------------------
 
     private interface Callback {
