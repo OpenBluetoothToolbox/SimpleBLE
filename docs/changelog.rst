@@ -5,21 +5,51 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog`_, and this project adheres to `Semantic Versioning`_.
 
-[0.6.2] - XXXX-XX-XX
+[0.8.0] - XXXX-XX-XX
+--------------------
+
+**Added**
+
+-
+
+**Changed**
+
+-
+
+**Fixed**
+
+-
+
+
+[0.7.X]
+--------------------
+
+This entire series is dedicated to reviewing and updating the license terms of the project.
+
+
+[0.7.0] - 2024-02-15
 --------------------
 
 **Added**
 
 - Function to query the version of SimpleBLE at runtime.
+- (Python) Missing API from SimpleBLE::Characteristic.
 
 **Changed**
 
 - (MacOS) Main adapter address is now hardcoded to allow caching based on adapter address. *(Thanks BlissChapman!)*
+- (Python) Release GIL when calling ``Peripheral.write_request`` and ``Peripheral.write_command``.
+- (MacOS) Rewrote the entire backend.
+- (MacOS) OperationFailed exception now contains the error message provided by the OS.
 
 **Fixed**
 
 - (MacOS) Remove unnecessary timeout during service discovery. *(Thanks BlissChapman!)*
+- (MacOS) Return correct list of devices when scanning. *(Thanks roozmahdavian!)*
+- (MacOS) Remove unnecessary timeout during characteristic notification. *(Thanks BlissChapman!)*
+- (MacOS) Remove unnecessary timeout during operations on characteristics.
 - (Windows) Failed connection attempt would not trigger an exception. *(Thanks eriklins!)*
+- (Linux) Use correct UUIDs for advertized services. *(Thanks Symbitic!)*
 
 
 [0.6.1] - 2023-03-14

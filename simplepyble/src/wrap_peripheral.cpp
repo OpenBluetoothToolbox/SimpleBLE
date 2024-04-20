@@ -149,12 +149,14 @@ void wrap_peripheral(py::module& m) {
             [](SimpleBLE::Peripheral& p, std::string service, std::string characteristic, py::bytes payload) {
                 p.write_request(service, characteristic, payload);
             },
+            py::call_guard<py::gil_scoped_release>(),
             kDocsPeripheralWriteRequest)
         .def(
             "write_command",
             [](SimpleBLE::Peripheral& p, std::string service, std::string characteristic, py::bytes payload) {
                 p.write_command(service, characteristic, payload);
             },
+            py::call_guard<py::gil_scoped_release>(),
             kDocsPeripheralWriteCommand)
         .def(
             "notify",

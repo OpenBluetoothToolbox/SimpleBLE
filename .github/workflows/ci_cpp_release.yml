@@ -37,12 +37,24 @@ jobs:
         with:
           ref: ${{ env.TAG }}
 
-      - name: Install dependencies
+      - name: Build Expat
         run: |
-          sudo -H apt-get update -y
-          sudo -H apt-get install -y libdbus-1-dev
-        env:
-          DEBIAN_FRONTEND: noninteractive
+          git clone https://github.com/libexpat/libexpat.git /tmp/libexpat
+          cd /tmp/libexpat/expat
+
+          cmake -B /tmb/expat/build -S /tmp/libexpat/expat -DEXPAT_BUILD_DOCS=OFF -DEXPAT_BUILD_EXAMPLES=OFF -DEXPAT_BUILD_TESTS=OFF
+          cmake --build /tmb/expat/build --config Release --parallel 4
+          cmake --install /tmb/expat/build --prefix /tmp/expat/install
+
+      - name: Build DBus
+        run: |
+          git clone https://gitlab.freedesktop.org/dbus/dbus.git /tmp/dbus
+
+          export CMAKE_PREFIX_PATH=/tmp/expat/install:$CMAKE_PREFIX_PATH
+
+          cmake -B /tmb/dbus/build -S /tmp/dbus -DDBUS_SESSION_SOCKET_DIR=/usr/local/var/run/dbus/system_bus_socket -DDBUS_BUILD_TESTS=OFF
+          cmake --build /tmb/dbus/build --config Release --parallel 4
+          cmake --install /tmb/dbus/build --prefix /tmp/dbus/install
 
       - name: Build SimpleBLE
         run: |
@@ -53,6 +65,8 @@ jobs:
           else
             BUILD_SHARED_LIBS=OFF
           fi
+
+          export CMAKE_PREFIX_PATH=/tmp/dbus/install:$CMAKE_PREFIX_PATH
 
           cmake -B $GITHUB_WORKSPACE/build_simpleble -DCMAKE_BUILD_TYPE=Release -S $GITHUB_WORKSPACE/simpleble -DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS
           cmake --build $GITHUB_WORKSPACE/build_simpleble --config Release --parallel 4
