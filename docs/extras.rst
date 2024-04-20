@@ -21,12 +21,19 @@ Release checklist
 Before releasing a new version of the project, the following steps should be
 performed:
 
+#. Ensure content parity between all readmes and the documentation.
+
+   - ``README.rst``
+   - ``LICENSE.md``
+   - ``simplepyble/README.rst``
+   - ``simplersble/README.md``
+
 #. Review/update the version number in the following files:
 
    - ``VERSION``
    - ``Cargo.toml``
    - ``docs/changelog.rst``
-   - ``simplepyble/setup.py``
+   - ``setup.py`` (Add or remove the ``.devX`` suffix as needed.)
 
 #. Commit the changes to the repository.
 
@@ -41,10 +48,11 @@ performed:
 #. Run the CI job to build and upload the artifacts to GitHub.
 
 #. Perform a manual release of the Rust crate to crates.io.
+   - ``cargo publish`` (Ensure that the version number in ``Cargo.toml`` is correct.)
 
 #. Advance the version number in the following files:
 
    - ``VERSION``
    - ``Cargo.toml``
    - ``docs/changelog.rst``
-   - ``simplepyble/setup.py``
+   - ``setup.py`` (Add or remove the ``.devX`` suffix as needed.)
