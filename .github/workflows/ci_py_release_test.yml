@@ -1,6 +1,9 @@
 name: PyPI Test Release
 
-on: [push, pull_request]
+on:
+  # push:
+  # pull_request:
+  workflow_dispatch:
 
 jobs:
   build_sdist:
@@ -66,7 +69,7 @@ jobs:
         run: pip install -r simplepyble/requirements.txt
 
       - name: Build wheel
-        uses: pypa/cibuildwheel@v2.11.3
+        uses: pypa/cibuildwheel@v2.16.5
         env:
           CIBW_BUILD: cp39-* # Only build for Python 3.9
           CIBW_BUILD_VERBOSITY: 3

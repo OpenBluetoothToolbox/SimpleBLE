@@ -40,7 +40,14 @@ on GitHub for more information on how to use SimpleRsBLE.
 Pull requests are welcome. For major changes, please open an issue first to discuss
 what you would like to change.
 
-## License
+# License
 
-All components within this project that have not been bundled from
-external creators, are licensed under the terms of the [MIT Licence](https://github.com/OpenBluetoothToolbox/SimpleBLE/blob/main/LICENCE.md).
+Since February 15th 2024, SimpleBLE is now available under the GNU General Public License
+version 3 (GPLv3), with the option for a commercial license without the GPLv3 restrictions
+available for a fee. (More information on pricing and commercial terms of service will be
+available soon.)
+
+To enquire about a commercial license, please contact us at `contact at simpleble dot org`.
+
+Likewise, if you are using SimpleBLE in an open-source project and would like to request
+a free commercial license or if you have any other questions, please reach out at `contact at simpleble dot org`.

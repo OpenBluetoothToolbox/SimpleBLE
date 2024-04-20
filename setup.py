@@ -33,7 +33,7 @@ root = pathlib.Path(__file__).parent.resolve()
 # Generate the version string
 # TODO: Make the dev portion smarter by looking at tags.
 version_str = (root / "VERSION").read_text(encoding="utf-8").strip()
-version_str += ".dev1"  # ! Ensure it matches the intended release version!
+version_str += ".dev0"  # ! Ensure it matches the intended release version!
 
 # Get the long description from the README file
 long_description = (root / "simplepyble" / "README.rst").read_text(encoding="utf-8")
@@ -82,7 +82,8 @@ skbuild.setup(
     platforms="Windows, macOS, Linux",
     python_requires=">=3.7",
     classifiers=[
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "License :: Other/Proprietary License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
