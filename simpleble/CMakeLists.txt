@@ -291,21 +291,23 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
 
     # Specify the source files for the Android backend
     # NOTE: These files have been commented out and replaced by the PLAIN version in order to develop the Android wrapper code.
-    # target_include_directories(simpleble PRIVATE
-    #     ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android)
-    # target_sources(simpleble PRIVATE
-    #     ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android/AdapterBase.cpp
-    #     ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android/PeripheralBase.cpp)
-
+    target_include_directories(simpleble PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android)
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/AdapterBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/PeripheralBase.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android/JniHelper.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android/AdapterBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android/PeripheralBase.cpp)
+
+    # target_sources(simpleble PRIVATE
+    #     ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/AdapterBase.cpp
+    #     ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/PeripheralBase.cpp)
 
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain)
 
     target_link_libraries(simpleble PUBLIC
         android
+        nativehelper
         log)
 endif()
 

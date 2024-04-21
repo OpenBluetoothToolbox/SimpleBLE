@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "org.simpleble.examples.android"
-        minSdk = 29
+        minSdk = 31
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"

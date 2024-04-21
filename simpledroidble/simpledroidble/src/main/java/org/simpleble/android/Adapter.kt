@@ -95,6 +95,7 @@ class Adapter private constructor(newInstanceId: Long) {
     val onScanFound get() = _onScanFound
 
     fun getPairedPeripherals(): List<Peripheral> {
+        // TODO: Implement
         return emptyList()
     }
 
@@ -107,6 +108,10 @@ class Adapter private constructor(newInstanceId: Long) {
 
         @JvmStatic
         fun getAdapters(): List<Adapter> {
+//            if (SimpleDroidBle.permissionsGranted.not()) {
+//                return emptyList()
+//            }
+
             val nativeAdapterIds = nativeGetAdapters()
             val adapters = ArrayList<Adapter>()
 
@@ -139,6 +144,7 @@ class Adapter private constructor(newInstanceId: Long) {
 
     private external fun nativeAdapterScanGetResults(adapterId: Long) : LongArray
 
+    // TODO: Implement
     private external fun nativeAdapterGetPairedPeripherals(adapterId: Long): LongArray
 
     // ----------------------------------------------------------------------------

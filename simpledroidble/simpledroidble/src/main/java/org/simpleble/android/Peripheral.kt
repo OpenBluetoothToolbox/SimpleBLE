@@ -102,13 +102,16 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
     }
 
     fun read(service: BluetoothUUID, characteristic: BluetoothUUID): ByteArray {
+        // TODO: Implement
         return ByteArray(0)
     }
 
     fun writeRequest(service: BluetoothUUID, characteristic: BluetoothUUID, data: ByteArray) {
+        // TODO: Implement
     }
 
     fun writeCommand(service: BluetoothUUID, characteristic: BluetoothUUID, data: ByteArray) {
+        // TODO: Implement
     }
 
     fun notify(
@@ -154,6 +157,7 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
         characteristic: BluetoothUUID,
         descriptor: BluetoothUUID
     ): ByteArray {
+        // TODO: Implement
         return ByteArray(0)
     }
 
@@ -163,6 +167,7 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
         descriptor: BluetoothUUID,
         data: ByteArray
     ) {
+        // TODO: Implement
     }
 
     val onConnected get() = _onConnected

@@ -13,4 +13,3 @@ material = { group = "com.google.android.material", name = "material", version.r
 [plugins]
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
-
