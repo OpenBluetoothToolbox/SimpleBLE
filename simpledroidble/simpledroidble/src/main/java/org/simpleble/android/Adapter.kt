@@ -103,7 +103,7 @@ class Adapter private constructor(newInstanceId: Long) {
 
         @JvmStatic
         fun isBluetoothEnabled(): Boolean {
-            return false
+            return nativeIsBluetoothEnabled()
         }
 
         @JvmStatic
@@ -124,6 +124,8 @@ class Adapter private constructor(newInstanceId: Long) {
 
         @JvmStatic
         private external fun nativeGetAdapters(): LongArray
+
+        private external fun nativeIsBluetoothEnabled(): Boolean
     }
 
     // ----------------------------------------------------------------------------

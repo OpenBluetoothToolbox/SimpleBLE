@@ -202,6 +202,12 @@ Java_org_simpleble_android_Adapter_nativeAdapterRegister(JNIEnv *env, jobject th
     });
 }
 
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_org_simpleble_android_Adapter_00024Companion_nativeIsBluetoothEnabled(JNIEnv *env, jobject thiz) {
+    return SimpleBLE::Safe::Adapter::bluetooth_enabled().value_or(false);
+}
+
 extern "C" JNIEXPORT jlongArray JNICALL Java_org_simpleble_android_Adapter_nativeGetAdapters(JNIEnv *env, jclass clazz) {
     auto adapters = SimpleBLE::Safe::Adapter::get_adapters();
 

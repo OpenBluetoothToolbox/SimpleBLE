@@ -294,7 +294,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android)
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android/JniHelper.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android/AdapterBase.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android/PeripheralBase.cpp)
 

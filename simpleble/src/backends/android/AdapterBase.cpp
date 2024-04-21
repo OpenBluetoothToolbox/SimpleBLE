@@ -2,38 +2,32 @@
 #include "CommonUtils.h"
 #include "PeripheralBase.h"
 #include "PeripheralBuilder.h"
-#include "JniHelper.h"
 
 #include <jni.h>
 #include <android/log.h>
-// Plenty of useful material here: https://android.googlesource.com/platform/libnativehelper/
 
 using namespace SimpleBLE;
 
-// GlobalRef g_bluetoothManagerClass;
-// GlobalRef g_bluetoothAdapterClass;
-// GlobalRef g_bluetoothAdapterObject;
+JNI::Class AdapterBase::_btAdapterCls;
+JNI::Object AdapterBase::_btAdapter;
 
-JNI::Class bluetoothManagerClass;
-JNI::Class bluetoothAdapterClass;
-JNI::Object bluetoothAdapterObject;
-
-
-std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
+void AdapterBase::initialize() {
     JNI::Env env;
 
-    if (bluetoothAdapterClass.get() == nullptr) {
-        bluetoothAdapterClass = env.find_class("android/bluetooth/BluetoothAdapter");
+    // Check if the BluetoothAdapter class has been loaded
+    if (_btAdapterCls.get() == nullptr) {
+        _btAdapterCls = env.find_class("android/bluetooth/BluetoothAdapter");
     }
 
-    if (bluetoothAdapterObject.get() == nullptr) {
-        bluetoothAdapterObject = bluetoothAdapterClass.call_static_method( "getDefaultAdapter", "()Landroid/bluetooth/BluetoothAdapter;");
+    if (_btAdapter.get() == nullptr) {
+        _btAdapter = _btAdapterCls.call_static_method( "getDefaultAdapter", "()Landroid/bluetooth/BluetoothAdapter;");
     }
+}
 
-
+std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
+    initialize();
 
     // Create an instance of AdapterBase and add it to the vector
-    // TODO: bluetoothAdapterObject must be passed to the constructor of the AdapterBase class
     std::shared_ptr<AdapterBase> adapter = std::make_shared<AdapterBase>();
     std::vector<std::shared_ptr<AdapterBase>> adapters;
     adapters.push_back(adapter);
@@ -42,10 +36,13 @@ std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
 }
 
 bool AdapterBase::bluetooth_enabled() {
-    int bluetoothState = bluetoothAdapterObject.call_int_method("getState", "()I");
+    initialize();
+
+    bool isEnabled = _btAdapter.call_boolean_method("isEnabled", "()Z");
+    int bluetoothState = _btAdapter.call_int_method("getState", "()I");
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", fmt::format("Bluetooth state: {}", bluetoothState).c_str());
 
-    return bluetoothAdapterObject.call_boolean_method("isEnabled", "()Z");
+    return isEnabled; //bluetoothState == 12;
 }
 
 AdapterBase::AdapterBase() {}
@@ -55,15 +52,11 @@ AdapterBase::~AdapterBase() {}
 void* AdapterBase::underlying() const { return nullptr; }
 
 std::string AdapterBase::identifier() {
-    return bluetoothAdapterObject.call_string_method("getName", "()Ljava/lang/String;");
+    return _btAdapter.call_string_method("getName", "()Ljava/lang/String;");
 }
 
 BluetoothAddress AdapterBase::address() {
-//    int bluetoothState = bluetoothAdapterObject.call_int_method("getState", "()I");
-//    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", fmt::format("Bluetooth state: {}", bluetoothState).c_str());
-
-    std::string address = bluetoothAdapterObject.call_string_method("getAddress", "()Ljava/lang/String;");
-    return BluetoothAddress(address);
+    return BluetoothAddress(_btAdapter.call_string_method("getAddress", "()Ljava/lang/String;"));
 
 }
 
