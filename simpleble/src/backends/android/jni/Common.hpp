@@ -19,13 +19,23 @@ class Object : public GlobalRef<jobject> {
     Object(jobject obj, jclass cls) : _obj(obj), _cls(cls) {}
 
     template <typename... Args>
-    GlobalRef<jobject> call_object_method(const char* name, const char* signature, Args&&... args) {
+    Object call_object_method(const char* name, const char* signature, Args&&... args) {
         JNIEnv* env = VM::env();
 
         jmethodID method = env->GetMethodID(_cls.get(), name, signature);
         jobject result = env->CallObjectMethod(_obj.get(), method, std::forward<Args>(args)...);
 
-        return GlobalRef<jobject>(result);
+        jclass resultClass = env->GetObjectClass(result);
+
+        return Object(result, resultClass);
+    }
+
+    template <typename... Args>
+    void call_void_method(const char* name, const char* signature, Args&&... args) {
+        JNIEnv* env = VM::env();
+
+        jmethodID method = env->GetMethodID(_cls.get(), name, signature);
+        env->CallVoidMethod(_obj.get(), method, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
@@ -81,6 +91,21 @@ class Class : public GlobalRef<jclass> {
         return Object(obj, _cls.get());
     }
 
+    template <typename... Args>
+    Object call_constructor(const char* signature, Args&&... args) {
+        JNIEnv* env = VM::env();
+
+        jmethodID method = env->GetMethodID(_cls.get(), "<init>", signature);
+        jobject obj = env->NewObject(_cls.get(), method, std::forward<Args>(args)...);
+
+        return Object(obj, _cls.get());
+    }
+
+    void register_natives(const JNINativeMethod* methods, int nMethods) {
+        JNIEnv* env = VM::env();
+        env->RegisterNatives(_cls.get(), methods, nMethods);
+    }
+
   private:
     GlobalRef<jclass> _cls;
 };
@@ -91,6 +116,8 @@ class Class : public GlobalRef<jclass> {
         virtual ~Env() = default;
         Env(Env& other) = delete;             // Remove the copy constructor
         void operator=(const Env&) = delete;  // Remove the copy assignment
+
+        JNIEnv* operator->() { return _env; }
 
         Class find_class(const std::string& name) {
             jclass jcls = _env->FindClass(name.c_str());

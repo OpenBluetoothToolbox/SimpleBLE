@@ -46,4 +46,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+
+    //noinspection UseTomlInstead
+    implementation("org.simpleble.android.bridge:simpleble-bridge")
 }

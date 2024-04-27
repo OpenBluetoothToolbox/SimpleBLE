@@ -54,7 +54,11 @@ class AdapterBase {
 
     // NOTE: Android BluetoothAdapter class is a singleton, so we can use a static instance.
     static JNI::Class _btAdapterCls;
+    static JNI::Class _btScanCallbackCls;
     static JNI::Object _btAdapter;
+    static JNI::Object _btScanner;
+    static JNI::Object _scan_callback;
+
 
 };
 

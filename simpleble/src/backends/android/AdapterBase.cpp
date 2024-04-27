@@ -9,7 +9,11 @@
 using namespace SimpleBLE;
 
 JNI::Class AdapterBase::_btAdapterCls;
+JNI::Class AdapterBase::_btScanCallbackCls;
 JNI::Object AdapterBase::_btAdapter;
+JNI::Object AdapterBase::_btScanner;
+JNI::Object AdapterBase::_scan_callback;
+
 
 void AdapterBase::initialize() {
     JNI::Env env;
@@ -19,9 +23,22 @@ void AdapterBase::initialize() {
         _btAdapterCls = env.find_class("android/bluetooth/BluetoothAdapter");
     }
 
+    if (_btScanCallbackCls.get() == nullptr) {
+        _btScanCallbackCls = env.find_class("org/simpleble/android/bridge/ScanCallback");
+        _scan_callback = _btScanCallbackCls.call_constructor("()V");
+    }
+
+    //
+
     if (_btAdapter.get() == nullptr) {
         _btAdapter = _btAdapterCls.call_static_method( "getDefaultAdapter", "()Landroid/bluetooth/BluetoothAdapter;");
     }
+
+    if (_btScanner.get() == nullptr) {
+        _btScanner = _btAdapter.call_object_method("getBluetoothLeScanner", "()Landroid/bluetooth/le/BluetoothLeScanner;");
+    }
+
+
 }
 
 std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
@@ -60,7 +77,12 @@ BluetoothAddress AdapterBase::address() {
 
 }
 
-void AdapterBase::scan_start() {}
+void AdapterBase::scan_start() {
+    JNI::Env env;
+
+    _btScanner.call_void_method("startScan", "(Landroid/bluetooth/le/ScanCallback;)V", _scan_callback.get());
+
+}
 
 void AdapterBase::scan_stop() {}
 
@@ -85,3 +107,23 @@ void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> o
 void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {}
 
 
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_simpleble_android_internal_ScanCallback_onScanResultCallback(JNIEnv *env, jobject thiz,
+                                                                      jint callback_type,
+                                                                      jobject result) {
+    // TODO: implement onScanResultCallback()
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_simpleble_android_internal_ScanCallback_onScanFailedCallback(JNIEnv *env, jobject thiz,
+                                                                      jint error_code) {
+    // TODO: implement onScanFailedCallback()
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_simpleble_android_internal_ScanCallback_onBatchScanResultsCallback(JNIEnv *env,
+                                                                            jobject thiz,
+                                                                            jobject results) {
+    // TODO: implement onBatchScanResultsCallback()
+}
