@@ -43,6 +43,15 @@ class AdapterBase {
     static bool bluetooth_enabled();
     static std::vector<std::shared_ptr<AdapterBase>> get_adapters();
 
+    // NOTE: The following methods have been made public to allow the JNI layer to call them, but
+    // should not be called directly by the user.
+
+    void onScanResultCallback(JNIEnv *env, jobject thiz, jint callback_type, jobject result);
+    void onBatchScanResultsCallback(JNIEnv *env, jobject thiz, jobject results);
+    void onScanFailedCallback(JNIEnv *env, jobject thiz, jint error_code);
+
+    static std::map<jobject, AdapterBase*, JNI::JObjectComparator> _scanCallbackMap;
+
   private:
     // NOTE: The correct way to request a BluetoothAdapter is to go though the BluetoothManager,
     // as described in https://developer.android.com/reference/android/bluetooth/BluetoothManager#getAdapter()
@@ -51,13 +60,14 @@ class AdapterBase {
     // object and call getSystemService(Context.BLUETOOTH_SERVICE) to get the BluetoothManager.
 
     void static initialize();
-
-    // NOTE: Android BluetoothAdapter class is a singleton, so we can use a static instance.
+    // NOTE: Android BluetoothAdapter and BluetoothScanner classes are singletons, so we can use a static instance.
     static JNI::Class _btAdapterCls;
     static JNI::Class _btScanCallbackCls;
+    static JNI::Class _btScanResultCls;
     static JNI::Object _btAdapter;
     static JNI::Object _btScanner;
-    static JNI::Object _scan_callback;
+
+    JNI::Object _btScanCallback;
 
 
 };

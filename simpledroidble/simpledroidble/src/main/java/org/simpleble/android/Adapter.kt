@@ -1,5 +1,6 @@
 package org.simpleble.android
 
+import android.annotation.SuppressLint
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

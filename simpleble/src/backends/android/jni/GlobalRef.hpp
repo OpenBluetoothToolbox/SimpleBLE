@@ -12,7 +12,7 @@ class GlobalRef {
   public:
     GlobalRef() = default;
 
-    GlobalRef(T obj) { _obj = (T) VM::env()->NewGlobalRef(obj); }
+    GlobalRef(T obj) {_obj = (T) VM::env()->NewGlobalRef(obj);}
 
     GlobalRef(const GlobalRef& other) {
         // Custom copy constructor
@@ -33,6 +33,7 @@ class GlobalRef {
     ~GlobalRef() {
         if (_obj != nullptr) {
             VM::env()->DeleteGlobalRef(_obj);
+            _obj = nullptr;
         }
     }
 
@@ -40,7 +41,7 @@ class GlobalRef {
 
     T get() { return _obj; }
 
-  private:
+  protected:
     T _obj = nullptr;
 };
 

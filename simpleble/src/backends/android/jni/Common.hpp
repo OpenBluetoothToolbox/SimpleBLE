@@ -9,14 +9,33 @@
 namespace SimpleBLE {
 namespace JNI {
 
+struct JObjectComparator {
+    bool operator() (const jobject& lhs, const jobject& rhs) const {
+        // Use JNI's IsSameObject to compare objects, considering NULL cases
+        if (lhs == nullptr || rhs == nullptr) {
+            return lhs < rhs;  // Handle nulls consistently by pointer comparison
+        }
+
+        JNIEnv* env = VM::env();
+        return !env->IsSameObject(lhs, rhs) && lhs < rhs;
+    }
+};
+
 // Forward declarations
 class Class;
 
-class Object : public GlobalRef<jobject> {
+class Object {
   public:
     Object() = default;
 
+    Object(jobject obj) : _obj(obj) {
+        JNIEnv* env = VM::env();
+        _cls = env->GetObjectClass(obj);
+    }
+    
     Object(jobject obj, jclass cls) : _obj(obj), _cls(cls) {}
+
+    jobject get() { return _obj.get(); }
 
     template <typename... Args>
     Object call_object_method(const char* name, const char* signature, Args&&... args) {
@@ -72,14 +91,16 @@ class Object : public GlobalRef<jobject> {
     }
 
   private:
-    GlobalRef<jclass> _cls;
     GlobalRef<jobject> _obj;
+    GlobalRef<jclass> _cls;
 };
 
-class Class : public GlobalRef<jclass> {
+class Class {
   public:
     Class() = default;
     Class(jclass cls) : _cls(cls) {}
+
+    jclass get() { return _cls.get(); }
 
     template <typename... Args>
     Object call_static_method(const char* name, const char* signature, Args&&... args) {
