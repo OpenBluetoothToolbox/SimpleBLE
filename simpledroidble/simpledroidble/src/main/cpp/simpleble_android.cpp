@@ -124,7 +124,7 @@ Java_org_simpleble_android_Adapter_nativeAdapterRegister(JNIEnv *env, jobject th
     });
 
     adapter.set_callback_on_scan_found([adapter_id](SimpleBLE::Safe::Peripheral peripheral){
-        size_t peripheral_hash = std::hash<std::string>{}(peripheral.identifier().value_or("UNKNOWN"));
+        size_t peripheral_hash = std::hash<std::string>{}(peripheral.address().value_or("UNKNOWN"));
 
         // Add to the cache if it doesn't exist
         if (cached_peripherals[adapter_id].count(peripheral_hash) == 0) {
@@ -148,8 +148,7 @@ Java_org_simpleble_android_Adapter_nativeAdapterRegister(JNIEnv *env, jobject th
                     // Find the Java class and method to invoke
                     // TODO: We should cache the class and method IDs
                     jclass callbackClass = env->GetObjectClass(callbackRef);
-                    jmethodID onScanFoundMethod = env->GetMethodID(callbackClass, "onScanFound",
-                                                                   "(J)V");
+                    jmethodID onScanFoundMethod = env->GetMethodID(callbackClass, "onScanFound","(J)V");
 
                     // Invoke the Java callback method
                     env->CallVoidMethod(callbackRef, onScanFoundMethod, peripheral_hash);
@@ -163,7 +162,7 @@ Java_org_simpleble_android_Adapter_nativeAdapterRegister(JNIEnv *env, jobject th
     });
 
     adapter.set_callback_on_scan_updated([adapter_id](SimpleBLE::Safe::Peripheral peripheral){
-        size_t peripheral_hash = std::hash<std::string>{}(peripheral.identifier().value_or("UNKNOWN"));
+        size_t peripheral_hash = std::hash<std::string>{}(peripheral.address().value_or("UNKNOWN"));
 
         // Add to the cache if it doesn't exist
         if (cached_peripherals[adapter_id].count(peripheral_hash) == 0) {
@@ -187,8 +186,7 @@ Java_org_simpleble_android_Adapter_nativeAdapterRegister(JNIEnv *env, jobject th
                     // Find the Java class and method to invoke
                     // TODO: We should cache the class and method IDs
                     jclass callbackClass = env->GetObjectClass(callbackRef);
-                    jmethodID onScanFoundMethod = env->GetMethodID(callbackClass, "onScanUpdated",
-                                                                   "(J)V");
+                    jmethodID onScanFoundMethod = env->GetMethodID(callbackClass, "onScanUpdated", "(J)V");
 
                     // Invoke the Java callback method
                     env->CallVoidMethod(callbackRef, onScanFoundMethod, peripheral_hash);
@@ -291,7 +289,7 @@ extern "C" JNIEXPORT jlongArray JNICALL Java_org_simpleble_android_Adapter_nativ
     jsize j_peripheral_index = 0;
     jlongArray j_peripheral_result = env->NewLongArray(static_cast<int>(peripherals.value().size()));
     for (auto &peripheral: peripherals.value()) {
-        size_t peripheral_hash = std::hash<std::string>{}(peripheral.identifier().value_or("UNKNOWN"));
+        size_t peripheral_hash = std::hash<std::string>{}(peripheral.address().value_or("UNKNOWN"));
 
         // Add to the cache if it doesn't exist
         if (cached_peripherals[adapter_id].count(peripheral_hash) == 0) {

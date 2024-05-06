@@ -7,6 +7,8 @@
 #include <android/log.h>
 #include <thread>
 #include <fmt/core.h>
+#include <android/BluetoothDevice.h>
+#include <android/ScanResult.h>
 
 using namespace SimpleBLE;
 
@@ -85,23 +87,14 @@ std::string AdapterBase::identifier() {
 
 BluetoothAddress AdapterBase::address() {
     return BluetoothAddress(_btAdapter.call_string_method("getAddress", "()Ljava/lang/String;"));
-
 }
 
 void AdapterBase::scan_start() {
-    JNI::Env env;
     _btScanner.call_void_method("startScan", "(Landroid/bluetooth/le/ScanCallback;)V", _btScanCallback.get());
-
-    auto msg = fmt::format("Scanning started with callback: {}", (void*) _btScanCallback.get());
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
 }
 
 void AdapterBase::scan_stop() {
-    JNI::Env env;
     _btScanner.call_void_method("stopScan", "(Landroid/bluetooth/le/ScanCallback;)V", _btScanCallback.get());
-
-    auto msg = fmt::format("Scanning stopped with callback: {}", (void*) _btScanCallback.get());
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
 }
 
 void AdapterBase::scan_for(int timeout_ms) {
@@ -120,20 +113,67 @@ std::vector<Peripheral> AdapterBase::get_paired_peripherals() {
     return std::vector<Peripheral>();
 }
 
-void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start) {}
+void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start) {
+    if (on_scan_start) {
+        callback_on_scan_start_.load(on_scan_start);
+    } else {
+        callback_on_scan_start_.unload();
+    }
+}
 
-void AdapterBase::set_callback_on_scan_stop(std::function<void()> on_scan_stop) {}
+void AdapterBase::set_callback_on_scan_stop(std::function<void()> on_scan_stop) {
+    if (on_scan_stop) {
+        callback_on_scan_stop_.load(on_scan_stop);
+    } else {
+        callback_on_scan_stop_.unload();
+    }
+}
 
-void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) {}
+void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) {
+    if (on_scan_updated) {
+        callback_on_scan_updated_.load(on_scan_updated);
+    } else {
+        callback_on_scan_updated_.unload();
+    }
+}
 
-void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {}
+void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {
+    if (on_scan_found) {
+        callback_on_scan_found_.load(on_scan_found);
+    } else {
+        callback_on_scan_found_.unload();
+    }
+}
 
 void AdapterBase::onScanResultCallback(JNIEnv *env, jobject thiz, jint callback_type, jobject j_scan_result) {
-    JNI::Object scanResult(j_scan_result, _btScanResultCls.get());
-    std::string str = scanResult.call_string_method("toString", "()Ljava/lang/String;");
+    Android::ScanResult scan_result(JNI::Object(j_scan_result, _btScanResultCls.get()));
+    std::string address = scan_result.getDevice().getAddress();
 
-    auto msg = fmt::format("onScanResultCallback: {}", str);
+    auto msg = fmt::format("onScanResultCallback: {}", scan_result.toString());
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+
+
+    if (this->peripherals_.count(address) == 0) {
+        // If the incoming peripheral has never been seen before, create and save a reference to it.
+        auto base_peripheral = std::make_shared<PeripheralBase>(scan_result);
+        this->peripherals_.insert(std::make_pair(address, base_peripheral));
+    }
+
+    // Update the received advertising data.
+    auto base_peripheral = this->peripherals_.at(address);
+    base_peripheral->update_advertising_data(scan_result);
+
+    // Convert the base object into an external-facing Peripheral object
+    PeripheralBuilder peripheral_builder(base_peripheral);
+
+    // Check if the device has been seen before, to forward the correct call to the user.
+    if (this->seen_peripherals_.count(address) == 0) {
+        // Store it in our table of seen peripherals
+        this->seen_peripherals_.insert(std::make_pair(address, base_peripheral));
+        SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral_builder);
+    } else {
+        SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral_builder);
+    }
 
 }
 

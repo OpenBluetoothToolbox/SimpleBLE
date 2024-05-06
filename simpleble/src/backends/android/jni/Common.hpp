@@ -84,6 +84,10 @@ class Object {
         jmethodID method = env->GetMethodID(_cls.get(), name, signature);
         jstring jstr = (jstring)env->CallObjectMethod(_obj.get(), method, std::forward<Args>(args)...);
 
+        if (jstr == nullptr) {
+            return "";
+        }
+
         const char* c_str = env->GetStringUTFChars(jstr, nullptr);
         std::string result(c_str);
         env->ReleaseStringUTFChars(jstr, c_str);

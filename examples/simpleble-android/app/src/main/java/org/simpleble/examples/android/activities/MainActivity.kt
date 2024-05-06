@@ -29,7 +29,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
+import org.simpleble.android.Adapter
 import org.simpleble.android.SimpleDroidBle
+import org.simpleble.examples.android.viewmodels.BluetoothViewModel
 import org.simpleble.examples.android.views.ConnectContent
 import org.simpleble.examples.android.views.ListAdaptersContent
 import org.simpleble.examples.android.views.NotifyContent
@@ -39,6 +41,7 @@ import java.lang.ref.WeakReference
 
 class MainActivity : ComponentActivity() {
     private val bluetoothHasPermissions = mutableStateOf(false)
+    private val bluetoothViewModel = BluetoothViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +55,7 @@ class MainActivity : ComponentActivity() {
             MaterialTheme {
                 Surface {
                     if (bluetoothHasPermissions.value) {
-                        ExampleView()
+                        ExampleView(bluetoothViewModel)
                     } else {
                         Column {
                             Button(onClick = { SimpleDroidBle.requestPermissions() }) {
@@ -77,7 +80,7 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun ExampleView() {
+fun ExampleView(bluetoothViewModel: BluetoothViewModel) {
     var selectedTab by remember { mutableIntStateOf(0) }
 
     Scaffold(
@@ -121,7 +124,7 @@ fun ExampleView() {
         ) {
             when (selectedTab) {
                 0 -> ListAdaptersContent()
-                1 -> ScanContent()
+                1 -> ScanContent(bluetoothViewModel)
                 2 -> ConnectContent()
                 3 -> ReadContent()
                 4 -> NotifyContent()

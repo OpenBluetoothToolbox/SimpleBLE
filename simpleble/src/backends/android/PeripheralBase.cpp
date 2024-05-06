@@ -13,15 +13,19 @@
 using namespace SimpleBLE;
 using namespace std::chrono_literals;
 
-PeripheralBase::PeripheralBase() {}
+PeripheralBase::PeripheralBase(Android::ScanResult scan_result) : _device(scan_result.getDevice()) {}
 
 PeripheralBase::~PeripheralBase() {}
 
+void PeripheralBase::update_advertising_data(Android::ScanResult scan_result) {
+
+}
+
 void* PeripheralBase::underlying() const { return nullptr; }
 
-std::string PeripheralBase::identifier() { return ""; }
+std::string PeripheralBase::identifier() { return _device.getName(); }
 
-BluetoothAddress PeripheralBase::address() { return BluetoothAddress(); }
+BluetoothAddress PeripheralBase::address() { return BluetoothAddress(_device.getAddress()); }
 
 BluetoothAddressType PeripheralBase::address_type() { return BluetoothAddressType::UNSPECIFIED; }
 

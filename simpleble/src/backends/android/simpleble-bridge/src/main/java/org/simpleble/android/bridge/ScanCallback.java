@@ -7,27 +7,22 @@ import android.util.Log;
 
 public class ScanCallback extends android.bluetooth.le.ScanCallback {
 
-    public ScanCallback() {
-        Log.e("ScanCallback", "constructor " + this.toString());
-    }
+    public ScanCallback() {}
 
     @Override
     public void onScanResult(int callbackType, ScanResult result) {
-        Log.e("ScanCallback", "onScanResult");
         super.onScanResult(callbackType, result);
         onScanResultCallback(callbackType, result);
     }
 
     @Override
     public void onBatchScanResults(List<ScanResult> results) {
-        Log.e("ScanCallback", "onBatchScanResults");
         super.onBatchScanResults(results);
         onBatchScanResultsCallback(results);
     }
 
     @Override
     public void onScanFailed(int errorCode) {
-        Log.e("ScanCallback", "onScanFailed");
         super.onScanFailed(errorCode);
         onScanFailedCallback(errorCode);
     }

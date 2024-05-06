@@ -4,13 +4,15 @@
 #include <simpleble/Service.h>
 #include <simpleble/Types.h>
 
+#include <android/ScanResult.h>
+
 #include <map>
 
 namespace SimpleBLE {
 
 class PeripheralBase {
   public:
-    PeripheralBase();
+    PeripheralBase(Android::ScanResult scan_result);
     virtual ~PeripheralBase();
 
     void* underlying() const;
@@ -48,7 +50,13 @@ class PeripheralBase {
     void set_callback_on_connected(std::function<void()> on_connected);
     void set_callback_on_disconnected(std::function<void()> on_disconnected);
 
+    // Internal methods not exposed to the user.
+
+    void update_advertising_data(Android::ScanResult scan_result);
+
   private:
+
+    Android::BluetoothDevice _device;
 
 };
 

@@ -284,7 +284,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
 
     # Set the include directories for the Android NDK headers and other necessary directories
     include_directories(${ANDROID_NDK}/sysroot/usr/include)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android)
 
     # Add any necessary compile definitions or options for Android
     add_compile_options(-DANDROID -D__ANDROID_API__=${ANDROID_NATIVE_API_LEVEL})
@@ -294,8 +294,11 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android)
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android/AdapterBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/Android/PeripheralBase.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/AdapterBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/PeripheralBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/BluetoothDevice.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/ScanResult.cpp
+    )
 
     # target_sources(simpleble PRIVATE
     #     ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/AdapterBase.cpp

@@ -69,6 +69,14 @@ class AdapterBase {
 
     JNI::Object _btScanCallback;
 
+    std::map<BluetoothAddress, std::shared_ptr<PeripheralBase>> peripherals_;
+    std::map<BluetoothAddress, std::shared_ptr<PeripheralBase>> seen_peripherals_;
+
+    kvn::safe_callback<void()> callback_on_scan_start_;
+    kvn::safe_callback<void()> callback_on_scan_stop_;
+    kvn::safe_callback<void(Peripheral)> callback_on_scan_updated_;
+    kvn::safe_callback<void(Peripheral)> callback_on_scan_found_;
+
 
 };
 

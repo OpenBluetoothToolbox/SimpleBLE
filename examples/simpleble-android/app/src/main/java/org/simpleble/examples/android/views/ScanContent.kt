@@ -26,47 +26,44 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.simpleble.android.Adapter
 import org.simpleble.android.Peripheral
-
-
-
+import org.simpleble.examples.android.viewmodels.BluetoothViewModel
 
 
 @Composable
-fun ScanContent() {
-    val adapter = Adapter.getAdapters()[0]
+fun ScanContent(bluetoothViewModel: BluetoothViewModel) {
     var scanActive by remember { mutableStateOf(false) }
     var scanResults by remember { mutableStateOf(emptyList<Peripheral>()) }
 
     LaunchedEffect(Unit) {
         CoroutineScope(Dispatchers.Main).launch {
-            adapter.onScanStart.collect {
+            bluetoothViewModel.adapter.onScanStart.collect {
                 Log.d("SimpleBLE", "Scan started.")
             }
         }
 
         CoroutineScope(Dispatchers.Main).launch {
-            adapter.onScanStop.collect {
+            bluetoothViewModel.adapter.onScanStop.collect {
                 Log.d("SimpleBLE", "Scan stopped.")
             }
         }
 
         CoroutineScope(Dispatchers.Main).launch {
-            adapter.onScanActive.collect {
+            bluetoothViewModel.adapter.onScanActive.collect {
                 Log.d("SimpleBLE", "Scan active: $it")
                 scanActive = it
             }
         }
 
         CoroutineScope(Dispatchers.Main).launch {
-            adapter.onScanFound.collect {
-                Log.d("SimpleBLE", "Found device: ${it.identifier} [${it.address}] ${it.rssi} dBm")
+            bluetoothViewModel.adapter.onScanFound.collect {
+                Log.d("SimpleBLE", "Found device: ${it.identifier} [${it.address}] ${it.rssi} dBm ${it.hashCode()}")
                 scanResults = scanResults + it
             }
         }
 
         CoroutineScope(Dispatchers.Main).launch {
-            adapter.onScanUpdated.collect {
-                Log.d("SimpleBLE", "Updated device: ${it.identifier} [${it.address}] ${it.rssi} dBm")
+            bluetoothViewModel.adapter.onScanUpdated.collect {
+                Log.d("SimpleBLE", "Updated device: ${it.identifier} [${it.address}] ${it.rssi} dBm ${it.hashCode()}")
             }
         }
     }
@@ -78,10 +75,10 @@ fun ScanContent() {
     ) {
         Button(
             onClick = {
-                if (!adapter.scanIsActive) {
+                if (!bluetoothViewModel.adapter.scanIsActive) {
                     CoroutineScope(Dispatchers.Main).launch {
                         scanResults = emptyList()
-                        adapter.scanFor(5000)
+                        bluetoothViewModel.adapter.scanFor(5000)
                     }
                 }
             },

@@ -7,6 +7,11 @@
         <compositeConfiguration>
           <compositeBuild compositeDefinitionSource="SCRIPT">
             <builds>
+              <build path="$PROJECT_DIR$/../../simpleble/src/backends/android/simpleble-bridge" name="simpleble-bridge">
+                <projects>
+                  <project path="$PROJECT_DIR$/../../simpleble/src/backends/android/simpleble-bridge" />
+                </projects>
+              </build>
               <build path="$PROJECT_DIR$/../../simpledroidble" name="SimpleDroidBle">
                 <projects>
                   <project path="$PROJECT_DIR$/../../simpledroidble" />
@@ -22,6 +27,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/../../simpleble/src/backends/android/simpleble-bridge" />
             <option value="$PROJECT_DIR$/../../simpledroidble" />
             <option value="$PROJECT_DIR$/../../simpledroidble/simpledroidble" />
           </set>
@@ -29,10 +35,22 @@
         <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/../../simpleble/src/backends/android/simpleble-bridge" name="simpleble-bridge">
+                <projects>
+                  <project path="$PROJECT_DIR$/../../simpleble/src/backends/android/simpleble-bridge" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
         <option name="externalProjectPath" value="$PROJECT_DIR$/../../simpledroidble" />
         <option name="gradleJvm" value="#GRADLE_LOCAL_JAVA_HOME" />
         <option name="modules">
           <set>
+            <option value="$PROJECT_DIR$/../../simpleble/src/backends/android/simpleble-bridge" />
             <option value="$PROJECT_DIR$/../../simpledroidble" />
             <option value="$PROJECT_DIR$/../../simpledroidble/simpledroidble" />
           </set>
