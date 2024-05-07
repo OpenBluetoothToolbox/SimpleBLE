@@ -29,10 +29,10 @@ import kotlinx.coroutines.launch
 import org.simpleble.android.Adapter
 import org.simpleble.android.BluetoothUUID
 import org.simpleble.android.Peripheral
+import org.simpleble.examples.android.viewmodels.BluetoothViewModel
 
 @Composable
-fun ReadContent() {
-    val adapter = Adapter.getAdapters()[0]
+fun ReadContent(bluetoothViewModel: BluetoothViewModel) {
     var scanResults by remember { mutableStateOf(emptyList<Peripheral>()) }
     var isScanning by remember { mutableStateOf(false) }
     var selectedDevice by remember { mutableStateOf<Peripheral?>(null) }
@@ -43,14 +43,14 @@ fun ReadContent() {
 
     LaunchedEffect(Unit) {
         CoroutineScope(Dispatchers.Main).launch {
-            adapter.onScanActive.collect {
+            bluetoothViewModel.adapter.onScanActive.collect {
                 Log.d("SimpleBLE", "Scan active: $it")
                 isScanning = it
             }
         }
 
         CoroutineScope(Dispatchers.Main).launch {
-            adapter.onScanFound.collect {
+            bluetoothViewModel.adapter.onScanFound.collect {
                 Log.d("SimpleBLE", "Found device: ${it.identifier} [${it.address}] ${it.rssi} dBm")
                 scanResults = scanResults + it
             }
@@ -67,7 +67,7 @@ fun ReadContent() {
                 if (!isScanning) {
                     CoroutineScope(Dispatchers.Main).launch {
                         scanResults = emptyList()
-                        adapter.scanFor(5000)
+                        bluetoothViewModel.adapter.scanFor(5000)
                     }
                 }
             },

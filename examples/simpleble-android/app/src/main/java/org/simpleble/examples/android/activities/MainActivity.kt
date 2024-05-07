@@ -125,9 +125,9 @@ fun ExampleView(bluetoothViewModel: BluetoothViewModel) {
             when (selectedTab) {
                 0 -> ListAdaptersContent()
                 1 -> ScanContent(bluetoothViewModel)
-                2 -> ConnectContent()
-                3 -> ReadContent()
-                4 -> NotifyContent()
+                2 -> ConnectContent(bluetoothViewModel)
+                3 -> ReadContent(bluetoothViewModel)
+                4 -> NotifyContent(bluetoothViewModel)
                 else -> ListAdaptersContent() // Default
             }
         }
