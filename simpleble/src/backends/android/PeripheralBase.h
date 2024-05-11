@@ -52,9 +52,15 @@ class PeripheralBase {
 
     // Internal methods not exposed to the user.
 
+    void static initialize();
+
     void update_advertising_data(Android::ScanResult scan_result);
 
   private:
+
+    static JNI::Class _btGattCallbackCls;
+
+    JNI::Object _btGattCallback;
 
     Android::BluetoothDevice _device;
 

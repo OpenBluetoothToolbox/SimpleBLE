@@ -77,6 +77,8 @@ class AdapterBase {
     kvn::safe_callback<void(Peripheral)> callback_on_scan_updated_;
     kvn::safe_callback<void(Peripheral)> callback_on_scan_found_;
 
+    std::atomic<bool> scanning_{false};
+
 
 };
 

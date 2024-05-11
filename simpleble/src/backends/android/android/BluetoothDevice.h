@@ -12,6 +12,8 @@ public:
     std::string getAddress();
     std::string getName();
 
+    JNI::Object connectGatt(bool autoConnect, JNI::Object callback);
+
 private:
     JNI::Object _obj;
 

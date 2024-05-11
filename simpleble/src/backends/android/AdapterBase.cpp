@@ -44,6 +44,8 @@ void AdapterBase::initialize() {
     if (_btScanner.get() == nullptr) {
         _btScanner = _btAdapter.call_object_method("getBluetoothLeScanner", "()Landroid/bluetooth/le/BluetoothLeScanner;");
     }
+
+    PeripheralBase::initialize();
 }
 
 std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
@@ -91,10 +93,14 @@ BluetoothAddress AdapterBase::address() {
 
 void AdapterBase::scan_start() {
     _btScanner.call_void_method("startScan", "(Landroid/bluetooth/le/ScanCallback;)V", _btScanCallback.get());
+    scanning_ = true;
+    SAFE_CALLBACK_CALL(this->callback_on_scan_start_);
 }
 
 void AdapterBase::scan_stop() {
     _btScanner.call_void_method("stopScan", "(Landroid/bluetooth/le/ScanCallback;)V", _btScanCallback.get());
+    scanning_ = false;
+    SAFE_CALLBACK_CALL(this->callback_on_scan_stop_);
 }
 
 void AdapterBase::scan_for(int timeout_ms) {
@@ -103,7 +109,7 @@ void AdapterBase::scan_for(int timeout_ms) {
     scan_stop();
 }
 
-bool AdapterBase::scan_is_active() { return false; }
+bool AdapterBase::scan_is_active() { return scanning_; }
 
 std::vector<Peripheral> AdapterBase::scan_get_results() {
     return std::vector<Peripheral>();
