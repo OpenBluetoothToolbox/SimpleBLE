@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "jni/Common.hpp"
+#include "bridge/ScanCallback.h"
 
 namespace SimpleBLE {
 
@@ -50,7 +51,7 @@ class AdapterBase {
     void onBatchScanResultsCallback(JNIEnv *env, jobject thiz, jobject results);
     void onScanFailedCallback(JNIEnv *env, jobject thiz, jint error_code);
 
-    static std::map<jobject, AdapterBase*, JNI::JObjectComparator> _scanCallbackMap;
+    //static std::map<jobject, AdapterBase*, JNI::JObjectComparator> _scanCallbackMap;
 
   private:
     // NOTE: The correct way to request a BluetoothAdapter is to go though the BluetoothManager,
@@ -67,7 +68,7 @@ class AdapterBase {
     static JNI::Object _btAdapter;
     static JNI::Object _btScanner;
 
-    JNI::Object _btScanCallback;
+    Android::Bridge::ScanCallback _btScanCallback;
 
     std::map<BluetoothAddress, std::shared_ptr<PeripheralBase>> peripherals_;
     std::map<BluetoothAddress, std::shared_ptr<PeripheralBase>> seen_peripherals_;

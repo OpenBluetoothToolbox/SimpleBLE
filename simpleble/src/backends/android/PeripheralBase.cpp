@@ -25,7 +25,7 @@ void PeripheralBase::initialize() {
 }
 
 PeripheralBase::PeripheralBase(Android::ScanResult scan_result) : _device(scan_result.getDevice()) {
-    _btGattCallback = _btGattCallbackCls.call_constructor("()V");
+    //_btGattCallback = _btGattCallbackCls.call_constructor("()V");
 }
 
 PeripheralBase::~PeripheralBase() {}

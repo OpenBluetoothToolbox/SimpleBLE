@@ -297,12 +297,11 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/AdapterBase.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/PeripheralBase.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/BluetoothDevice.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/BluetoothGatt.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/ScanResult.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/bridge/BluetoothGattCallback.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/bridge/ScanCallback.cpp
     )
-
-    # target_sources(simpleble PRIVATE
-    #     ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/AdapterBase.cpp
-    #     ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/PeripheralBase.cpp)
 
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain)

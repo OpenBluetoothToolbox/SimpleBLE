@@ -13,13 +13,10 @@
 using namespace SimpleBLE;
 
 JNI::Class AdapterBase::_btAdapterCls;
-JNI::Class AdapterBase::_btScanCallbackCls;
 JNI::Class AdapterBase::_btScanResultCls;
 
 JNI::Object AdapterBase::_btAdapter;
 JNI::Object AdapterBase::_btScanner;
-std::map<jobject, AdapterBase*, JNI::JObjectComparator> AdapterBase::_scanCallbackMap;
-
 
 void AdapterBase::initialize() {
     JNI::Env env;
@@ -27,10 +24,6 @@ void AdapterBase::initialize() {
     // Check if the BluetoothAdapter class has been loaded
     if (_btAdapterCls.get() == nullptr) {
         _btAdapterCls = env.find_class("android/bluetooth/BluetoothAdapter");
-    }
-
-    if (_btScanCallbackCls.get() == nullptr) {
-        _btScanCallbackCls = env.find_class("org/simpleble/android/bridge/ScanCallback");
     }
 
     if (_btScanResultCls.get() == nullptr) {
@@ -70,15 +63,36 @@ bool AdapterBase::bluetooth_enabled() {
 }
 
 AdapterBase::AdapterBase() {
-    _btScanCallback = _btScanCallbackCls.call_constructor("()V");
+    _btScanCallback.set_callback_onScanResult([this](Android::ScanResult scan_result) {
+        std::string address = scan_result.getDevice().getAddress();
 
-    // Add the callback to the map
-    _scanCallbackMap[_btScanCallback.get()] = this;
+        if (this->peripherals_.count(address) == 0) {
+            // If the incoming peripheral has never been seen before, create and save a reference to it.
+            auto base_peripheral = std::make_shared<PeripheralBase>(scan_result);
+            this->peripherals_.insert(std::make_pair(address, base_peripheral));
+        }
+
+        // Update the received advertising data.
+        auto base_peripheral = this->peripherals_.at(address);
+        base_peripheral->update_advertising_data(scan_result);
+
+        // Convert the base object into an external-facing Peripheral object
+        PeripheralBuilder peripheral_builder(base_peripheral);
+
+        // Check if the device has been seen before, to forward the correct call to the user.
+        if (this->seen_peripherals_.count(address) == 0) {
+            // Store it in our table of seen peripherals
+            this->seen_peripherals_.insert(std::make_pair(address, base_peripheral));
+            SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral_builder);
+        } else {
+            SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral_builder);
+        }
+    });
+
 }
 
 AdapterBase::~AdapterBase() {
-    // Remove the callback from the map
-    _scanCallbackMap.erase(_btScanCallback.get());
+
 }
 
 void* AdapterBase::underlying() const { return nullptr; }
@@ -151,70 +165,3 @@ void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_
     }
 }
 
-void AdapterBase::onScanResultCallback(JNIEnv *env, jobject thiz, jint callback_type, jobject j_scan_result) {
-    Android::ScanResult scan_result(JNI::Object(j_scan_result, _btScanResultCls.get()));
-    std::string address = scan_result.getDevice().getAddress();
-
-    auto msg = fmt::format("onScanResultCallback: {}", scan_result.toString());
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
-
-
-    if (this->peripherals_.count(address) == 0) {
-        // If the incoming peripheral has never been seen before, create and save a reference to it.
-        auto base_peripheral = std::make_shared<PeripheralBase>(scan_result);
-        this->peripherals_.insert(std::make_pair(address, base_peripheral));
-    }
-
-    // Update the received advertising data.
-    auto base_peripheral = this->peripherals_.at(address);
-    base_peripheral->update_advertising_data(scan_result);
-
-    // Convert the base object into an external-facing Peripheral object
-    PeripheralBuilder peripheral_builder(base_peripheral);
-
-    // Check if the device has been seen before, to forward the correct call to the user.
-    if (this->seen_peripherals_.count(address) == 0) {
-        // Store it in our table of seen peripherals
-        this->seen_peripherals_.insert(std::make_pair(address, base_peripheral));
-        SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral_builder);
-    } else {
-        SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral_builder);
-    }
-
-}
-
-void AdapterBase::onBatchScanResultsCallback(JNIEnv *env, jobject thiz, jobject results) {
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", "onBatchScanResultsCallback");
-}
-
-void AdapterBase::onScanFailedCallback(JNIEnv *env, jobject thiz, jint error_code) {
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", "onScanFailedCallback");
-}
-
-extern "C" JNIEXPORT void JNICALL Java_org_simpleble_android_bridge_ScanCallback_onScanResultCallback(JNIEnv *env, jobject thiz, jint callback_type, jobject result) {
-    auto it = AdapterBase::_scanCallbackMap.find(thiz);
-    if (it != AdapterBase::_scanCallbackMap.end()) {
-        AdapterBase* adapter = it->second;
-        adapter->onScanResultCallback(env, thiz, callback_type, result);
-    } else {
-        // TODO: Throw an exception
-    }
-}
-extern "C" JNIEXPORT void JNICALL Java_org_simpleble_android_bridge_ScanCallback_onScanFailedCallback(JNIEnv *env, jobject thiz, jint error_code) {
-    auto it = AdapterBase::_scanCallbackMap.find(thiz);
-    if (it != AdapterBase::_scanCallbackMap.end()) {
-        AdapterBase* adapter = it->second;
-        adapter->onScanFailedCallback(env, thiz, error_code);
-    } else {
-        // TODO: Throw an exception
-    }
-}
-extern "C" JNIEXPORT void JNICALL Java_org_simpleble_android_bridge_ScanCallback_onBatchScanResultsCallback(JNIEnv *env, jobject thiz, jobject results) {
-    auto it = AdapterBase::_scanCallbackMap.find(thiz);
-    if (it != AdapterBase::_scanCallbackMap.end()) {
-        AdapterBase* adapter = it->second;
-        adapter->onBatchScanResultsCallback(env, thiz, results);
-    } else {
-        // TODO: Throw an exception
-    }
-}

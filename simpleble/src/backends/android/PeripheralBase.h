@@ -51,6 +51,7 @@ class PeripheralBase {
     void set_callback_on_disconnected(std::function<void()> on_disconnected);
 
     // Internal methods not exposed to the user.
+    static std::map<jobject, PeripheralBase*, JNI::JObjectComparator> _gattCallbackMap;
 
     void static initialize();
 
@@ -59,7 +60,6 @@ class PeripheralBase {
   private:
 
     static JNI::Class _btGattCallbackCls;
-
     JNI::Object _btGattCallback;
 
     Android::BluetoothDevice _device;

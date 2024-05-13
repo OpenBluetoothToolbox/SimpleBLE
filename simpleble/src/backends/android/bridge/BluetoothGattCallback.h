@@ -2,24 +2,22 @@
 
 #include "jni/Common.hpp"
 
-#include "BluetoothDevice.h"
-
 namespace SimpleBLE {
 namespace Android {
+namespace Bridge {
 
-class ScanResult {
+class BluetoothGattCallback {
   public:
-    ScanResult(jobject j_scan_result);
-
-    BluetoothDevice getDevice();
-    std::string toString();
+    BluetoothGattCallback();
 
   private:
     static JNI::Class _cls;
+
     static void initialize();
 
     JNI::Object _obj;
 };
 
+}  // namespace Bridge
 }  // namespace Android
 }  // namespace SimpleBLE

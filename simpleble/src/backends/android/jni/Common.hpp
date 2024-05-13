@@ -32,10 +32,56 @@ class Object {
         JNIEnv* env = VM::env();
         _cls = env->GetObjectClass(obj);
     }
-    
+
     Object(jobject obj, jclass cls) : _obj(obj), _cls(cls) {}
 
     jobject get() { return _obj.get(); }
+
+    template <typename... Args>
+    Object call_object_method(jmethodID method, Args&&... args) {
+        JNIEnv* env = VM::env();
+        jobject result = env->CallObjectMethod(_obj.get(), method, std::forward<Args>(args)...);
+        jclass resultClass = env->GetObjectClass(result);
+        return Object(result, resultClass);
+    }
+
+    template <typename... Args>
+    void call_void_method(jmethodID method, Args&&... args) {
+        JNIEnv* env = VM::env();
+        env->CallVoidMethod(_obj.get(), method, std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    bool call_boolean_method(jmethodID method, Args&&... args) {
+        JNIEnv* env = VM::env();
+        jboolean result = env->CallBooleanMethod(_obj.get(), method, std::forward<Args>(args)...);
+        return result;
+    }
+
+    template <typename... Args>
+    int call_int_method(jmethodID method, Args&&... args) {
+        JNIEnv* env = VM::env();
+        jint result = env->CallIntMethod(_obj.get(), method, std::forward<Args>(args)...);
+        return result;
+    }
+
+    template <typename... Args>
+    std::string call_string_method(jmethodID method, Args&&... args) {
+        JNIEnv* env = VM::env();
+        jstring jstr = (jstring)env->CallObjectMethod(_obj.get(), method, std::forward<Args>(args)...);
+
+        if (jstr == nullptr) {
+            return "";
+        }
+
+        const char* c_str = env->GetStringUTFChars(jstr, nullptr);
+        std::string result(c_str);
+        env->ReleaseStringUTFChars(jstr, c_str);
+        return result;
+    }
+
+    
+
 
     template <typename... Args>
     Object call_object_method(const char* name, const char* signature, Args&&... args) {
