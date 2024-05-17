@@ -38,7 +38,7 @@ std::string BluetoothDevice::getAddress() { return _obj.call_string_method(_meth
 
 std::string BluetoothDevice::getName() { return _obj.call_string_method(_method_getName); }
 
-BluetoothGatt BluetoothDevice::connectGatt(bool autoConnect, JNI::Object callback) {
+BluetoothGatt BluetoothDevice::connectGatt(bool autoConnect, Bridge::BluetoothGattCallback& callback) {
     return BluetoothGatt(_obj.call_object_method(_method_connectGatt, nullptr, autoConnect, callback.get()));
 }
 

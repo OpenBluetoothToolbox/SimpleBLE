@@ -3,6 +3,7 @@
 #include "BluetoothGatt.h"
 
 #include "jni/Common.hpp"
+#include "bridge/BluetoothGattCallback.h"
 
 namespace SimpleBLE {
 namespace Android {
@@ -14,7 +15,7 @@ public:
     std::string getAddress();
     std::string getName();
 
-    BluetoothGatt connectGatt(bool autoConnect, JNI::Object callback);
+    BluetoothGatt connectGatt(bool autoConnect, Bridge::BluetoothGattCallback& callback);
 
 private:
     static JNI::Class _cls;

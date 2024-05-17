@@ -7,6 +7,7 @@ namespace Android {
 
 class BluetoothGatt {
 public:
+    BluetoothGatt();
     BluetoothGatt(JNI::Object obj);
 
     void close();

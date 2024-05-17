@@ -33,6 +33,10 @@ void BluetoothGatt::initialize() {
     }
 }
 
+BluetoothGatt::BluetoothGatt() {
+    initialize();
+}
+
 BluetoothGatt::BluetoothGatt(JNI::Object obj) : _obj(obj) {
     initialize();
 }
@@ -52,6 +56,8 @@ void BluetoothGatt::disconnect() {
 bool BluetoothGatt::discoverServices() {
     return _obj.call_boolean_method(_method_discoverServices);
 }
+
+
 
 }  // namespace Android
 }  // namespace SimpleBLE

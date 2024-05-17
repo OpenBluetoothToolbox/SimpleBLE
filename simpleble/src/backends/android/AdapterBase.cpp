@@ -38,7 +38,6 @@ void AdapterBase::initialize() {
         _btScanner = _btAdapter.call_object_method("getBluetoothLeScanner", "()Landroid/bluetooth/le/BluetoothLeScanner;");
     }
 
-    PeripheralBase::initialize();
 }
 
 std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
