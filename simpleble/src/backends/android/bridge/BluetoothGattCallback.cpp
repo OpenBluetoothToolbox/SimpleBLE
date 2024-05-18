@@ -2,6 +2,7 @@
 #include "BluetoothGattCallback.h"
 
 #include <android/log.h>
+#include <climits>
 
 namespace SimpleBLE {
 namespace Android {
@@ -18,7 +19,7 @@ void BluetoothGattCallback::initialize() {
     }
 }
 
-BluetoothGattCallback::BluetoothGattCallback() {
+BluetoothGattCallback::BluetoothGattCallback() : connected(false), mtu(UINT16_MAX) {
     initialize();
 
     _obj = _cls.call_constructor("()V");
@@ -34,6 +35,14 @@ void BluetoothGattCallback::set_callback_onConnectionStateChange(std::function<v
         _callback_onConnectionStateChange.load(callback);
     } else {
         _callback_onConnectionStateChange.unload();
+    }
+}
+
+void BluetoothGattCallback::set_callback_onServicesDiscovered(std::function<void(void)> callback) {
+    if (callback) {
+        _callback_onServicesDiscovered.load(callback);
+    } else {
+        _callback_onServicesDiscovered.unload();
     }
 }
 
@@ -60,11 +69,9 @@ void BluetoothGattCallback::jni_onConnectionStateChangeCallback(JNIEnv *env, job
     auto it = BluetoothGattCallback::_map.find(thiz);
     if (it != BluetoothGattCallback::_map.end()) {
         BluetoothGattCallback* obj = it->second;
-
-        auto msg = "Found object!!";
-        __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg);
-
-        SAFE_CALLBACK_CALL(obj->_callback_onConnectionStateChange, new_state == 2);
+        const bool connected = new_state == 2;
+        obj->connected = connected;
+        SAFE_CALLBACK_CALL(obj->_callback_onConnectionStateChange, connected);
     } else {
         // TODO: Throw an exception
     }
@@ -83,6 +90,14 @@ void BluetoothGattCallback::jni_onDescriptorWriteCallback(JNIEnv *env, jobject t
 void BluetoothGattCallback::jni_onMtuChangedCallback(JNIEnv *env, jobject thiz, jobject gatt, jint mtu, jint status) {
     auto msg = "onMtuChangedCallback";
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg);
+
+    auto it = BluetoothGattCallback::_map.find(thiz);
+    if (it != BluetoothGattCallback::_map.end()) {
+        BluetoothGattCallback* obj = it->second;
+        obj->mtu = mtu;
+    } else {
+        // TODO: Throw an exception
+    }
 }
 
 void BluetoothGattCallback::jni_onPhyReadCallback(JNIEnv *env, jobject thiz, jobject gatt, jint tx_phy, jint rx_phy, jint status) {
@@ -113,6 +128,15 @@ void BluetoothGattCallback::jni_onServiceChangedCallback(JNIEnv *env, jobject th
 void BluetoothGattCallback::jni_onServicesDiscoveredCallback(JNIEnv *env, jobject thiz, jobject gatt, jint status) {
     auto msg = "onServicesDiscoveredCallback";
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg);
+
+    auto it = BluetoothGattCallback::_map.find(thiz);
+    if (it != BluetoothGattCallback::_map.end()) {
+        BluetoothGattCallback* obj = it->second;
+        obj->services_discovered = true;
+        SAFE_CALLBACK_CALL(obj->_callback_onServicesDiscovered);
+    } else {
+        // TODO: Throw an exception
+    }
 }
 
 }  // namespace Bridge

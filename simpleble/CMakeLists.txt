@@ -298,6 +298,9 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/PeripheralBase.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/BluetoothDevice.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/BluetoothGatt.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/BluetoothGattService.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/BluetoothGattCharacteristic.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/BluetoothGattDescriptor.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/ScanResult.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/bridge/BluetoothGattCallback.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/bridge/ScanCallback.cpp

@@ -37,9 +37,9 @@ class GlobalRef {
         }
     }
 
-    T* operator->() { return &_obj; }
+    T* operator->() const { return &_obj; }
 
-    T get() { return _obj; }
+    T get() const { return _obj; }
 
   protected:
     T _obj = nullptr;

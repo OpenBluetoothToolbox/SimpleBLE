@@ -35,7 +35,11 @@ class Object {
 
     Object(jobject obj, jclass cls) : _obj(obj), _cls(cls) {}
 
-    jobject get() { return _obj.get(); }
+    jobject get() const { return _obj.get(); }
+
+    explicit operator bool() const {
+        return _obj.get() != nullptr;
+    }
 
     template <typename... Args>
     Object call_object_method(jmethodID method, Args&&... args) {

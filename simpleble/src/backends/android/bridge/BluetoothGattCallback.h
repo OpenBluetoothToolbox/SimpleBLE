@@ -15,6 +15,11 @@ class BluetoothGattCallback {
     jobject get() { return _obj.get(); } // TODO: Remove once nothing uses this
 
     void set_callback_onConnectionStateChange(std::function<void(bool)> callback);
+    void set_callback_onServicesDiscovered(std::function<void(void)> callback);
+
+    bool connected;
+    bool services_discovered;
+    uint16_t mtu;
 
     // Not for public use
     // clang-format off
@@ -41,6 +46,7 @@ class BluetoothGattCallback {
     JNI::Object _obj;
 
     kvn::safe_callback<void(bool)> _callback_onConnectionStateChange;
+    kvn::safe_callback<void()> _callback_onServicesDiscovered;
 };
 
 }  // namespace Bridge

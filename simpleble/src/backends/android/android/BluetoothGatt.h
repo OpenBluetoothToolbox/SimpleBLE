@@ -1,6 +1,7 @@
 #pragma once
 
 #include "jni/Common.hpp"
+#include <cstdint>
 
 namespace SimpleBLE {
 namespace Android {

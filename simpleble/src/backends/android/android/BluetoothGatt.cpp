@@ -37,23 +37,31 @@ BluetoothGatt::BluetoothGatt() {
     initialize();
 }
 
-BluetoothGatt::BluetoothGatt(JNI::Object obj) : _obj(obj) {
-    initialize();
+BluetoothGatt::BluetoothGatt(JNI::Object obj) : BluetoothGatt() {
+    _obj = obj;
 }
 
 void BluetoothGatt::close() {
+    if (!_obj) return;
+
     _obj.call_void_method(_method_close);
 }
 
 bool BluetoothGatt::connect() {
+    if (!_obj) return false;
+
     return _obj.call_boolean_method(_method_connect);
 }
 
 void BluetoothGatt::disconnect() {
+    if (!_obj) return;
+
     _obj.call_void_method(_method_disconnect);
 }
 
 bool BluetoothGatt::discoverServices() {
+    if (!_obj) return false;
+
     return _obj.call_boolean_method(_method_discoverServices);
 }
 

@@ -18,13 +18,22 @@ using namespace std::chrono_literals;
 
 PeripheralBase::PeripheralBase(Android::ScanResult scan_result) : _device(scan_result.getDevice()) {
     _btGattCallback.set_callback_onConnectionStateChange([this](bool connected) {
+        // If a connection has been established, request service discovery.
         if (connected) {
-            __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", "Connected to device");
-            SAFE_CALLBACK_CALL(callback_on_connected_);
+            _gatt.discoverServices();
         } else {
+            // TODO: Whatever cleanup is necessary when disconnected.
             __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", "Disconnected from device");
             SAFE_CALLBACK_CALL(callback_on_disconnected_);
         }
+    });
+
+    _btGattCallback.set_callback_onServicesDiscovered([this]() {
+        // TODO KEVIN: RETRIEVE SERVICES AND CHARACTERISTICS
+
+        // Notify the user that the connection has been established once services hace been discovered.
+        __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", "Services discovered");
+        SAFE_CALLBACK_CALL(callback_on_connected_);
     });
 
 }
@@ -45,16 +54,17 @@ int16_t PeripheralBase::rssi() { return 0; }
 
 int16_t PeripheralBase::tx_power() { return 0; }
 
-uint16_t PeripheralBase::mtu() { return 0; }
+uint16_t PeripheralBase::mtu() { return _btGattCallback.mtu; }
 
 void PeripheralBase::connect() {
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", "Connecting to device");
     _gatt = _device.connectGatt(false, _btGattCallback);
 }
 
-void PeripheralBase::disconnect() {}
+void PeripheralBase::disconnect() {
+    _gatt.disconnect();
+}
 
-bool PeripheralBase::is_connected() { return false; }
+bool PeripheralBase::is_connected() { return _btGattCallback.connected && _btGattCallback.services_discovered; }
 
 bool PeripheralBase::is_connectable() { return false; }
 
