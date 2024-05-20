@@ -105,6 +105,7 @@ BluetoothAddress AdapterBase::address() {
 }
 
 void AdapterBase::scan_start() {
+    seen_peripherals_.clear();
     _btScanner.call_void_method("startScan", "(Landroid/bluetooth/le/ScanCallback;)V", _btScanCallback.get());
     scanning_ = true;
     SAFE_CALLBACK_CALL(this->callback_on_scan_start_);

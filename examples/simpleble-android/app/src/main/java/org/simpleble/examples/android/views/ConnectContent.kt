@@ -86,6 +86,8 @@ fun ConnectContent(bluetoothViewModel: BluetoothViewModel) {
 
     }
 
+
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -115,37 +117,6 @@ fun ConnectContent(bluetoothViewModel: BluetoothViewModel) {
             modifier = Modifier.padding(16.dp)
         ) {
             Text(text = if (isScanning) "Stop Scan" else "Start Scan")
-        }
-
-        if (scanResults.isNotEmpty()) {
-            Text(
-                text = "The following devices were found:",
-                style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(16.dp)
-            ) {
-                items(scanResults.withIndex().toList()) { (index, peripheral) ->
-                    Text(
-                        text = "[$index] ${peripheral.identifier} [${peripheral.address}]",
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .clickable {
-                                selectedDevice = peripheral
-                            }
-                    )
-                }
-            }
-        } else {
-            Text(
-                text = "No devices found.",
-                style = MaterialTheme.typography.body1,
-                modifier = Modifier.padding(16.dp)
-            )
         }
 
         selectedDevice?.let { peripheral ->
@@ -217,5 +188,38 @@ fun ConnectContent(bluetoothViewModel: BluetoothViewModel) {
                 }
             }
         }
+
+        if (scanResults.isNotEmpty()) {
+            Text(
+                text = "The following devices were found:",
+                style = MaterialTheme.typography.h6,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(8.dp)
+            ) {
+                items(scanResults.withIndex().toList()) { (index, peripheral) ->
+                    Text(
+                        text = "[$index] ${peripheral.identifier} [${peripheral.address}]",
+                        style = MaterialTheme.typography.body1,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clickable {
+                                selectedDevice = peripheral
+                            }
+                    )
+                }
+            }
+        } else {
+            Text(
+                text = "No devices found.",
+                style = MaterialTheme.typography.body1,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+
+
     }
 }

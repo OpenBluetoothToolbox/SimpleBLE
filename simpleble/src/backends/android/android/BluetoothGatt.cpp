@@ -65,6 +65,22 @@ bool BluetoothGatt::discoverServices() {
     return _obj.call_boolean_method(_method_discoverServices);
 }
 
+std::vector<BluetoothGattService> BluetoothGatt::getServices() {
+    if (!_obj) return std::vector<BluetoothGattService>();
+
+    JNI::Object services = _obj.call_object_method("getServices", "()Ljava/util/List;");
+    if (!services) return std::vector<BluetoothGattService>();
+
+    JNI::Object iterator = services.call_object_method("iterator", "()Ljava/util/Iterator;");
+
+    std::vector<BluetoothGattService> result;
+    while (iterator.call_boolean_method("hasNext", "()Z")) {
+        JNI::Object service = iterator.call_object_method("next", "()Ljava/lang/Object;");
+        result.push_back(BluetoothGattService(service));
+    }
+
+    return std::vector<BluetoothGattService>();
+}
 
 
 }  // namespace Android

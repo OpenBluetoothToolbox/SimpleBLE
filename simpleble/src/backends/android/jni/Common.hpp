@@ -10,14 +10,37 @@ namespace SimpleBLE {
 namespace JNI {
 
 struct JObjectComparator {
-    bool operator() (const jobject& lhs, const jobject& rhs) const {
-        // Use JNI's IsSameObject to compare objects, considering NULL cases
-        if (lhs == nullptr || rhs == nullptr) {
-            return lhs < rhs;  // Handle nulls consistently by pointer comparison
+    bool operator()(const jobject& lhs, const jobject& rhs) const {
+        if (lhs == nullptr && rhs == nullptr) {
+            return false;  // Both are null, considered equal
+        }
+        if (lhs == nullptr) {
+            return true;   // lhs is null, rhs is not null, lhs < rhs
+        }
+        if (rhs == nullptr) {
+            return false;  // rhs is null, lhs is not null, lhs > rhs
         }
 
         JNIEnv* env = VM::env();
-        return !env->IsSameObject(lhs, rhs) && lhs < rhs;
+        if (env->IsSameObject(lhs, rhs)) {
+            return false;  // Both objects are the same
+        }
+
+        // Use hashCode method to establish a consistent ordering
+        // TODO: Cache all references statically for this class!
+        jclass objectClass = env->FindClass("java/lang/Object");
+        jmethodID hashCodeMethod = env->GetMethodID(objectClass, "hashCode", "()I");
+
+        const jobject lhsObject = lhs;
+        const jobject rhsObject = rhs;
+
+        jint lhsHashCode = env->CallIntMethod(lhsObject, hashCodeMethod);
+        jint rhsHashCode = env->CallIntMethod(rhsObject, hashCodeMethod);
+
+        return lhsHashCode < rhsHashCode;
+
+        // Use a unique identifier or a pointer value as the final comparison for non-equal objects
+        return lhs < rhs;  // This can still be used for consistent ordering
     }
 };
 

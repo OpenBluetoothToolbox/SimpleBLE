@@ -29,10 +29,19 @@ PeripheralBase::PeripheralBase(Android::ScanResult scan_result) : _device(scan_r
     });
 
     _btGattCallback.set_callback_onServicesDiscovered([this]() {
+        std::vector<Android::BluetoothGattService> services = _gatt.getServices();
+
+        auto msg = fmt::format("Services discovered: {}", services.size());
+        __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+
+        for (auto& service : services) {
+            auto msg = fmt::format("Service: {}", service.getUuid());
+            __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+        }
+
         // TODO KEVIN: RETRIEVE SERVICES AND CHARACTERISTICS
 
         // Notify the user that the connection has been established once services hace been discovered.
-        __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", "Services discovered");
         SAFE_CALLBACK_CALL(callback_on_connected_);
     });
 

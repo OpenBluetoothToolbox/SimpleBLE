@@ -63,8 +63,8 @@ void BluetoothGattCallback::jni_onCharacteristicWriteCallback(JNIEnv *env, jobje
 }
 
 void BluetoothGattCallback::jni_onConnectionStateChangeCallback(JNIEnv *env, jobject thiz, jobject gatt, jint status, jint new_state) {
-    auto msg = "onConnectionStateChangeCallback";
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg);
+    auto msg = fmt::format("onConnectionStateChangeCallback status: {} new_state: {}", status, new_state);
+    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
 
     auto it = BluetoothGattCallback::_map.find(thiz);
     if (it != BluetoothGattCallback::_map.end()) {

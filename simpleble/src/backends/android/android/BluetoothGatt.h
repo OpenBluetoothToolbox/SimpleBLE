@@ -1,6 +1,9 @@
 #pragma once
 
 #include "jni/Common.hpp"
+#include "BluetoothGattService.h"
+
+#include <vector>
 #include <cstdint>
 
 namespace SimpleBLE {
@@ -15,6 +18,7 @@ public:
     bool connect();
     void disconnect();
     bool discoverServices();
+    std::vector<BluetoothGattService> getServices();
 
     // void abortReliableWrite(BluetoothDevice mDevice);
     // void abortReliableWrite();
