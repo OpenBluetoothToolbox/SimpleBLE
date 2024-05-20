@@ -3,6 +3,7 @@
 //
 
 #include "BluetoothGattService.h"
+#include "UUID.h"
 
 namespace SimpleBLE {
 namespace Android {
@@ -62,8 +63,8 @@ void BluetoothGattService::initialize() {
 BluetoothGattService::BluetoothGattService() { initialize(); }
 
 
-BluetoothGattService::BluetoothGattService(JNI::Object _obj) : BluetoothGattService() {
-    _obj = _obj;
+BluetoothGattService::BluetoothGattService(JNI::Object obj) : BluetoothGattService() {
+    _obj = obj;
 }
 
 //bool BluetoothGattService::addCharacteristic(BluetoothGattCharacteristic characteristic) {
@@ -97,9 +98,13 @@ int BluetoothGattService::getInstanceId() { return _obj.call_int_method(_method_
 int BluetoothGattService::getType() { return _obj.call_int_method(_method_getType); }
 
 std::string BluetoothGattService::getUuid() {
-    JNI::Env env;
+    if (!_obj) return "INVALID!!";
+
     JNI::Object uuidObj = _obj.call_object_method(_method_getUuid);
-    return env->GetStringUTFChars((jstring)uuidObj.get(), nullptr);
+
+    if (!uuidObj) return "INVALID!!";
+
+    return UUID(uuidObj).toString();
 }
 
 }  // namespace Android

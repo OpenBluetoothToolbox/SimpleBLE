@@ -64,6 +64,11 @@ class Object {
         return _obj.get() != nullptr;
     }
 
+    jmethodID get_method(const char* name, const char* signature) {
+        JNIEnv* env = VM::env();
+        return env->GetMethodID(_cls.get(), name, signature);
+    }
+
     template <typename... Args>
     Object call_object_method(jmethodID method, Args&&... args) {
         JNIEnv* env = VM::env();

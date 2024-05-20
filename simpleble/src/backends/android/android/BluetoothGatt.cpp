@@ -1,3 +1,5 @@
+#include <fmt/core.h>
+#include <android/log.h>
 #include "BluetoothGatt.h"
 
 namespace SimpleBLE {
@@ -76,10 +78,12 @@ std::vector<BluetoothGattService> BluetoothGatt::getServices() {
     std::vector<BluetoothGattService> result;
     while (iterator.call_boolean_method("hasNext", "()Z")) {
         JNI::Object service = iterator.call_object_method("next", "()Ljava/lang/Object;");
+
+        if (!service) continue;
         result.push_back(BluetoothGattService(service));
     }
 
-    return std::vector<BluetoothGattService>();
+    return result;
 }
 
 
