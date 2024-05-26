@@ -10,7 +10,7 @@ class DescriptorBase {
     DescriptorBase(const BluetoothUUID& uuid);
     virtual ~DescriptorBase() = default;
 
-    BluetoothUUID uuid();
+    BluetoothUUID uuid() const;
 
   protected:
     BluetoothUUID uuid_;

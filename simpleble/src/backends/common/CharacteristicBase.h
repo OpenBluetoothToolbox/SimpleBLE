@@ -12,14 +12,14 @@ class CharacteristicBase {
                        bool can_write_request, bool can_write_command, bool can_notify, bool can_indicate);
     virtual ~CharacteristicBase() = default;
 
-    BluetoothUUID uuid();
-    std::vector<Descriptor> descriptors();
+    BluetoothUUID uuid() const;
+    std::vector<Descriptor> descriptors() const;
 
-    bool can_read();
-    bool can_write_request();
-    bool can_write_command();
-    bool can_notify();
-    bool can_indicate();
+    bool can_read() const;
+    bool can_write_request() const;
+    bool can_write_command() const;
+    bool can_notify() const;
+    bool can_indicate() const;
 
   protected:
     BluetoothUUID uuid_;

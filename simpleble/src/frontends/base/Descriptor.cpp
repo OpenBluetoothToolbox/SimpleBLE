@@ -5,4 +5,6 @@
 
 using namespace SimpleBLE;
 
-BluetoothUUID Descriptor::uuid() { return internal_->uuid(); }
+BluetoothUUID Descriptor::uuid() const { return internal().uuid(); }
+
+const DescriptorBase &Descriptor::internal() const { return *internal_; }

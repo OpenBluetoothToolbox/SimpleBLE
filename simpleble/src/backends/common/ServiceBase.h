@@ -13,9 +13,9 @@ class ServiceBase {
     ServiceBase(const BluetoothUUID& uuid, std::vector<Characteristic>& characteristics);
     virtual ~ServiceBase() = default;
 
-    BluetoothUUID uuid();
-    ByteArray data();
-    std::vector<Characteristic> characteristics();
+    BluetoothUUID uuid() const;
+    ByteArray data() const;
+    std::vector<Characteristic> characteristics() const;
 
   protected:
     BluetoothUUID uuid_;

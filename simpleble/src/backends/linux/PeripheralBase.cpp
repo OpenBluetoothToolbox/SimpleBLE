@@ -34,11 +34,11 @@ PeripheralBase::~PeripheralBase() {
 
 void* PeripheralBase::underlying() const { return device_.get(); }
 
-std::string PeripheralBase::identifier() { return device_->name(); }
+std::string PeripheralBase::identifier() const { return device_->name(); }
 
-BluetoothAddress PeripheralBase::address() { return device_->address(); }
+BluetoothAddress PeripheralBase::address() const { return device_->address(); }
 
-BluetoothAddressType PeripheralBase::address_type() {
+BluetoothAddressType PeripheralBase::address_type() const {
     std::string address_type = device_->address_type();
 
     if (address_type == "public") {
@@ -50,11 +50,11 @@ BluetoothAddressType PeripheralBase::address_type() {
     }
 }
 
-int16_t PeripheralBase::rssi() { return device_->rssi(); }
+int16_t PeripheralBase::rssi() const { return device_->rssi(); }
 
-int16_t PeripheralBase::tx_power() { return device_->tx_power(); }
+int16_t PeripheralBase::tx_power() const { return device_->tx_power(); }
 
-uint16_t PeripheralBase::mtu() {
+uint16_t PeripheralBase::mtu() const {
     if (!is_connected()) return 0;
 
     for (auto bluez_service : device_->services()) {
@@ -107,15 +107,15 @@ void PeripheralBase::disconnect() {
     }
 }
 
-bool PeripheralBase::is_connected() {
+bool PeripheralBase::is_connected() const {
     // NOTE: For Bluez, a device being connected means that it's both
     // connected and services have been resolved.
     return device_->connected() && device_->services_resolved();
 }
 
-bool PeripheralBase::is_connectable() { return device_->name() != ""; }
+bool PeripheralBase::is_connectable() const { return device_->name() != ""; }
 
-bool PeripheralBase::is_paired() { return device_->paired(); }
+bool PeripheralBase::is_paired() const { return device_->paired(); }
 
 void PeripheralBase::unpair() {
     if (device_->paired()) {
@@ -123,7 +123,7 @@ void PeripheralBase::unpair() {
     }
 }
 
-std::vector<Service> PeripheralBase::services() {
+std::vector<Service> PeripheralBase::services() const {
     bool is_battery_service_available = false;
 
     std::vector<Service> service_list;
@@ -169,7 +169,7 @@ std::vector<Service> PeripheralBase::services() {
     return service_list;
 }
 
-std::vector<Service> PeripheralBase::advertised_services() {
+std::vector<Service> PeripheralBase::advertised_services() const {
     std::vector<Service> service_list;
     for (auto& service_uuid : device_->uuids()) {
         service_list.push_back(ServiceBuilder(service_uuid));
@@ -178,7 +178,7 @@ std::vector<Service> PeripheralBase::advertised_services() {
     return service_list;
 }
 
-std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() {
+std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() const {
     std::map<uint16_t, ByteArray> manufacturer_data;
     for (auto& [manufacturer_id, value_array] : device_->manufacturer_data()) {
         manufacturer_data[manufacturer_id] = ByteArray((const char*)value_array.data(), value_array.size());

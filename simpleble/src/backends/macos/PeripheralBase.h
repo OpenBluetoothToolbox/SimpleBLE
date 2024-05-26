@@ -19,23 +19,23 @@ class PeripheralBase {
 
     void* underlying() const;
 
-    std::string identifier();
-    BluetoothAddress address();
-    BluetoothAddressType address_type();
-    int16_t tx_power();
-    int16_t rssi();
-    uint16_t mtu();
+    std::string identifier() const;
+    BluetoothAddress address() const;
+    BluetoothAddressType address_type() const;
+    int16_t tx_power() const;
+    int16_t rssi() const;
+    uint16_t mtu() const;
 
     void connect();
     void disconnect();
-    bool is_connected();
-    bool is_connectable();
-    bool is_paired();
+    bool is_connected() const;
+    bool is_connectable() const;
+    bool is_paired() const;
     void unpair();
 
-    std::vector<Service> services();
-    std::vector<Service> advertised_services();
-    std::map<uint16_t, ByteArray> manufacturer_data();
+    std::vector<Service> services() const;
+    std::vector<Service> advertised_services() const;
+    std::map<uint16_t, ByteArray> manufacturer_data() const;
 
     // clang-format off
     ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic);

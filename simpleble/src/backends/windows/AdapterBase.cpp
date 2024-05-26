@@ -183,9 +183,9 @@ std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
 
 void* AdapterBase::underlying() const { return reinterpret_cast<void*>(const_cast<BluetoothAdapter*>(&adapter_)); }
 
-std::string AdapterBase::identifier() { return identifier_; }
+std::string AdapterBase::identifier() const { return identifier_; }
 
-BluetoothAddress AdapterBase::address() { return _mac_address_to_str(adapter_.BluetoothAddress()); }
+BluetoothAddress AdapterBase::address() const { return _mac_address_to_str(adapter_.BluetoothAddress()); }
 
 void AdapterBase::scan_start() {
     this->seen_peripherals_.clear();
@@ -215,9 +215,9 @@ void AdapterBase::scan_for(int timeout_ms) {
     scan_stop();
 }
 
-bool AdapterBase::scan_is_active() { return scan_is_active_; }
+bool AdapterBase::scan_is_active() const { return scan_is_active_; }
 
-std::vector<Peripheral> AdapterBase::scan_get_results() {
+std::vector<Peripheral> AdapterBase::scan_get_results() const {
     std::vector<Peripheral> peripherals;
     for (auto& [address, base_peripheral] : this->seen_peripherals_) {
         PeripheralBuilder peripheral_builder(base_peripheral);
@@ -227,7 +227,7 @@ std::vector<Peripheral> AdapterBase::scan_get_results() {
     return peripherals;
 }
 
-std::vector<Peripheral> AdapterBase::get_paired_peripherals() { return {}; }
+std::vector<Peripheral> AdapterBase::get_paired_peripherals() const { return {}; }
 
 void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start) {
     if (on_scan_start) {
