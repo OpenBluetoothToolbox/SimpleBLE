@@ -3,6 +3,7 @@
 //
 
 #include "BluetoothGattCharacteristic.h"
+#include "UUID.h"
 
 namespace SimpleBLE {
 namespace Android {
@@ -85,11 +86,23 @@ BluetoothGattCharacteristic::BluetoothGattCharacteristic(JNI::Object obj) : Blue
 //    return BluetoothGattDescriptor(descObj);
 //}
 //
-//std::vector<BluetoothGattDescriptor> BluetoothGattCharacteristic::getDescriptors() {
-//    JNI::Env env;
-//    JNI::Object listObj = _obj.call_object_method(_method_getDescriptors);
-//    return JNI::convert_list<BluetoothGattDescriptor>(listObj);
-//}
+std::vector<BluetoothGattDescriptor> BluetoothGattCharacteristic::getDescriptors() {
+    if (!_obj) return std::vector<BluetoothGattDescriptor>();
+
+    JNI::Object descriptors = _obj.call_object_method(_method_getDescriptors);
+    if (!descriptors) return std::vector<BluetoothGattDescriptor>();
+
+    std::vector<BluetoothGattDescriptor> result;
+    JNI::Object iterator = descriptors.call_object_method("iterator", "()Ljava/util/Iterator;");
+    while (iterator.call_boolean_method("hasNext", "()Z")) {
+        JNI::Object descriptor = iterator.call_object_method("next", "()Ljava/lang/Object;");
+
+        if (!descriptor) continue;
+        result.push_back(BluetoothGattDescriptor(descriptor));
+    }
+
+    return result;
+}
 
 int BluetoothGattCharacteristic::getInstanceId() { return _obj.call_int_method(_method_getInstanceId); }
 
@@ -98,9 +111,12 @@ int BluetoothGattCharacteristic::getPermissions() { return _obj.call_int_method(
 int BluetoothGattCharacteristic::getProperties() { return _obj.call_int_method(_method_getProperties); }
 
 std::string BluetoothGattCharacteristic::getUuid() {
-    JNI::Env env;
+    if (!_obj) return "";
+
     JNI::Object uuidObj = _obj.call_object_method(_method_getUuid);
-    return env->GetStringUTFChars((jstring)uuidObj.get(), nullptr);
+    if (!uuidObj) return "";
+
+    return UUID(uuidObj).toString();
 }
 
 int BluetoothGattCharacteristic::getWriteType() { return _obj.call_int_method(_method_getWriteType); }

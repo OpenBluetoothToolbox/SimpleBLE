@@ -73,9 +73,9 @@ std::vector<BluetoothGattService> BluetoothGatt::getServices() {
     JNI::Object services = _obj.call_object_method("getServices", "()Ljava/util/List;");
     if (!services) return std::vector<BluetoothGattService>();
 
-    JNI::Object iterator = services.call_object_method("iterator", "()Ljava/util/Iterator;");
-
+    // TODO: We should create a List class type and cache method IDs.
     std::vector<BluetoothGattService> result;
+    JNI::Object iterator = services.call_object_method("iterator", "()Ljava/util/Iterator;");
     while (iterator.call_boolean_method("hasNext", "()Z")) {
         JNI::Object service = iterator.call_object_method("next", "()Ljava/lang/Object;");
 

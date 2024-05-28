@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 #include "BluetoothGattDescriptor.h"
-#include "BluetoothGattService.h"
 #include "jni/Common.hpp"
 
 namespace SimpleBLE {
@@ -16,7 +15,7 @@ class BluetoothGattCharacteristic {
 
 //    bool addDescriptor(BluetoothGattDescriptor descriptor);
 //    BluetoothGattDescriptor getDescriptor(std::string uuid);
-//    std::vector<BluetoothGattDescriptor> getDescriptors();
+    std::vector<BluetoothGattDescriptor> getDescriptors();
     int getInstanceId();
     int getPermissions();
     int getProperties();
@@ -26,7 +25,14 @@ class BluetoothGattCharacteristic {
 
     JNI::Object getObject() const { return _obj; }
 
-  private:
+    static const int PROPERTY_INDICATE = 0x00000020;
+    static const int PROPERTY_NOTIFY = 0x00000010;
+    static const int PROPERTY_READ = 0x00000002;
+    static const int PROPERTY_WRITE = 0x00000008;
+    static const int PROPERTY_WRITE_NO_RESPONSE = 0x00000004;
+
+
+private:
     JNI::Object _obj;
     static JNI::Class _cls;
     static jmethodID _method_addDescriptor;

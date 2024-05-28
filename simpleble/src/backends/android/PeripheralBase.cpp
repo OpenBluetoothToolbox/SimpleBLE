@@ -29,17 +29,9 @@ PeripheralBase::PeripheralBase(Android::ScanResult scan_result) : _device(scan_r
     });
 
     _btGattCallback.set_callback_onServicesDiscovered([this]() {
-        std::vector<Android::BluetoothGattService> services = _gatt.getServices();
+        _services = _gatt.getServices();
 
-        auto msg = fmt::format("Services discovered: {}", services.size());
-        __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
 
-        for (auto& service : services) {
-            auto msg = fmt::format("Service: {}", service.getUuid());
-            __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
-        }
-
-        // TODO KEVIN: RETRIEVE SERVICES AND CHARACTERISTICS
 
         // Notify the user that the connection has been established once services hace been discovered.
         SAFE_CALLBACK_CALL(callback_on_connected_);
@@ -81,29 +73,77 @@ bool PeripheralBase::is_paired() { return false; }
 
 void PeripheralBase::unpair() {}
 
-std::vector<Service> PeripheralBase::services() { return std::vector<Service>(); }
+std::vector<Service> PeripheralBase::services() {
+
+    std::vector<Service> service_list;
+    for (auto service : _services) {
+        // Build the list of characteristics for the service.
+        std::vector<Characteristic> characteristic_list;
+        for (auto characteristic : service.getCharacteristics()) {
+            // Build the list of descriptors for the characteristic.
+            std::vector<Descriptor> descriptor_list;
+            for (auto descriptor : characteristic.getDescriptors()) {
+                descriptor_list.push_back(DescriptorBuilder(descriptor.getUuid()));
+            }
+
+            int flags = characteristic.getProperties();
+
+            bool can_read = flags & Android::BluetoothGattCharacteristic::PROPERTY_READ;
+            bool can_write_request = flags & Android::BluetoothGattCharacteristic::PROPERTY_WRITE;
+            bool can_write_command = flags & Android::BluetoothGattCharacteristic::PROPERTY_WRITE_NO_RESPONSE;
+            bool can_notify = flags & Android::BluetoothGattCharacteristic::PROPERTY_NOTIFY;
+            bool can_indicate = flags & Android::BluetoothGattCharacteristic::PROPERTY_INDICATE;
+
+            characteristic_list.push_back(CharacteristicBuilder(characteristic.getUuid(), descriptor_list, can_read,
+                                                                can_write_request, can_write_command, can_notify,
+                                                                can_indicate));
+        }
+
+        service_list.push_back(ServiceBuilder(service.getUuid(), characteristic_list));
+    }
+
+    return service_list;
+}
 
 std::vector<Service> PeripheralBase::advertised_services() { return std::vector<Service>(); }
 
 std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() { return std::map<uint16_t, ByteArray>(); }
 
 ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
+    auto msg = "Reading characteristic " + characteristic;
+    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+
     return ByteArray();
 }
 
 void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                   ByteArray const& data) {}
+                                   ByteArray const& data) {
+    auto msg = "Writing request to characteristic " + characteristic;
+    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+}
 
 void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                   ByteArray const& data) {}
+                                   ByteArray const& data) {
+    auto msg = "Writing command to characteristic " + characteristic;
+    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+}
 
 void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                            std::function<void(ByteArray payload)> callback) {}
+                            std::function<void(ByteArray payload)> callback) {
+    auto msg = "Subscribing to characteristic " + characteristic;
+    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+}
 
 void PeripheralBase::indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                              std::function<void(ByteArray payload)> callback) {}
+                              std::function<void(ByteArray payload)> callback) {
+    auto msg = "Subscribing to characteristic " + characteristic;
+    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+}
 
-void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) {}
+void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
+    auto msg = "Unsubscribing from characteristic " + characteristic;
+    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+}
 
 ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                                BluetoothUUID const& descriptor) {
@@ -127,4 +167,44 @@ void PeripheralBase::set_callback_on_disconnected(std::function<void()> on_disco
     } else {
         callback_on_disconnected_.unload();
     }
+}
+
+// NOTE: This approach to retrieve the characteristic and descriptor objects is not ideal, as it involves
+//       iterating on Java objects and returning a copy of the desired object. This will be improved in the future
+//       if performance becomes a bottleneck.
+Android::BluetoothGattCharacteristic PeripheralBase::_fetch_characteristic(const BluetoothUUID& service_uuid,
+                                                             const BluetoothUUID& characteristic_uuid) {
+    for (auto& service : _services) {
+        if (service.getUuid() == service_uuid) {
+            for (auto& characteristic : service.getCharacteristics()) {
+                if (characteristic.getUuid() == characteristic_uuid) {
+                    return characteristic;
+                }
+                throw SimpleBLE::Exception::CharacteristicNotFound(characteristic_uuid);
+            }
+        }
+    }
+
+    throw SimpleBLE::Exception::ServiceNotFound(service_uuid);
+}
+
+Android::BluetoothGattDescriptor PeripheralBase::_fetch_descriptor(const BluetoothUUID& service_uuid,
+                                                 const BluetoothUUID& characteristic_uuid,
+                                                 const BluetoothUUID& descriptor_uuid) {
+    for (auto& service : _services) {
+        if (service.getUuid() == service_uuid) {
+            for (auto& characteristic : service.getCharacteristics()) {
+                if (characteristic.getUuid() == characteristic_uuid) {
+                    for (auto& descriptor : characteristic.getDescriptors()) {
+                        if (descriptor.getUuid() == descriptor_uuid) {
+                            return descriptor;
+                        }
+                        throw SimpleBLE::Exception::DescriptorNotFound(descriptor_uuid);
+                    }
+                }
+                throw SimpleBLE::Exception::CharacteristicNotFound(characteristic_uuid);
+            }
+        }
+    }
+    throw SimpleBLE::Exception::ServiceNotFound(service_uuid);
 }

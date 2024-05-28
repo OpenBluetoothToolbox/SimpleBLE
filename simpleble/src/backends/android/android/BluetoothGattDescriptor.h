@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include "BluetoothGattCharacteristic.h"
 #include "jni/Common.hpp"
 
 namespace SimpleBLE {

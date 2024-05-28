@@ -16,7 +16,7 @@ class BluetoothGattService {
 //    bool addCharacteristic(BluetoothGattCharacteristic characteristic);
 //    bool addService(BluetoothGattService service);
 //    BluetoothGattCharacteristic getCharacteristic(std::string uuid);
-//    std::vector<BluetoothGattCharacteristic> getCharacteristics();
+    std::vector<BluetoothGattCharacteristic> getCharacteristics();
 //    std::vector<BluetoothGattService> getIncludedServices();
     int getInstanceId();
     int getType();

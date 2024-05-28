@@ -1,4 +1,5 @@
 #include "BluetoothGattDescriptor.h"
+#include "UUID.h"
 
 namespace SimpleBLE {
 namespace Android {
@@ -36,9 +37,12 @@ BluetoothGattDescriptor::BluetoothGattDescriptor(JNI::Object obj) : BluetoothGat
 int BluetoothGattDescriptor::getPermissions() { return _obj.call_int_method(_method_getPermissions); }
 
 std::string BluetoothGattDescriptor::getUuid() {
-    JNI::Env env;
+    if (!_obj) return "";
+
     JNI::Object uuidObj = _obj.call_object_method(_method_getUuid);
-    return env->GetStringUTFChars((jstring)uuidObj.get(), nullptr);
+    if (!uuidObj) return "";
+
+    return UUID(uuidObj).toString();
 }
 }  // namespace Android
 }  // namespace SimpleBLE

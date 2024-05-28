@@ -157,19 +157,23 @@ fun ConnectContent(bluetoothViewModel: BluetoothViewModel) {
                     modifier = Modifier.padding(16.dp)
                 )
 
-                peripheral.services().forEach { service ->
-                    Text(
-                        text = "Service: ${service.uuid}",
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier.padding(16.dp)
-                    )
-
-                    service.characteristics.forEach { characteristic ->
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(8.dp)
+                ) {
+                    items(peripheral.services().withIndex().toList()) { (index, service) ->
                         Text(
-                            text = "Characteristic: ${characteristic.uuid}",
-                            style = MaterialTheme.typography.body2,
-                            modifier = Modifier.padding(start = 32.dp)
+                            text = "Service: ${service.uuid}",
+                            style = MaterialTheme.typography.body1,
+                            modifier = Modifier.padding(16.dp)
                         )
+
+                        service.characteristics.forEach { characteristic ->
+                            Text(
+                                text = "Characteristic: ${characteristic.uuid}",
+                                style = MaterialTheme.typography.body2,
+                                modifier = Modifier.padding(start = 32.dp)
+                            )
 
 //                        Text(
 //                            text = "Capabilities: ${characteristic.capabilities.joinToString(", ")}",
@@ -177,12 +181,13 @@ fun ConnectContent(bluetoothViewModel: BluetoothViewModel) {
 //                            modifier = Modifier.padding(start = 32.dp)
 //                        )
 
-                        characteristic.descriptors.forEach { descriptor ->
-                            Text(
-                                text = "Descriptor: ${descriptor.uuid}",
-                                style = MaterialTheme.typography.body2,
-                                modifier = Modifier.padding(start = 48.dp)
-                            )
+                            characteristic.descriptors.forEach { descriptor ->
+                                Text(
+                                    text = "Descriptor: ${descriptor.uuid}",
+                                    style = MaterialTheme.typography.body2,
+                                    modifier = Modifier.padding(start = 48.dp)
+                                )
+                            }
                         }
                     }
                 }

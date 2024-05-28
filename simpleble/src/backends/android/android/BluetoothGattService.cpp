@@ -81,11 +81,23 @@ BluetoothGattService::BluetoothGattService(JNI::Object obj) : BluetoothGattServi
 //    return BluetoothGattCharacteristic(charObj);
 //}
 //
-//std::vector<BluetoothGattCharacteristic> BluetoothGattService::getCharacteristics() {
-//    JNI::Env env;
-//    JNI::Object listObj = _obj.call_object_method(_method_getCharacteristics);
-//    return JNI::convert_list<BluetoothGattCharacteristic>(listObj);
-//}
+std::vector<BluetoothGattCharacteristic> BluetoothGattService::getCharacteristics() {
+    if (!_obj) return std::vector<BluetoothGattCharacteristic>();
+
+    JNI::Object characteristics = _obj.call_object_method(_method_getCharacteristics);
+    if (!characteristics) return std::vector<BluetoothGattCharacteristic>();
+
+    std::vector<BluetoothGattCharacteristic> result;
+    JNI::Object iterator = characteristics.call_object_method("iterator", "()Ljava/util/Iterator;");
+    while (iterator.call_boolean_method("hasNext", "()Z")) {
+        JNI::Object characteristic = iterator.call_object_method("next", "()Ljava/lang/Object;");
+
+        if (!characteristic) continue;
+        result.push_back(BluetoothGattCharacteristic(characteristic));
+    }
+
+    return result;
+}
 //
 //std::vector<BluetoothGattService> BluetoothGattService::getIncludedServices() {
 //    JNI::Env env;
@@ -98,11 +110,10 @@ int BluetoothGattService::getInstanceId() { return _obj.call_int_method(_method_
 int BluetoothGattService::getType() { return _obj.call_int_method(_method_getType); }
 
 std::string BluetoothGattService::getUuid() {
-    if (!_obj) return "INVALID!!";
+    if (!_obj) return "";
 
     JNI::Object uuidObj = _obj.call_object_method(_method_getUuid);
-
-    if (!uuidObj) return "INVALID!!";
+    if (!uuidObj) return "";
 
     return UUID(uuidObj).toString();
 }

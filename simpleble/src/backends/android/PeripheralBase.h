@@ -58,9 +58,16 @@ class PeripheralBase {
     Android::Bridge::BluetoothGattCallback _btGattCallback;
     Android::BluetoothDevice _device;
     Android::BluetoothGatt _gatt;
+    std::vector<Android::BluetoothGattService> _services;
 
     kvn::safe_callback<void()> callback_on_connected_;
     kvn::safe_callback<void()> callback_on_disconnected_;
+
+    Android::BluetoothGattCharacteristic _fetch_characteristic(const BluetoothUUID& service_uuid,
+                                                               const BluetoothUUID& characteristic_uuid);
+    Android::BluetoothGattDescriptor _fetch_descriptor(const BluetoothUUID& service_uuid,
+                                                       const BluetoothUUID& characteristic_uuid,
+                                                       const BluetoothUUID& descriptor_uuid);
 
 };
 
