@@ -210,6 +210,8 @@ To run the thread sanitizer tests, run the following command: ::
 
 .. Links
 
+.. _CMake: https://cmake.org/
+
 .. _cmake-init-fetchcontent: https://github.com/friendlyanon/cmake-init-fetchcontent
 
 .. _fmtlib: https://github.com/fmtlib/fmt
