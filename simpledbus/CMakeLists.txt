@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.21)
 
+# Only allow Linux builds
+if(NOT CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+    message(FATAL_ERROR "-- [ERROR] UNSUPPORTED SYSTEM: '${CMAKE_HOST_SYSTEM_NAME}'. SimpleDBus can only be built on Linux.")
+endif()
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
 
 project(
