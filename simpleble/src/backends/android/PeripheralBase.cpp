@@ -113,6 +113,13 @@ ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const
     auto msg = "Reading characteristic " + characteristic;
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
 
+    auto characteristic_obj = _fetch_characteristic(service, characteristic);
+
+    bool success = _gatt.readCharacteristic(characteristic_obj);
+    if (!success) {
+        throw SimpleBLE::Exception::OperationFailed("Failed to read characteristic " + characteristic);
+    }
+
     return ByteArray();
 }
 
@@ -131,6 +138,29 @@ void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID c
 void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                             std::function<void(ByteArray payload)> callback) {
     auto msg = "Subscribing to characteristic " + characteristic;
+    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+
+    auto characteristic_obj = _fetch_characteristic(service, characteristic);
+    auto descriptor_obj = _fetch_descriptor(service, characteristic, Android::BluetoothGattDescriptor::CLIENT_CHARACTERISTIC_CONFIG);
+
+    bool success = _gatt.setCharacteristicNotification(characteristic_obj, true);
+    if (!success) {
+        throw SimpleBLE::Exception::OperationFailed("Failed to subscribe to characteristic " + characteristic);
+    }
+
+    msg = "Subscribed to characteristic " + characteristic + " successfully. Will now enable notifications";
+    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+
+    descriptor_obj.setValue(Android::BluetoothGattDescriptor::ENABLE_NOTIFICATION_VALUE);
+    msg = "Setting value for descriptor " + Android::BluetoothGattDescriptor::CLIENT_CHARACTERISTIC_CONFIG;
+    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+
+    success = _gatt.writeDescriptor(descriptor_obj);
+    if (!success) {
+        throw SimpleBLE::Exception::OperationFailed("Failed to write descriptor for characteristic " + characteristic);
+    }
+
+    msg = "Subscribed to characteristic " + characteristic;
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
 }
 

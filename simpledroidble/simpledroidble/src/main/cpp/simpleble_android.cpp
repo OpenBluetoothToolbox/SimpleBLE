@@ -730,10 +730,16 @@ Java_org_simpleble_android_Peripheral_nativePeripheralManufacturerData(JNIEnv* e
 extern "C"
 JNIEXPORT jbyteArray JNICALL
 Java_org_simpleble_android_Peripheral_nativePeripheralRead(JNIEnv *env, jobject thiz,
-                                                           jlong adapter_id, jlong instance_id,
-                                                           jstring service,
-                                                           jstring characteristic) {
-    // TODO: implement nativePeripheralRead()
+                                                           jlong adapter_id, jlong peripheral_id,
+                                                           jstring j_service,
+                                                           jstring j_characteristic) {
+    std::string service = from_jstring(env, j_service);
+    std::string characteristic = from_jstring(env, j_characteristic);
+
+    auto peripheral = cached_peripherals[adapter_id].at(peripheral_id);
+    SimpleBLE::ByteArray result = peripheral.read(service, characteristic).value_or("");
+
+    return to_jbyteArray(env, result);
 }
 extern "C"
 JNIEXPORT void JNICALL

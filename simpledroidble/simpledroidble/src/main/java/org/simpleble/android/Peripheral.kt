@@ -102,8 +102,7 @@ class Peripheral internal constructor(newAdapterId: Long, newInstanceId: Long) {
     }
 
     fun read(service: BluetoothUUID, characteristic: BluetoothUUID): ByteArray {
-        // TODO: Implement
-        return ByteArray(0)
+        return nativePeripheralRead(adapterId, instanceId, service.toString(), characteristic.toString())
     }
 
     fun writeRequest(service: BluetoothUUID, characteristic: BluetoothUUID, data: ByteArray) {

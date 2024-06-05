@@ -2,6 +2,8 @@
 
 #include <jni.h>
 #include <string>
+#include <vector>
+#include <cstdint>
 
 #include "GlobalRef.hpp"
 #include "VM.hpp"
@@ -112,6 +114,23 @@ class Object {
         return result;
     }
 
+    template<typename... Args>
+    std::vector<uint8_t> call_byte_array_method(jmethodID method, Args&&... args) {
+        JNIEnv* env = VM::env();
+        jbyteArray jarr = (jbyteArray)env->CallObjectMethod(_obj.get(), method, std::forward<Args>(args)...);
+
+        if (jarr == nullptr) {
+            return {};
+        }
+
+        jsize len = env->GetArrayLength(jarr);
+        jbyte* arr = env->GetByteArrayElements(jarr, nullptr);
+
+        std::vector<uint8_t> result(arr, arr + len);
+
+        env->ReleaseByteArrayElements(jarr, arr, JNI_ABORT);
+        return result;
+    }
     
 
 
@@ -169,6 +188,26 @@ class Object {
         const char* c_str = env->GetStringUTFChars(jstr, nullptr);
         std::string result(c_str);
         env->ReleaseStringUTFChars(jstr, c_str);
+        return result;
+    }
+
+    template<typename... Args>
+    std::vector<uint8_t> call_byte_array_method(const char* name, const char* signature, Args&&... args) {
+        JNIEnv* env = VM::env();
+
+        jmethodID method = env->GetMethodID(_cls.get(), name, signature);
+        jbyteArray jarr = (jbyteArray)env->CallObjectMethod(_obj.get(), method, std::forward<Args>(args)...);
+
+        if (jarr == nullptr) {
+            return {};
+        }
+
+        jsize len = env->GetArrayLength(jarr);
+        jbyte* arr = env->GetByteArrayElements(jarr, nullptr);
+
+        std::vector<uint8_t> result(arr, arr + len);
+
+        env->ReleaseByteArrayElements(jarr, arr, JNI_ABORT);
         return result;
     }
 

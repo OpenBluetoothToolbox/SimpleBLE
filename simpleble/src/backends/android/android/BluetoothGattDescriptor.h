@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <simpleble/Types.h>
 #include "jni/Common.hpp"
 
 namespace SimpleBLE {
@@ -11,17 +12,24 @@ class BluetoothGattDescriptor {
     BluetoothGattDescriptor();
     BluetoothGattDescriptor(JNI::Object obj);
 
-    int getPermissions();
     std::string getUuid();
 
+    std::vector<uint8_t> getValue();
+    bool setValue(const std::vector<uint8_t>& value);
+
     JNI::Object getObject() const { return _obj; }
+
+    static const std::string CLIENT_CHARACTERISTIC_CONFIG;
+    static const std::vector<uint8_t> ENABLE_NOTIFICATION_VALUE;
+    static const std::vector<uint8_t> ENABLE_INDICATION_VALUE;
+
 
   private:
     JNI::Object _obj;
     static JNI::Class _cls;
-    static jmethodID _method_getCharacteristic;
-    static jmethodID _method_getPermissions;
     static jmethodID _method_getUuid;
+    static jmethodID _method_getValue;
+    static jmethodID _method_setValue;
 
     void initialize();
 };

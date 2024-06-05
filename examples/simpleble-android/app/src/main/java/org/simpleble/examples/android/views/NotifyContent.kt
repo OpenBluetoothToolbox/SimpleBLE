@@ -21,8 +21,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -72,6 +75,7 @@ fun NotifyContent(bluetoothViewModel: BluetoothViewModel) {
 
                     servicescharacteristics = peripheral.services().flatMap { service ->
                         service.characteristics.map { characteristic ->
+                            Log.d("SimpleBLE", "Service: ${service.uuid} Characteristic: ${characteristic.uuid} [Notify: ${characteristic.canNotify} Indicate: ${characteristic.canIndicate} Read: ${characteristic.canRead} WriteCommand: ${characteristic.canWriteCommand} WriteRequest: ${characteristic.canWriteRequest}]")
                             Pair(BluetoothUUID(service.uuid), BluetoothUUID(characteristic.uuid))
                         }
                     }
@@ -163,13 +167,24 @@ fun NotifyContent(bluetoothViewModel: BluetoothViewModel) {
                                 }
                             }
                             CoroutineScope(Dispatchers.Main).launch {
-                                delay(5000)
+                                delay(10000)
                                 peripheral.unsubscribe(servicecharacteristic.first, servicecharacteristic.second)
                             }
                         },
                         modifier = Modifier.padding(16.dp)
                     ) {
                         Text(text = "Subscribe to Notifications")
+                    }
+
+                    Button(
+                        onClick = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                peripheral.read(servicecharacteristic.first, servicecharacteristic.second)
+                            }
+                        },
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(text = "Read")
                     }
 
                     receivedData?.let { data ->
@@ -188,6 +203,12 @@ fun NotifyContent(bluetoothViewModel: BluetoothViewModel) {
                     items(servicescharacteristics.withIndex().toList()) { (index, characteristic) ->
                         Text(
                             text = "[$index] ${characteristic.first} ${characteristic.second}",
+                            style = TextStyle(
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 8.sp,
+                                lineHeight = 12.sp,
+                                letterSpacing = 0.5.sp
+                            ),
                             modifier = Modifier
                                 .padding(8.dp)
                                 .clickable {

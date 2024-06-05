@@ -3,21 +3,39 @@ package org.simpleble.android.bridge;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
-import android.os.Build;
+import android.util.Log;
 
 public class BluetoothGattCallback extends android.bluetooth.BluetoothGattCallback {
 
     public BluetoothGattCallback() {}
 
     @Override
+    public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+        // NOTE: This method has been deprecated on API 33, but we're still using API 31, so we need to support this.
+        super.onCharacteristicChanged(gatt, characteristic);
+        Log.d("BluetoothGattCallback", "onCharacteristicChanged: " + characteristic.getUuid());
+        onCharacteristicChangedCallback(gatt, characteristic, characteristic.getValue());
+    }
+
+    @Override
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, byte[] value) {
         super.onCharacteristicChanged(gatt, characteristic, value);
+        Log.d("BluetoothGattCallback", "onCharacteristicChanged new: " + characteristic.getUuid());
         onCharacteristicChangedCallback(gatt, characteristic, value);
+    }
+
+    @Override
+    public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic,
+                                     int status) {
+        super.onCharacteristicRead(gatt, characteristic, status);
+        Log.d("BluetoothGattCallback", "onCharacteristicRead: " + characteristic.getUuid());
+        onCharacteristicReadCallback(gatt, characteristic, characteristic.getValue(), status);
     }
 
     @Override
     public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, byte[] value, int status) {
         super.onCharacteristicRead(gatt, characteristic, value, status);
+        Log.d("BluetoothGattCallback", "onCharacteristicRead new: " + characteristic.getUuid());
         onCharacteristicReadCallback(gatt, characteristic, value, status);
     }
 
