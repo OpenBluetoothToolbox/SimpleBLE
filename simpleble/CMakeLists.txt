@@ -225,7 +225,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
 
     target_link_libraries(simpleble PUBLIC pthread)
-    target_link_libraries(simpleble PRIVATE ${DBus1_LIBRARIES})
+    target_link_libraries(simpleble PRIVATE dbus-1::dbus-1)
 
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
