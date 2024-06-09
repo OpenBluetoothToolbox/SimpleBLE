@@ -4,7 +4,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
 
 project(
     simpleble
-    VERSION ${SIMPLEBLE_VERSION}
+    VERSION "${SIMPLEBLE_VERSION}"
     DESCRIPTION "The ultimate fully-fledged cross-platform library for Bluetooth Low Energy (BLE)."
     HOMEPAGE_URL "https://github.com/OpenBluetoothToolbox/SimpleBLE"
     LANGUAGES CXX
