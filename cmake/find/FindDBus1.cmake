@@ -1,24 +1,25 @@
-# Attempt to load DBus1 as CONFIG silently
-find_package(DBus1 CONFIG QUIET)
-
-# If DBus1 was not found, try to find it as MODULE
-if(NOT DBus1_FOUND)
-
-    find_package(PkgConfig REQUIRED)
-    pkg_search_module(PC_DBUS REQUIRED dbus-1)
-
-    set(DBus1_INCLUDE_DIRS ${PC_DBUS_INCLUDE_DIRS})
-
-    # setup imported target
-    add_library(dbus-1 INTERFACE)
-    set_property(TARGET dbus-1 APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${DBus1_INCLUDE_DIRS})
-
-    set(DBus1_FOUND ${PC_DBUS_FOUND})
-
-    # get_cmake_property(_variableNames VARIABLES)
-    # list (SORT _variableNames)
-    # foreach (_variableName ${_variableNames})
-    #     message(STATUS "${_variableName}=${${_variableName}}")
-    # endforeach()
-
+find_package(PkgConfig QUIET)
+if(PKG_CONFIG_FOUND)
+    pkg_check_modules(_dbus_hint QUIET libdbus)
 endif()
+
+find_path(DBus1_INCLUDE_DIRS
+  NAMES
+    dbus/dbus.h
+  HINTS
+    ${_dbus_hint_INCLUDE_DIRS}
+  PATH_SUFFIXES
+    include/
+    include/dbus-1.0/
+    dbus-1.0/
+)
+
+if(NOT DBus1_INCLUDE_DIRS)
+    set(DBus1_FOUND 0)
+    return()
+endif()
+
+# setup imported target
+add_library(dbus-1 INTERFACE)
+set_property(TARGET dbus-1 APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${DBus1_INCLUDE_DIRS})
+set(DBus1_FOUND 1)
