@@ -23,14 +23,14 @@ void Connection::init() {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
 
     ::DBusError err;
-    dbus_error_init(&err);
+    dbus.error_init(&err);
 
-    dbus_threads_init_default();
-    _conn = dbus_bus_get(_dbus_bus_type, &err);
-    if (dbus_error_is_set(&err)) {
+    dbus.threads_init_default();
+    _conn = dbus.bus_get(_dbus_bus_type, &err);
+    if (dbus.error_is_set(&err)) {
         std::string err_name = err.name;
         std::string err_message = err.message;
-        dbus_error_free(&err);
+        dbus.error_free(&err);
         throw Exception::DBusException(err_name, err_message);
     }
     _initialized = true;
@@ -52,7 +52,7 @@ void Connection::uninit() {
         message = pop_message();
     } while (message.is_valid());
 
-    dbus_connection_unref(_conn);
+    dbus.connection_unref(_conn);
     _initialized = false;
 }
 
@@ -66,14 +66,14 @@ void Connection::add_match(std::string rule) {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
 
     ::DBusError err;
-    dbus_error_init(&err);
+    dbus.error_init(&err);
 
-    dbus_bus_add_match(_conn, rule.c_str(), &err);
-    dbus_connection_flush(_conn);
-    if (dbus_error_is_set(&err)) {
+    dbus.bus_add_match(_conn, rule.c_str(), &err);
+    dbus.connection_flush(_conn);
+    if (dbus.error_is_set(&err)) {
         std::string err_name = err.name;
         std::string err_message = err.message;
-        dbus_error_free(&err);
+        dbus.error_free(&err);
         throw Exception::DBusException(err_name, err_message);
     }
 }
@@ -86,14 +86,14 @@ void Connection::remove_match(std::string rule) {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
 
     ::DBusError err;
-    dbus_error_init(&err);
+    dbus.error_init(&err);
 
-    dbus_bus_remove_match(_conn, rule.c_str(), &err);
-    dbus_connection_flush(_conn);
-    if (dbus_error_is_set(&err)) {
+    dbus.bus_remove_match(_conn, rule.c_str(), &err);
+    dbus.connection_flush(_conn);
+    if (dbus.error_is_set(&err)) {
         std::string err_name = err.name;
         std::string err_message = err.message;
-        dbus_error_free(&err);
+        dbus.error_free(&err);
         throw Exception::DBusException(err_name, err_message);
     }
 }
@@ -106,7 +106,7 @@ void Connection::read_write() {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
 
     // Non blocking read of the next available message
-    dbus_connection_read_write(_conn, 0);
+    dbus.connection_read_write(_conn, 0);
 }
 
 Message Connection::pop_message() {
@@ -116,7 +116,7 @@ Message Connection::pop_message() {
 
     std::lock_guard<std::recursive_mutex> lock(_mutex);
 
-    DBusMessage* msg = dbus_connection_pop_message(_conn);
+    DBusMessage* msg = dbus.connection_pop_message(_conn);
     if (msg == nullptr) {
         return Message();
     } else {
@@ -132,8 +132,8 @@ void Connection::send(Message& msg) {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
 
     uint32_t msg_serial = 0;
-    dbus_connection_send(_conn, msg._msg, &msg_serial);
-    dbus_connection_flush(_conn);
+    dbus.connection_send(_conn, msg._msg, &msg_serial);
+    dbus.connection_flush(_conn);
 }
 
 Message Connection::send_with_reply_and_block(Message& msg) {
@@ -144,13 +144,13 @@ Message Connection::send_with_reply_and_block(Message& msg) {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
 
     ::DBusError err;
-    dbus_error_init(&err);
-    DBusMessage* msg_tmp = dbus_connection_send_with_reply_and_block(_conn, msg._msg, -1, &err);
+    dbus.error_init(&err);
+    DBusMessage* msg_tmp = dbus.connection_send_with_reply_and_block(_conn, msg._msg, -1, &err);
 
-    if (dbus_error_is_set(&err)) {
+    if (dbus.error_is_set(&err)) {
         std::string err_name = err.name;
         std::string err_message = err.message;
-        dbus_error_free(&err);
+        dbus.error_free(&err);
         throw Exception::SendFailed(err_name, err_message, msg.to_string());
     }
 
@@ -164,5 +164,5 @@ std::string Connection::unique_name() {
 
     std::lock_guard<std::recursive_mutex> lock(_mutex);
 
-    return std::string(dbus_bus_get_unique_name(_conn));
+    return std::string(dbus.bus_get_unique_name(_conn));
 }

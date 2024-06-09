@@ -3,24 +3,25 @@
 #include <sstream>
 
 using namespace SimpleDBus;
+static const libdbus& dbus = libdbus::instance();
 
 #define MESSAGE_DICT_APPEND_KEY_NUM(key_sig, dict_contents)                                   \
     for (auto& [key, value] : dict_contents) {                                                \
         DBusMessageIter entry_iter;                                                           \
-        dbus_message_iter_open_container(&sub_iter, DBUS_TYPE_DICT_ENTRY, NULL, &entry_iter); \
-        dbus_message_iter_append_basic(&entry_iter, key_sig, &key);                           \
+        dbus.message_iter_open_container(&sub_iter, DBUS_TYPE_DICT_ENTRY, NULL, &entry_iter); \
+        dbus.message_iter_append_basic(&entry_iter, key_sig, &key);                           \
         _append_argument(&entry_iter, value, value_sig);                                      \
-        dbus_message_iter_close_container(&sub_iter, &entry_iter);                            \
+        dbus.message_iter_close_container(&sub_iter, &entry_iter);                            \
     }
 
 #define MESSAGE_DICT_APPEND_KEY_STR(key_sig, dict_contents)                                   \
     for (auto& [key, value] : dict_contents) {                                                \
         const char* p_value = key.c_str();                                                    \
         DBusMessageIter entry_iter;                                                           \
-        dbus_message_iter_open_container(&sub_iter, DBUS_TYPE_DICT_ENTRY, NULL, &entry_iter); \
-        dbus_message_iter_append_basic(&entry_iter, key_sig, &p_value);                       \
+        dbus.message_iter_open_container(&sub_iter, DBUS_TYPE_DICT_ENTRY, NULL, &entry_iter); \
+        dbus.message_iter_append_basic(&entry_iter, key_sig, &p_value);                       \
         _append_argument(&entry_iter, value, value_sig);                                      \
-        dbus_message_iter_close_container(&sub_iter, &entry_iter);                            \
+        dbus.message_iter_close_container(&sub_iter, &entry_iter);                            \
     }
 
 std::atomic_int32_t Message::creation_counter = 0;
@@ -69,7 +70,7 @@ Message::Message(const Message& other) : Message() {
         this->_is_extracted = other._is_extracted;
         this->_extracted = other._extracted;
         this->_arguments = other._arguments;
-        this->_msg = dbus_message_copy(other._msg);
+        this->_msg = dbus.message_copy(other._msg);
     }
 }
 
@@ -108,7 +109,7 @@ Message& Message::operator=(const Message& other) {
             this->_is_extracted = other._is_extracted;
             this->_extracted = other._extracted;
             this->_arguments = other._arguments;
-            this->_msg = dbus_message_copy(other._msg);
+            this->_msg = dbus.message_copy(other._msg);
         }
     }
 
@@ -133,7 +134,7 @@ void Message::_invalidate() {
 
 void Message::_safe_delete() {
     if (is_valid()) {
-        dbus_message_unref(this->_msg);
+        dbus.message_unref(this->_msg);
         _invalidate();
     }
 }
@@ -144,80 +145,80 @@ void Message::_append_argument(DBusMessageIter* iter, Holder& argument, std::str
     switch (signature[0]) {
         case DBUS_TYPE_BYTE: {
             uint8_t value = argument.get_byte();
-            dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE, &value);
+            dbus.message_iter_append_basic(iter, DBUS_TYPE_BYTE, &value);
             break;
         }
         case DBUS_TYPE_BOOLEAN: {
             uint32_t value = static_cast<uint32_t>(argument.get_boolean());
-            dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
+            dbus.message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
             break;
         }
         case DBUS_TYPE_INT16: {
             int16_t value = argument.get_int16();
-            dbus_message_iter_append_basic(iter, DBUS_TYPE_INT16, &value);
+            dbus.message_iter_append_basic(iter, DBUS_TYPE_INT16, &value);
             break;
         }
         case DBUS_TYPE_UINT16: {
             uint16_t value = argument.get_uint16();
-            dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &value);
+            dbus.message_iter_append_basic(iter, DBUS_TYPE_UINT16, &value);
             break;
         }
         case DBUS_TYPE_INT32: {
             int32_t value = argument.get_int32();
-            dbus_message_iter_append_basic(iter, DBUS_TYPE_INT32, &value);
+            dbus.message_iter_append_basic(iter, DBUS_TYPE_INT32, &value);
             break;
         }
         case DBUS_TYPE_UINT32: {
             uint32_t value = argument.get_uint32();
-            dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32, &value);
+            dbus.message_iter_append_basic(iter, DBUS_TYPE_UINT32, &value);
             break;
         }
         case DBUS_TYPE_INT64: {
             int64_t value = argument.get_int64();
-            dbus_message_iter_append_basic(iter, DBUS_TYPE_INT64, &value);
+            dbus.message_iter_append_basic(iter, DBUS_TYPE_INT64, &value);
             break;
         }
         case DBUS_TYPE_UINT64: {
             uint64_t value = argument.get_uint64();
-            dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT64, &value);
+            dbus.message_iter_append_basic(iter, DBUS_TYPE_UINT64, &value);
             break;
         }
         case DBUS_TYPE_DOUBLE: {
             double value = argument.get_double();
-            dbus_message_iter_append_basic(iter, DBUS_TYPE_DOUBLE, &value);
+            dbus.message_iter_append_basic(iter, DBUS_TYPE_DOUBLE, &value);
             break;
         }
         case DBUS_TYPE_STRING: {
             std::string value = argument.get_string();
             const char* p_value = value.c_str();
-            dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &p_value);
+            dbus.message_iter_append_basic(iter, DBUS_TYPE_STRING, &p_value);
             break;
         }
         case DBUS_TYPE_OBJECT_PATH: {
             std::string value = argument.get_object_path();
             const char* p_value = value.c_str();
-            dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &p_value);
+            dbus.message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &p_value);
             break;
         }
         case DBUS_TYPE_SIGNATURE: {
             std::string value = argument.get_signature();
             const char* p_value = value.c_str();
-            dbus_message_iter_append_basic(iter, DBUS_TYPE_SIGNATURE, &p_value);
+            dbus.message_iter_append_basic(iter, DBUS_TYPE_SIGNATURE, &p_value);
             break;
         }
         case DBUS_TYPE_VARIANT: {
             DBusMessageIter sub_iter;
             std::string signature = argument.signature();
-            dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT, signature.c_str(), &sub_iter);
+            dbus.message_iter_open_container(iter, DBUS_TYPE_VARIANT, signature.c_str(), &sub_iter);
             _append_argument(&sub_iter, argument, signature);
-            dbus_message_iter_close_container(iter, &sub_iter);
+            dbus.message_iter_close_container(iter, &sub_iter);
             break;
         }
 
         case DBUS_TYPE_ARRAY: {
             auto sig_next = signature.substr(1);
             DBusMessageIter sub_iter;
-            dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, sig_next.c_str(), &sub_iter);
+            dbus.message_iter_open_container(iter, DBUS_TYPE_ARRAY, sig_next.c_str(), &sub_iter);
             if (sig_next[0] != DBUS_DICT_ENTRY_BEGIN_CHAR) {
                 auto array_contents = argument.get_array();
                 for (auto elem : array_contents) {
@@ -281,13 +282,13 @@ void Message::_append_argument(DBusMessageIter* iter, Holder& argument, std::str
                     }
                 }
             }
-            dbus_message_iter_close_container(iter, &sub_iter);
+            dbus.message_iter_close_container(iter, &sub_iter);
         }
     }
 }
 
 void Message::append_argument(Holder argument, std::string signature) {
-    dbus_message_iter_init_append(_msg, &_iter);
+    dbus.message_iter_init_append(_msg, &_iter);
     _append_argument(&_iter, argument, signature);
     _arguments.push_back(argument);
 }
@@ -296,7 +297,7 @@ int32_t Message::get_unique_id() { return _unique_id; }
 
 uint32_t Message::get_serial() {
     if (is_valid()) {
-        return dbus_message_get_serial(_msg);
+        return dbus.message_get_serial(_msg);
     } else {
         return 0;
     }
@@ -304,7 +305,7 @@ uint32_t Message::get_serial() {
 
 std::string Message::get_signature() {
     if (is_valid() && _iter_initialized) {
-        return dbus_message_iter_get_signature(&_iter);
+        return dbus.message_iter_get_signature(&_iter);
     } else {
         return "";
     }
@@ -312,7 +313,7 @@ std::string Message::get_signature() {
 
 Message::Type Message::get_type() const {
     if (is_valid()) {
-        return (Message::Type)dbus_message_get_type(_msg);
+        return (Message::Type)dbus.message_get_type(_msg);
     } else {
         return Message::Type::INVALID;
     }
@@ -320,7 +321,7 @@ Message::Type Message::get_type() const {
 
 std::string Message::get_path() {
     if (is_valid() && (get_type() == Message::Type::SIGNAL || get_type() == Message::Type::METHOD_CALL)) {
-        return dbus_message_get_path(_msg);
+        return dbus.message_get_path(_msg);
     } else {
         return "";
     }
@@ -328,7 +329,7 @@ std::string Message::get_path() {
 
 std::string Message::get_interface() {
     if (is_valid()) {
-        return dbus_message_get_interface(_msg);
+        return dbus.message_get_interface(_msg);
     } else {
         return "";
     }
@@ -336,14 +337,14 @@ std::string Message::get_interface() {
 
 std::string Message::get_member() {
     if (is_valid() && get_type() == Message::Type::METHOD_CALL) {
-        return dbus_message_get_member(_msg);
+        return dbus.message_get_member(_msg);
     } else {
         return "";
     }
 }
 
 bool Message::is_signal(std::string interface, std::string signal_name) {
-    return is_valid() && dbus_message_is_signal(_msg, interface.c_str(), signal_name.c_str());
+    return is_valid() && dbus.message_is_signal(_msg, interface.c_str(), signal_name.c_str());
 }
 
 static const char* type_to_name(int message_type) {
@@ -371,15 +372,15 @@ std::string Message::to_string(bool append_arguments) const {
     const char* sender;
     const char* destination;
 
-    sender = dbus_message_get_sender(_msg);
+    sender = dbus.message_get_sender(_msg);
     sender = sender ? sender : "(null)";
-    destination = dbus_message_get_destination(_msg);
+    destination = dbus.message_get_destination(_msg);
     destination = destination ? destination : "(null)";
 
-    oss << "[" << _unique_id << "] " << type_to_name(dbus_message_get_type(_msg));
+    oss << "[" << _unique_id << "] " << type_to_name(dbus.message_get_type(_msg));
     oss << "[" << sender << "->" << destination << "] ";
-    oss << dbus_message_get_path(_msg) << " " << dbus_message_get_interface(_msg) << " "
-        << dbus_message_get_member(_msg);
+    oss << dbus.message_get_path(_msg) << " " << dbus.message_get_interface(_msg) << " "
+        << dbus.message_get_member(_msg);
 
     if (get_type() == Message::Type::METHOD_CALL && append_arguments) {
         oss << std::endl;
@@ -408,16 +409,16 @@ Holder Message::extract() {
 
 void Message::extract_reset() {
     if (is_valid()) {
-        dbus_message_iter_init(_msg, &_iter);
+        dbus.message_iter_init(_msg, &_iter);
         _iter_initialized = true;
     }
 }
 
-bool Message::extract_has_next() { return _iter_initialized && dbus_message_iter_has_next(&_iter); }
+bool Message::extract_has_next() { return _iter_initialized && dbus.message_iter_has_next(&_iter); }
 
 void Message::extract_next() {
     if (extract_has_next()) {
-        dbus_message_iter_next(&_iter);
+        dbus.message_iter_next(&_iter);
         _is_extracted = false;
     }
 }
@@ -425,7 +426,7 @@ void Message::extract_next() {
 Holder Message::_extract_bytearray(DBusMessageIter* iter) {
     const unsigned char* bytes;
     int len;
-    dbus_message_iter_get_fixed_array(iter, &bytes, &len);
+    dbus.message_iter_get_fixed_array(iter, &bytes, &len);
     Holder holder_array = Holder::create_array();
     for (int i = 0; i < len; i++) {
         holder_array.array_append(Holder::create_byte(bytes[i]));
@@ -436,16 +437,16 @@ Holder Message::_extract_bytearray(DBusMessageIter* iter) {
 Holder Message::_extract_array(DBusMessageIter* iter) {
     Holder holder_array = Holder::create_array();
     indent += 1;
-    int current_type = dbus_message_iter_get_arg_type(iter);
+    int current_type = dbus.message_iter_get_arg_type(iter);
     if (current_type == DBUS_TYPE_BYTE) {
         holder_array = _extract_bytearray(iter);
     } else {
-        while ((current_type = dbus_message_iter_get_arg_type(iter)) != DBUS_TYPE_INVALID) {
+        while ((current_type = dbus.message_iter_get_arg_type(iter)) != DBUS_TYPE_INVALID) {
             Holder h = _extract_generic(iter);
             if (h.type() != Holder::NONE) {
                 holder_array.array_append(h);
             }
-            dbus_message_iter_next(iter);
+            dbus.message_iter_next(iter);
         }
     }
     indent -= 1;
@@ -459,14 +460,14 @@ Holder Message::_extract_dict(DBusMessageIter* iter) {
     int current_type;
 
     // Loop through all dictionary entries.
-    while ((current_type = dbus_message_iter_get_arg_type(iter)) != DBUS_TYPE_INVALID) {
+    while ((current_type = dbus.message_iter_get_arg_type(iter)) != DBUS_TYPE_INVALID) {
         // Access the dictionary entry
         DBusMessageIter sub;
-        dbus_message_iter_recurse(iter, &sub);
+        dbus.message_iter_recurse(iter, &sub);
 
         // Extract the data from the dictionary entry
         Holder key = _extract_generic(&sub);
-        dbus_message_iter_next(&sub);
+        dbus.message_iter_next(&sub);
         Holder value = _extract_generic(&sub);
 
         // Add the data to the dictionary
@@ -476,14 +477,14 @@ Holder Message::_extract_dict(DBusMessageIter* iter) {
         }
 
         holder_dict.dict_append(key.type(), key.get_contents(), value);
-        dbus_message_iter_next(iter);
+        dbus.message_iter_next(iter);
     }
     indent -= 1;
     return holder_dict;
 }
 
 Holder Message::_extract_generic(DBusMessageIter* iter) {
-    int current_type = dbus_message_iter_get_arg_type(iter);
+    int current_type = dbus.message_iter_get_arg_type(iter);
     if (current_type != DBUS_TYPE_INVALID) {
         // for (int i = 0; i < indent; i++) {
         //     std::cout << '\t';
@@ -492,80 +493,80 @@ Holder Message::_extract_generic(DBusMessageIter* iter) {
         switch (current_type) {
             case DBUS_TYPE_BYTE: {
                 uint8_t contents;
-                dbus_message_iter_get_basic(iter, &contents);
+                dbus.message_iter_get_basic(iter, &contents);
                 return Holder::create_byte(contents);
                 break;
             }
             case DBUS_TYPE_BOOLEAN: {
                 bool contents;
-                dbus_message_iter_get_basic(iter, &contents);
+                dbus.message_iter_get_basic(iter, &contents);
                 return Holder::create_boolean(contents);
                 break;
             }
             case DBUS_TYPE_INT16: {
                 int16_t contents;
-                dbus_message_iter_get_basic(iter, &contents);
+                dbus.message_iter_get_basic(iter, &contents);
                 return Holder::create_int16(contents);
                 break;
             }
             case DBUS_TYPE_UINT16: {
                 uint16_t contents;
-                dbus_message_iter_get_basic(iter, &contents);
+                dbus.message_iter_get_basic(iter, &contents);
                 return Holder::create_uint16(contents);
                 break;
             }
             case DBUS_TYPE_INT32: {
                 int32_t contents;
-                dbus_message_iter_get_basic(iter, &contents);
+                dbus.message_iter_get_basic(iter, &contents);
                 return Holder::create_int32(contents);
                 break;
             }
             case DBUS_TYPE_UINT32: {
                 uint32_t contents;
-                dbus_message_iter_get_basic(iter, &contents);
+                dbus.message_iter_get_basic(iter, &contents);
                 return Holder::create_uint32(contents);
                 break;
             }
             case DBUS_TYPE_INT64: {
                 int64_t contents;
-                dbus_message_iter_get_basic(iter, &contents);
+                dbus.message_iter_get_basic(iter, &contents);
                 return Holder::create_int64(contents);
                 break;
             }
             case DBUS_TYPE_UINT64: {
                 uint64_t contents;
-                dbus_message_iter_get_basic(iter, &contents);
+                dbus.message_iter_get_basic(iter, &contents);
                 return Holder::create_uint64(contents);
                 break;
             }
             case DBUS_TYPE_DOUBLE: {
                 double contents;
-                dbus_message_iter_get_basic(iter, &contents);
+                dbus.message_iter_get_basic(iter, &contents);
                 return Holder::create_double(contents);
                 break;
             }
             case DBUS_TYPE_STRING: {
                 char* contents;
-                dbus_message_iter_get_basic(iter, &contents);
+                dbus.message_iter_get_basic(iter, &contents);
                 return Holder::create_string(contents);
                 break;
             }
             case DBUS_TYPE_OBJECT_PATH: {
                 char* contents;
-                dbus_message_iter_get_basic(iter, &contents);
+                dbus.message_iter_get_basic(iter, &contents);
                 return Holder::create_object_path(contents);
                 break;
             }
             case DBUS_TYPE_SIGNATURE: {
                 char* contents;
-                dbus_message_iter_get_basic(iter, &contents);
+                dbus.message_iter_get_basic(iter, &contents);
                 return Holder::create_signature(contents);
                 break;
             }
             case DBUS_TYPE_ARRAY: {
                 DBusMessageIter sub;
-                dbus_message_iter_recurse(iter, &sub);
-                int sub_type = dbus_message_iter_get_arg_type(&sub);
+                dbus.message_iter_recurse(iter, &sub);
+                int sub_type = dbus.message_iter_get_arg_type(&sub);
                 if (sub_type == DBUS_TYPE_DICT_ENTRY) {
                     return _extract_dict(&sub);
                 } else {
@@ -575,7 +576,7 @@ Holder Message::_extract_generic(DBusMessageIter* iter) {
             }
             case DBUS_TYPE_VARIANT: {
                 DBusMessageIter sub;
-                dbus_message_iter_recurse(iter, &sub);
+                dbus.message_iter_recurse(iter, &sub);
                 indent += 1;
                 Holder h = _extract_generic(&sub);
                 indent -= 1;
@@ -588,11 +589,11 @@ Holder Message::_extract_generic(DBusMessageIter* iter) {
 }
 
 Message Message::create_method_call(std::string bus_name, std::string path, std::string interface, std::string method) {
-    return Message(dbus_message_new_method_call(bus_name.c_str(), path.c_str(), interface.c_str(), method.c_str()));
+    return Message(dbus.message_new_method_call(bus_name.c_str(), path.c_str(), interface.c_str(), method.c_str()));
 }
 
-Message Message::create_method_return(const Message& msg) { return Message(dbus_message_new_method_return(msg._msg)); }
+Message Message::create_method_return(const Message& msg) { return Message(dbus.message_new_method_return(msg._msg)); }
 
 Message Message::create_error(const Message& msg, std::string error_name, std::string error_message) {
-    return Message(dbus_message_new_error(msg._msg, error_name.c_str(), error_message.c_str()));
+    return Message(dbus.message_new_error(msg._msg, error_name.c_str(), error_message.c_str()));
 }
