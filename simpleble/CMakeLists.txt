@@ -94,7 +94,9 @@ set_target_properties(simpleble PROPERTIES
     RELEASE_POSTFIX ""
     RELWITHDEBINFO_POSTFIX "-relwithdebinfo"
     MINSIZEREL_POSTFIX "-minsizerel"
-    DEBUG_POSTFIX "-debug")
+    DEBUG_POSTFIX "-debug"
+    UNITY_BUILD NO
+)
 
 set_target_properties(simpleble-c PROPERTIES
     C_VISIBILITY_PRESET hidden
@@ -111,7 +113,9 @@ set_target_properties(simpleble-c PROPERTIES
     RELEASE_POSTFIX ""
     RELWITHDEBINFO_POSTFIX "-relwithdebinfo"
     MINSIZEREL_POSTFIX "-minsizerel"
-    DEBUG_POSTFIX "-debug")
+    DEBUG_POSTFIX "-debug"
+    UNITY_BUILD NO
+)
 
 generate_export_header(
     simpleble
