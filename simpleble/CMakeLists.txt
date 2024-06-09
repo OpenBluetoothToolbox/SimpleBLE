@@ -34,6 +34,13 @@ if(SIMPLEBLE_TEST)
     set(SIMPLEBLE_PLAIN ON)
 endif()
 
+if(UNIX AND NOT APPLE AND NOT WIN32 AND NOT SIMPLEBLE_PLAIN)
+    find_package(DBus1)
+    if(NOT TARGET dbus-1::dbus-1)
+        return()
+    endif()
+endif()
+
 set(SIMPLEBLE_PRIVATE_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -165,10 +172,8 @@ if(SIMPLEBLE_PLAIN)
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain)
 
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+elseif(UNIX AND NOT APPLE AND NOT WIN32)
     message(STATUS "Linux Host Detected")
-
-    find_package(DBus1 REQUIRED)
 
     if(NOT SIMPLEDBUS_LOG_LEVEL)
         set(SIMPLEDBUS_LOG_LEVEL "FATAL")
