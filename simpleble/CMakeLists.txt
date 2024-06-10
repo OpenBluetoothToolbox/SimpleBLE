@@ -278,7 +278,6 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         # TODO: This should be removed once the warnings are fixed.
         list(APPEND PRIVATE_COMPILE_OPTIONS "/w")
     else()
-        list(APPEND PRIVATE_COMPILE_OPTIONS "-fcoroutines")
         target_include_directories(simpleble SYSTEM PRIVATE
           $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/cppwinrt>
         )
