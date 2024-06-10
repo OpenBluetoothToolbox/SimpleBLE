@@ -42,14 +42,14 @@ if(UNIX AND NOT APPLE AND NOT WIN32 AND NOT SIMPLEBLE_PLAIN)
 endif()
 
 if(WIN32 AND NOT MSVC)
-    if(NOT EXISTS "${CMAKE_BINARY_DIR}/cppwinrt/winrt/")
+    if(NOT EXISTS "${CMAKE_BINARY_DIR}/Microsoft.Windows.SDK.CPP/")
         file(DOWNLOAD
-          https://github.com/microsoft/MIDI/releases/download/dev-preview-5/all-headers-sdk-10.0.22621.0-plus-dp5.zip
-          "${CMAKE_BINARY_DIR}/cppwinrt-headers.zip"
+          https://github.com/ossia/sdk/releases/download/sdk30/10.0.22621.0.zip
+          "${CMAKE_BINARY_DIR}/10.0.22621.0.zip"
         )
         file(ARCHIVE_EXTRACT
-          INPUT "${CMAKE_BINARY_DIR}/cppwinrt-headers.zip"
-          DESTINATION "${CMAKE_BINARY_DIR}/cppwinrt/winrt/"
+          INPUT "${CMAKE_BINARY_DIR}/10.0.22621.0.zip"
+          DESTINATION "${CMAKE_BINARY_DIR}/win_sdk_headers/"
         )
     endif()
 endif()
@@ -279,7 +279,8 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         list(APPEND PRIVATE_COMPILE_OPTIONS "/w")
     else()
         target_include_directories(simpleble SYSTEM PRIVATE
-          $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/cppwinrt>
+          $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/win_sdk_headers/cppwinrt>
+          $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/win_sdk_headers>
         )
         target_link_libraries(simpleble PRIVATE RuntimeObject)
     endif()
