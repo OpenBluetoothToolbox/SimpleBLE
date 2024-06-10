@@ -103,7 +103,7 @@ add_library(simpleble::simpleble-c ALIAS simpleble-c)
 set_target_properties(simpleble PROPERTIES
     CXX_VISIBILITY_PRESET hidden
     VISIBILITY_INLINES_HIDDEN YES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
     POSITION_INDEPENDENT_CODE ON
@@ -121,7 +121,7 @@ set_target_properties(simpleble PROPERTIES
 set_target_properties(simpleble-c PROPERTIES
     C_VISIBILITY_PRESET hidden
     VISIBILITY_INLINES_HIDDEN YES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
     POSITION_INDEPENDENT_CODE ON
@@ -243,7 +243,7 @@ elseif(UNIX AND NOT APPLE AND NOT WIN32)
     )
 
     target_link_libraries(simpleble PUBLIC pthread)
-    target_link_libraries(simpleble PRIVATE dbus-1::dbus-1)
+    target_link_libraries(simpleble PRIVATE dbus-1::dbus-1-headers-only)
 
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
@@ -278,6 +278,7 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         # TODO: This should be removed once the warnings are fixed.
         list(APPEND PRIVATE_COMPILE_OPTIONS "/w")
     else()
+        list(APPEND PRIVATE_COMPILE_OPTIONS "-fcoroutines")
         target_include_directories(simpleble SYSTEM PRIVATE
           $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/cppwinrt>
         )
