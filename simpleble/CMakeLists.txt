@@ -41,7 +41,7 @@ if(UNIX AND NOT APPLE AND NOT WIN32 AND NOT SIMPLEBLE_PLAIN)
     endif()
 endif()
 
-if(WIN32 AND NOT MSVC)
+if(0)
     if(NOT EXISTS "${CMAKE_BINARY_DIR}/Microsoft.Windows.SDK.CPP/")
         file(DOWNLOAD
           https://github.com/ossia/sdk/releases/download/sdk30/10.0.22621.0.zip
@@ -278,10 +278,10 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         # TODO: This should be removed once the warnings are fixed.
         list(APPEND PRIVATE_COMPILE_OPTIONS "/w")
     else()
-        target_include_directories(simpleble SYSTEM PRIVATE
-          $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/win_sdk_headers/cppwinrt>
-          $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/win_sdk_headers>
-        )
+        # target_include_directories(simpleble SYSTEM PRIVATE
+        #   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/win_sdk_headers/cppwinrt>
+        #   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/win_sdk_headers>
+        # )
         target_link_libraries(simpleble PRIVATE RuntimeObject)
     endif()
 

@@ -5,7 +5,7 @@
 #include <sstream>
 
 #include <sdkddkver.h>
-#include "../winrt/roapi.h"
+#include <roapi.h>
 
 #include "LoggingInternal.h"
 
