@@ -36,7 +36,7 @@ endif()
 
 if(UNIX AND NOT APPLE AND NOT WIN32 AND NOT SIMPLEBLE_PLAIN)
     find_package(DBus1)
-    if(NOT TARGET dbus-1::dbus-1)
+    if(NOT TARGET dbus-1::dbus-1-headers-only)
         return()
     endif()
 endif()

@@ -39,7 +39,7 @@ if(NOT DBus1_ARCH_INCLUDE_DIRS)
 endif()
 
 # setup imported target
-add_library(dbus-1 INTERFACE)
-add_library(dbus-1::dbus-1 ALIAS dbus-1)
-set_property(TARGET dbus-1 APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${DBus1_INCLUDE_DIRS} ${DBus1_ARCH_INCLUDE_DIRS})
+add_library(dbus-1-headers-only INTERFACE)
+add_library(dbus-1::dbus-1-headers-only ALIAS dbus-1-headers-only)
+set_property(TARGET dbus-1-headers-only APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${DBus1_INCLUDE_DIRS} ${DBus1_ARCH_INCLUDE_DIRS})
 set(DBus1_FOUND 1)
