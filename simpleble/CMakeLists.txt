@@ -282,7 +282,7 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         #   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/win_sdk_headers/cppwinrt>
         #   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/win_sdk_headers>
         # )
-        target_link_libraries(simpleble PRIVATE RuntimeObject)
+        target_link_libraries(simpleble PRIVATE RuntimeObject Shlwapi)
     endif()
 
     target_include_directories(simpleble PRIVATE
