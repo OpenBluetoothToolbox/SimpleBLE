@@ -41,6 +41,19 @@ if(UNIX AND NOT APPLE AND NOT WIN32 AND NOT SIMPLEBLE_PLAIN)
     endif()
 endif()
 
+if(WIN32 AND NOT MSVC)
+    if(NOT EXISTS "${CMAKE_BINARY_DIR}/cppwinrt/winrt/")
+        file(DOWNLOAD
+          https://github.com/microsoft/MIDI/releases/download/dev-preview-5/all-headers-sdk-10.0.22621.0-plus-dp5.zip
+          "${CMAKE_BINARY_DIR}/cppwinrt-headers.zip"
+        )
+        file(ARCHIVE_EXTRACT
+          INPUT "${CMAKE_BINARY_DIR}/cppwinrt-headers.zip"
+          DESTINATION "${CMAKE_BINARY_DIR}/cppwinrt/winrt/"
+        )
+    endif()
+endif()
+
 set(SIMPLEBLE_PRIVATE_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -263,7 +276,12 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         list(APPEND PRIVATE_COMPILE_OPTIONS "/WX")
         # /W1 -> Use the lowest level of warnings, as there are some unsafe functions that MSVC doesn't like.
         # TODO: This should be removed once the warnings are fixed.
-        list(APPEND PRIVATE_COMPILE_OPTIONS "/W1")
+        list(APPEND PRIVATE_COMPILE_OPTIONS "/w")
+    else()
+        target_include_directories(simpleble SYSTEM PRIVATE
+          $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/cppwinrt>
+        )
+        target_link_libraries(simpleble PRIVATE RuntimeObject)
     endif()
 
     target_include_directories(simpleble PRIVATE
