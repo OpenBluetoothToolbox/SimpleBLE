@@ -10,6 +10,7 @@ jmethodID BluetoothGattDescriptor::_method_getValue = nullptr;
 jmethodID BluetoothGattDescriptor::_method_setValue = nullptr;
 
 const std::string BluetoothGattDescriptor::CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
+const std::vector<uint8_t> BluetoothGattDescriptor::DISABLE_NOTIFICATION_VALUE = {0x00, 0x00};
 const std::vector<uint8_t> BluetoothGattDescriptor::ENABLE_NOTIFICATION_VALUE = {0x01, 0x00};
 const std::vector<uint8_t> BluetoothGattDescriptor::ENABLE_INDICATION_VALUE = {0x02, 0x00};
 

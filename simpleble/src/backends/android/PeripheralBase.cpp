@@ -31,9 +31,7 @@ PeripheralBase::PeripheralBase(Android::ScanResult scan_result) : _device(scan_r
     _btGattCallback.set_callback_onServicesDiscovered([this]() {
         _services = _gatt.getServices();
 
-
-
-        // Notify the user that the connection has been established once services hace been discovered.
+        // Notify the user that the connection has been established once services have been discovered.
         SAFE_CALLBACK_CALL(callback_on_connected_);
     });
 
@@ -148,20 +146,16 @@ void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& c
         throw SimpleBLE::Exception::OperationFailed("Failed to subscribe to characteristic " + characteristic);
     }
 
-    msg = "Subscribed to characteristic " + characteristic + " successfully. Will now enable notifications";
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
-
+    _btGattCallback.set_flag_descriptorWritePending(descriptor_obj.getObject().get());
     descriptor_obj.setValue(Android::BluetoothGattDescriptor::ENABLE_NOTIFICATION_VALUE);
-    msg = "Setting value for descriptor " + Android::BluetoothGattDescriptor::CLIENT_CHARACTERISTIC_CONFIG;
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
-
-    success = _gatt.writeDescriptor(descriptor_obj);
-    if (!success) {
+    if (!_gatt.writeDescriptor(descriptor_obj)) {
         throw SimpleBLE::Exception::OperationFailed("Failed to write descriptor for characteristic " + characteristic);
     }
+    _btGattCallback.wait_flag_descriptorWritePending(descriptor_obj.getObject().get());
 
     msg = "Subscribed to characteristic " + characteristic;
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+
 }
 
 void PeripheralBase::indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,

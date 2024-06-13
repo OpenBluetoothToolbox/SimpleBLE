@@ -13,29 +13,27 @@ public class BluetoothGattCallback extends android.bluetooth.BluetoothGattCallba
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
         // NOTE: This method has been deprecated on API 33, but we're still using API 31, so we need to support this.
         super.onCharacteristicChanged(gatt, characteristic);
-        Log.d("BluetoothGattCallback", "onCharacteristicChanged: " + characteristic.getUuid());
         onCharacteristicChangedCallback(gatt, characteristic, characteristic.getValue());
     }
 
     @Override
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, byte[] value) {
+        // NOTE: This method is only available from API 33 onwards.
         super.onCharacteristicChanged(gatt, characteristic, value);
-        Log.d("BluetoothGattCallback", "onCharacteristicChanged new: " + characteristic.getUuid());
         onCharacteristicChangedCallback(gatt, characteristic, value);
     }
 
     @Override
-    public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic,
-                                     int status) {
+    public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+        // NOTE: This method has been deprecated on API 33, but we're still using API 31, so we need to support this.
         super.onCharacteristicRead(gatt, characteristic, status);
-        Log.d("BluetoothGattCallback", "onCharacteristicRead: " + characteristic.getUuid());
         onCharacteristicReadCallback(gatt, characteristic, characteristic.getValue(), status);
     }
 
     @Override
     public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, byte[] value, int status) {
+        // NOTE: This method is only available from API 33 onwards.
         super.onCharacteristicRead(gatt, characteristic, value, status);
-        Log.d("BluetoothGattCallback", "onCharacteristicRead new: " + characteristic.getUuid());
         onCharacteristicReadCallback(gatt, characteristic, value, status);
     }
 
@@ -52,11 +50,19 @@ public class BluetoothGattCallback extends android.bluetooth.BluetoothGattCallba
     }
 
     // NOTE: This method is only available from API 33 onwards
-    //    @Override
-    //    public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, byte[] value, int status) {
-    //        super.onDescriptorRead(gatt, descriptor, status, value);
-    //        onDescriptorReadCallback(gatt, descriptor, value, status);
-    //    }
+    @Override
+    public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+        // NOTE: This method has been deprecated on API 33, but we're still using API 31, so we need to support this.
+        super.onDescriptorRead(gatt, descriptor, status);
+        onDescriptorReadCallback(gatt, descriptor, descriptor.getValue(), status);
+    }
+
+    @Override
+    public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status, byte[] value) {
+        // NOTE: This method is only available from API 33 onwards.
+        super.onDescriptorRead(gatt, descriptor, status, value);
+        onDescriptorReadCallback(gatt, descriptor, value, status);
+    }
 
     @Override
     public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {

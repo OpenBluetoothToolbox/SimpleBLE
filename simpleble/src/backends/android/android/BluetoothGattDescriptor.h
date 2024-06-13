@@ -20,6 +20,7 @@ class BluetoothGattDescriptor {
     JNI::Object getObject() const { return _obj; }
 
     static const std::string CLIENT_CHARACTERISTIC_CONFIG;
+    static const std::vector<uint8_t> DISABLE_NOTIFICATION_VALUE;
     static const std::vector<uint8_t> ENABLE_NOTIFICATION_VALUE;
     static const std::vector<uint8_t> ENABLE_INDICATION_VALUE;
 
