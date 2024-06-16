@@ -25,7 +25,7 @@ class Signature {
     Signature(const char* signature) : signature(signature) {}
     operator std::string() const { return signature; }
     bool operator<(const Signature& other) const { return signature < other.signature; }
-    
+
   private:
     std::string signature;
 };
@@ -143,4 +143,3 @@ class Holder {
 };
 
 }  // namespace SimpleDBus
-
