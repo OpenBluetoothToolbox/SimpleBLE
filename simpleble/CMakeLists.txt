@@ -4,7 +4,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/prelude.cmake)
 
 project(
     simpleble
-    VERSION ${SIMPLEBLE_VERSION}
+    VERSION "${SIMPLEBLE_VERSION}"
     DESCRIPTION "The ultimate fully-fledged cross-platform library for Bluetooth Low Energy (BLE)."
     HOMEPAGE_URL "https://github.com/OpenBluetoothToolbox/SimpleBLE"
     LANGUAGES CXX
@@ -17,6 +17,7 @@ include(GenerateExportHeader)
 include(GNUInstallDirs)
 
 option(SIMPLEBLE_PLAIN "Use plain version of SimpleBLE" OFF)
+option(SIMPLEBLE_INSTALL "Add install rules" ON)
 
 if(NOT TARGET fmt::fmt-header-only)
     option(LIBFMT_VENDORIZE "Enable vendorized libfmt" ON)
@@ -24,12 +25,33 @@ if(NOT TARGET fmt::fmt-header-only)
 
     if(TARGET fmt)
         set_target_properties(fmt PROPERTIES EXCLUDE_FROM_ALL TRUE)
+        add_library(fmt::fmt-header-only ALIAS fmt)
     endif()
 endif()
 
 if(SIMPLEBLE_TEST)
     message(STATUS "Building tests requires plain version of SimpleBLE")
     set(SIMPLEBLE_PLAIN ON)
+endif()
+
+if(UNIX AND NOT APPLE AND NOT WIN32 AND NOT SIMPLEBLE_PLAIN)
+    find_package(DBus1)
+    if(NOT TARGET dbus-1::dbus-1-headers-only)
+        return()
+    endif()
+endif()
+
+if(0)
+    if(NOT EXISTS "${CMAKE_BINARY_DIR}/Microsoft.Windows.SDK.CPP/")
+        file(DOWNLOAD
+          https://github.com/ossia/sdk/releases/download/sdk30/10.0.22621.0.zip
+          "${CMAKE_BINARY_DIR}/10.0.22621.0.zip"
+        )
+        file(ARCHIVE_EXTRACT
+          INPUT "${CMAKE_BINARY_DIR}/10.0.22621.0.zip"
+          DESTINATION "${CMAKE_BINARY_DIR}/win_sdk_headers/"
+        )
+    endif()
 endif()
 
 set(SIMPLEBLE_PRIVATE_INCLUDES
@@ -81,7 +103,7 @@ add_library(simpleble::simpleble-c ALIAS simpleble-c)
 set_target_properties(simpleble PROPERTIES
     CXX_VISIBILITY_PRESET hidden
     VISIBILITY_INLINES_HIDDEN YES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
     POSITION_INDEPENDENT_CODE ON
@@ -92,12 +114,14 @@ set_target_properties(simpleble PROPERTIES
     RELEASE_POSTFIX ""
     RELWITHDEBINFO_POSTFIX "-relwithdebinfo"
     MINSIZEREL_POSTFIX "-minsizerel"
-    DEBUG_POSTFIX "-debug")
+    DEBUG_POSTFIX "-debug"
+    UNITY_BUILD NO
+)
 
 set_target_properties(simpleble-c PROPERTIES
     C_VISIBILITY_PRESET hidden
     VISIBILITY_INLINES_HIDDEN YES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
     POSITION_INDEPENDENT_CODE ON
@@ -109,7 +133,9 @@ set_target_properties(simpleble-c PROPERTIES
     RELEASE_POSTFIX ""
     RELWITHDEBINFO_POSTFIX "-relwithdebinfo"
     MINSIZEREL_POSTFIX "-minsizerel"
-    DEBUG_POSTFIX "-debug")
+    DEBUG_POSTFIX "-debug"
+    UNITY_BUILD NO
+)
 
 generate_export_header(
     simpleble
@@ -159,10 +185,8 @@ if(SIMPLEBLE_PLAIN)
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain)
 
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+elseif(UNIX AND NOT APPLE AND NOT WIN32)
     message(STATUS "Linux Host Detected")
-
-    find_package(DBus1 REQUIRED)
 
     if(NOT SIMPLEDBUS_LOG_LEVEL)
         set(SIMPLEDBUS_LOG_LEVEL "FATAL")
@@ -219,7 +243,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
 
     target_link_libraries(simpleble PUBLIC pthread)
-    target_link_libraries(simpleble PRIVATE ${DBus1_LIBRARIES})
+    target_link_libraries(simpleble PRIVATE dbus-1::dbus-1-headers-only)
 
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
@@ -252,7 +276,13 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         list(APPEND PRIVATE_COMPILE_OPTIONS "/WX")
         # /W1 -> Use the lowest level of warnings, as there are some unsafe functions that MSVC doesn't like.
         # TODO: This should be removed once the warnings are fixed.
-        list(APPEND PRIVATE_COMPILE_OPTIONS "/W1")
+        list(APPEND PRIVATE_COMPILE_OPTIONS "/w")
+    else()
+        # target_include_directories(simpleble SYSTEM PRIVATE
+        #   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/win_sdk_headers/cppwinrt>
+        #   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/win_sdk_headers>
+        # )
+        target_link_libraries(simpleble PRIVATE RuntimeObject Shlwapi)
     endif()
 
     target_include_directories(simpleble PRIVATE
@@ -296,36 +326,38 @@ apply_build_options(simpleble-c
     "${PRIVATE_LINK_OPTIONS}"
     "${PUBLIC_LINK_OPTIONS}")
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/simpleble.pc.in
-            ${CMAKE_CURRENT_BINARY_DIR}/simpleble.pc @ONLY)
+if(SIMPLEBLE_INSTALL)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/simpleble.pc.in
+                ${CMAKE_CURRENT_BINARY_DIR}/simpleble.pc @ONLY)
 
-install(
-    TARGETS simpleble simpleble-c
-    EXPORT simpleble-config
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    install(
+        TARGETS simpleble simpleble-c
+        EXPORT simpleble-config
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-install(
-    EXPORT simpleble-config
-    NAMESPACE simpleble::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/simpleble)
+    install(
+        EXPORT simpleble-config
+        NAMESPACE simpleble::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/simpleble)
 
-install(
-    DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/simpleble/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpleble)
+    install(
+        DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/simpleble/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpleble)
 
-install(
-    DIRECTORY ${PROJECT_BINARY_DIR}/export/simpleble/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpleble)
+    install(
+        DIRECTORY ${PROJECT_BINARY_DIR}/export/simpleble/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpleble)
 
-install(
-    DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/simpleble_c/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpleble_c)
+    install(
+        DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/simpleble_c/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpleble_c)
 
-install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/simpleble.pc
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+    install(
+        FILES ${CMAKE_CURRENT_BINARY_DIR}/simpleble.pc
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+endif()
 
 if(SIMPLEBLE_TEST)
     message(STATUS "Building Tests")

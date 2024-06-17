@@ -1,7 +1,7 @@
 #pragma once
 
-#include <dbus/dbus.h>
 #include <mutex>
+#include "Library.h"
 #include "Message.h"
 
 namespace SimpleDBus {
@@ -30,6 +30,7 @@ class Connection {
     std::string unique_name();
 
   private:
+    const libdbus& dbus = libdbus::instance();
     bool _initialized = false;
 
     ::DBusBusType _dbus_bus_type;

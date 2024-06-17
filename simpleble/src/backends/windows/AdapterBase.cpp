@@ -73,7 +73,7 @@ AdapterBase::AdapterBase(std::string device_id)
 
             // Parse manufacturer data
             auto manufacturer_data = args.Advertisement().ManufacturerData();
-            for (auto& item : manufacturer_data) {
+            for (const auto& item : manufacturer_data) {
                 uint16_t company_id = item.CompanyId();
                 ByteArray manufacturer_data_buffer = ibuffer_to_bytearray(item.Data());
                 data.manufacturer_data[company_id] = manufacturer_data_buffer;
@@ -122,7 +122,7 @@ AdapterBase::AdapterBase(std::string device_id)
 
             // Parse service uuids
             auto service_data = args.Advertisement().ServiceUuids();
-            for (auto& service_guid : service_data) {
+            for (const auto& service_guid : service_data) {
                 std::string service_uuid = guid_to_uuid(service_guid);
                 data.service_data.emplace(std::make_pair(service_uuid, ByteArray()));
             }
