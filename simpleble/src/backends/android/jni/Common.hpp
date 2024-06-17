@@ -240,6 +240,8 @@ private:
     JNIEnv* _env = nullptr;
 };
 
+// TODO: Move these to their own namespace
+
 struct JObjectComparator {
     bool operator()(const jobject& lhs, const jobject& rhs) const {
         if (lhs == nullptr && rhs == nullptr) {

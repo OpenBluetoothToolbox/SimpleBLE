@@ -3,6 +3,7 @@
 
 #include <android/log.h>
 #include <climits>
+#include <jni/Types.h>
 
 namespace SimpleBLE {
 namespace Android {
@@ -44,6 +45,18 @@ void BluetoothGattCallback::set_callback_onServicesDiscovered(std::function<void
     } else {
         _callback_onServicesDiscovered.unload();
     }
+}
+
+void BluetoothGattCallback::set_callback_onCharacteristicChanged(JNI::Object characteristic, std::function<void(std::vector<uint8_t>)> callback) {
+    if (callback) {
+        _callback_onCharacteristicChanged[characteristic].load(callback);
+    } else {
+        _callback_onCharacteristicChanged[characteristic].unload();
+    }
+}
+
+void BluetoothGattCallback::clear_callback_onCharacteristicChanged(JNI::Object characteristic) {
+    _callback_onCharacteristicChanged[characteristic].unload();
 }
 
 void BluetoothGattCallback::set_flag_descriptorWritePending(JNI::Object descriptor) {
@@ -127,6 +140,13 @@ void BluetoothGattCallback::jni_onCharacteristicChangedCallback(JNIEnv *env, job
     if (it == BluetoothGattCallback::_map.end()) {
         // TODO: Throw an exception
         return;
+    }
+
+    BluetoothGattCallback* obj = it->second;
+    auto& callback = obj->_callback_onCharacteristicChanged[characteristic];
+    if (callback) {
+        std::vector<uint8_t> data = JNI::Types::fromJByteArray(value);
+        SAFE_CALLBACK_CALL(callback, data);
     }
 }
 

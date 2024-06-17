@@ -141,6 +141,10 @@ void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& c
     auto characteristic_obj = _fetch_characteristic(service, characteristic);
     auto descriptor_obj = _fetch_descriptor(service, characteristic, Android::BluetoothGattDescriptor::CLIENT_CHARACTERISTIC_CONFIG);
 
+    _btGattCallback.set_callback_onCharacteristicChanged(characteristic_obj.getObject(), [callback](std::vector<uint8_t> data) {
+        ByteArray payload(data.begin(), data.end());
+        callback(payload);
+    });
     bool success = _gatt.setCharacteristicNotification(characteristic_obj, true);
     if (!success) {
         throw SimpleBLE::Exception::OperationFailed("Failed to subscribe to characteristic " + characteristic);
@@ -152,21 +156,55 @@ void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& c
         throw SimpleBLE::Exception::OperationFailed("Failed to write descriptor for characteristic " + characteristic);
     }
     _btGattCallback.wait_flag_descriptorWritePending(descriptor_obj.getObject().get());
-
-    msg = "Subscribed to characteristic " + characteristic;
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
-
 }
 
 void PeripheralBase::indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                               std::function<void(ByteArray payload)> callback) {
     auto msg = "Subscribing to characteristic " + characteristic;
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+
+    auto characteristic_obj = _fetch_characteristic(service, characteristic);
+    auto descriptor_obj = _fetch_descriptor(service, characteristic, Android::BluetoothGattDescriptor::CLIENT_CHARACTERISTIC_CONFIG);
+
+    _btGattCallback.set_callback_onCharacteristicChanged(characteristic_obj.getObject(), [callback](std::vector<uint8_t> data) {
+        ByteArray payload(data.begin(), data.end());
+        callback(payload);
+    });
+    bool success = _gatt.setCharacteristicNotification(characteristic_obj, true);
+    if (!success) {
+        throw SimpleBLE::Exception::OperationFailed("Failed to subscribe to characteristic " + characteristic);
+    }
+
+    _btGattCallback.set_flag_descriptorWritePending(descriptor_obj.getObject().get());
+    descriptor_obj.setValue(Android::BluetoothGattDescriptor::ENABLE_INDICATION_VALUE);
+    if (!_gatt.writeDescriptor(descriptor_obj)) {
+        throw SimpleBLE::Exception::OperationFailed("Failed to write descriptor for characteristic " + characteristic);
+    }
+    _btGattCallback.wait_flag_descriptorWritePending(descriptor_obj.getObject().get());
+
+    msg = "Subscribed to characteristic " + characteristic;
+    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
 }
 
 void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     auto msg = "Unsubscribing from characteristic " + characteristic;
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+
+    auto characteristic_obj = _fetch_characteristic(service, characteristic);
+    auto descriptor_obj = _fetch_descriptor(service, characteristic, Android::BluetoothGattDescriptor::CLIENT_CHARACTERISTIC_CONFIG);
+
+    _btGattCallback.set_flag_descriptorWritePending(descriptor_obj.getObject().get());
+    descriptor_obj.setValue(Android::BluetoothGattDescriptor::DISABLE_NOTIFICATION_VALUE);
+    if (!_gatt.writeDescriptor(descriptor_obj)) {
+        throw SimpleBLE::Exception::OperationFailed("Failed to write descriptor for characteristic " + characteristic);
+    }
+    _btGattCallback.wait_flag_descriptorWritePending(descriptor_obj.getObject().get());
+
+    _btGattCallback.clear_callback_onCharacteristicChanged(characteristic_obj.getObject());
+    bool success = _gatt.setCharacteristicNotification(characteristic_obj, true);
+    if (!success) {
+        throw SimpleBLE::Exception::OperationFailed("Failed to subscribe to characteristic " + characteristic);
+    }
 }
 
 ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic,

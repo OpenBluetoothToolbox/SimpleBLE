@@ -20,6 +20,9 @@ class BluetoothGattCallback {
     void set_callback_onConnectionStateChange(std::function<void(bool)> callback);
     void set_callback_onServicesDiscovered(std::function<void(void)> callback);
 
+    void set_callback_onCharacteristicChanged(JNI::Object characteristic, std::function<void(std::vector<uint8_t> value)> callback);
+    void clear_callback_onCharacteristicChanged(JNI::Object characteristic);
+
     void set_flag_descriptorWritePending(JNI::Object descriptor);
     void clear_flag_descriptorWritePending(JNI::Object descriptor);
     void wait_flag_descriptorWritePending(JNI::Object descriptor);
@@ -64,6 +67,8 @@ class BluetoothGattCallback {
 
     kvn::safe_callback<void(bool)> _callback_onConnectionStateChange;
     kvn::safe_callback<void()> _callback_onServicesDiscovered;
+
+    std::map<JNI::Object, kvn::safe_callback<void(std::vector<uint8_t>)>, JNI::JniObjectComparator> _callback_onCharacteristicChanged;
 
     std::map<JNI::Object, FlagData, JNI::JniObjectComparator> _flag_descriptorWritePending;
 };
