@@ -100,18 +100,20 @@ INSTALL_PATH=$BUILD_PATH/install
 EXAMPLE_BUILD_PATH=$PROJECT_ROOT/build_"$LIB_NAME"_examples
 EXAMPLE_SOURCE_PATH=$PROJECT_ROOT/examples/$LIB_NAME
 
+LIB_NAME_UPPER=$(echo "$LIB_NAME" | tr '[:lower:]' '[:upper:]')
+
 # If FLAG_TEST is set, build the library with the test argument
 if [[ ! -z "$FLAG_TEST" ]]; then
-    BUILD_TEST_ARG="-D${LIB_NAME^^}_TEST=ON"
+    BUILD_TEST_ARG="-D${LIB_NAME_UPPER}_TEST=ON"
 
     # If FLAG_SANITIZE_ADDRESS is set, build the library with the sanitize address argument
     if [[ ! -z "$FLAG_SANITIZE_ADDRESS" ]]; then
-        BUILD_SANITIZE_ADDRESS_ARG="-D${LIB_NAME^^}_SANITIZE=Address"
+        BUILD_SANITIZE_ADDRESS_ARG="-D${LIB_NAME_UPPER}_SANITIZE=Address"
     fi
 
     # If FLAG_SANITIZE_THREAD is set, build the library with the sanitize thread argument
     if [[ ! -z "$FLAG_SANITIZE_THREAD" ]]; then
-        BUILD_SANITIZE_THREAD_ARG="-D${LIB_NAME^^}_SANITIZE=Thread"
+        BUILD_SANITIZE_THREAD_ARG="-D${LIB_NAME_UPPER}_SANITIZE=Thread"
     fi
 
 fi
@@ -140,9 +142,9 @@ cmake --install $BUILD_PATH --prefix "${INSTALL_PATH}"
 
 # If FLAG_LOCAL is set, we want to build examples out of source files instead of the installed library
 if [[ ! -z "$FLAG_LOCAL" ]]; then
-    BUILD_EXAMPLE_ARGS="-D${LIB_NAME^^}_LOCAL=ON"
+    BUILD_EXAMPLE_ARGS="-D${LIB_NAME_UPPER}_LOCAL=ON"
 else
-    BUILD_EXAMPLE_ARGS="-D${LIB_NAME^^}_LOCAL=OFF -D${LIB_NAME}_ROOT=${INSTALL_PATH}"
+    BUILD_EXAMPLE_ARGS="-D${LIB_NAME_UPPER}_LOCAL=OFF -D${LIB_NAME}_ROOT=${INSTALL_PATH}"
 fi
 
 if [[ ! -z "$FLAG_EXAMPLE" ]]; then

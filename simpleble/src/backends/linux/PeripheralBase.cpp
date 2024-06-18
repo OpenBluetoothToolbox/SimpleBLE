@@ -181,7 +181,7 @@ std::vector<Service> PeripheralBase::advertised_services() {
 std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() {
     std::map<uint16_t, ByteArray> manufacturer_data;
     for (auto& [manufacturer_id, value_array] : device_->manufacturer_data()) {
-        manufacturer_data[manufacturer_id] = ByteArray((const char*)value_array.data(), value_array.size());
+        manufacturer_data[manufacturer_id] = ByteArray(value_array);
     }
 
     return manufacturer_data;
@@ -206,7 +206,7 @@ void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID c
     // TODO: Check if the characteristic is writable.
     // TODO: SimpleBluez::Characteristic::write_request() should also take ByteArray by const reference (but that's
     // another library)
-    _get_characteristic(service, characteristic)->write_request(data);
+    _get_characteristic(service, characteristic)->write_request(static_cast<std::string>(data));
 }
 
 void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic,
@@ -214,7 +214,7 @@ void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID c
     // TODO: Check if the characteristic is writable.
     // TODO: SimpleBluez::Characteristic::write_command() should also take ByteArray by const reference (but that's
     // another library)
-    _get_characteristic(service, characteristic)->write_command(data);
+    _get_characteristic(service, characteristic)->write_command(static_cast<std::string>(data));
 }
 
 void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
@@ -271,7 +271,7 @@ ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const
 
 void PeripheralBase::write(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                            BluetoothUUID const& descriptor, ByteArray const& data) {
-    _get_descriptor(service, characteristic, descriptor)->write(data);
+    _get_descriptor(service, characteristic, descriptor)->write(static_cast<std::string>(data));
 }
 
 void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) {

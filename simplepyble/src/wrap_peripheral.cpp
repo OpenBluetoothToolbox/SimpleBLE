@@ -147,14 +147,14 @@ void wrap_peripheral(py::module& m) {
         .def(
             "write_request",
             [](SimpleBLE::Peripheral& p, std::string service, std::string characteristic, py::bytes payload) {
-                p.write_request(service, characteristic, payload);
+                p.write_request(service, characteristic, static_cast<std::string>(payload));
             },
             py::call_guard<py::gil_scoped_release>(),
             kDocsPeripheralWriteRequest)
         .def(
             "write_command",
             [](SimpleBLE::Peripheral& p, std::string service, std::string characteristic, py::bytes payload) {
-                p.write_command(service, characteristic, payload);
+                p.write_command(service, characteristic, static_cast<std::string>(payload));
             },
             py::call_guard<py::gil_scoped_release>(),
             kDocsPeripheralWriteCommand)
@@ -182,7 +182,7 @@ void wrap_peripheral(py::module& m) {
         .def(
             "descriptor_write",
             [](SimpleBLE::Peripheral& p, std::string service, std::string characteristic, std::string const& descriptor,
-               py::bytes payload) { p.write(service, characteristic, descriptor, payload); },
+               py::bytes payload) { p.write(service, characteristic, descriptor, static_cast<std::string>(payload)); },
             kDocsPeripheralDescriptorWrite)
 
         .def("set_callback_on_connected", &SimpleBLE::Peripheral::set_callback_on_connected, py::keep_alive<1, 2>(),

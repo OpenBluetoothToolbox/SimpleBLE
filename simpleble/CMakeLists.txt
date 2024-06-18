@@ -366,6 +366,7 @@ if(SIMPLEBLE_TEST)
     add_executable(simpleble_test
         ${CMAKE_CURRENT_SOURCE_DIR}/test/src/main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/test/src/test_utils.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/test/src/test_bytearray.cpp
     )
 
     set_target_properties(simpleble_test PROPERTIES

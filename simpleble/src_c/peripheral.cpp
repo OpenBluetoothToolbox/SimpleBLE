@@ -279,7 +279,7 @@ simpleble_err_t simpleble_peripheral_read(simpleble_peripheral_t handle, simpleb
 
     *data_length = read_data.value().size();
     *data = static_cast<uint8_t*>(malloc(*data_length));
-    memcpy(*data, read_data.value().c_str(), *data_length);
+    memcpy(*data, read_data.value().c_str().get(), *data_length);
 
     return SIMPLEBLE_SUCCESS;
 }
@@ -390,7 +390,7 @@ simpleble_err_t simpleble_peripheral_read_descriptor(simpleble_peripheral_t hand
 
     *data_length = read_data.value().size();
     *data = static_cast<uint8_t*>(malloc(*data_length));
-    memcpy(*data, read_data.value().c_str(), *data_length);
+    memcpy(*data, read_data.value().c_str().get(), *data_length);
 
     return SIMPLEBLE_SUCCESS;
 }

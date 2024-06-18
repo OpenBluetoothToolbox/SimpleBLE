@@ -68,10 +68,8 @@ int main() {
     }
 
     // Subscribe to the characteristic.
-    peripheral.notify(uuids[selection.value()].first, uuids[selection.value()].second, [&](SimpleBLE::ByteArray bytes) {
-        std::cout << "Received: ";
-        Utils::print_byte_array(bytes);
-    });
+    peripheral.notify(uuids[selection.value()].first, uuids[selection.value()].second,
+                      [&](SimpleBLE::ByteArray bytes) { std::cout << "Received: " << bytes << std::endl; });
 
     std::this_thread::sleep_for(5s);
 
