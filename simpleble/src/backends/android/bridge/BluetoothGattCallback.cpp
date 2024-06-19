@@ -1,9 +1,9 @@
-#include <CommonUtils.h>
 #include "BluetoothGattCallback.h"
+#include <CommonUtils.h>
 
 #include <android/log.h>
-#include <climits>
 #include <jni/Types.h>
+#include <climits>
 
 namespace SimpleBLE {
 namespace Android {
@@ -27,9 +27,7 @@ BluetoothGattCallback::BluetoothGattCallback() : connected(false), mtu(UINT16_MA
     _map[_obj.get()] = this;
 }
 
-BluetoothGattCallback::~BluetoothGattCallback() {
-    _map.erase(_obj.get());
-}
+BluetoothGattCallback::~BluetoothGattCallback() { _map.erase(_obj.get()); }
 
 void BluetoothGattCallback::set_callback_onConnectionStateChange(std::function<void(bool)> callback) {
     if (callback) {
@@ -47,7 +45,8 @@ void BluetoothGattCallback::set_callback_onServicesDiscovered(std::function<void
     }
 }
 
-void BluetoothGattCallback::set_callback_onCharacteristicChanged(JNI::Object characteristic, std::function<void(std::vector<uint8_t>)> callback) {
+void BluetoothGattCallback::set_callback_onCharacteristicChanged(JNI::Object characteristic,
+                                                                 std::function<void(std::vector<uint8_t>)> callback) {
     if (callback) {
         _callback_onCharacteristicChanged[characteristic].load(callback);
     } else {
@@ -57,6 +56,66 @@ void BluetoothGattCallback::set_callback_onCharacteristicChanged(JNI::Object cha
 
 void BluetoothGattCallback::clear_callback_onCharacteristicChanged(JNI::Object characteristic) {
     _callback_onCharacteristicChanged[characteristic].unload();
+}
+
+void BluetoothGattCallback::set_flag_characteristicWritePending(JNI::Object characteristic) {
+    auto& flag_data = _flag_characteristicWritePending[characteristic];
+
+    std::lock_guard<std::mutex> lock(flag_data.mtx);
+    flag_data.flag = true;
+}
+
+void BluetoothGattCallback::clear_flag_characteristicWritePending(JNI::Object characteristic) {
+    auto& flag_data = _flag_characteristicWritePending[characteristic];
+    {
+        std::lock_guard<std::mutex> lock(flag_data.mtx);
+        flag_data.flag = false;
+    }
+    flag_data.cv.notify_all();
+}
+
+void BluetoothGattCallback::wait_flag_characteristicWritePending(JNI::Object characteristic) {
+    auto& flag_data = _flag_characteristicWritePending[characteristic];
+    std::unique_lock<std::mutex> lock(flag_data.mtx);
+    flag_data.cv.wait_for(lock, std::chrono::seconds(5), [&flag_data] { return !flag_data.flag; });
+
+    if (flag_data.flag) {
+        // TODO CLEANUP
+        throw std::runtime_error("Failed to write characteristic");
+    }
+
+    // TODO CLEANUP
+}
+
+void BluetoothGattCallback::set_flag_characteristicReadPending(JNI::Object characteristic) {
+    auto& flag_data = _flag_characteristicReadPending[characteristic];
+
+    std::lock_guard<std::mutex> lock(flag_data.mtx);
+    flag_data.flag = true;
+}
+
+void BluetoothGattCallback::clear_flag_characteristicReadPending(JNI::Object characteristic,
+                                                                 std::vector<uint8_t> value) {
+    auto& flag_data = _flag_characteristicReadPending[characteristic];
+    {
+        std::lock_guard<std::mutex> lock(flag_data.mtx);
+        flag_data.flag = false;
+        flag_data.value = value;
+    }
+    flag_data.cv.notify_all();
+}
+
+std::vector<uint8_t> BluetoothGattCallback::wait_flag_characteristicReadPending(JNI::Object characteristic) {
+    auto& flag_data = _flag_characteristicReadPending[characteristic];
+    std::unique_lock<std::mutex> lock(flag_data.mtx);
+    flag_data.cv.wait_for(lock, std::chrono::seconds(5), [&flag_data] { return !flag_data.flag; });
+
+    if (flag_data.flag) {
+        // TODO CLEANUP
+        throw std::runtime_error("Failed to read characteristic");
+    }
+
+    return flag_data.value;
 }
 
 void BluetoothGattCallback::set_flag_descriptorWritePending(JNI::Object descriptor) {
@@ -88,7 +147,38 @@ void BluetoothGattCallback::wait_flag_descriptorWritePending(JNI::Object descrip
     // TODO CLEANUP
 }
 
-void BluetoothGattCallback::jni_onConnectionStateChangeCallback(JNIEnv *env, jobject thiz, jobject gatt, jint status, jint new_state) {
+void BluetoothGattCallback::set_flag_descriptorReadPending(JNI::Object descriptor) {
+    auto& flag_data = _flag_descriptorWritePending[descriptor];
+
+    std::lock_guard<std::mutex> lock(flag_data.mtx);
+    flag_data.flag = true;
+}
+
+void BluetoothGattCallback::clear_flag_descriptorReadPending(JNI::Object descriptor, std::vector<uint8_t> value) {
+    auto& flag_data = _flag_descriptorWritePending[descriptor];
+    {
+        std::lock_guard<std::mutex> lock(flag_data.mtx);
+        flag_data.flag = false;
+        flag_data.value = value;
+    }
+    flag_data.cv.notify_all();
+}
+
+std::vector<uint8_t> BluetoothGattCallback::wait_flag_descriptorReadPending(JNI::Object descriptor) {
+    auto& flag_data = _flag_descriptorWritePending[descriptor];
+    std::unique_lock<std::mutex> lock(flag_data.mtx);
+    flag_data.cv.wait_for(lock, std::chrono::seconds(5), [&flag_data] { return !flag_data.flag; });
+
+    if (flag_data.flag) {
+        // TODO CLEANUP
+        throw std::runtime_error("Failed to read descriptor");
+    }
+
+    return flag_data.value;
+}
+
+void BluetoothGattCallback::jni_onConnectionStateChangeCallback(JNIEnv* env, jobject thiz, jobject gatt, jint status,
+                                                                jint new_state) {
     auto msg = fmt::format("onConnectionStateChangeCallback status: {} new_state: {}", status, new_state);
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
 
@@ -104,7 +194,7 @@ void BluetoothGattCallback::jni_onConnectionStateChangeCallback(JNIEnv *env, job
     SAFE_CALLBACK_CALL(obj->_callback_onConnectionStateChange, connected);
 }
 
-void BluetoothGattCallback::jni_onServicesDiscoveredCallback(JNIEnv *env, jobject thiz, jobject gatt, jint status) {
+void BluetoothGattCallback::jni_onServicesDiscoveredCallback(JNIEnv* env, jobject thiz, jobject gatt, jint status) {
     auto msg = "onServicesDiscoveredCallback";
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg);
 
@@ -119,7 +209,7 @@ void BluetoothGattCallback::jni_onServicesDiscoveredCallback(JNIEnv *env, jobjec
     SAFE_CALLBACK_CALL(obj->_callback_onServicesDiscovered);
 }
 
-void BluetoothGattCallback::jni_onServiceChangedCallback(JNIEnv *env, jobject thiz, jobject gatt) {
+void BluetoothGattCallback::jni_onServiceChangedCallback(JNIEnv* env, jobject thiz, jobject gatt) {
     // NOTE: If this one gets triggered we're kinda screwed.
     auto msg = "onServiceChangedCallback";
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg);
@@ -131,8 +221,8 @@ void BluetoothGattCallback::jni_onServiceChangedCallback(JNIEnv *env, jobject th
     }
 }
 
-
-void BluetoothGattCallback::jni_onCharacteristicChangedCallback(JNIEnv *env, jobject thiz, jobject gatt, jobject characteristic, jbyteArray value) {
+void BluetoothGattCallback::jni_onCharacteristicChangedCallback(JNIEnv* env, jobject thiz, jobject gatt,
+                                                                jobject characteristic, jbyteArray value) {
     auto msg = "onCharacteristicChangedCallback";
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg);
 
@@ -150,7 +240,8 @@ void BluetoothGattCallback::jni_onCharacteristicChangedCallback(JNIEnv *env, job
     }
 }
 
-void BluetoothGattCallback::jni_onCharacteristicReadCallback(JNIEnv *env, jobject thiz, jobject gatt, jobject characteristic, jbyteArray value, jint status) {
+void BluetoothGattCallback::jni_onCharacteristicReadCallback(JNIEnv* env, jobject thiz, jobject gatt,
+                                                             jobject characteristic, jbyteArray value, jint status) {
     auto msg = "onCharacteristicReadCallback";
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg);
 
@@ -159,9 +250,13 @@ void BluetoothGattCallback::jni_onCharacteristicReadCallback(JNIEnv *env, jobjec
         // TODO: Throw an exception
         return;
     }
+
+    BluetoothGattCallback* obj = it->second;
+    obj->clear_flag_characteristicReadPending(characteristic, JNI::Types::fromJByteArray(value));
 }
 
-void BluetoothGattCallback::jni_onCharacteristicWriteCallback(JNIEnv *env, jobject thiz, jobject gatt, jobject characteristic, jint status) {
+void BluetoothGattCallback::jni_onCharacteristicWriteCallback(JNIEnv* env, jobject thiz, jobject gatt,
+                                                              jobject characteristic, jint status) {
     auto msg = "onCharacteristicWriteCallback";
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg);
 
@@ -170,9 +265,13 @@ void BluetoothGattCallback::jni_onCharacteristicWriteCallback(JNIEnv *env, jobje
         // TODO: Throw an exception
         return;
     }
+
+    BluetoothGattCallback* obj = it->second;
+    obj->clear_flag_characteristicWritePending(characteristic);
 }
 
-void BluetoothGattCallback::jni_onDescriptorReadCallback(JNIEnv *env, jobject thiz, jobject gatt, jobject descriptor, jbyteArray value, jint status) {
+void BluetoothGattCallback::jni_onDescriptorReadCallback(JNIEnv* env, jobject thiz, jobject gatt, jobject descriptor,
+                                                         jbyteArray value, jint status) {
     auto msg = "onDescriptorReadCallback";
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg);
 
@@ -181,9 +280,13 @@ void BluetoothGattCallback::jni_onDescriptorReadCallback(JNIEnv *env, jobject th
         // TODO: Throw an exception
         return;
     }
+
+    BluetoothGattCallback* obj = it->second;
+    obj->clear_flag_descriptorReadPending(descriptor, JNI::Types::fromJByteArray(value));
 }
 
-void BluetoothGattCallback::jni_onDescriptorWriteCallback(JNIEnv *env, jobject thiz, jobject gatt, jobject descriptor, jint status) {
+void BluetoothGattCallback::jni_onDescriptorWriteCallback(JNIEnv* env, jobject thiz, jobject gatt, jobject descriptor,
+                                                          jint status) {
     auto msg = "onDescriptorWriteCallback";
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg);
 
@@ -197,7 +300,7 @@ void BluetoothGattCallback::jni_onDescriptorWriteCallback(JNIEnv *env, jobject t
     obj->clear_flag_descriptorWritePending(descriptor);
 }
 
-void BluetoothGattCallback::jni_onMtuChangedCallback(JNIEnv *env, jobject thiz, jobject gatt, jint mtu, jint status) {
+void BluetoothGattCallback::jni_onMtuChangedCallback(JNIEnv* env, jobject thiz, jobject gatt, jint mtu, jint status) {
     auto msg = "onMtuChangedCallback";
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg);
 
@@ -210,34 +313,32 @@ void BluetoothGattCallback::jni_onMtuChangedCallback(JNIEnv *env, jobject thiz, 
     }
 }
 
-void BluetoothGattCallback::jni_onPhyReadCallback(JNIEnv *env, jobject thiz, jobject gatt, jint tx_phy, jint rx_phy, jint status) {
+void BluetoothGattCallback::jni_onPhyReadCallback(JNIEnv* env, jobject thiz, jobject gatt, jint tx_phy, jint rx_phy,
+                                                  jint status) {
     auto msg = "onPhyReadCallback";
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg);
 }
 
-void BluetoothGattCallback::jni_onPhyUpdateCallback(JNIEnv *env, jobject thiz, jobject gatt, jint tx_phy, jint rx_phy, jint status) {
+void BluetoothGattCallback::jni_onPhyUpdateCallback(JNIEnv* env, jobject thiz, jobject gatt, jint tx_phy, jint rx_phy,
+                                                    jint status) {
     auto msg = "onPhyUpdateCallback";
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg);
 }
 
-void BluetoothGattCallback::jni_onReadRemoteRssiCallback(JNIEnv *env, jobject thiz, jobject gatt, jint rssi, jint status) {
+void BluetoothGattCallback::jni_onReadRemoteRssiCallback(JNIEnv* env, jobject thiz, jobject gatt, jint rssi,
+                                                         jint status) {
     auto msg = "onReadRemoteRssiCallback";
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg);
 }
 
-void BluetoothGattCallback::jni_onReliableWriteCompletedCallback(JNIEnv *env, jobject thiz, jobject gatt, jint status) {
+void BluetoothGattCallback::jni_onReliableWriteCompletedCallback(JNIEnv* env, jobject thiz, jobject gatt, jint status) {
     auto msg = "onReliableWriteCompletedCallback";
     __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg);
 }
 
-
-
-
-
 }  // namespace Bridge
 }  // namespace Android
 }  // namespace SimpleBLE
-
 
 extern "C" {
 // clang-format off

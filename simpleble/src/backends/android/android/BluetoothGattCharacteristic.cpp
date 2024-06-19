@@ -4,6 +4,7 @@
 
 #include "BluetoothGattCharacteristic.h"
 #include "UUID.h"
+#include "jni/Types.h"
 
 namespace SimpleBLE {
 namespace Android {
@@ -19,6 +20,7 @@ jmethodID BluetoothGattCharacteristic::_method_getService = nullptr;
 jmethodID BluetoothGattCharacteristic::_method_getUuid = nullptr;
 jmethodID BluetoothGattCharacteristic::_method_getWriteType = nullptr;
 jmethodID BluetoothGattCharacteristic::_method_setWriteType = nullptr;
+jmethodID BluetoothGattCharacteristic::_method_setValue = nullptr;
 
 void BluetoothGattCharacteristic::initialize() {
     JNI::Env env;
@@ -68,6 +70,10 @@ void BluetoothGattCharacteristic::initialize() {
     if (!_method_setWriteType) {
         _method_setWriteType = env->GetMethodID(_cls.get(), "setWriteType", "(I)V");
     }
+
+    if (!_method_setValue) {
+        _method_setValue = env->GetMethodID(_cls.get(), "setValue", "([B)Z");
+    }
 }
 
 BluetoothGattCharacteristic::BluetoothGattCharacteristic() { initialize(); }
@@ -76,15 +82,15 @@ BluetoothGattCharacteristic::BluetoothGattCharacteristic(JNI::Object obj) : Blue
     _obj = obj;
 }
 
-//bool BluetoothGattCharacteristic::addDescriptor(BluetoothGattDescriptor descriptor) {
-//    return _obj.call_boolean_method(_method_addDescriptor, descriptor.getObject());
-//}
+// bool BluetoothGattCharacteristic::addDescriptor(BluetoothGattDescriptor descriptor) {
+//     return _obj.call_boolean_method(_method_addDescriptor, descriptor.getObject());
+// }
 //
-//BluetoothGattDescriptor BluetoothGattCharacteristic::getDescriptor(std::string uuid) {
-//    JNI::Env env;
-//    JNI::Object descObj = _obj.call_object_method(_method_getDescriptor, env->NewStringUTF(uuid.c_str()));
-//    return BluetoothGattDescriptor(descObj);
-//}
+// BluetoothGattDescriptor BluetoothGattCharacteristic::getDescriptor(std::string uuid) {
+//     JNI::Env env;
+//     JNI::Object descObj = _obj.call_object_method(_method_getDescriptor, env->NewStringUTF(uuid.c_str()));
+//     return BluetoothGattDescriptor(descObj);
+// }
 //
 std::vector<BluetoothGattDescriptor> BluetoothGattCharacteristic::getDescriptors() {
     if (!_obj) return std::vector<BluetoothGattDescriptor>();
@@ -123,6 +129,15 @@ int BluetoothGattCharacteristic::getWriteType() { return _obj.call_int_method(_m
 
 void BluetoothGattCharacteristic::setWriteType(int writeType) {
     _obj.call_void_method(_method_setWriteType, writeType);
+}
+
+bool BluetoothGattCharacteristic::setValue(const std::vector<uint8_t>& value) {
+    JNI::Env env;
+    jbyteArray array = JNI::Types::toJByteArray(value);
+
+    bool result = _obj.call_boolean_method(_method_setValue, array);
+    env->DeleteLocalRef(array);
+    return result;
 }
 
 }  // namespace Android

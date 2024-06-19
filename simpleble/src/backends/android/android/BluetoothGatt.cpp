@@ -1,6 +1,6 @@
-#include <fmt/core.h>
-#include <android/log.h>
 #include "BluetoothGatt.h"
+#include <android/log.h>
+#include <fmt/core.h>
 
 namespace SimpleBLE {
 namespace Android {
@@ -11,7 +11,9 @@ jmethodID BluetoothGatt::_method_connect = nullptr;
 jmethodID BluetoothGatt::_method_disconnect = nullptr;
 jmethodID BluetoothGatt::_method_discoverServices = nullptr;
 jmethodID BluetoothGatt::_method_readCharacteristic = nullptr;
+jmethodID BluetoothGatt::_method_readDescriptor = nullptr;
 jmethodID BluetoothGatt::_method_setCharacteristicNotification = nullptr;
+jmethodID BluetoothGatt::_method_writeCharacteristic = nullptr;
 jmethodID BluetoothGatt::_method_writeDescriptor = nullptr;
 
 void BluetoothGatt::initialize() {
@@ -38,25 +40,34 @@ void BluetoothGatt::initialize() {
     }
 
     if (!_method_readCharacteristic) {
-        _method_readCharacteristic = env->GetMethodID(_cls.get(), "readCharacteristic", "(Landroid/bluetooth/BluetoothGattCharacteristic;)Z");
+        _method_readCharacteristic = env->GetMethodID(_cls.get(), "readCharacteristic",
+                                                      "(Landroid/bluetooth/BluetoothGattCharacteristic;)Z");
+    }
+
+    if (!_method_readDescriptor) {
+        _method_readDescriptor = env->GetMethodID(_cls.get(), "readDescriptor",
+                                                  "(Landroid/bluetooth/BluetoothGattDescriptor;)Z");
     }
 
     if (!_method_setCharacteristicNotification) {
-        _method_setCharacteristicNotification = env->GetMethodID(_cls.get(), "setCharacteristicNotification", "(Landroid/bluetooth/BluetoothGattCharacteristic;Z)Z");
+        _method_setCharacteristicNotification = env->GetMethodID(_cls.get(), "setCharacteristicNotification",
+                                                                 "(Landroid/bluetooth/BluetoothGattCharacteristic;Z)Z");
+    }
+
+    if (!_method_writeCharacteristic) {
+        _method_writeCharacteristic = env->GetMethodID(_cls.get(), "writeCharacteristic",
+                                                       "(Landroid/bluetooth/BluetoothGattCharacteristic;)Z");
     }
 
     if (!_method_writeDescriptor) {
-        _method_writeDescriptor = env->GetMethodID(_cls.get(), "writeDescriptor", "(Landroid/bluetooth/BluetoothGattDescriptor;)Z");
+        _method_writeDescriptor = env->GetMethodID(_cls.get(), "writeDescriptor",
+                                                   "(Landroid/bluetooth/BluetoothGattDescriptor;)Z");
     }
 }
 
-BluetoothGatt::BluetoothGatt() {
-    initialize();
-}
+BluetoothGatt::BluetoothGatt() { initialize(); }
 
-BluetoothGatt::BluetoothGatt(JNI::Object obj) : BluetoothGatt() {
-    _obj = obj;
-}
+BluetoothGatt::BluetoothGatt(JNI::Object obj) : BluetoothGatt() { _obj = obj; }
 
 void BluetoothGatt::close() {
     if (!_obj) return;
@@ -107,10 +118,22 @@ bool BluetoothGatt::readCharacteristic(BluetoothGattCharacteristic characteristi
     return _obj.call_boolean_method(_method_readCharacteristic, characteristic.getObject().get());
 }
 
+bool BluetoothGatt::readDescriptor(BluetoothGattDescriptor descriptor) {
+    if (!_obj) return false;
+
+    return _obj.call_boolean_method(_method_readDescriptor, descriptor.getObject().get());
+}
+
 bool BluetoothGatt::setCharacteristicNotification(BluetoothGattCharacteristic characteristic, bool enable) {
     if (!_obj) return false;
 
     return _obj.call_boolean_method(_method_setCharacteristicNotification, characteristic.getObject().get(), enable);
+}
+
+bool BluetoothGatt::writeCharacteristic(BluetoothGattCharacteristic characteristic) {
+    if (!_obj) return false;
+
+    return _obj.call_boolean_method(_method_writeCharacteristic, characteristic.getObject().get());
 }
 
 bool BluetoothGatt::writeDescriptor(BluetoothGattDescriptor descriptor) {
@@ -121,4 +144,3 @@ bool BluetoothGatt::writeDescriptor(BluetoothGattDescriptor descriptor) {
 
 }  // namespace Android
 }  // namespace SimpleBLE
-

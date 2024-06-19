@@ -1,11 +1,11 @@
 #pragma once
 
-#include "jni/Common.hpp"
-#include <kvn_safe_callback.hpp>
-#include <map>
 #include <atomic>
 #include <condition_variable>
+#include <kvn_safe_callback.hpp>
+#include <map>
 #include <mutex>
+#include "jni/Common.hpp"
 
 namespace SimpleBLE {
 namespace Android {
@@ -15,17 +15,30 @@ class BluetoothGattCallback {
   public:
     BluetoothGattCallback();
     virtual ~BluetoothGattCallback();
-    jobject get() { return _obj.get(); } // TODO: Remove once nothing uses this
+    jobject get() { return _obj.get(); }  // TODO: Remove once nothing uses this
 
     void set_callback_onConnectionStateChange(std::function<void(bool)> callback);
     void set_callback_onServicesDiscovered(std::function<void(void)> callback);
 
-    void set_callback_onCharacteristicChanged(JNI::Object characteristic, std::function<void(std::vector<uint8_t> value)> callback);
+    void set_callback_onCharacteristicChanged(JNI::Object characteristic,
+                                              std::function<void(std::vector<uint8_t> value)> callback);
     void clear_callback_onCharacteristicChanged(JNI::Object characteristic);
+
+    void set_flag_characteristicWritePending(JNI::Object characteristic);
+    void clear_flag_characteristicWritePending(JNI::Object characteristic);
+    void wait_flag_characteristicWritePending(JNI::Object characteristic);
+
+    void set_flag_characteristicReadPending(JNI::Object characteristic);
+    void clear_flag_characteristicReadPending(JNI::Object characteristic, std::vector<uint8_t> value);
+    std::vector<uint8_t> wait_flag_characteristicReadPending(JNI::Object characteristic);
 
     void set_flag_descriptorWritePending(JNI::Object descriptor);
     void clear_flag_descriptorWritePending(JNI::Object descriptor);
     void wait_flag_descriptorWritePending(JNI::Object descriptor);
+
+    void set_flag_descriptorReadPending(JNI::Object descriptor);
+    void clear_flag_descriptorReadPending(JNI::Object descriptor, std::vector<uint8_t> value);
+    std::vector<uint8_t> wait_flag_descriptorReadPending(JNI::Object descriptor);
 
     bool connected;
     bool services_discovered;
@@ -56,8 +69,8 @@ class BluetoothGattCallback {
         bool flag;
         std::condition_variable cv;
         std::mutex mtx;
+        std::vector<uint8_t> value;
     };
-
 
     static JNI::Class _cls;
     static std::map<jobject, BluetoothGattCallback*, JNI::JObjectComparator> _map;
@@ -68,9 +81,13 @@ class BluetoothGattCallback {
     kvn::safe_callback<void(bool)> _callback_onConnectionStateChange;
     kvn::safe_callback<void()> _callback_onServicesDiscovered;
 
-    std::map<JNI::Object, kvn::safe_callback<void(std::vector<uint8_t>)>, JNI::JniObjectComparator> _callback_onCharacteristicChanged;
+    std::map<JNI::Object, kvn::safe_callback<void(std::vector<uint8_t>)>, JNI::JniObjectComparator>
+        _callback_onCharacteristicChanged;
 
+    std::map<JNI::Object, FlagData, JNI::JniObjectComparator> _flag_characteristicWritePending;
+    std::map<JNI::Object, FlagData, JNI::JniObjectComparator> _flag_characteristicReadPending;
     std::map<JNI::Object, FlagData, JNI::JniObjectComparator> _flag_descriptorWritePending;
+    std::map<JNI::Object, FlagData, JNI::JniObjectComparator> _flag_descriptorReadPending;
 };
 
 }  // namespace Bridge

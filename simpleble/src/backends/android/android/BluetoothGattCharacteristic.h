@@ -13,8 +13,8 @@ class BluetoothGattCharacteristic {
     BluetoothGattCharacteristic();
     BluetoothGattCharacteristic(JNI::Object obj);
 
-//    bool addDescriptor(BluetoothGattDescriptor descriptor);
-//    BluetoothGattDescriptor getDescriptor(std::string uuid);
+    //    bool addDescriptor(BluetoothGattDescriptor descriptor);
+    //    BluetoothGattDescriptor getDescriptor(std::string uuid);
     std::vector<BluetoothGattDescriptor> getDescriptors();
     int getInstanceId();
     int getPermissions();
@@ -22,6 +22,7 @@ class BluetoothGattCharacteristic {
     std::string getUuid();
     int getWriteType();
     void setWriteType(int writeType);
+    bool setValue(const std::vector<uint8_t>& value);
 
     JNI::Object getObject() const { return _obj; }
 
@@ -31,8 +32,10 @@ class BluetoothGattCharacteristic {
     static const int PROPERTY_WRITE = 0x00000008;
     static const int PROPERTY_WRITE_NO_RESPONSE = 0x00000004;
 
+    static const int WRITE_TYPE_DEFAULT = 2;
+    static const int WRITE_TYPE_NO_RESPONSE = 1;
 
-private:
+  private:
     JNI::Object _obj;
     static JNI::Class _cls;
     static jmethodID _method_addDescriptor;
@@ -45,6 +48,7 @@ private:
     static jmethodID _method_getUuid;
     static jmethodID _method_getWriteType;
     static jmethodID _method_setWriteType;
+    static jmethodID _method_setValue;
 
     void initialize();
 };
