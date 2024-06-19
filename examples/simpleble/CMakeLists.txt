@@ -12,6 +12,7 @@ option(SIMPLEBLE_LOCAL "Use local SimpleBLE" ON)
 if (SIMPLEBLE_LOCAL)
     add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../simpleble ${CMAKE_BINARY_DIR}/simpleble)
 else()
+    cmake_policy(SET CMP0144 OLD)
     find_package(simpleble CONFIG REQUIRED)
 endif()
 

@@ -22,6 +22,7 @@ enum class OperatingSystem {
     LINUX,
 };
 
+// TODO: Add to_string functions for all enums.
 enum BluetoothAddressType : int32_t { PUBLIC = 0, RANDOM = 1, UNSPECIFIED = 2 };
 
 }  // namespace SimpleBLE
