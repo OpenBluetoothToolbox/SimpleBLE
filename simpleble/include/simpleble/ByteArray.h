@@ -97,7 +97,7 @@ class ByteArray {
      *
      * @return A hex string representation of the ByteArray.
      */
-    std::string toHexString(bool spacing = false) const {
+    std::string toHex(bool spacing = false) const {
         std::ostringstream oss;
         for (auto byte : data_) {
             oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(byte);
@@ -157,7 +157,7 @@ class ByteArray {
      * @return The output stream.
      */
     friend std::ostream& operator<<(std::ostream& os, const ByteArray& byteArray) {
-        os << byteArray.toHexString(true);
+        os << byteArray.toHex(true);
         return os;
     }
 

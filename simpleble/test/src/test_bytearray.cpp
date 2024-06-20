@@ -76,10 +76,10 @@ TEST(ByteArrayTest, FromHexInvalid) {
     EXPECT_THROW(ByteArray::fromHex("G123"), std::invalid_argument);
 }
 
-TEST(ByteArrayTest, ToStringMethod) {
+TEST(ByteArrayTest, ToHex) {
     ByteArray byteArray("Hello");
-    EXPECT_EQ(byteArray.toHexString(), "48656c6c6f");
-    EXPECT_EQ(byteArray.toHexString(true), "48 65 6c 6c 6f ");
+    EXPECT_EQ(byteArray.toHex(), "48656c6c6f");
+    EXPECT_EQ(byteArray.toHex(true), "48 65 6c 6c 6f ");
 }
 
 TEST(ByteArrayTest, StingConversion) {
