@@ -1,9 +1,9 @@
 #pragma once
 
-#include <string>
+#include "common/ByteArray.h"
 
 namespace SimpleBluez {
 
-typedef std::string ByteArray;
+using ByteArray = Common::ByteArray;
 
 }

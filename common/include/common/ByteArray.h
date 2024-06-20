@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <vector>
 
-namespace SimpleBLE {
+namespace Common {
 
 /**
  * @class ByteArray
@@ -185,4 +185,4 @@ class ByteArray {
     std::vector<uint8_t> data_;
 };
 
-}  // namespace SimpleBLE
+}  // namespace Common

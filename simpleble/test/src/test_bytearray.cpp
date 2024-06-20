@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include "simpleble/ByteArray.h"
+#include "common/ByteArray.h"
 
-using namespace SimpleBLE;
+using namespace Common;
 
 TEST(ByteArrayTest, DefaultConstructor) {
     ByteArray byteArray;
