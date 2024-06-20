@@ -206,7 +206,7 @@ void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID c
     // TODO: Check if the characteristic is writable.
     // TODO: SimpleBluez::Characteristic::write_request() should also take ByteArray by const reference (but that's
     // another library)
-    _get_characteristic(service, characteristic)->write_request(static_cast<std::string>(data));
+    _get_characteristic(service, characteristic)->write_request(data);
 }
 
 void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic,
@@ -214,7 +214,7 @@ void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID c
     // TODO: Check if the characteristic is writable.
     // TODO: SimpleBluez::Characteristic::write_command() should also take ByteArray by const reference (but that's
     // another library)
-    _get_characteristic(service, characteristic)->write_command(static_cast<std::string>(data));
+    _get_characteristic(service, characteristic)->write_command(data);
 }
 
 void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
@@ -271,7 +271,7 @@ ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const
 
 void PeripheralBase::write(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                            BluetoothUUID const& descriptor, ByteArray const& data) {
-    _get_descriptor(service, characteristic, descriptor)->write(static_cast<std::string>(data));
+    _get_descriptor(service, characteristic, descriptor)->write(data);
 }
 
 void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) {
