@@ -154,3 +154,83 @@ TEST(ByteArrayTest, ConstIndexOperatorAccessesCorrectElement) {
     EXPECT_EQ(0x01, constByteArray[0]);
     EXPECT_EQ(0x02, constByteArray[1]);
 }
+
+TEST(ByteArrayTest, SliceValidRange) {
+    std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
+    ByteArray byteArray(vec);
+    ByteArray slicedArray = byteArray.slice(1, 3);
+
+    ASSERT_EQ(slicedArray.size(), 2);
+    EXPECT_EQ(slicedArray[0], 0x02);
+    EXPECT_EQ(slicedArray[1], 0x03);
+}
+
+TEST(ByteArrayTest, SliceFullRange) {
+    std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
+    ByteArray byteArray(vec);
+    ByteArray slicedArray = byteArray.slice(0, byteArray.size());
+
+    ASSERT_EQ(slicedArray.size(), byteArray.size());
+    EXPECT_EQ(slicedArray[0], 0x01);
+    EXPECT_EQ(slicedArray[4], 0x05);
+}
+
+TEST(ByteArrayTest, SliceSingleElement) {
+    std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
+    ByteArray byteArray(vec);
+    ByteArray slicedArray = byteArray.slice(2, 3);
+
+    ASSERT_EQ(slicedArray.size(), 1);
+    EXPECT_EQ(slicedArray[0], 0x03);
+}
+
+TEST(ByteArrayTest, SliceOutOfRange) {
+    std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
+    ByteArray byteArray(vec);
+
+    EXPECT_THROW(byteArray.slice(1, 6), std::out_of_range);
+    EXPECT_THROW(byteArray.slice(6, 7), std::out_of_range);
+}
+
+TEST(ByteArrayTest, SliceInvalidRange) {
+    std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
+    ByteArray byteArray(vec);
+
+    EXPECT_THROW(byteArray.slice(3, 2), std::out_of_range);
+}
+
+TEST(ByteArrayTest, SliceFromIndexToEnd) {
+    std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
+    ByteArray byteArray(vec);
+    ByteArray slicedArray = byteArray.slice_from(2);
+
+    ASSERT_EQ(slicedArray.size(), 3);
+    EXPECT_EQ(slicedArray[0], 0x03);
+    EXPECT_EQ(slicedArray[1], 0x04);
+    EXPECT_EQ(slicedArray[2], 0x05);
+}
+
+TEST(ByteArrayTest, SliceFromBeginningToIndex) {
+    std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
+    ByteArray byteArray(vec);
+    ByteArray slicedArray = byteArray.slice_to(3);
+
+    ASSERT_EQ(slicedArray.size(), 3);
+    EXPECT_EQ(slicedArray[0], 0x01);
+    EXPECT_EQ(slicedArray[1], 0x02);
+    EXPECT_EQ(slicedArray[2], 0x03);
+}
+
+TEST(ByteArrayTest, SliceFromIndexToEndOutOfRange) {
+    std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
+    ByteArray byteArray(vec);
+
+    EXPECT_THROW(byteArray.slice_from(6), std::out_of_range);
+}
+
+TEST(ByteArrayTest, SliceFromBeginningToIndexOutOfRange) {
+    std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
+    ByteArray byteArray(vec);
+
+    EXPECT_THROW(byteArray.slice_to(6), std::out_of_range);
+}

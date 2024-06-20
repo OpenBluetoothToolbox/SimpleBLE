@@ -109,6 +109,48 @@ class ByteArray {
     }
 
     /**
+     * @brief Slices the ByteArray from a specified start index to an end index.
+     *
+     * This method creates a new ByteArray containing bytes from the specified range.
+     * The start index is inclusive, while the end index is exclusive.
+     *
+     * @param start The starting index from which to begin slicing.
+     * @param end The ending index up to which to slice (exclusive).
+     * @return ByteArray A new ByteArray containing the sliced segment.
+     * @throws std::out_of_range If the start index is greater than the end index or if the end index is out of bounds.
+     */
+    ByteArray slice(size_t start, size_t end) const {
+        if (start > end || end > data_.size()) {
+            throw std::out_of_range("Invalid slice range");
+        }
+        return ByteArray(std::vector<uint8_t>(data_.begin() + start, data_.begin() + end));
+    }
+
+    /**
+     * @brief Slices the ByteArray from a specified start index to the end of the array.
+     *
+     * This method creates a new ByteArray containing all bytes from the specified start index to the end of the
+     * ByteArray.
+     *
+     * @param start The starting index from which to begin slicing.
+     * @return ByteArray A new ByteArray containing the sliced segment from the start index to the end.
+     * @throws std::out_of_range If the start index is out of the bounds of the ByteArray.
+     */
+    ByteArray slice_from(size_t start) const { return slice(start, data_.size()); }
+
+    /**
+     * @brief Slices the ByteArray from the beginning to a specified end index.
+     *
+     * This method creates a new ByteArray containing all bytes from the beginning of the ByteArray to the specified end
+     * index.
+     *
+     * @param end The ending index up to which to slice (exclusive).
+     * @return ByteArray A new ByteArray containing the sliced segment from the beginning to the end index.
+     * @throws std::out_of_range If the end index is out of the bounds of the ByteArray.
+     */
+    ByteArray slice_to(size_t end) const { return slice(0, end); }
+
+    /**
      * @brief Overloaded stream insertion operator for ByteArray.
      * @param os The output stream.
      * @param byteArray The ByteArray object.
