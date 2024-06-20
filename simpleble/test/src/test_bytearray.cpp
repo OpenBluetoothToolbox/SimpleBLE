@@ -113,3 +113,63 @@ TEST(ByteArrayTest, StreamOperator) {
     oss << byteArray;
     EXPECT_EQ(oss.str(), "48 65 6c 6c 6f ");
 }
+
+TEST(ByteArrayTest, DefaultConstructor_Empty) {
+    ByteArray byteArray;
+    EXPECT_TRUE(byteArray.empty());
+}
+
+TEST(ByteArrayTest, PushBackIncreasesSize) {
+    ByteArray byteArray;
+    byteArray.push_back(0x01);
+    EXPECT_EQ(1, byteArray.size());
+    byteArray.push_back(0x02);
+    EXPECT_EQ(2, byteArray.size());
+}
+
+TEST(ByteArrayTest, ClearEmptiesArray) {
+    ByteArray byteArray;
+    byteArray.push_back(0x01);
+    byteArray.push_back(0x02);
+    byteArray.clear();
+    EXPECT_TRUE(byteArray.empty());
+}
+
+TEST(ByteArrayTest, IndexOperatorAccessesCorrectElement) {
+    ByteArray byteArray;
+    byteArray.push_back(0x01);
+    byteArray.push_back(0x02);
+    EXPECT_EQ(0x01, byteArray[0]);
+    EXPECT_EQ(0x02, byteArray[1]);
+}
+
+TEST(ByteArrayTest, DataPointerIsValid) {
+    ByteArray byteArray;
+    byteArray.push_back(0x01);
+    byteArray.push_back(0x02);
+    const uint8_t* data_ptr = byteArray.data();
+    ASSERT_NE(nullptr, data_ptr);
+    EXPECT_EQ(0x01, data_ptr[0]);
+    EXPECT_EQ(0x02, data_ptr[1]);
+}
+
+TEST(ByteArrayTest, BeginEndIterators) {
+    ByteArray byteArray;
+    byteArray.push_back(0x01);
+    byteArray.push_back(0x02);
+    auto it = byteArray.begin();
+    EXPECT_EQ(0x01, *it);
+    ++it;
+    EXPECT_EQ(0x02, *it);
+    ++it;
+    EXPECT_EQ(byteArray.end(), it);
+}
+
+TEST(ByteArrayTest, ConstIndexOperatorAccessesCorrectElement) {
+    ByteArray byteArray;
+    byteArray.push_back(0x01);
+    byteArray.push_back(0x02);
+    const ByteArray constByteArray = byteArray;
+    EXPECT_EQ(0x01, constByteArray[0]);
+    EXPECT_EQ(0x02, constByteArray[1]);
+}
