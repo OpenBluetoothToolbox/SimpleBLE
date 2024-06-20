@@ -92,35 +92,6 @@ class ByteArray {
     }
 
     /**
-     * @brief Converts the ByteArray to a C-style string.
-     * @note The returned pointer is a `unique_ptr` to ensure proper memory management.
-     *       The caller takes ownership of the `unique_ptr`, and the memory will be automatically
-     *       deallocated when the `unique_ptr` goes out of scope.
-     * @return A `unique_ptr` to a C-style string.
-     */
-    std::unique_ptr<char[]> c_str() const {
-        std::unique_ptr<char[]> buffer(new char[data_.size() + 1]);
-        std::copy(data_.begin(), data_.end(), buffer.get());
-        buffer[data_.size()] = '\0';
-        return buffer;
-    }
-
-    /**
-     * @brief Copies the contents of the ByteArray to a provided buffer as a C-style string.
-     *
-     * This function converts the ByteArray to a null-terminated C-style string by copying
-     * its contents into the provided buffer. The buffer should be large enough to hold
-     * all the elements of the ByteArray plus the null-terminator.
-     *
-     * @param[out] buffer Pointer to a buffer where the C-style string will be copied.
-     *                    The caller is responsible for ensuring the buffer is properly allocated.
-     */
-    void c_str(unsigned char* buffer) const {
-        std::copy(data_.begin(), data_.end(), buffer);
-        buffer[data_.size()] = '\0';
-    }
-
-    /**
      * @brief Converts the ByteArray to a hex string.
      * @param spacing Whether to include spaces between bytes.
      *
