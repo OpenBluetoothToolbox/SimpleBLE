@@ -178,14 +178,7 @@ std::vector<Service> PeripheralBase::advertised_services() {
     return service_list;
 }
 
-std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() {
-    std::map<uint16_t, ByteArray> manufacturer_data;
-    for (auto& [manufacturer_id, value_array] : device_->manufacturer_data()) {
-        manufacturer_data[manufacturer_id] = ByteArray(value_array);
-    }
-
-    return manufacturer_data;
-}
+std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() { return device_->manufacturer_data(); }
 
 ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     // Check if the user is attempting to read the battery service/characteristic and if so,
