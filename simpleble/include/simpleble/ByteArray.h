@@ -84,7 +84,7 @@ class ByteArray {
         byteArray.data_.reserve(size / 2);
 
         for (size_t i = 0; i < size; i += 2) {
-            uint8_t byte = hexCharToByte(hexStr[i]) * 16 + hexCharToByte(hexStr[i + 1]);
+            uint8_t byte = static_cast<uint8_t>(std::stoi(hexStr.substr(i, 2), nullptr, 16));
             byteArray.data_.push_back(byte);
         }
 
@@ -183,24 +183,6 @@ class ByteArray {
 
   private:
     std::vector<uint8_t> data_;
-
-    /**
-     * @brief Converts a hex character to a byte.
-     * @param hexChar A hex character.
-     * @return The byte value of the hex character.
-     * @throws std::invalid_argument if the character is not a valid hex character.
-     */
-    static uint8_t hexCharToByte(char hexChar) {
-        if (hexChar >= '0' && hexChar <= '9') {
-            return hexChar - '0';
-        } else if (hexChar >= 'A' && hexChar <= 'F') {
-            return hexChar - 'A' + 10;
-        } else if (hexChar >= 'a' && hexChar <= 'f') {
-            return hexChar - 'a' + 10;
-        } else {
-            throw std::invalid_argument(std::string("Invalid hex character: ") + hexChar);
-        }
-    }
 };
 
 }  // namespace SimpleBLE
