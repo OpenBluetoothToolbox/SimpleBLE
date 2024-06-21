@@ -9,6 +9,11 @@ Interface::Interface(std::shared_ptr<Connection> conn, const std::string& bus_na
 
 // ----- LIFE CYCLE -----
 
+template<typename T>
+Interface::Property<T> Interface::create_property(const std::string& name) {
+    return Property<T>(*this, name);
+}
+
 void Interface::load(Holder options) {
     _property_update_mutex.lock();
     auto changed_options = options.get_dict_string();

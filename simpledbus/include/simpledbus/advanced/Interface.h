@@ -12,12 +12,39 @@ namespace SimpleDBus {
 
 class Interface {
   public:
+
+    template<typename T>
+    class Property {
+      public:
+        Property(Interface& interface, const std::string& name)
+            : _interface(interface), _name(name) {}
+
+        T get(bool refresh = true) {
+          if (refresh) {
+            _interface.property_refresh(_name);
+          }
+          std::scoped_lock lock(_interface._property_update_mutex);
+          return _interface._properties[_name].template get<T>();
+        }
+
+        void set(T value) {
+          std::scoped_lock lock(_interface._property_update_mutex);
+          _interface.property_set(_name, SimpleDBus::Holder::create<T>(value));
+        }
+      private:
+        Interface& _interface; ///< The interface object.
+        const std::string& _name; ///< The name of the property.
+    };
+
     Interface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
               const std::string& interface_name);
 
     virtual ~Interface() = default;
 
+
     // ----- LIFE CYCLE -----
+    template<typename T>
+    Property<T> create_property(const std::string& name); 
     void load(Holder options);
     void unload();
     bool is_loaded() const;
@@ -59,3 +86,4 @@ class Interface {
 };
 
 }  // namespace SimpleDBus
+
