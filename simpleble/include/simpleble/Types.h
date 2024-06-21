@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-#include "common/ByteArray.h"
+#include "ByteArray.h"
 
 namespace SimpleBLE {
 
@@ -13,7 +13,7 @@ using BluetoothAddress = std::string;
 // returns the same string, but provides a homogeneous interface.
 using BluetoothUUID = std::string;
 
-using ByteArray = Common::ByteArray;
+using ByteArray = kvn::ByteArray;
 
 enum class OperatingSystem {
     WINDOWS,

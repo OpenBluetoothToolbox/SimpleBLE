@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <vector>
 
-namespace Common {
+namespace kvn {
 
 /**
  * @class ByteArray
@@ -185,4 +185,4 @@ class ByteArray {
     std::vector<uint8_t> data_;
 };
 
-}  // namespace Common
+}  // namespace kvn

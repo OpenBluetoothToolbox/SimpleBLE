@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include "common/ByteArray.h"
+#include "ByteArray.h"
 
-using namespace Common;
+using namespace kvn;
 
 TEST(ByteArrayTest, DefaultConstructor) {
     ByteArray byteArray;

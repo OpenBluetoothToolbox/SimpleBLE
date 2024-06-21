@@ -1,9 +1,9 @@
 #pragma once
 
-#include "common/ByteArray.h"
+#include "ByteArray.h"
 
 namespace SimpleBluez {
 
-using ByteArray = Common::ByteArray;
+using ByteArray = kvn::ByteArray;
 
 }
