@@ -95,10 +95,10 @@ void Device::clear_on_services_resolved() { device1()->OnServicesResolved.unload
 
 bool Device::has_battery_interface() { return interface_exists("org.bluez.Battery1"); }
 
-uint8_t Device::battery_percentage() { return battery1()->Percentage(); }
+uint8_t Device::battery_percentage() { return battery1()->Percentage.get(); }
 
 void Device::set_on_battery_percentage_changed(std::function<void(uint8_t new_value)> callback) {
-    battery1()->OnPercentageChanged.load([this, callback]() { callback(battery1()->Percentage()); });
+    battery1()->OnPercentageChanged.load([this, callback]() { callback(battery1()->Percentage.get()); });
     // As the `property_changed` callback only occurs when the property is changed, we need to manually
     // call the callback once to make sure the callback is called with the current value.
     battery1()->OnPercentageChanged();
