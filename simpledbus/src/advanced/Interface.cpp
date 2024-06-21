@@ -7,6 +7,29 @@ Interface::Interface(std::shared_ptr<Connection> conn, const std::string& bus_na
                      const std::string& interface_name)
     : _conn(conn), _bus_name(bus_name), _path(path), _interface_name(interface_name), _loaded(true) {}
 
+
+// ----- PROPERTY INNER CLASS -----
+
+template<typename T>
+Interface::Property<T>::Property(Interface& interface, const std::string& name)
+    : _interface(interface), _name(name) {}
+
+template<typename T>
+T Interface::Property<T>::get(bool refresh) {
+    if (refresh) {
+    _interface.property_refresh(_name);
+    }
+    std::scoped_lock lock(_interface._property_update_mutex);
+    return _interface._properties[_name].template get<T>();
+}
+
+template<typename T>
+void Interface::Property<T>::set(T value) {
+    std::scoped_lock lock(_interface._property_update_mutex);
+    _interface.property_set(_name, SimpleDBus::Holder::create<T>(value));
+}
+
+
 // ----- LIFE CYCLE -----
 
 template<typename T>

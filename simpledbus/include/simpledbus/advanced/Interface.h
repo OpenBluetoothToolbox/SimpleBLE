@@ -13,27 +13,44 @@ namespace SimpleDBus {
 class Interface {
   public:
 
+    /**
+     * @brief Property class is meant to facilitate using setters and getters
+     *  for dbus properties. It is meant to be used to delcare properties on
+     *  classes inheriting from Interface. 
+     * 
+     * Usage example:
+     * 
+     * class MyInterface : public SimpleDBus::Interface {
+     * public:
+     *   MyInterface(std::shared_ptr<SimpleDBus::Connection> conn, std::string destination, std::string path)
+     *     : SimpleDBus::Interface(std::move(conn), std::move(destination), std::move(path)) {
+     *   }
+     *
+     *   // Declare a property
+     *   SimpleDBus::Interface::Property<bool> my_property = create_property<bool>("MyProperty");
+     *
+     *   // Set a property
+     *   void set_my_property(bool value) {
+     *     my_property.set(value);
+     *   }
+     *
+     *   // Get a property
+     *   bool get_my_property() {
+     *     return my_property.get();
+     *   }
+     * };
+     * 
+     */
     template<typename T>
     class Property {
       public:
-        Property(Interface& interface, const std::string& name)
-            : _interface(interface), _name(name) {}
+        Property(Interface& interface, const std::string& name);
+        T get(bool refresh = true);
+        void set(T value);
 
-        T get(bool refresh = true) {
-          if (refresh) {
-            _interface.property_refresh(_name);
-          }
-          std::scoped_lock lock(_interface._property_update_mutex);
-          return _interface._properties[_name].template get<T>();
-        }
-
-        void set(T value) {
-          std::scoped_lock lock(_interface._property_update_mutex);
-          _interface.property_set(_name, SimpleDBus::Holder::create<T>(value));
-        }
       private:
-        Interface& _interface; ///< The interface object.
-        const std::string& _name; ///< The name of the property.
+        Interface& _interface; 
+        const std::string& _name; 
     };
 
     Interface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
