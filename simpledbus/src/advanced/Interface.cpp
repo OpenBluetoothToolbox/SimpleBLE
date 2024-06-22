@@ -15,12 +15,15 @@ Interface::Property<T>::Property(Interface& interface, const std::string& name)
     : _interface(interface), _name(name) {}
 
 template<typename T>
-T Interface::Property<T>::get(bool refresh) {
-    if (refresh) {
-    _interface.property_refresh(_name);
-    }
+T Interface::Property<T>::get() {
     std::scoped_lock lock(_interface._property_update_mutex);
     return _interface._properties[_name].template get<T>();
+}
+
+template<typename T>
+T Interface::Property<T>::refresh_and_get() {
+    _interface.property_refresh(_name);
+    return Interface::Property<T>::get();
 }
 
 template<typename T>
@@ -35,6 +38,11 @@ void Interface::Property<T>::set(T value) {
 template<typename T>
 Interface::Property<T> Interface::create_property(const std::string& name) {
     return Property<T>(*this, name);
+}
+
+template<typename T>
+Interface::CachedProperty<T> Interface::create_cached_property(const std::string& name) {
+    return CachedProperty<T>(*this, name);
 }
 
 void Interface::load(Holder options) {

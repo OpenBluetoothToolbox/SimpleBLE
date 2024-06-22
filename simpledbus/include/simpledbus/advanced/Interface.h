@@ -45,13 +45,55 @@ class Interface {
     class Property {
       public:
         Property(Interface& interface, const std::string& name);
-        T get(bool refresh = true);
-        void set(T value);
+        virtual T get();
+        virtual T refresh_and_get();
+        virtual void set(T value);
 
-      private:
+      protected:
         Interface& _interface; 
         const std::string& _name; 
     };
+
+
+    template<typename T>
+    class CachedProperty : public Property<T> {
+      public:
+        using Property<T>::get;
+
+        T get() override {
+            return this->_cached_property;
+        }
+
+        T refresh_and_get() override {
+          update_cached_property();
+          return get();
+        }
+
+        void update_cached_property() {
+            this->_cached_property = this->refresh_and_get();
+        }
+
+      private:
+        T _cached_property = T();
+    };
+
+    template<typename K, typename V>
+    class CachedProperty<std::map<K, std::vector<V>>> : public Property<std::map<K, std::vector<V>>> {
+      public:
+        using Property<std::map<K, std::vector<V>>>::get;
+
+        void update_cached_property() {
+            auto data = this->refresh_and_get();
+            this->_cached_property.clear();
+            for (auto& [key, value_array] : data) {
+                this->_cached_property[key] = value_array;
+            }
+        }
+
+      private:
+        std::map<K, std::vector<V>> _cached_property;
+    };
+
 
     Interface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
               const std::string& interface_name);
@@ -62,6 +104,8 @@ class Interface {
     // ----- LIFE CYCLE -----
     template<typename T>
     Property<T> create_property(const std::string& name); 
+    template<typename T>
+    CachedProperty<T> create_cached_property(const std::string& name); 
     void load(Holder options);
     void unload();
     bool is_loaded() const;
