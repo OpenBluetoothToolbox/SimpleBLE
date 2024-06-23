@@ -10,7 +10,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 
 **Added**
 
--
+- (Android) Alpha preview of Android support.
+- (SimpleDBus) Added templated version of creation and getter functions for Holder class. *(Thanks lorsi96!)*
 
 **Changed**
 
