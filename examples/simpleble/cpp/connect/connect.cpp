@@ -23,8 +23,12 @@ int main() {
     // Scan for 5 seconds and return.
     adapter.scan_for(5000);
 
-    std::cout << "The following devices were found:" << std::endl;
+    std::cout << "The following connectable devices were found:" << std::endl;
     for (size_t i = 0; i < peripherals.size(); i++) {
+        if (!peripherals[i].is_connectable()) {
+            continue;
+        }
+
         std::cout << "[" << i << "] " << peripherals[i].identifier() << " [" << peripherals[i].address() << "]"
                   << std::endl;
     }
