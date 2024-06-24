@@ -71,6 +71,16 @@ TEST(ByteArrayTest, FromHexValid) {
     EXPECT_EQ(byteArray[4], 'o');
 }
 
+TEST(ByteArrayTest, FromHexValidWithPrefix) {
+    ByteArray byteArray = ByteArray::fromHex("0x48656c6C6f");
+    EXPECT_EQ(byteArray.size(), 5);
+    EXPECT_EQ(byteArray[0], 'H');
+    EXPECT_EQ(byteArray[1], 'e');
+    EXPECT_EQ(byteArray[2], 'l');
+    EXPECT_EQ(byteArray[3], 'l');
+    EXPECT_EQ(byteArray[4], 'o');
+}
+
 TEST(ByteArrayTest, FromHexInvalid) {
     EXPECT_THROW(ByteArray::fromHex("123"), std::length_error);
     EXPECT_THROW(ByteArray::fromHex("G123"), std::invalid_argument);

@@ -56,26 +56,23 @@ class ByteArray {
 
     /**
      * @brief Creates a ByteArray from a hex string.
-     * @param byteArr A C-style string containing hex data.
-     * @return A ByteArray object.
-     */
-    static ByteArray fromHex(const char* byteArr) { return fromHex(std::string(byteArr)); }
-
-    /**
-     * @brief Creates a ByteArray from a hex string.
-     * @param byteArr A C-style string containing hex data.
-     * @param size The size of the string.
-     * @return A ByteArray object.
-     */
-    static ByteArray fromHex(const char* byteArr, size_t size) { return fromHex(std::string(byteArr, size)); }
-
-    /**
-     * @brief Creates a ByteArray from a hex string.
+     * 
+     * Case is ignored and the string may have a '0x' hex prefix or not.
+     * 
      * @param hexStr A string containing hex data.
      * @return A ByteArray object.
+     * @throws std::invalid_argument If the hex string contains non-hexadecimal characters.
+     * @throws std::length_error If the hex string length is not even.
      */
     static ByteArray fromHex(const std::string& hexStr) {
-        size_t size = hexStr.size();
+        std::string cleanString(hexStr);
+
+        // Check and skip the '0x' prefix if present
+        if (cleanString.size() >= 2 && cleanString.substr(0, 2) == "0x") {
+            cleanString = cleanString.substr(2);
+        }
+
+        size_t size = cleanString.size();
         if (size % 2 != 0) {
             throw std::length_error("Hex string length must be even.");
         }
@@ -84,7 +81,7 @@ class ByteArray {
         byteArray.data_.reserve(size / 2);
 
         for (size_t i = 0; i < size; i += 2) {
-            uint8_t byte = static_cast<uint8_t>(std::stoi(hexStr.substr(i, 2), nullptr, 16));
+            uint8_t byte = static_cast<uint8_t>(std::stoi(cleanString.substr(i, 2), nullptr, 16));
             byteArray.data_.push_back(byte);
         }
 
@@ -92,10 +89,20 @@ class ByteArray {
     }
 
     /**
-     * @brief Converts the ByteArray to a hex string.
+     * @overload
+     */
+    static ByteArray fromHex(const char* byteArr) { return fromHex(std::string(byteArr)); }
+
+    /**
+     * @overload
+     */
+    static ByteArray fromHex(const char* byteArr, size_t size) { return fromHex(std::string(byteArr, size)); }
+
+    /**
+     * @brief Converts the ByteArray to a lowercase hex string without '0x' prefix.
      * @param spacing Whether to include spaces between bytes.
      *
-     * @return A hex string representation of the ByteArray.
+     * @return A lowercase hex string representation of the ByteArray without '0x' prefix.
      */
     std::string toHex(bool spacing = false) const {
         std::ostringstream oss;
