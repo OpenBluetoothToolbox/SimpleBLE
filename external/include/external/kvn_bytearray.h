@@ -12,47 +12,47 @@
 namespace kvn {
 
 /**
- * @class ByteArray
+ * @class bytearray
  * @brief A class to handle byte arrays and their conversion from/to hex strings.
  */
-class ByteArray {
+class bytearray {
   public:
     /**
      * @brief Default constructor.
      */
-    ByteArray() = default;
+    bytearray() = default;
 
     /**
-     * @brief Constructs ByteArray from a vector of uint8_t.
+     * @brief Constructs byte array from a vector of uint8_t.
      * @param vec A vector of uint8_t.
      */
-    ByteArray(const std::vector<uint8_t>& vec) : data_(vec) {}
+    bytearray(const std::vector<uint8_t>& vec) : data_(vec) {}
 
     /**
-     * @brief Constructs ByteArray from a raw pointer and size.
+     * @brief Constructs byte array from a raw pointer and size.
      * @param ptr A pointer to uint8_t data.
      * @param size The size of the data.
      */
-    ByteArray(const uint8_t* ptr, size_t size) : data_(ptr, ptr + size) {}
+    bytearray(const uint8_t* ptr, size_t size) : data_(ptr, ptr + size) {}
 
     /**
-     * @brief Constructs ByteArray from a std::string.
+     * @brief Constructs byte array from a std::string.
      * @param byteArr A string containing byte data.
      */
-    ByteArray(const std::string& byteArr) : data_(byteArr.begin(), byteArr.end()) {}
+    bytearray(const std::string& byteArr) : data_(byteArr.begin(), byteArr.end()) {}
 
     /**
-     * @brief Constructs ByteArray from a C-style string and size.
+     * @brief Constructs byte array from a C-style string and size.
      * @param byteArr A C-style string.
      * @param size The size of the string.
      */
-    ByteArray(const char* byteArr, size_t size) : ByteArray(std::string(byteArr, size)) {}
+    bytearray(const char* byteArr, size_t size) : bytearray(std::string(byteArr, size)) {}
 
     /**
-     * @brief Constructs ByteArray from a C-style string.
+     * @brief Constructs byte array from a C-style string.
      * @param byteArr A C-style string.
      */
-    ByteArray(const char* byteArr) : ByteArray(std::string(byteArr)) {}
+    bytearray(const char* byteArr) : bytearray(std::string(byteArr)) {}
 
     /**
      * @brief Creates a ByteArray from a hex string.
@@ -64,7 +64,7 @@ class ByteArray {
      * @throws std::invalid_argument If the hex string contains non-hexadecimal characters.
      * @throws std::length_error If the hex string length is not even.
      */
-    static ByteArray fromHex(const std::string& hexStr) {
+    static bytearray fromHex(const std::string& hexStr) {
         std::string cleanString(hexStr);
 
         // Check and skip the '0x' prefix if present
@@ -77,7 +77,7 @@ class ByteArray {
             throw std::length_error("Hex string length must be even.");
         }
 
-        ByteArray byteArray;
+        bytearray byteArray;
         byteArray.data_.reserve(size / 2);
 
         for (size_t i = 0; i < size; i += 2) {
@@ -91,18 +91,18 @@ class ByteArray {
     /**
      * @overload
      */
-    static ByteArray fromHex(const char* byteArr) { return fromHex(std::string(byteArr)); }
+    static bytearray fromHex(const char* byteArr) { return fromHex(std::string(byteArr)); }
 
     /**
      * @overload
      */
-    static ByteArray fromHex(const char* byteArr, size_t size) { return fromHex(std::string(byteArr, size)); }
+    static bytearray fromHex(const char* byteArr, size_t size) { return fromHex(std::string(byteArr, size)); }
 
     /**
-     * @brief Converts the ByteArray to a lowercase hex string without '0x' prefix.
+     * @brief Converts the byte array to a lowercase hex string without '0x' prefix.
      * @param spacing Whether to include spaces between bytes.
      *
-     * @return A lowercase hex string representation of the ByteArray without '0x' prefix.
+     * @return A hex string representation of the byte array.
      */
     std::string toHex(bool spacing = false) const {
         std::ostringstream oss;
@@ -116,67 +116,68 @@ class ByteArray {
     }
 
     /**
-     * @brief Slices the ByteArray from a specified start index to an end index.
+     * @brief Slices the byte array from a specified start index to an end index.
      *
-     * This method creates a new ByteArray containing bytes from the specified range.
+     * This method creates a new byte array containing bytes from the specified range.
      * The start index is inclusive, while the end index is exclusive.
      *
      * @param start The starting index from which to begin slicing.
      * @param end The ending index up to which to slice (exclusive).
-     * @return ByteArray A new ByteArray containing the sliced segment.
+     * @return byte array A new byte array containing the sliced segment.
      * @throws std::out_of_range If the start index is greater than the end index or if the end index is out of bounds.
      */
-    ByteArray slice(size_t start, size_t end) const {
+    bytearray slice(size_t start, size_t end) const {
         if (start > end || end > data_.size()) {
             throw std::out_of_range("Invalid slice range");
         }
-        return ByteArray(std::vector<uint8_t>(data_.begin() + start, data_.begin() + end));
+        return bytearray(std::vector<uint8_t>(data_.begin() + start, data_.begin() + end));
     }
 
     /**
-     * @brief Slices the ByteArray from a specified start index to the end of the array.
+     * @brief Slices the byte array from a specified start index to the end of the array.
      *
-     * This method creates a new ByteArray containing all bytes from the specified start index to the end of the
-     * ByteArray.
+     * This method creates a new byte array containing all bytes from the specified start index to the end of the
+     * byte array.
      *
      * @param start The starting index from which to begin slicing.
-     * @return ByteArray A new ByteArray containing the sliced segment from the start index to the end.
-     * @throws std::out_of_range If the start index is out of the bounds of the ByteArray.
+     * @return byte array A new byte array containing the sliced segment from the start index to the end.
+     * @throws std::out_of_range If the start index is out of the bounds of the byte array.
      */
-    ByteArray slice_from(size_t start) const { return slice(start, data_.size()); }
+    bytearray slice_from(size_t start) const { return slice(start, data_.size()); }
 
     /**
-     * @brief Slices the ByteArray from the beginning to a specified end index.
+     * @brief Slices the byte array from the beginning to a specified end index.
      *
-     * This method creates a new ByteArray containing all bytes from the beginning of the ByteArray to the specified end
+     * This method creates a new byte array containing all bytes from the beginning of the byte array to the specified end
      * index.
      *
      * @param end The ending index up to which to slice (exclusive).
-     * @return ByteArray A new ByteArray containing the sliced segment from the beginning to the end index.
-     * @throws std::out_of_range If the end index is out of the bounds of the ByteArray.
+     * @return byte array A new byte array containing the sliced segment from the beginning to the end index.
+     * @throws std::out_of_range If the end index is out of the bounds of the byte array.
      */
-    ByteArray slice_to(size_t end) const { return slice(0, end); }
+    bytearray slice_to(size_t end) const { return slice(0, end); }
 
     /**
-     * @brief Overloaded stream insertion operator for ByteArray.
+     * @brief Overloaded stream insertion operator for byte array.
      * @param os The output stream.
-     * @param byteArray The ByteArray object.
+     * @param byteArray The byte array object.
      * @return The output stream.
      */
-    friend std::ostream& operator<<(std::ostream& os, const ByteArray& byteArray) {
+    friend std::ostream& operator<<(std::ostream& os, const bytearray& byteArray) {
         os << byteArray.toHex(true);
         return os;
     }
 
     /**
-     * @brief Conversion operator to convert ByteArray to std::string.
+     * @brief Conversion operator to convert byte array to std::string.
      *
-     * @note This is provided to support code that relies on ByteArray
+     * @note This is provided to support code that relies on byte array
      *       being representd as a string.
-     * @return String containing the raw bytes of the ByteArray
+     * @return String containing the raw bytes of the byte array
      */
     operator std::string() const { return std::string(data_.begin(), data_.end()); }
 
+    //! @cond Doxygen_Suppress
     // Expose vector-like functionality
     size_t size() const { return data_.size(); }
     const uint8_t* data() const { return data_.data(); }
@@ -187,6 +188,7 @@ class ByteArray {
     void push_back(uint8_t byte) { data_.push_back(byte); }
     auto begin() const { return data_.begin(); }
     auto end() const { return data_.end(); }
+    //! @endcond
 
   private:
     std::vector<uint8_t> data_;

@@ -1,16 +1,16 @@
 #include <gtest/gtest.h>
-#include "ByteArray.h"
+#include "kvn_bytearray.h"
 
 using namespace kvn;
 
 TEST(ByteArrayTest, DefaultConstructor) {
-    ByteArray byteArray;
+    bytearray byteArray;
     EXPECT_EQ(byteArray.size(), 0);
 }
 
 TEST(ByteArrayTest, VectorConstructor) {
     std::vector<uint8_t> vec = {1, 2, 3, 4};
-    ByteArray byteArray(vec);
+    bytearray byteArray(vec);
     EXPECT_EQ(byteArray.size(), 4);
     EXPECT_EQ(byteArray[0], 1);
     EXPECT_EQ(byteArray[1], 2);
@@ -20,7 +20,7 @@ TEST(ByteArrayTest, VectorConstructor) {
 
 TEST(ByteArrayTest, PointerConstructor) {
     uint8_t data[] = {1, 2, 3, 4};
-    ByteArray byteArray(data, 4);
+    bytearray byteArray(data, 4);
     EXPECT_EQ(byteArray.size(), 4);
     EXPECT_EQ(byteArray[0], 1);
     EXPECT_EQ(byteArray[1], 2);
@@ -30,7 +30,7 @@ TEST(ByteArrayTest, PointerConstructor) {
 
 TEST(ByteArrayTest, StringConstructor) {
     std::string str = "Hello";
-    ByteArray byteArray(str);
+    bytearray byteArray(str);
     EXPECT_EQ(byteArray.size(), 5);
     EXPECT_EQ(byteArray[0], 'H');
     EXPECT_EQ(byteArray[1], 'e');
@@ -41,7 +41,7 @@ TEST(ByteArrayTest, StringConstructor) {
 
 TEST(ByteArrayTest, CharArrayConstructor) {
     const char str[] = {'H', 'e', 'l', 'l', 'o'};
-    ByteArray byteArray(str, 5);
+    bytearray byteArray(str, 5);
     EXPECT_EQ(byteArray.size(), 5);
     EXPECT_EQ(byteArray[0], 'H');
     EXPECT_EQ(byteArray[1], 'e');
@@ -52,7 +52,7 @@ TEST(ByteArrayTest, CharArrayConstructor) {
 
 TEST(ByteArrayTest, CStringConstructor) {
     const char* str = "Hello";
-    ByteArray byteArray(str);
+    bytearray byteArray(str);
     EXPECT_EQ(byteArray.size(), 5);
     EXPECT_EQ(byteArray[0], 'H');
     EXPECT_EQ(byteArray[1], 'e');
@@ -62,7 +62,7 @@ TEST(ByteArrayTest, CStringConstructor) {
 }
 
 TEST(ByteArrayTest, FromHexValid) {
-    ByteArray byteArray = ByteArray::fromHex("48656c6C6f");
+    bytearray byteArray = bytearray::fromHex("48656c6C6f");
     EXPECT_EQ(byteArray.size(), 5);
     EXPECT_EQ(byteArray[0], 'H');
     EXPECT_EQ(byteArray[1], 'e');
@@ -72,7 +72,7 @@ TEST(ByteArrayTest, FromHexValid) {
 }
 
 TEST(ByteArrayTest, FromHexValidWithPrefix) {
-    ByteArray byteArray = ByteArray::fromHex("0x48656c6C6f");
+    bytearray byteArray = bytearray::fromHex("0x48656c6C6f");
     EXPECT_EQ(byteArray.size(), 5);
     EXPECT_EQ(byteArray[0], 'H');
     EXPECT_EQ(byteArray[1], 'e');
@@ -82,36 +82,36 @@ TEST(ByteArrayTest, FromHexValidWithPrefix) {
 }
 
 TEST(ByteArrayTest, FromHexInvalid) {
-    EXPECT_THROW(ByteArray::fromHex("123"), std::length_error);
-    EXPECT_THROW(ByteArray::fromHex("G123"), std::invalid_argument);
+    EXPECT_THROW(bytearray::fromHex("123"), std::length_error);
+    EXPECT_THROW(bytearray::fromHex("G123"), std::invalid_argument);
 }
 
 TEST(ByteArrayTest, ToHex) {
-    ByteArray byteArray("Hello");
+    bytearray byteArray("Hello");
     EXPECT_EQ(byteArray.toHex(), "48656c6c6f");
     EXPECT_EQ(byteArray.toHex(true), "48 65 6c 6c 6f ");
 }
 
 TEST(ByteArrayTest, StingConversion) {
-    ByteArray byteArray = ByteArray::fromHex("48656c6C6f");
+    bytearray byteArray = bytearray::fromHex("48656c6C6f");
     std::string str = static_cast<std::string>(byteArray);
     EXPECT_EQ(str, "Hello");
 }
 
 TEST(ByteArrayTest, StreamOperator) {
-    ByteArray byteArray("Hello");
+    bytearray byteArray("Hello");
     std::ostringstream oss;
     oss << byteArray;
     EXPECT_EQ(oss.str(), "48 65 6c 6c 6f ");
 }
 
 TEST(ByteArrayTest, DefaultConstructor_Empty) {
-    ByteArray byteArray;
+    bytearray byteArray;
     EXPECT_TRUE(byteArray.empty());
 }
 
 TEST(ByteArrayTest, PushBackIncreasesSize) {
-    ByteArray byteArray;
+    bytearray byteArray;
     byteArray.push_back(0x01);
     EXPECT_EQ(1, byteArray.size());
     byteArray.push_back(0x02);
@@ -119,7 +119,7 @@ TEST(ByteArrayTest, PushBackIncreasesSize) {
 }
 
 TEST(ByteArrayTest, ClearEmptiesArray) {
-    ByteArray byteArray;
+    bytearray byteArray;
     byteArray.push_back(0x01);
     byteArray.push_back(0x02);
     byteArray.clear();
@@ -127,7 +127,7 @@ TEST(ByteArrayTest, ClearEmptiesArray) {
 }
 
 TEST(ByteArrayTest, IndexOperatorAccessesCorrectElement) {
-    ByteArray byteArray;
+    bytearray byteArray;
     byteArray.push_back(0x01);
     byteArray.push_back(0x02);
     EXPECT_EQ(0x01, byteArray[0]);
@@ -135,7 +135,7 @@ TEST(ByteArrayTest, IndexOperatorAccessesCorrectElement) {
 }
 
 TEST(ByteArrayTest, DataPointerIsValid) {
-    ByteArray byteArray;
+    bytearray byteArray;
     byteArray.push_back(0x01);
     byteArray.push_back(0x02);
     const uint8_t* data_ptr = byteArray.data();
@@ -145,7 +145,7 @@ TEST(ByteArrayTest, DataPointerIsValid) {
 }
 
 TEST(ByteArrayTest, BeginEndIterators) {
-    ByteArray byteArray;
+    bytearray byteArray;
     byteArray.push_back(0x01);
     byteArray.push_back(0x02);
     auto it = byteArray.begin();
@@ -157,18 +157,18 @@ TEST(ByteArrayTest, BeginEndIterators) {
 }
 
 TEST(ByteArrayTest, ConstIndexOperatorAccessesCorrectElement) {
-    ByteArray byteArray;
+    bytearray byteArray;
     byteArray.push_back(0x01);
     byteArray.push_back(0x02);
-    const ByteArray constByteArray = byteArray;
+    const bytearray constByteArray = byteArray;
     EXPECT_EQ(0x01, constByteArray[0]);
     EXPECT_EQ(0x02, constByteArray[1]);
 }
 
 TEST(ByteArrayTest, SliceValidRange) {
     std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
-    ByteArray byteArray(vec);
-    ByteArray slicedArray = byteArray.slice(1, 3);
+    bytearray byteArray(vec);
+    bytearray slicedArray = byteArray.slice(1, 3);
 
     ASSERT_EQ(slicedArray.size(), 2);
     EXPECT_EQ(slicedArray[0], 0x02);
@@ -177,8 +177,8 @@ TEST(ByteArrayTest, SliceValidRange) {
 
 TEST(ByteArrayTest, SliceFullRange) {
     std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
-    ByteArray byteArray(vec);
-    ByteArray slicedArray = byteArray.slice(0, byteArray.size());
+    bytearray byteArray(vec);
+    bytearray slicedArray = byteArray.slice(0, byteArray.size());
 
     ASSERT_EQ(slicedArray.size(), byteArray.size());
     EXPECT_EQ(slicedArray[0], 0x01);
@@ -187,8 +187,8 @@ TEST(ByteArrayTest, SliceFullRange) {
 
 TEST(ByteArrayTest, SliceSingleElement) {
     std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
-    ByteArray byteArray(vec);
-    ByteArray slicedArray = byteArray.slice(2, 3);
+    bytearray byteArray(vec);
+    bytearray slicedArray = byteArray.slice(2, 3);
 
     ASSERT_EQ(slicedArray.size(), 1);
     EXPECT_EQ(slicedArray[0], 0x03);
@@ -196,7 +196,7 @@ TEST(ByteArrayTest, SliceSingleElement) {
 
 TEST(ByteArrayTest, SliceOutOfRange) {
     std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
-    ByteArray byteArray(vec);
+    bytearray byteArray(vec);
 
     EXPECT_THROW(byteArray.slice(1, 6), std::out_of_range);
     EXPECT_THROW(byteArray.slice(6, 7), std::out_of_range);
@@ -204,15 +204,15 @@ TEST(ByteArrayTest, SliceOutOfRange) {
 
 TEST(ByteArrayTest, SliceInvalidRange) {
     std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
-    ByteArray byteArray(vec);
+    bytearray byteArray(vec);
 
     EXPECT_THROW(byteArray.slice(3, 2), std::out_of_range);
 }
 
 TEST(ByteArrayTest, SliceFromIndexToEnd) {
     std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
-    ByteArray byteArray(vec);
-    ByteArray slicedArray = byteArray.slice_from(2);
+    bytearray byteArray(vec);
+    bytearray slicedArray = byteArray.slice_from(2);
 
     ASSERT_EQ(slicedArray.size(), 3);
     EXPECT_EQ(slicedArray[0], 0x03);
@@ -222,8 +222,8 @@ TEST(ByteArrayTest, SliceFromIndexToEnd) {
 
 TEST(ByteArrayTest, SliceFromBeginningToIndex) {
     std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
-    ByteArray byteArray(vec);
-    ByteArray slicedArray = byteArray.slice_to(3);
+    bytearray byteArray(vec);
+    bytearray slicedArray = byteArray.slice_to(3);
 
     ASSERT_EQ(slicedArray.size(), 3);
     EXPECT_EQ(slicedArray[0], 0x01);
@@ -233,14 +233,14 @@ TEST(ByteArrayTest, SliceFromBeginningToIndex) {
 
 TEST(ByteArrayTest, SliceFromIndexToEndOutOfRange) {
     std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
-    ByteArray byteArray(vec);
+    bytearray byteArray(vec);
 
     EXPECT_THROW(byteArray.slice_from(6), std::out_of_range);
 }
 
 TEST(ByteArrayTest, SliceFromBeginningToIndexOutOfRange) {
     std::vector<uint8_t> vec = {1, 2, 3, 4, 5};
-    ByteArray byteArray(vec);
+    bytearray byteArray(vec);
 
     EXPECT_THROW(byteArray.slice_to(6), std::out_of_range);
 }

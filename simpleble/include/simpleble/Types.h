@@ -3,7 +3,12 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-#include "ByteArray.h"
+#include "external/kvn_bytearray.h"
+
+/**
+ * @file Types.h
+ * @brief Defines types and enumerations used throughout the SimpleBLE library.
+ */
 
 namespace SimpleBLE {
 
@@ -13,7 +18,11 @@ using BluetoothAddress = std::string;
 // returns the same string, but provides a homogeneous interface.
 using BluetoothUUID = std::string;
 
-using ByteArray = kvn::ByteArray;
+/**
+ * @typedef ByteArray
+ * @brief Represents a byte array using kvn::bytearray from the external library.
+ */
+using ByteArray = kvn::bytearray;
 
 enum class OperatingSystem {
     WINDOWS,
