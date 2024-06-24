@@ -65,6 +65,8 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 # -- Extension configuration -------------------------------------------------
-breathe_projects = { 'simpleble': '_doxygen/xml' }
+breathe_projects = { 'simpleble': '_doxygen/xml',
+                    'external': '_doxygen/xml'
+                    }
 
 autosummary_generate = True
