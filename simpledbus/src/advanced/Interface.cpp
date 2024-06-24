@@ -14,11 +14,25 @@ template<typename T>
 Interface::Property<T>::Property(Interface& interface, const std::string& name)
     : _interface(interface), _name(name) {}
 
+
 template<typename T>
 T Interface::Property<T>::get() {
-    std::scoped_lock lock(_interface._property_update_mutex);
+     std::scoped_lock lock(_interface._property_update_mutex);
     return _interface._properties[_name].template get<T>();
 }
+
+template<>
+std::vector<std::string> Interface::Property<std::vector<std::string>>::get() {
+    std::scoped_lock lock(_interface._property_update_mutex);
+
+    std::vector<std::string> items;
+    for (SimpleDBus::Holder& item : _interface._properties[_name].get_array()) {
+        items.push_back(item.get_string());
+    }
+
+    return items;
+}
+
 
 template<typename T>
 T Interface::Property<T>::refresh_and_get() {

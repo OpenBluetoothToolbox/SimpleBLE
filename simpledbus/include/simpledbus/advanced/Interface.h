@@ -1,6 +1,7 @@
 #pragma once
 
 #include <simpledbus/base/Connection.h>
+#include <simplebluez/Types.h>
 
 #include <atomic>
 #include <map>
@@ -93,6 +94,20 @@ class Interface {
       private:
         std::map<K, std::vector<V>> _cached_property;
     };
+
+
+    // template<>
+    // class CachedProperty<SimpleBluez::ByteArray> : public Property<SimpleBluez::ByteArray> {
+    //   public:
+    //     using Property<SimpleBluez::ByteArray>::get;
+
+    //     void update_cached_property() {
+    //         // auto newValue = this->refresh_and_get();
+    //         // std::scoped_lock lock(_interface._property_update_mutex);
+    //         // std::vector<uint8_t> valueData = newValue.get_vector();
+    //         // _cached_property = SimpleBluez::ByteArray(valueData.data(), valueData.size());
+    //     }
+    // };
 
 
     Interface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
