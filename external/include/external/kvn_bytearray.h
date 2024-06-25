@@ -56,9 +56,9 @@ class bytearray {
 
     /**
      * @brief Creates a ByteArray from a hex string.
-     * 
+     *
      * Case is ignored and the string may have a '0x' hex prefix or not.
-     * 
+     *
      * @param hexStr A string containing hex data.
      * @return A ByteArray object.
      * @throws std::invalid_argument If the hex string contains non-hexadecimal characters.
@@ -116,7 +116,7 @@ class bytearray {
     }
 
     /**
-     * @brief Slices the byte array from a specified start index to an end index.
+     * @brief Slices  the byte array from a specified start index to an end index.
      *
      * This method creates a new byte array containing bytes from the specified range.
      * The start index is inclusive, while the end index is exclusive.
@@ -148,8 +148,8 @@ class bytearray {
     /**
      * @brief Slices the byte array from the beginning to a specified end index.
      *
-     * This method creates a new byte array containing all bytes from the beginning of the byte array to the specified end
-     * index.
+     * This method creates a new byte array containing all bytes from the beginning of the byte array to the specified
+     * end index.
      *
      * @param end The ending index up to which to slice (exclusive).
      * @return byte array A new byte array containing the sliced segment from the beginning to the end index.
