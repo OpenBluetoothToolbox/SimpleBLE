@@ -1,4 +1,5 @@
-#pragma once
+#ifndef KVN_BYTEARRAY_H
+#define KVN_BYTEARRAY_H
 
 #include <cstdint>
 #include <cstring>
@@ -195,3 +196,5 @@ class bytearray {
 };
 
 }  // namespace kvn
+
+#endif  // KVN_BYTEARRAY_H
