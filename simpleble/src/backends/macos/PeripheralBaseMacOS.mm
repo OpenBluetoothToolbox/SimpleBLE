@@ -213,12 +213,13 @@
                 for (CBDescriptor* descriptor in characteristic.descriptors) {
                     @synchronized(self) {
                         [characteristicExtras.descriptorExtras setObject:[[DescriptorExtras alloc] init]
-                                                                  forKey:[[descriptor.UUID UUIDString] lowercaseString]];
+                                                                  forKey:uuidToString(descriptor.UUID)];
                     }
                 }
 
                 @synchronized(self) {
-                    [self.characteristicExtras setObject:characteristicExtras forKey:[[characteristic.UUID UUIDString] lowercaseString]];
+                    NSLog(@"Characteristic %@ loaded", [characteristic.UUID UUIDString]);
+                    [self.characteristicExtras setObject:characteristicExtras forKey:uuidToString(characteristic.UUID)];
                 }
             }
         }
@@ -627,7 +628,8 @@
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[[characteristic.UUID UUIDString] lowercaseString]];
+    NSLog(@"Characteristic %@ updated", [characteristic.UUID UUIDString]);
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:uuidToString(characteristic.UUID)];
 
     if (characteristic.isNotifying) {
         // If the characteristic is notifying, just save the value and trigger the callback.
@@ -651,7 +653,7 @@
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[[characteristic.UUID UUIDString] lowercaseString]];
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:uuidToString(characteristic.UUID)];
     BleTask* task = characteristicExtras.task;
 
     @synchronized(self) {
@@ -663,7 +665,7 @@
 - (void)peripheral:(CBPeripheral*)peripheral
     didUpdateNotificationStateForCharacteristic:(CBCharacteristic*)characteristic
                                           error:(NSError*)error {
-    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[[characteristic.UUID UUIDString] lowercaseString]];
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:uuidToString(characteristic.UUID)];
     BleTask* task = characteristicExtras.task;
 
     @synchronized(self) {
@@ -677,8 +679,8 @@
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
-    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[[descriptor.characteristic.UUID UUIDString] lowercaseString]];
-    DescriptorExtras* descriptorExtras = [characteristicExtras.descriptorExtras objectForKey:[[descriptor.UUID UUIDString] lowercaseString]];
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:uuidToString(descriptor.characteristic.UUID)];
+    DescriptorExtras* descriptorExtras = [characteristicExtras.descriptorExtras objectForKey:uuidToString(descriptor.UUID)];
     BleTask* task = descriptorExtras.task;
 
     @synchronized(self) {
@@ -688,8 +690,8 @@
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didWriteValueForDescriptor:(CBDescriptor*)descriptor error:(NSError*)error {
-    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:[[descriptor.characteristic.UUID UUIDString] lowercaseString]];
-    DescriptorExtras* descriptorExtras = [characteristicExtras.descriptorExtras objectForKey:[[descriptor.UUID UUIDString] lowercaseString]];
+    CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:uuidToString(descriptor.characteristic.UUID)];
+    DescriptorExtras* descriptorExtras = [characteristicExtras.descriptorExtras objectForKey:uuidToString(descriptor.UUID)];
     BleTask* task = descriptorExtras.task;
 
     @synchronized(self) {
