@@ -20,6 +20,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 **Fixed**
 
 - (SimpleBluez) Fixed improper handling of non `org.Bluez.Service1` objects within a `org.bluez.Device1` object. *(Thanks Kober Engineering!)*
+- (MacOS) Fixed incorrect storage and retrieval with standard Bluetooth UUIDs inside the peripheral class. *(Thanks TellowKrinkle!)*
 
 
 [0.7.X]
