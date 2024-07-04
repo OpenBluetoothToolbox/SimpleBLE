@@ -218,7 +218,6 @@
                 }
 
                 @synchronized(self) {
-                    NSLog(@"Characteristic %@ loaded", [characteristic.UUID UUIDString]);
                     [self.characteristicExtras setObject:characteristicExtras forKey:uuidToString(characteristic.UUID)];
                 }
             }
@@ -628,7 +627,6 @@
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didUpdateValueForCharacteristic:(CBCharacteristic*)characteristic error:(NSError*)error {
-    NSLog(@"Characteristic %@ updated", [characteristic.UUID UUIDString]);
     CharacteristicExtras* characteristicExtras = [self.characteristicExtras objectForKey:uuidToString(characteristic.UUID)];
 
     if (characteristic.isNotifying) {
