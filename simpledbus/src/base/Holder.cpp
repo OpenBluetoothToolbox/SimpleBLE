@@ -492,6 +492,11 @@ Holder Holder::create(const std::string& value) {
 }
 
 template <>
+Holder Holder::create(std::string value) {
+    return create_string(value);
+}
+
+template <>
 Holder Holder::create(const ObjectPath& value) {
     return create_object_path(value);
 }
