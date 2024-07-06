@@ -27,6 +27,20 @@ class Interface {
         std::string _name; 
     };
 
+    template<typename K>
+    class Property<std::vector<K>> {
+      public:
+        Property(Interface& interface, std::string name);
+
+        virtual std::vector<K> get(); 
+        virtual std::vector<K> refresh_and_get();
+
+      protected:
+        Interface& _interface; 
+        std::string _name; 
+    };
+
+
     template<typename T>
     class CachedProperty : public Property<T> {
       public:

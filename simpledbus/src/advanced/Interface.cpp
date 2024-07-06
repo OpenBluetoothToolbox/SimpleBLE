@@ -21,16 +21,24 @@ T Interface::Property<T>::get() {
     return _interface._properties[_name].get<T>();
 }
 
-template<>
-std::vector<std::string> Interface::Property<std::vector<std::string>>::get() {
+template<typename K>
+Interface::Property<std::vector<K>>::Property(Interface& interface, std::string name) : _interface(interface), _name(name) {}
+
+template<typename K>
+std::vector<K> Interface::Property<std::vector<K>>::get() {
+    printf("Vector property");
     std::scoped_lock lock(_interface._property_update_mutex);
-
-    std::vector<std::string> items;
+    std::vector<K> container;
     for (SimpleDBus::Holder& item : _interface._properties[_name].get_array()) {
-        items.push_back(item.get_string());
+        container.push_back(item.get<K>());
     }
+    return container;
+}
 
-    return items;
+template<typename K>
+std::vector<K> Interface::Property<std::vector<K>>::refresh_and_get() {
+    _interface.property_refresh(_name);
+    return get();
 }
 
 
@@ -206,6 +214,7 @@ template class Interface::Property<int32_t>;
 template class Interface::Property<int64_t>;
 template class Interface::Property<bool>;
 template class Interface::Property<std::string>;
+template class Interface::Property<std::vector<std::string>>;
 
 template class Interface::CachedProperty<uint8_t>;
 template class Interface::CachedProperty<uint16_t>;
