@@ -175,5 +175,12 @@ void Interface::message_handle(Message& msg) {}
 
 // ------ TEMPLATE INSTANTIATIONS ------
 template class Interface::Property<uint8_t>;
+template class Interface::Property<uint16_t>;
+template class Interface::Property<uint32_t>;
+template class Interface::Property<uint64_t>;
+template class Interface::Property<int8_t>;
+template class Interface::Property<int16_t>;
+template class Interface::Property<int32_t>;
+template class Interface::Property<int64_t>;
 template class Interface::Property<bool>;
 template class Interface::Property<std::string>;
