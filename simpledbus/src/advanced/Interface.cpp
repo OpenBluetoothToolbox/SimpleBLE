@@ -47,6 +47,28 @@ void Interface::Property<T>::set(T value) {
 }
 
 
+// ----- CACHED PROPERTY -----
+
+template<typename T>
+Interface::CachedProperty<T>::CachedProperty(Interface& interface, std::string name)
+    : Property<T>(interface, name) {}
+
+template<typename T>
+T Interface::CachedProperty<T>::get() {
+    return this->_cached_property;
+}
+
+template<typename T>
+T Interface::CachedProperty<T>::refresh_and_get() {
+    return Property<T>::refresh_and_get();
+}
+
+template<typename T>
+void Interface::CachedProperty<T>::update_cached_property() {
+    this->_cached_property = this->refresh_and_get();
+}
+
+
 // ----- LIFE CYCLE -----
 
 void Interface::load(Holder options) {
@@ -184,3 +206,14 @@ template class Interface::Property<int32_t>;
 template class Interface::Property<int64_t>;
 template class Interface::Property<bool>;
 template class Interface::Property<std::string>;
+
+template class Interface::CachedProperty<uint8_t>;
+template class Interface::CachedProperty<uint16_t>;
+template class Interface::CachedProperty<uint32_t>;
+template class Interface::CachedProperty<uint64_t>;
+template class Interface::CachedProperty<int8_t>;
+template class Interface::CachedProperty<int16_t>;
+template class Interface::CachedProperty<int32_t>;
+template class Interface::CachedProperty<int64_t>;
+template class Interface::CachedProperty<bool>;
+template class Interface::CachedProperty<std::string>;

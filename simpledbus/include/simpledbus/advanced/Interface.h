@@ -30,20 +30,10 @@ class Interface {
     template<typename T>
     class CachedProperty : public Property<T> {
       public:
-        CachedProperty(Interface& interface, std::string name): 
-          Property<T>(interface, name) {}
-
-        T get() override {
-            return this->_cached_property;
-        }
-
-        T refresh_and_get() override {
-          return Property<T>::refresh_and_get();
-        }
-
-        void update_cached_property() {
-            this->_cached_property = this->refresh_and_get();
-        }
+        CachedProperty(Interface& interface, std::string name);
+        T get() override;
+        T refresh_and_get() override;
+        void update_cached_property(); 
 
       private:
         T _cached_property = T();
