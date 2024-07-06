@@ -45,23 +45,23 @@ Building SimpleDBus
 
 You can use the following commands to build SimpleDBus: ::
 
-   cmake -H <path-to-simpledbus> -B build_simpledbus
+   cmake -S <path-to-simpledbus> -B build_simpledbus
    cmake --build build_simpledbus -j7
 
 Note that if you want to modify the build configuration, you can do so by passing
 additional arguments to the ``cmake`` command. For example, to build a shared library
 set the ``BUILD_SHARED_LIBS`` CMake variable to ``TRUE`` ::
 
-   cmake -H <path-to-simpledbus> -B build_simpledbus -DBUILD_SHARED_LIBS=TRUE
+   cmake -S <path-to-simpledbus> -B build_simpledbus -DBUILD_SHARED_LIBS=TRUE
 
 To modify the log level, set the ``SIMPLEDBUS_LOG_LEVEL`` CMake variable to one of the
 following values: ``VERBOSE``, ``DEBUG``, ``INFO``, ``WARN``, ``ERROR``, ``FATAL`` ::
 
-   cmake -H <path-to-simpledbus> -B build_simpledbus -DSIMPLEDBUS_LOG_LEVEL=DEBUG
+   cmake -S <path-to-simpledbus> -B build_simpledbus -DSIMPLEDBUS_LOG_LEVEL=DEBUG
 
 To force the usage of the DBus session bus, enable the ``SIMPLEDBUS_USE_SESSION_DBUS`` flag ::
 
-   cmake -H <path-to-simpledbus> -B build_simpledbus -DSIMPLEDBUS_USE_SESSION_DBUS=TRUE
+   cmake -S <path-to-simpledbus> -B build_simpledbus -DSIMPLEDBUS_USE_SESSION_DBUS=TRUE
 
 Installing SimpleDBus
 ----------------------
@@ -161,7 +161,7 @@ Build Examples
 
 Use the following instructions to build the provided SimpleDBus examples: ::
 
-   cmake -H <path-to-simpledbus>/examples/simpledbus -B build_simpledbus_examples -DSIMPLEDBUS_LOCAL=ON
+   cmake -S <path-to-simpledbus>/examples/simpledbus -B build_simpledbus_examples -DSIMPLEDBUS_LOCAL=ON
    cmake --build build_simpledbus_examples -j7
 
 
@@ -180,7 +180,7 @@ Unit Tests
 
 To run the unit tests, run the following command: ::
 
-   cmake -H <path-to-simpledbus> -B build_simpledbus_test -DSIMPLEDBUS_TEST=ON
+   cmake -S <path-to-simpledbus> -B build_simpledbus_test -DSIMPLEDBUS_TEST=ON
    cmake --build build_simpledbus_test -j7
    ./build_simpledbus_test/bin/simpledbus_test
 
@@ -190,7 +190,7 @@ Address Sanitizer Tests
 
 To run the address sanitizer tests, run the following command: ::
 
-   cmake -H <path-to-simpledbus> -B build_simpledbus_test -DSIMPLEDBUS_SANITIZE=Address -DSIMPLEDBUS_TEST=ON
+   cmake -S <path-to-simpledbus> -B build_simpledbus_test -DSIMPLEDBUS_SANITIZE=Address -DSIMPLEDBUS_TEST=ON
    cmake --build build_simpledbus_test -j7
    PYTHONMALLOC=malloc ./build_simpledbus_test/bin/simpledbus_test
 
@@ -203,12 +203,14 @@ Thread Sanitizer Tests
 
 To run the thread sanitizer tests, run the following command: ::
 
-   cmake -H <path-to-simpledbus> -B build_simpledbus_test -DSIMPLEDBUS_SANITIZE=Thread -DSIMPLEDBUS_TEST=ON
+   cmake -S <path-to-simpledbus> -B build_simpledbus_test -DSIMPLEDBUS_SANITIZE=Thread -DSIMPLEDBUS_TEST=ON
    cmake --build build_simpledbus_test -j7
    ./build_simpledbus_test/bin/simpledbus_test
 
 
 .. Links
+
+.. _CMake: https://cmake.org/
 
 .. _cmake-init-fetchcontent: https://github.com/friendlyanon/cmake-init-fetchcontent
 
