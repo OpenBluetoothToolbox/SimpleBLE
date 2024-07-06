@@ -11,14 +11,14 @@ Interface::Interface(std::shared_ptr<Connection> conn, const std::string& bus_na
 // ----- PROPERTY INNER CLASS -----
 
 template<typename T>
-Interface::Property<T>::Property(Interface& interface, const std::string& name)
+Interface::Property<T>::Property(Interface& interface, std::string name)
     : _interface(interface), _name(name) {}
 
 
 template<typename T>
 T Interface::Property<T>::get() {
     std::scoped_lock lock(_interface._property_update_mutex);
-    return _interface._properties[_name].template get<T>();
+    return _interface._properties[_name].get<T>();
 }
 
 template<>

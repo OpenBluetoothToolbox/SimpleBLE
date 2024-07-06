@@ -17,14 +17,14 @@ class Interface {
     template<typename T>
     class Property {
       public:
-        Property(Interface& interface, const std::string& name);
+        Property(Interface& interface, std::string name);
         virtual T get();
         virtual T refresh_and_get();
         virtual void set(T value);
 
       protected:
         Interface& _interface; 
-        const std::string& _name; 
+        std::string _name; 
     };
 
 
@@ -32,7 +32,6 @@ class Interface {
               const std::string& interface_name);
 
     virtual ~Interface() = default;
-
 
     // ----- LIFE CYCLE -----
     void load(Holder options);
