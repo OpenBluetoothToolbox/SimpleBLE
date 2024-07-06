@@ -83,7 +83,7 @@ int16_t Device::rssi() { return device1()->RSSI.get(); }
 
 int16_t Device::tx_power() { return device1()->TxPower.get(); }
 
-std::vector<std::string> Device::uuids() { return device1()->UUIDs(); }
+std::vector<std::string> Device::uuids() { return device1()->UUIDs.get(); }
 
 std::map<uint16_t, std::vector<uint8_t>> Device::manufacturer_data() { return device1()->ManufacturerData(); }
 

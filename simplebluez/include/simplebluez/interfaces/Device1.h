@@ -21,13 +21,13 @@ class Device1 : public SimpleDBus::Interface {
     // ----- PROPERTIES -----
     Property<int16_t> RSSI = Property<int16_t>(*this, "RSSI");
     CachedProperty<int16_t> TxPower = CachedProperty<int16_t>(*this, "TxPower");
+    Property<std::vector<std::string>> UUIDs = Property<std::vector<std::string>>(*this, "UUIDs");
 
     uint16_t Appearance();  // On Bluez 5.53, this always returns 0.
     std::string Address();
     std::string AddressType();
     std::string Alias();
     std::string Name();
-    std::vector<std::string> UUIDs();
     std::map<uint16_t, std::vector<uint8_t>> ManufacturerData(bool refresh = true);
     std::map<std::string, std::vector<uint8_t>> ServiceData(bool refresh = true);
     bool Paired(bool refresh = true);
@@ -41,8 +41,6 @@ class Device1 : public SimpleDBus::Interface {
   protected:
     void property_changed(std::string option_name) override;
 
-    int16_t _rssi = INT16_MIN;
-    int16_t _tx_power = INT16_MIN;
     std::string _name;
     std::string _alias;
     std::string _address;
