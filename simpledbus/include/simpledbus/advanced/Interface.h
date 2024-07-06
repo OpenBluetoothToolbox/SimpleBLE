@@ -1,6 +1,7 @@
 #pragma once
 
 #include <simpledbus/base/Connection.h>
+#include <simplebluez/Types.h>
 
 #include <atomic>
 #include <map>
@@ -12,10 +13,26 @@ namespace SimpleDBus {
 
 class Interface {
   public:
+
+    template<typename T>
+    class Property {
+      public:
+        Property(Interface& interface, const std::string& name);
+        virtual T get();
+        virtual T refresh_and_get();
+        virtual void set(T value);
+
+      protected:
+        Interface& _interface; 
+        const std::string& _name; 
+    };
+
+
     Interface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
               const std::string& interface_name);
 
     virtual ~Interface() = default;
+
 
     // ----- LIFE CYCLE -----
     void load(Holder options);
@@ -59,3 +76,4 @@ class Interface {
 };
 
 }  // namespace SimpleDBus
+
