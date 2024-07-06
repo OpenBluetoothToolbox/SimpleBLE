@@ -27,6 +27,29 @@ class Interface {
         std::string _name; 
     };
 
+    template<typename T>
+    class CachedProperty : public Property<T> {
+      public:
+        CachedProperty(Interface& interface, std::string name): 
+          Property<T>(interface, name) {}
+
+        T get() override {
+            return this->_cached_property;
+        }
+
+        T refresh_and_get() override {
+          return Property<T>::refresh_and_get();
+        }
+
+        void update_cached_property() {
+            this->_cached_property = this->refresh_and_get();
+        }
+
+      private:
+        T _cached_property = T();
+    };
+
+
 
     Interface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
               const std::string& interface_name);
