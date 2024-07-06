@@ -30,8 +30,6 @@ void Device1::CancelPairing() {
     _conn->send_with_reply_and_block(msg);
 }
 
-int16_t Device1::TxPower() { return _tx_power; }
-
 uint16_t Device1::Appearance() {
     std::scoped_lock lock(_property_update_mutex);
     return _properties["Appearance"].get_uint16();
@@ -151,6 +149,6 @@ void Device1::property_changed(std::string option_name) {
             _service_data[key] = raw_service_data;
         }
     } else if (option_name == "TxPower") {
-        _tx_power = _properties["TxPower"].get_int16();
+        TxPower.update_cached_property();
     }
 }

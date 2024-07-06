@@ -20,8 +20,8 @@ class Device1 : public SimpleDBus::Interface {
 
     // ----- PROPERTIES -----
     Property<int16_t> RSSI = Property<int16_t>(*this, "RSSI");
+    CachedProperty<int16_t> TxPower = CachedProperty<int16_t>(*this, "TxPower");
 
-    int16_t TxPower();
     uint16_t Appearance();  // On Bluez 5.53, this always returns 0.
     std::string Address();
     std::string AddressType();

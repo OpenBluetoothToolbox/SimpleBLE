@@ -81,7 +81,7 @@ std::string Device::alias() { return device1()->Alias(); }
 
 int16_t Device::rssi() { return device1()->RSSI.get(); }
 
-int16_t Device::tx_power() { return device1()->TxPower(); }
+int16_t Device::tx_power() { return device1()->TxPower.get(); }
 
 std::vector<std::string> Device::uuids() { return device1()->UUIDs(); }
 
