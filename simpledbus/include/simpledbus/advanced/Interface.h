@@ -2,6 +2,7 @@
 
 #include <simpledbus/base/Connection.h>
 #include <simplebluez/Types.h>
+#include <simpledbus/advanced/Property.h>
 
 #include <atomic>
 #include <map>
@@ -10,70 +11,6 @@
 #include <string>
 
 namespace SimpleDBus {
-
-// template<typename T>
-// class Property {
-//   public:
-//     Property(Interface& interface, std::string name);
-//     virtual T get();
-//     virtual T refresh_and_get();
-//     virtual void set(T value);
-
-//   protected:
-//     Interface& _interface; 
-//     std::string _name; 
-// };
-
-// template<typename K>
-// class Property<std::vector<K>> {
-//   public:
-//     Property(Interface& interface, std::string name);
-
-//     virtual std::vector<K> get(); 
-//     virtual std::vector<K> refresh_and_get();
-
-//   protected:
-//     Interface& _interface; 
-//     std::string _name; 
-// };
-
-
-// template<typename K, typename V>
-// class Property<std::map<K, std::vector<V>>> {
-//   public:
-//     Property(Interface& interface, std::string name);
-//     virtual std::map<K, std::vector<V>> get();
-//     virtual std::map<K, std::vector<V>> refresh_and_get(); 
-
-//   protected:
-//     Interface& _interface; 
-//     std::string _name; 
-// };
-
-
-// template<typename T>
-// class CachedProperty : public Property<T> {
-//   public:
-//     CachedProperty(Interface& interface, std::string name);
-//     T get() override;
-//     T refresh_and_get() override;
-//     void update_cached_property(); 
-
-//   private:
-//     T _cached_property = T();
-// };
-
-// template<typename K, typename T>
-// class CachedProperty<std::map<K, std::vector<T>>> : public Property<std::map<K, std::vector<T>>> {
-//   public:
-//     CachedProperty(Interface& interface, std::string name);
-//     std::map<K, std::vector<T>> get() override;
-//     std::map<K, std::vector<T>> refresh_and_get() override;
-//     void update_cached_property();
-  
-//   private:
-//     std::map<K, std::vector<T>> _cached_property;
-// };
 
 
 class Interface {
@@ -99,6 +36,16 @@ class Interface {
     Holder property_get(const std::string& property_name);
     void property_set(const std::string& property_name, const Holder& value);
     void property_refresh(const std::string& property_name);
+
+    template<typename T>
+    inline Property<T> create_property(const std::string& property_name) {
+        return Property<T>(*this, property_name);
+    }
+
+    template<typename T>
+    inline CachedProperty<T> create_cached_property(const std::string& property_name) {
+        return CachedProperty<T>(*this, property_name);
+    }
 
     // ----- SIGNALS -----
     void signal_property_changed(Holder changed_properties, Holder invalidated_properties);
