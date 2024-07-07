@@ -71,13 +71,13 @@ void Device::connect() { device1()->Connect(); }
 
 void Device::disconnect() { device1()->Disconnect(); }
 
-std::string Device::address() { return device1()->Address(); }
+std::string Device::address() { return device1()->Address.get(); }
 
-std::string Device::address_type() { return device1()->AddressType(); }
+std::string Device::address_type() { return device1()->AddressType.get(); }
 
-std::string Device::name() { return device1()->Name(); }
+std::string Device::name() { return device1()->Name.get(); }
 
-std::string Device::alias() { return device1()->Alias(); }
+std::string Device::alias() { return device1()->Alias.get(); }
 
 int16_t Device::rssi() { return device1()->RSSI.get(); }
 
@@ -89,11 +89,11 @@ std::map<uint16_t, std::vector<uint8_t>> Device::manufacturer_data() { return de
 
 std::map<std::string, std::vector<uint8_t>> Device::service_data() { return device1()->ServiceData.refresh_and_get(); }
 
-bool Device::paired() { return device1()->Paired(); }
+bool Device::paired() { return device1()->Paired.refresh_and_get(); }
 
-bool Device::connected() { return device1()->Connected(); }
+bool Device::connected() { return device1()->Connected.refresh_and_get(); }
 
-bool Device::services_resolved() { return device1()->ServicesResolved(); }
+bool Device::services_resolved() { return device1()->ServicesResolved.refresh_and_get(); }
 
 void Device::set_on_disconnected(std::function<void()> callback) { device1()->OnDisconnected.load(callback); }
 

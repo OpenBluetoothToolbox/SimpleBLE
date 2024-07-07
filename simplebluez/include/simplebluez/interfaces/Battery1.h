@@ -16,7 +16,7 @@ class Battery1 : public SimpleDBus::Interface {
     // ----- METHODS -----
 
     // ----- PROPERTIES -----
-    SimpleDBus::Property<uint8_t> Percentage = SimpleDBus::Property<uint8_t>(*this, "Percentage"); 
+    SimpleDBus::Property<uint8_t> Percentage = create_property<uint8_t>("Percentage");
 
     // ----- CALLBACKS -----
     kvn::safe_callback<void()> OnPercentageChanged;

@@ -30,65 +30,13 @@ void Device1::CancelPairing() {
     _conn->send_with_reply_and_block(msg);
 }
 
-uint16_t Device1::Appearance() {
-    std::scoped_lock lock(_property_update_mutex);
-    return _properties["Appearance"].get_uint16();
-}
-
-std::string Device1::Address() {
-    std::scoped_lock lock(_property_update_mutex);
-    return _properties["Address"].get_string();
-}
-
-std::string Device1::AddressType() {
-    std::scoped_lock lock(_property_update_mutex);
-    return _properties["AddressType"].get_string();
-}
-
-std::string Device1::Alias() {
-    std::scoped_lock lock(_property_update_mutex);
-    return _properties["Alias"].get_string();
-}
-
-std::string Device1::Name() {
-    std::scoped_lock lock(_property_update_mutex);
-    return _properties["Name"].get_string();
-}
-
-bool Device1::Paired(bool refresh) {
-    if (refresh) {
-        property_refresh("Paired");
-    }
-
-    std::scoped_lock lock(_property_update_mutex);
-    return _properties["Paired"].get_boolean();
-}
-
-bool Device1::Connected(bool refresh) {
-    if (refresh) {
-        property_refresh("Connected");
-    }
-
-    std::scoped_lock lock(_property_update_mutex);
-    return _properties["Connected"].get_boolean();
-}
-
-bool Device1::ServicesResolved(bool refresh) {
-    if (refresh) {
-        property_refresh("ServicesResolved");
-    }
-
-    std::scoped_lock lock(_property_update_mutex);
-    return _properties["ServicesResolved"].get_boolean();
-}
-
 void Device1::property_changed(std::string option_name) {
     if (option_name == "Connected") {
-        if (!Connected(false)) {
+        if (!Connected.get()) {
             OnDisconnected();
         }
     } else if (option_name == "ServicesResolved") {
-        if (ServicesResolved(false)) {
+        if (ServicesResolved.get()) {
             OnServicesResolved();
         }
     } else if (option_name == "ManufacturerData") {
