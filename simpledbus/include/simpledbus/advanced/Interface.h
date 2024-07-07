@@ -84,6 +84,28 @@ class Interface {
         T _cached_property = T();
     };
 
+    template<typename K, typename T>
+    class CachedProperty<std::map<K, std::vector<T>>> : public Property<std::map<K, std::vector<T>>> {
+      public:
+        CachedProperty(Interface& interface, std::string name) : Property<std::map<K, std::vector<T>>>(interface, name) {}
+
+        std::map<K, std::vector<T>> get() override {
+          return this->_cached_property;
+        }
+
+        std::map<K, std::vector<T>> refresh_and_get() override {
+          update_cached_property();
+          return _cached_property; 
+        }
+
+        void update_cached_property() {
+          this->_cached_property = Property<std::map<K, std::vector<T>>>::refresh_and_get();;
+        }
+      
+      private:
+        std::map<K, std::vector<T>> _cached_property;
+    };
+
     Interface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
               const std::string& interface_name);
 

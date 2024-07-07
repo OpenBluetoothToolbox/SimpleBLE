@@ -26,7 +26,6 @@ Interface::Property<std::vector<K>>::Property(Interface& interface, std::string 
 
 template<typename K>
 std::vector<K> Interface::Property<std::vector<K>>::get() {
-    printf("Vector property");
     std::scoped_lock lock(_interface._property_update_mutex);
     std::vector<K> container;
     for (SimpleDBus::Holder& item : _interface._properties[_name].get_array()) {
