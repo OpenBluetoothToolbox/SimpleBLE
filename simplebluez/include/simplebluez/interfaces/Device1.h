@@ -22,6 +22,7 @@ class Device1 : public SimpleDBus::Interface {
     Property<int16_t> RSSI = Property<int16_t>(*this, "RSSI");
     CachedProperty<int16_t> TxPower = CachedProperty<int16_t>(*this, "TxPower");
     Property<std::vector<std::string>> UUIDs = Property<std::vector<std::string>>(*this, "UUIDs");
+    Property<std::map<std::string, std::vector<uint8_t>>> ServiceData = Property<std::map<std::string, std::vector<uint8_t>>>(*this, "ServiceData");
 
     uint16_t Appearance();  // On Bluez 5.53, this always returns 0.
     std::string Address();
@@ -29,7 +30,6 @@ class Device1 : public SimpleDBus::Interface {
     std::string Alias();
     std::string Name();
     std::map<uint16_t, std::vector<uint8_t>> ManufacturerData(bool refresh = true);
-    std::map<std::string, std::vector<uint8_t>> ServiceData(bool refresh = true);
     bool Paired(bool refresh = true);
     bool Connected(bool refresh = true);
     bool ServicesResolved(bool refresh = true);
