@@ -44,27 +44,9 @@ class Interface {
     template<typename K, typename V>
     class Property<std::map<K, std::vector<V>>> {
       public:
-        Property(Interface& interface, std::string name) : _interface(interface), _name(name) {}
-
-        virtual std::map<K, std::vector<V>> get() {
-          std::scoped_lock lock(_interface._property_update_mutex);
-          std::map<K, std::vector<V>> propmap;
-          std::map<K, SimpleDBus::Holder> prop_map = _interface._properties[_name].get<std::map<K, SimpleDBus::Holder>>();
-          // Loop through all received keys and store them.
-          for (auto& [key, value_array] : prop_map) {
-              std::vector<V> raw_service_data;
-              for (SimpleDBus::Holder& elem : value_array.get_array()) {
-                  raw_service_data.push_back(elem.get<V>());
-              }
-              propmap[key] = raw_service_data;
-          }
-          return propmap;
-        }
-
-        virtual std::map<K, std::vector<V>> refresh_and_get() {
-          _interface.property_refresh(_name);
-          return get();
-        }
+        Property(Interface& interface, std::string name);
+        virtual std::map<K, std::vector<V>> get();
+        virtual std::map<K, std::vector<V>> refresh_and_get(); 
 
       protected:
         Interface& _interface; 
@@ -87,20 +69,10 @@ class Interface {
     template<typename K, typename T>
     class CachedProperty<std::map<K, std::vector<T>>> : public Property<std::map<K, std::vector<T>>> {
       public:
-        CachedProperty(Interface& interface, std::string name) : Property<std::map<K, std::vector<T>>>(interface, name) {}
-
-        std::map<K, std::vector<T>> get() override {
-          return this->_cached_property;
-        }
-
-        std::map<K, std::vector<T>> refresh_and_get() override {
-          update_cached_property();
-          return _cached_property; 
-        }
-
-        void update_cached_property() {
-          this->_cached_property = Property<std::map<K, std::vector<T>>>::refresh_and_get();;
-        }
+        CachedProperty(Interface& interface, std::string name);
+        std::map<K, std::vector<T>> get() override;
+        std::map<K, std::vector<T>> refresh_and_get() override;
+        void update_cached_property();
       
       private:
         std::map<K, std::vector<T>> _cached_property;

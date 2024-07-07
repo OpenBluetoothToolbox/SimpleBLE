@@ -40,6 +40,32 @@ std::vector<K> Interface::Property<std::vector<K>>::refresh_and_get() {
     return get();
 }
 
+template<typename K, typename V>
+Interface::Property<std::map<K, std::vector<V>>>::Property(Interface& interface, std::string name) : _interface(interface), _name(name) {}
+
+template<typename K, typename V>
+std::map<K, std::vector<V>> Interface::Property<std::map<K, std::vector<V>>>::get() {
+          std::scoped_lock lock(_interface._property_update_mutex);
+          std::map<K, std::vector<V>> propmap;
+          std::map<K, SimpleDBus::Holder> prop_map = _interface._properties[_name].get<std::map<K, SimpleDBus::Holder>>();
+          // Loop through all received keys and store them.
+          for (auto& [key, value_array] : prop_map) {
+              std::vector<V> raw_service_data;
+              for (SimpleDBus::Holder& elem : value_array.get_array()) {
+            raw_service_data.push_back(elem.get<V>());
+        }
+        propmap[key] = raw_service_data;
+    }
+    return propmap;
+}
+
+template<typename K, typename V>
+std::map<K, std::vector<V>> Interface::Property<std::map<K, std::vector<V>>>::refresh_and_get() {
+    _interface.property_refresh(_name);
+    return get();
+}
+
+
 
 template<typename T>
 T Interface::Property<T>::refresh_and_get() {
@@ -75,6 +101,26 @@ template<typename T>
 void Interface::CachedProperty<T>::update_cached_property() {
     this->_cached_property = Property<T>::refresh_and_get();;
 }
+
+template<typename K, typename T>
+Interface::CachedProperty<std::map<K, std::vector<T>>>::CachedProperty(Interface& interface, std::string name) : Property<std::map<K, std::vector<T>>>(interface, name) {}
+
+template<typename K, typename T>
+std::map<K, std::vector<T>> Interface::CachedProperty<std::map<K, std::vector<T>>>::get() {
+    return this->_cached_property;
+}
+
+template<typename K, typename T>
+std::map<K, std::vector<T>> Interface::CachedProperty<std::map<K, std::vector<T>>>::refresh_and_get() {
+    update_cached_property();
+    return _cached_property; 
+}
+
+template<typename K, typename T>
+void Interface::CachedProperty<std::map<K, std::vector<T>>>::update_cached_property() {
+    this->_cached_property = Property<std::map<K, std::vector<T>>>::refresh_and_get();;
+}
+
 
 
 // ----- LIFE CYCLE -----
@@ -215,6 +261,9 @@ template class Interface::Property<int64_t>;
 template class Interface::Property<bool>;
 template class Interface::Property<std::string>;
 template class Interface::Property<std::vector<std::string>>;
+template class Interface::Property<std::map<uint16_t, std::vector<uint8_t>>>;
+template class Interface::Property<std::map<std::string, std::vector<uint8_t>>>;
+
 
 template class Interface::CachedProperty<uint8_t>;
 template class Interface::CachedProperty<uint16_t>;
@@ -226,3 +275,5 @@ template class Interface::CachedProperty<int32_t>;
 template class Interface::CachedProperty<int64_t>;
 template class Interface::CachedProperty<bool>;
 template class Interface::CachedProperty<std::string>;
+template class Interface::CachedProperty<std::map<uint16_t, std::vector<uint8_t>>>;
+template class Interface::CachedProperty<std::map<std::string, std::vector<uint8_t>>>;
