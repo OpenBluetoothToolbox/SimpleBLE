@@ -85,7 +85,7 @@ int16_t Device::tx_power() { return device1()->TxPower.get(); }
 
 std::vector<std::string> Device::uuids() { return device1()->UUIDs.get(); }
 
-std::map<uint16_t, std::vector<uint8_t>> Device::manufacturer_data() { return device1()->ManufacturerData(); }
+std::map<uint16_t, std::vector<uint8_t>> Device::manufacturer_data() { return device1()->ManufacturerData.refresh_and_get(); }
 
 std::map<std::string, std::vector<uint8_t>> Device::service_data() { return device1()->ServiceData.refresh_and_get(); }
 

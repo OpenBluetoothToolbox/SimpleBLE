@@ -55,16 +55,6 @@ std::string Device1::Name() {
     return _properties["Name"].get_string();
 }
 
-std::map<uint16_t, std::vector<uint8_t>> Device1::ManufacturerData(bool refresh) {
-    if (refresh) {
-        property_refresh("ManufacturerData");
-    }
-
-    // Use the locally cached version to avoid parsing the map multiple times.
-    std::scoped_lock lock(_property_update_mutex);
-    return _manufacturer_data;
-}
-
 bool Device1::Paired(bool refresh) {
     if (refresh) {
         property_refresh("Paired");
@@ -102,20 +92,9 @@ void Device1::property_changed(std::string option_name) {
             OnServicesResolved();
         }
     } else if (option_name == "ManufacturerData") {
-        std::scoped_lock lock(_property_update_mutex);
-
-        _manufacturer_data.clear();
-        std::map<uint16_t, SimpleDBus::Holder> manuf_data = _properties["ManufacturerData"].get_dict_uint16();
-        // Loop through all received keys and store them.
-        for (auto& [key, value_array] : manuf_data) {
-            std::vector<uint8_t> raw_manuf_data;
-            for (auto& elem : value_array.get_array()) {
-                raw_manuf_data.push_back(elem.get_byte());
-            }
-            _manufacturer_data[key] = raw_manuf_data;
-        }
+        ManufacturerData.update_cached_property();
     } else if (option_name == "ServiceData") {
-        //
+        ServiceData.update_cached_property();
     } else if (option_name == "TxPower") {
         TxPower.update_cached_property();
     }
