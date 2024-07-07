@@ -30,15 +30,15 @@ std::shared_ptr<GattCharacteristic1> Characteristic::gattcharacteristic1() {
     return std::dynamic_pointer_cast<GattCharacteristic1>(interface_get("org.bluez.GattCharacteristic1"));
 }
 
-bool Characteristic::notifying() { return gattcharacteristic1()->Notifying(); }
+bool Characteristic::notifying() { return gattcharacteristic1()->Notifying.refresh_and_get(); }
 
-std::string Characteristic::uuid() { return gattcharacteristic1()->UUID(); }
+std::string Characteristic::uuid() { return gattcharacteristic1()->UUID.get(); }
 
 ByteArray Characteristic::value() { return gattcharacteristic1()->Value(); }
 
-std::vector<std::string> Characteristic::flags() { return gattcharacteristic1()->Flags(); }
+std::vector<std::string> Characteristic::flags() { return gattcharacteristic1()->Flags.get(); }
 
-uint16_t Characteristic::mtu() { return gattcharacteristic1()->MTU(); }
+uint16_t Characteristic::mtu() { return gattcharacteristic1()->MTU.get(); }
 
 ByteArray Characteristic::read() { return gattcharacteristic1()->ReadValue(); }
 

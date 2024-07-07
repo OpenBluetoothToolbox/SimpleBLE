@@ -35,12 +35,6 @@ ByteArray GattDescriptor1::ReadValue() {
     return Value();
 }
 
-std::string GattDescriptor1::UUID() {
-    // As the UUID property doesn't change, we can cache it
-    std::scoped_lock lock(_property_update_mutex);
-    return _uuid;
-}
-
 ByteArray GattDescriptor1::Value() {
     std::scoped_lock lock(_property_update_mutex);
     return _value;
@@ -48,8 +42,7 @@ ByteArray GattDescriptor1::Value() {
 
 void GattDescriptor1::property_changed(std::string option_name) {
     if (option_name == "UUID") {
-        std::scoped_lock lock(_property_update_mutex);
-        _uuid = _properties["UUID"].get_string();
+        UUID.update_cached_property();
     } else if (option_name == "Value") {
         update_value(_properties["Value"]);
         OnValueChanged();

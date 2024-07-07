@@ -21,7 +21,7 @@ std::shared_ptr<GattDescriptor1> Descriptor::gattdescriptor1() {
     return std::dynamic_pointer_cast<GattDescriptor1>(interface_get("org.bluez.GattDescriptor1"));
 }
 
-std::string Descriptor::uuid() { return gattdescriptor1()->UUID(); }
+std::string Descriptor::uuid() { return gattdescriptor1()->UUID.get(); }
 
 ByteArray Descriptor::value() { return gattdescriptor1()->Value(); }
 

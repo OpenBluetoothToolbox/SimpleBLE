@@ -19,7 +19,7 @@ class GattDescriptor1 : public SimpleDBus::Interface {
     ByteArray ReadValue();
 
     // ----- PROPERTIES -----
-    std::string UUID();
+    SimpleDBus::CachedProperty<std::string> UUID = create_cached_property<std::string>("UUID");
     ByteArray Value();
 
     // ----- CALLBACKS -----
@@ -29,7 +29,6 @@ class GattDescriptor1 : public SimpleDBus::Interface {
     void property_changed(std::string option_name) override;
     void update_value(SimpleDBus::Holder& new_value);
 
-    std::string _uuid;
     ByteArray _value;
 };
 
