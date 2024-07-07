@@ -41,6 +41,37 @@ class Interface {
     };
 
 
+    template<typename K, typename V>
+    class Property<std::map<K, std::vector<V>>> {
+      public:
+        Property(Interface& interface, std::string name) : _interface(interface), _name(name) {}
+
+        virtual std::map<K, std::vector<V>> get() {
+          std::scoped_lock lock(_interface._property_update_mutex);
+          std::map<K, std::vector<V>> propmap;
+          std::map<K, SimpleDBus::Holder> prop_map = _interface._properties[_name].get<std::map<K, SimpleDBus::Holder>>();
+          // Loop through all received keys and store them.
+          for (auto& [key, value_array] : prop_map) {
+              std::vector<V> raw_service_data;
+              for (SimpleDBus::Holder& elem : value_array.get_array()) {
+                  raw_service_data.push_back(elem.get<V>());
+              }
+              propmap[key] = raw_service_data;
+          }
+          return propmap;
+        }
+
+        virtual std::map<K, std::vector<V>> refresh_and_get() {
+          _interface.property_refresh(_name);
+          return get();
+        }
+
+      protected:
+        Interface& _interface; 
+        std::string _name; 
+    };
+
+
     template<typename T>
     class CachedProperty : public Property<T> {
       public:
@@ -52,8 +83,6 @@ class Interface {
       private:
         T _cached_property = T();
     };
-
-
 
     Interface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
               const std::string& interface_name);
