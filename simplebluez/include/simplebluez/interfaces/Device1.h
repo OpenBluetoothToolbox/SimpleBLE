@@ -1,6 +1,7 @@
 #pragma once
 
 #include <simpledbus/advanced/Interface.h>
+#include <simpledbus/advanced/Property.h>
 #include <simpledbus/external/kvn_safe_callback.hpp>
 
 #include <string>
@@ -19,11 +20,11 @@ class Device1 : public SimpleDBus::Interface {
     void CancelPairing();
 
     // ----- PROPERTIES -----
-    Property<int16_t> RSSI = Property<int16_t>(*this, "RSSI");
-    CachedProperty<int16_t> TxPower = CachedProperty<int16_t>(*this, "TxPower");
-    Property<std::vector<std::string>> UUIDs = Property<std::vector<std::string>>(*this, "UUIDs");
-    CachedProperty<std::map<std::string, std::vector<uint8_t>>> ServiceData = CachedProperty<std::map<std::string, std::vector<uint8_t>>>(*this, "ServiceData");
-    CachedProperty<std::map<uint16_t, std::vector<uint8_t>>> ManufacturerData = CachedProperty<std::map<uint16_t, std::vector<uint8_t>>>(*this, "ManufacturerData");
+    SimpleDBus::Property<int16_t> RSSI = SimpleDBus::Property<int16_t>(*this, "RSSI");
+    SimpleDBus::CachedProperty<int16_t> TxPower = SimpleDBus::CachedProperty<int16_t>(*this, "TxPower");
+    SimpleDBus::Property<std::vector<std::string>> UUIDs = SimpleDBus::Property<std::vector<std::string>>(*this, "UUIDs");
+    SimpleDBus::CachedProperty<std::map<std::string, std::vector<uint8_t>>> ServiceData = SimpleDBus::CachedProperty<std::map<std::string, std::vector<uint8_t>>>(*this, "ServiceData");
+    SimpleDBus::CachedProperty<std::map<uint16_t, std::vector<uint8_t>>> ManufacturerData = SimpleDBus::CachedProperty<std::map<uint16_t, std::vector<uint8_t>>>(*this, "ManufacturerData");
 
     uint16_t Appearance();  // On Bluez 5.53, this always returns 0.
     std::string Address();

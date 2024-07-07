@@ -143,6 +143,7 @@ include simpledbus/include/simpledbus/external/kvn_safe_callback.hpp
 include simpledbus/include/simpledbus/external/logfwd.hpp
 include simpledbus/include/simpledbus/interfaces/ObjectManager.h
 include simpledbus/src/advanced/Interface.cpp
+include simpledbus/src/advanced/Property.cpp
 include simpledbus/src/advanced/Proxy.cpp
 include simpledbus/src/base/Connection.cpp
 include simpledbus/src/base/Exceptions.cpp
