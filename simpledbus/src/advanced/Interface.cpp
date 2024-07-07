@@ -68,12 +68,13 @@ T Interface::CachedProperty<T>::get() {
 
 template<typename T>
 T Interface::CachedProperty<T>::refresh_and_get() {
-    return Property<T>::refresh_and_get();
+    update_cached_property();
+    return _cached_property; 
 }
 
 template<typename T>
 void Interface::CachedProperty<T>::update_cached_property() {
-    this->_cached_property = this->refresh_and_get();
+    this->_cached_property = Property<T>::refresh_and_get();;
 }
 
 
