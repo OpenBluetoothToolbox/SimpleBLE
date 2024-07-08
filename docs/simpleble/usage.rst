@@ -44,6 +44,12 @@ MacOS
 
    - `Xcode Command Line Tools` (install via ``xcode-select --install``)
 
+Android
+-------
+
+   - `Android Studio`
+   - `Android NDK` (Version 25 or higher. Older versions might work but haven't been thoroughly tested.)
+
 
 Building and Installing SimpleBLE (Source)
 ============================================
@@ -175,6 +181,35 @@ the following CMake options available:
   - ``LIBFMT_GIT_TAG``: The git tag to use for fmtlib. *(Default: v9.1.0)*
 
   - ``LIBFMT_LOCAL_PATH``: The local path to use for fmtlib. *(Default: None)*
+
+
+Usage alongside native code in Android
+======================================
+
+When using SimpleBLE alongside native code in Android, you must include a small
+Android dependency module that includes some necessary bridge classes used by SimpleBLE.
+This is required because the Android JVM doesn't allow programatic definition of
+derived classes, which forces us to bring these definitions in externally.
+
+To include this dependency module, add the following to your `settings.gradle` file:
+
+```groovy
+includeBuild("path/to/simpleble/src/backends/android/simpleble-bridge") {
+    dependencySubstitution {
+        substitute module("org.simpleble.android.bridge:simpleble-bridge") with project(":")
+    }
+}
+```
+
+```kotlin
+includeBuild("path/to/simpleble/src/backends/android/simpleble-bridge") {
+    dependencySubstitution {
+        substitute(module("org.simpleble.android.bridge:simpleble-bridge")).using(project(":"))
+    }
+}
+```
+
+**NOTE:** We will provide Maven packages in the future.
 
 
 Build Examples
