@@ -18,11 +18,13 @@ class SIMPLEBLE_EXPORT Service {
     Service() = default;
     virtual ~Service() = default;
 
-    BluetoothUUID uuid();
-    ByteArray data();
-    std::vector<Characteristic> characteristics();
+    BluetoothUUID uuid() const;
+    ByteArray data() const;
+    std::vector<Characteristic> characteristics() const;
 
   protected:
+    ServiceBase &internal();
+    const ServiceBase &internal() const;
     std::shared_ptr<ServiceBase> internal_;
 };
 

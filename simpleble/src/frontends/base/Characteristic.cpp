@@ -5,11 +5,11 @@
 
 using namespace SimpleBLE;
 
-BluetoothUUID Characteristic::uuid() { return internal_->uuid(); }
+BluetoothUUID Characteristic::uuid() const { return internal().uuid(); }
 
-std::vector<Descriptor> Characteristic::descriptors() { return internal_->descriptors(); }
+std::vector<Descriptor> Characteristic::descriptors() const { return internal().descriptors(); }
 
-std::vector<std::string> Characteristic::capabilities() {
+std::vector<std::string> Characteristic::capabilities() const {
     std::vector<std::string> capabilities;
 
     if (can_read()) {
@@ -35,8 +35,11 @@ std::vector<std::string> Characteristic::capabilities() {
     return capabilities;
 }
 
-bool Characteristic::can_read() { return internal_->can_read(); }
-bool Characteristic::can_write_request() { return internal_->can_write_request(); }
-bool Characteristic::can_write_command() { return internal_->can_write_command(); }
-bool Characteristic::can_notify() { return internal_->can_notify(); }
-bool Characteristic::can_indicate() { return internal_->can_indicate(); }
+bool Characteristic::can_read() const { return internal().can_read(); }
+bool Characteristic::can_write_request() const { return internal().can_write_request(); }
+bool Characteristic::can_write_command() const { return internal().can_write_command(); }
+bool Characteristic::can_notify() const { return internal().can_notify(); }
+bool Characteristic::can_indicate() const { return internal().can_indicate(); }
+
+CharacteristicBase &Characteristic::internal() { return *internal_; }
+const CharacteristicBase &Characteristic::internal() const { return *internal_; }

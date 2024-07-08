@@ -25,10 +25,10 @@ class SIMPLEBLE_EXPORT Peripheral {
     bool initialized() const;
     void* underlying() const;
 
-    std::string identifier();
-    BluetoothAddress address();
-    BluetoothAddressType address_type();
-    int16_t rssi();
+    std::string identifier() const;
+    BluetoothAddress address() const;
+    BluetoothAddressType address_type() const;
+    int16_t rssi() const;
 
     /**
      * @brief Provides the advertised transmit power in dBm.
@@ -36,8 +36,8 @@ class SIMPLEBLE_EXPORT Peripheral {
      * @note If the field has not been advertised by the peripheral,
      *       the returned value will be -32768.
      */
-    int16_t tx_power();
-    uint16_t mtu();
+    int16_t tx_power() const;
+    uint16_t mtu() const;
 
     void connect();
     void disconnect();
@@ -71,6 +71,8 @@ class SIMPLEBLE_EXPORT Peripheral {
     void set_callback_on_disconnected(std::function<void()> on_disconnected);
 
   protected:
+    PeripheralBase &internal();
+    const PeripheralBase &internal() const;
     std::shared_ptr<PeripheralBase> internal_;
 };
 

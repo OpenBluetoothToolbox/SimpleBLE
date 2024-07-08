@@ -52,11 +52,11 @@ void* AdapterBase::underlying() const {
     return [internal underlying];
 }
 
-std::string AdapterBase::identifier() {
+std::string AdapterBase::identifier() const {
     return fmt::format("Default Adapter [{}]", this->address());
 }
 
-BluetoothAddress AdapterBase::address() {
+BluetoothAddress AdapterBase::address() const {
     AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)opaque_internal_;
 
     return [[internal address] UTF8String];
@@ -84,12 +84,12 @@ void AdapterBase::scan_for(int timeout_ms) {
     this->scan_stop();
 }
 
-bool AdapterBase::scan_is_active() {
+bool AdapterBase::scan_is_active() const {
     AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)opaque_internal_;
     return [internal scanIsActive];
 }
 
-std::vector<Peripheral> AdapterBase::scan_get_results() {
+std::vector<Peripheral> AdapterBase::scan_get_results() const {
     std::vector<Peripheral> peripherals;
     for (auto& [opaque_peripheral, base_peripheral] : this->seen_peripherals_) {
         PeripheralBuilder peripheral_builder(base_peripheral);
@@ -127,7 +127,7 @@ void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_
     }
 }
 
-std::vector<Peripheral> AdapterBase::get_paired_peripherals() { return {}; }
+std::vector<Peripheral> AdapterBase::get_paired_peripherals() const { return {}; }
 
 // Delegate methods passed for AdapterBaseMacOS
 

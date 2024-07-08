@@ -40,17 +40,17 @@ PeripheralBase::~PeripheralBase() {
 
 void* PeripheralBase::underlying() const { return reinterpret_cast<void*>(const_cast<BluetoothLEDevice*>(&device_)); }
 
-SimpleBLE::BluetoothAddressType PeripheralBase::address_type() { return address_type_; }
+SimpleBLE::BluetoothAddressType PeripheralBase::address_type() const { return address_type_; }
 
-std::string PeripheralBase::identifier() { return identifier_; }
+std::string PeripheralBase::identifier() const { return identifier_; }
 
-BluetoothAddress PeripheralBase::address() { return address_; }
+BluetoothAddress PeripheralBase::address() const { return address_; }
 
-int16_t PeripheralBase::rssi() { return rssi_; }
+int16_t PeripheralBase::rssi() const { return rssi_; }
 
-int16_t PeripheralBase::tx_power() { return tx_power_; }
+int16_t PeripheralBase::tx_power() const { return tx_power_; }
 
-uint16_t PeripheralBase::mtu() {
+uint16_t PeripheralBase::mtu() const {
     if (!is_connected()) return 0;
 
     // The value provided by the MaxPduSize includes an extra 3 bytes from the GATT header
@@ -114,13 +114,13 @@ void PeripheralBase::disconnect() {
     }
 }
 
-bool PeripheralBase::is_connected() {
+bool PeripheralBase::is_connected() const {
     return device_ != nullptr && device_.ConnectionStatus() == BluetoothConnectionStatus::Connected;
 }
 
-bool PeripheralBase::is_connectable() { return connectable_; }
+bool PeripheralBase::is_connectable() const { return connectable_; }
 
-bool PeripheralBase::is_paired() { throw Exception::OperationNotSupported(); }
+bool PeripheralBase::is_paired() const { throw Exception::OperationNotSupported(); }
 
 void PeripheralBase::unpair() { throw Exception::OperationNotSupported(); }
 
@@ -153,7 +153,7 @@ std::vector<Service> PeripheralBase::services() {
     return service_list;
 }
 
-std::vector<Service> PeripheralBase::advertised_services() {
+std::vector<Service> PeripheralBase::advertised_services() const {
     std::vector<Service> service_list;
     for (auto& [service_uuid, data] : service_data_) {
         service_list.push_back(ServiceBuilder(service_uuid, data));
@@ -162,7 +162,7 @@ std::vector<Service> PeripheralBase::advertised_services() {
     return service_list;
 }
 
-std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() { return manufacturer_data_; }
+std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() const { return manufacturer_data_; }
 
 ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic).obj;

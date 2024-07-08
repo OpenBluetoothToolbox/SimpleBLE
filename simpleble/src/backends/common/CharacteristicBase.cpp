@@ -16,12 +16,12 @@ CharacteristicBase::CharacteristicBase(const BluetoothUUID& uuid, std::vector<De
       can_notify_(can_notify),
       can_indicate_(can_indicate) {}
 
-BluetoothUUID CharacteristicBase::uuid() { return uuid_; }
+BluetoothUUID CharacteristicBase::uuid() const { return uuid_; }
 
-std::vector<Descriptor> CharacteristicBase::descriptors() { return descriptors_; }
+std::vector<Descriptor> CharacteristicBase::descriptors() const { return descriptors_; }
 
-bool CharacteristicBase::can_read() { return can_read_; }
-bool CharacteristicBase::can_write_request() { return can_write_request_; }
-bool CharacteristicBase::can_write_command() { return can_write_command_; }
-bool CharacteristicBase::can_notify() { return can_notify_; }
-bool CharacteristicBase::can_indicate() { return can_indicate_; }
+bool CharacteristicBase::can_read() const { return can_read_; }
+bool CharacteristicBase::can_write_request() const { return can_write_request_; }
+bool CharacteristicBase::can_write_command() const { return can_write_command_; }
+bool CharacteristicBase::can_notify() const { return can_notify_; }
+bool CharacteristicBase::can_indicate() const { return can_indicate_; }

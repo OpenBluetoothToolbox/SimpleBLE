@@ -39,25 +39,25 @@ void* PeripheralBase::underlying() const {
     return [internal underlying];
 }
 
-std::string PeripheralBase::identifier() {
+std::string PeripheralBase::identifier() const {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
     return std::string([[internal identifier] UTF8String]);
 }
 
-BluetoothAddress PeripheralBase::address() {
+BluetoothAddress PeripheralBase::address() const {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
     return std::string([[internal address] UTF8String]);
 }
 
-BluetoothAddressType PeripheralBase::address_type() {
+BluetoothAddressType PeripheralBase::address_type() const {
     return BluetoothAddressType::UNSPECIFIED;
 }
 
-int16_t PeripheralBase::rssi() { return rssi_; }
+int16_t PeripheralBase::rssi() const { return rssi_; }
 
-int16_t PeripheralBase::tx_power() { return tx_power_; }
+int16_t PeripheralBase::tx_power() const { return tx_power_; }
 
-uint16_t PeripheralBase::mtu() {
+uint16_t PeripheralBase::mtu() const {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
     return [internal mtu];
 }
@@ -90,23 +90,23 @@ void PeripheralBase::disconnect() {
     manual_disconnect_triggered_ = false;
 }
 
-bool PeripheralBase::is_connected() {
+bool PeripheralBase::is_connected() const {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
     return [internal isConnected];
 }
 
-bool PeripheralBase::is_connectable() { return is_connectable_; }
+bool PeripheralBase::is_connectable() const { return is_connectable_; }
 
-bool PeripheralBase::is_paired() { throw Exception::OperationNotSupported(); }
+bool PeripheralBase::is_paired() const { throw Exception::OperationNotSupported(); }
 
 void PeripheralBase::unpair() { throw Exception::OperationNotSupported(); }
 
-std::vector<Service> PeripheralBase::services() {
+std::vector<Service> PeripheralBase::services() const {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
     return [internal getServices];
 }
 
-std::vector<Service> PeripheralBase::advertised_services() {
+std::vector<Service> PeripheralBase::advertised_services() const {
     std::vector<Service> service_list;
     for (auto& [service_uuid, data] : service_data_) {
         service_list.push_back(ServiceBuilder(service_uuid, data));
@@ -115,7 +115,7 @@ std::vector<Service> PeripheralBase::advertised_services() {
     return service_list;
 }
 
-std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() { return manufacturer_data_; }
+std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() const { return manufacturer_data_; }
 
 ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;

@@ -17,17 +17,19 @@ class SIMPLEBLE_EXPORT Characteristic {
     Characteristic() = default;
     virtual ~Characteristic() = default;
 
-    BluetoothUUID uuid();
-    std::vector<Descriptor> descriptors();
-    std::vector<std::string> capabilities();
+    BluetoothUUID uuid() const;
+    std::vector<Descriptor> descriptors() const;
+    std::vector<std::string> capabilities() const;
 
-    bool can_read();
-    bool can_write_request();
-    bool can_write_command();
-    bool can_notify();
-    bool can_indicate();
+    bool can_read() const;
+    bool can_write_request() const;
+    bool can_write_command() const;
+    bool can_notify() const;
+    bool can_indicate() const;
 
   protected:
+    CharacteristicBase &internal();
+    const CharacteristicBase &internal() const;
     std::shared_ptr<CharacteristicBase> internal_;
 };
 

@@ -7,4 +7,4 @@ using namespace SimpleBLE;
 
 DescriptorBase::DescriptorBase(const BluetoothUUID& uuid) : uuid_(uuid) {}
 
-BluetoothUUID DescriptorBase::uuid() { return uuid_; }
+BluetoothUUID DescriptorBase::uuid() const { return uuid_; }
