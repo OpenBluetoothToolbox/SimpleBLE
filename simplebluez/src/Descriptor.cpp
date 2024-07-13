@@ -23,14 +23,14 @@ std::shared_ptr<GattDescriptor1> Descriptor::gattdescriptor1() {
 
 std::string Descriptor::uuid() { return gattdescriptor1()->UUID.get(); }
 
-ByteArray Descriptor::value() { return gattdescriptor1()->Value(); }
+ByteArray Descriptor::value() { return gattdescriptor1()->Value.refresh_and_get(); }
 
 ByteArray Descriptor::read() { return gattdescriptor1()->ReadValue(); }
 
 void Descriptor::write(ByteArray value) { gattdescriptor1()->WriteValue(value); }
 
 void Descriptor::set_on_value_changed(std::function<void(ByteArray new_value)> callback) {
-    gattdescriptor1()->OnValueChanged.load([this, callback]() { callback(gattdescriptor1()->Value()); });
+    gattdescriptor1()->OnValueChanged.load([this, callback]() { callback(gattdescriptor1()->Value.refresh_and_get()); });
 }
 
 void Descriptor::clear_on_value_changed() { gattdescriptor1()->OnValueChanged.unload(); }

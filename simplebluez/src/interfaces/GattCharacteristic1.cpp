@@ -44,16 +44,10 @@ ByteArray GattCharacteristic1::ReadValue() {
     msg.append_argument(options, "a{sv}");
 
     SimpleDBus::Message reply_msg = _conn->send_with_reply_and_block(msg);
-    SimpleDBus::Holder value = reply_msg.extract();
-    update_value(value);
-
-    return Value();
-}
-
-
-ByteArray GattCharacteristic1::Value() {
-    std::scoped_lock lock(_property_update_mutex);
-    return _value;
+    auto value = reply_msg.extract();
+    printf("Manual update cached property\n");
+    Value.update_cached_property(value);
+    return Value.get();
 }
 
 
@@ -61,19 +55,8 @@ void GattCharacteristic1::property_changed(std::string option_name) {
     if (option_name == "UUID") {
         UUID.update_cached_property();
     } else if (option_name == "Value") {
-        update_value(_properties["Value"]);
+        printf("Property changed\n");
+        Value.update_cached_property();
         OnValueChanged();
     }
-}
-
-void GattCharacteristic1::update_value(SimpleDBus::Holder& new_value) {
-    std::scoped_lock lock(_property_update_mutex);
-    auto value_array = new_value.get_array();
-
-    char* value_data = new char[value_array.size()];
-    for (std::size_t i = 0; i < value_array.size(); i++) {
-        value_data[i] = value_array[i].get_byte();
-    }
-    _value = ByteArray(value_data, value_array.size());
-    delete[] value_data;
 }

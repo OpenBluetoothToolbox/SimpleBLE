@@ -30,33 +30,16 @@ ByteArray GattDescriptor1::ReadValue() {
 
     SimpleDBus::Message reply_msg = _conn->send_with_reply_and_block(msg);
     SimpleDBus::Holder value = reply_msg.extract();
-    update_value(value);
 
-    return Value();
-}
-
-ByteArray GattDescriptor1::Value() {
-    std::scoped_lock lock(_property_update_mutex);
-    return _value;
+    Value.update_cached_property(value);
+    return Value.get();
 }
 
 void GattDescriptor1::property_changed(std::string option_name) {
     if (option_name == "UUID") {
         UUID.update_cached_property();
     } else if (option_name == "Value") {
-        update_value(_properties["Value"]);
+        Value.update_cached_property();
         OnValueChanged();
     }
-}
-
-void GattDescriptor1::update_value(SimpleDBus::Holder& new_value) {
-    std::scoped_lock lock(_property_update_mutex);
-    auto value_array = new_value.get_array();
-
-    char* value_data = new char[value_array.size()];
-    for (std::size_t i = 0; i < value_array.size(); i++) {
-        value_data[i] = value_array[i].get_byte();
-    }
-    _value = ByteArray(value_data, value_array.size());
-    delete[] value_data;
 }

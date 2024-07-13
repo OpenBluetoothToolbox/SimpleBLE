@@ -34,7 +34,7 @@ bool Characteristic::notifying() { return gattcharacteristic1()->Notifying.refre
 
 std::string Characteristic::uuid() { return gattcharacteristic1()->UUID.get(); }
 
-ByteArray Characteristic::value() { return gattcharacteristic1()->Value(); }
+ByteArray Characteristic::value() { return gattcharacteristic1()->Value.refresh_and_get(); }
 
 std::vector<std::string> Characteristic::flags() { return gattcharacteristic1()->Flags.get(); }
 
@@ -67,7 +67,7 @@ std::shared_ptr<Descriptor> Characteristic::get_descriptor(const std::string& uu
 }
 
 void Characteristic::set_on_value_changed(std::function<void(ByteArray new_value)> callback) {
-    gattcharacteristic1()->OnValueChanged.load([this, callback]() { callback(gattcharacteristic1()->Value()); });
+    gattcharacteristic1()->OnValueChanged.load([this, callback]() { callback(gattcharacteristic1()->Value.refresh_and_get()); });
 }
 
 void Characteristic::clear_on_value_changed() { gattcharacteristic1()->OnValueChanged.unload(); }
