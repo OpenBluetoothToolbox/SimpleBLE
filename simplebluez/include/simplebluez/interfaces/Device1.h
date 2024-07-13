@@ -1,6 +1,7 @@
 #pragma once
 
 #include <simpledbus/advanced/Interface.h>
+#include <simpledbus/advanced/Property.h>
 #include <simpledbus/external/kvn_safe_callback.hpp>
 
 #include <string>
@@ -19,19 +20,20 @@ class Device1 : public SimpleDBus::Interface {
     void CancelPairing();
 
     // ----- PROPERTIES -----
-    int16_t RSSI();
-    int16_t TxPower();
-    uint16_t Appearance();  // On Bluez 5.53, this always returns 0.
-    std::string Address();
-    std::string AddressType();
-    std::string Alias();
-    std::string Name();
-    std::vector<std::string> UUIDs();
-    std::map<uint16_t, std::vector<uint8_t>> ManufacturerData(bool refresh = true);
-    std::map<std::string, std::vector<uint8_t>> ServiceData(bool refresh = true);
-    bool Paired(bool refresh = true);
-    bool Connected(bool refresh = true);
-    bool ServicesResolved(bool refresh = true);
+    SimpleDBus::Property<int16_t> RSSI = create_property<int16_t>("RSSI");
+    SimpleDBus::CachedProperty<int16_t> TxPower = create_cached_property<int16_t>("TxPower");
+    SimpleDBus::Property<std::vector<std::string>> UUIDs = create_property<std::vector<std::string>>("UUIDs");
+    SimpleDBus::CachedProperty<std::map<std::string, std::vector<uint8_t>>> ServiceData = create_cached_property<std::map<std::string, std::vector<uint8_t>>>("ServiceData");
+    SimpleDBus::CachedProperty<std::map<uint16_t, std::vector<uint8_t>>> ManufacturerData = create_cached_property<std::map<uint16_t, std::vector<uint8_t>>>("ManufacturerData");
+
+    SimpleDBus::Property<uint16_t> Appearance = create_property<uint16_t>("Appearance");
+    SimpleDBus::Property<std::string> Address = create_property<std::string>("Address");
+    SimpleDBus::Property<std::string> AddressType = create_property<std::string>("AddressType");
+    SimpleDBus::Property<std::string> Alias = create_property<std::string>("Alias");
+    SimpleDBus::Property<std::string> Name = create_property<std::string>("Name");
+    SimpleDBus::Property<bool> Paired = create_property<bool>("Paired");
+    SimpleDBus::Property<bool> Connected = create_property<bool>("Connected");
+    SimpleDBus::Property<bool> ServicesResolved = create_property<bool>("ServicesResolved");
 
     // ----- CALLBACKS -----
     kvn::safe_callback<void()> OnServicesResolved;
@@ -40,16 +42,12 @@ class Device1 : public SimpleDBus::Interface {
   protected:
     void property_changed(std::string option_name) override;
 
-    int16_t _rssi = INT16_MIN;
-    int16_t _tx_power = INT16_MIN;
     std::string _name;
     std::string _alias;
     std::string _address;
     std::string _address_type;
     bool _connected;
     bool _services_resolved;
-    std::map<uint16_t, std::vector<uint8_t>> _manufacturer_data;
-    std::map<std::string, std::vector<uint8_t>> _service_data;
 };
 
 }  // namespace SimpleBluez

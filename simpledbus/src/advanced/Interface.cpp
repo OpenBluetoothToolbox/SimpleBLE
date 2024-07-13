@@ -7,6 +7,10 @@ Interface::Interface(std::shared_ptr<Connection> conn, const std::string& bus_na
                      const std::string& interface_name)
     : _conn(conn), _bus_name(bus_name), _path(path), _interface_name(interface_name), _loaded(true) {}
 
+
+// ----- PROPERTY INNER CLASS -----
+
+
 // ----- LIFE CYCLE -----
 
 void Interface::load(Holder options) {

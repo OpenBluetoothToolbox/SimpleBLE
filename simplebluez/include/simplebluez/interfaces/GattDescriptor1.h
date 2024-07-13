@@ -19,18 +19,14 @@ class GattDescriptor1 : public SimpleDBus::Interface {
     ByteArray ReadValue();
 
     // ----- PROPERTIES -----
-    std::string UUID();
-    ByteArray Value();
+    SimpleDBus::CachedProperty<std::string> UUID = create_cached_property<std::string>("UUID");
+    SimpleDBus::BytearrayProperty Value = SimpleDBus::BytearrayProperty(*this, "Value");
 
     // ----- CALLBACKS -----
     kvn::safe_callback<void()> OnValueChanged;
 
   protected:
     void property_changed(std::string option_name) override;
-    void update_value(SimpleDBus::Holder& new_value);
-
-    std::string _uuid;
-    ByteArray _value;
 };
 
 }  // namespace SimpleBluez

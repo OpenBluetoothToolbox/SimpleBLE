@@ -1,6 +1,7 @@
 #pragma once
 
 #include <simpledbus/advanced/Interface.h>
+#include <simpledbus/advanced/Property.h>
 #include <simpledbus/external/kvn_safe_callback.hpp>
 
 #include <string>
@@ -15,7 +16,7 @@ class Battery1 : public SimpleDBus::Interface {
     // ----- METHODS -----
 
     // ----- PROPERTIES -----
-    uint8_t Percentage();
+    SimpleDBus::Property<uint8_t> Percentage = create_property<uint8_t>("Percentage");
 
     // ----- CALLBACKS -----
     kvn::safe_callback<void()> OnPercentageChanged;
