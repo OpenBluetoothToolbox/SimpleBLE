@@ -95,6 +95,38 @@ void CachedProperty<T>::update_cached_property() {
     this->_cached_property = Property<T>::refresh_and_get();;
 }
 
+BytearrayProperty::BytearrayProperty(Interface& interface, std::string name) : _interface(interface), _name(name) {}
+
+std::string BytearrayProperty::get() {
+    return _value;
+}
+
+std::string BytearrayProperty::refresh_and_get() {
+    update_cached_property();
+    return get();
+}
+
+void BytearrayProperty::update_cached_property() {
+    _interface.property_refresh(_name);
+    auto value_array = _interface._properties[_name].get_array();
+    std::string value;
+    for (size_t i = 0; i < value_array.size(); i++) {
+        value.push_back(value_array[i].get_byte());
+    }
+    _value = value;
+}
+
+void BytearrayProperty::update_cached_property(SimpleDBus::Holder& holder) {
+    auto value_array = holder.get_array();
+    std::string value;
+    for (size_t i = 0; i < value_array.size(); i++) {
+        value.push_back(value_array[i].get_byte());
+    }
+    _value = value;
+}
+
+
+
 template<typename K, typename T>
 CachedProperty<std::map<K, std::vector<T>>>::CachedProperty(Interface& interface, std::string name) : Property<std::map<K, std::vector<T>>>(interface, name) {}
 

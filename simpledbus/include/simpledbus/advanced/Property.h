@@ -37,6 +37,22 @@ class Property<std::vector<K>> {
     std::string _name; 
 };
 
+class BytearrayProperty {
+  public:
+    BytearrayProperty(Interface& interface, std::string name);
+    virtual std::string get(); 
+    virtual std::string refresh_and_get(); 
+    virtual void update_cached_property(); 
+    virtual void update_cached_property(SimpleDBus::Holder& holder); 
+
+
+  protected:
+    std::string _value;
+    Interface& _interface; 
+    std::string _name; 
+};
+
+
 
 template<typename K, typename V>
 class Property<std::map<K, std::vector<V>>> {

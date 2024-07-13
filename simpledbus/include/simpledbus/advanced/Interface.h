@@ -73,6 +73,7 @@ class Interface {
 
     template<typename T>
     friend class Property;
+    friend class BytearrayProperty;
 
 };
 
