@@ -45,7 +45,6 @@ ByteArray GattCharacteristic1::ReadValue() {
 
     SimpleDBus::Message reply_msg = _conn->send_with_reply_and_block(msg);
     auto value = reply_msg.extract();
-    printf("Manual update cached property\n");
     Value.update_cached_property(value);
     return Value.get();
 }
@@ -55,7 +54,6 @@ void GattCharacteristic1::property_changed(std::string option_name) {
     if (option_name == "UUID") {
         UUID.update_cached_property();
     } else if (option_name == "Value") {
-        printf("Property changed\n");
         Value.update_cached_property();
         OnValueChanged();
     }
