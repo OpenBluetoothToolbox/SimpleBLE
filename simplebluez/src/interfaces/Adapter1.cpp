@@ -6,6 +6,10 @@ Adapter1::Adapter1(std::shared_ptr<SimpleDBus::Connection> conn, std::string pat
     : SimpleDBus::Interface(conn, "org.bluez", path, "org.bluez.Adapter1") {}
 
 void Adapter1::StartDiscovery() {
+    DiscoveryFilter f;
+    f.Transport = DiscoveryFilter::TransportType::LE;
+
+    SetDiscoveryFilter(f);
     auto msg = create_method_call("StartDiscovery");
     _conn->send_with_reply_and_block(msg);
 }
