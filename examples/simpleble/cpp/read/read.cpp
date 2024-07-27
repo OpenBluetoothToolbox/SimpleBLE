@@ -72,8 +72,7 @@ int main() {
     // Attempt to read the characteristic 5 times in 5 seconds.
     for (size_t i = 0; i < 5; i++) {
         SimpleBLE::ByteArray rx_data = peripheral.read(uuids[selection.value()].first, uuids[selection.value()].second);
-        std::cout << "Characteristic content is: ";
-        Utils::print_byte_array(rx_data);
+        std::cout << "Characteristic content is: " << rx_data << std::endl;
         std::this_thread::sleep_for(1s);
     }
 
