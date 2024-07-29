@@ -24,8 +24,11 @@ class SIMPLEBLE_EXPORT Characteristic {
     bool can_read();
     bool can_write_request();
     bool can_write_command();
+    bool can_write_authenticated();
     bool can_notify();
     bool can_indicate();
+    bool can_broadcast();
+    bool has_extended_properties();
 
   protected:
     std::shared_ptr<CharacteristicBase> internal_;
