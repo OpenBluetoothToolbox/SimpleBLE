@@ -15,7 +15,16 @@ int main() {
     }
 
     for (auto& adapter : adapter_list) {
-        std::cout << "Adapter: " << adapter.identifier() << " [" << adapter.address() << "]" << std::endl;
+        std::cout << "Adapter: " << adapter.identifier() << " [" << adapter.address() << "] (";
+        switch (adapter.power_state()) {
+            case SimpleBLE::PowerState::POWERED_OFF:
+                std::cout << "OFF";
+                break;
+            case SimpleBLE::PowerState::POWERED_ON:
+                std::cout << "ON";
+                break;
+        }
+        std::cout << ")" << std::endl;
     }
 
     return EXIT_SUCCESS;

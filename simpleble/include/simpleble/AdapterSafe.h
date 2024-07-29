@@ -16,6 +16,7 @@ class SIMPLEBLE_EXPORT Adapter : public SimpleBLE::Adapter {
 
     std::optional<std::string> identifier() noexcept;
     std::optional<BluetoothAddress> address() noexcept;
+    std::optional<PowerState> power_state() noexcept;
 
     bool scan_start() noexcept;
     bool scan_stop() noexcept;
@@ -27,6 +28,7 @@ class SIMPLEBLE_EXPORT Adapter : public SimpleBLE::Adapter {
     bool set_callback_on_scan_stop(std::function<void()> on_scan_stop) noexcept;
     bool set_callback_on_scan_updated(std::function<void(SimpleBLE::Safe::Peripheral)> on_scan_updated) noexcept;
     bool set_callback_on_scan_found(std::function<void(SimpleBLE::Safe::Peripheral)> on_scan_found) noexcept;
+    bool set_callback_on_power_state_changed(std::function<void(PowerState state)> on_power_state_changed) noexcept;
 
     std::optional<std::vector<SimpleBLE::Safe::Peripheral>> get_paired_peripherals() noexcept;
 

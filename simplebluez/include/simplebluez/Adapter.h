@@ -18,6 +18,7 @@ class Adapter : public SimpleDBus::Proxy {
 
     std::string identifier() const;
     std::string address();
+    std::string power_state();
     bool discovering();
     bool powered();
 
@@ -32,6 +33,9 @@ class Adapter : public SimpleDBus::Proxy {
 
     void set_on_device_updated(std::function<void(std::shared_ptr<Device> device)> callback);
     void clear_on_device_updated();
+
+    void set_on_power_state_changed(std::function<void(const std::string& state)> callback);
+    void clear_on_power_state_changed();
 
   private:
     std::shared_ptr<SimpleDBus::Proxy> path_create(const std::string& path) override;
