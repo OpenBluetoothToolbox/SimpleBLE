@@ -1,4 +1,5 @@
 #include "simplebluez/interfaces/Adapter1.h"
+#include <iostream>
 
 using namespace SimpleBluez;
 
