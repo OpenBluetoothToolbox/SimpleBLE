@@ -15,7 +15,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 
 **Changed**
 
--
+- Implemented standalone ByteArray class derived from `kvn::bytearray`. *(Thanks tlifschitz!)*
+-  **API CHANGE**: Notify and Indicate callback in C bindings now receive the peripheral handle as the first argument.
 
 **Fixed**
 
