@@ -40,3 +40,10 @@ jobs:
     with:
       tag: ${{ inputs.tag || github.ref }}
     secrets: inherit
+
+  android:
+    needs: [pre_job]
+    uses: ./.github/workflows/ci_android.yml
+    with:
+      tag: ${{ github.ref }}
+    secrets: inherit

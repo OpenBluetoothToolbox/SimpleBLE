@@ -93,6 +93,11 @@ jobs:
               - 'simpleble/src/frontends/**'
               - 'simplepyble/**'
               - 'setup.py'
+            android:
+              - 'simpleble/src/backends/common/**'
+              - 'simpleble/src/backends/android/**'
+              - 'simpleble/src/frontends/**'
+              - 'simpledroidble/**'
             rust:
               - *linux
               - *macos
@@ -183,6 +188,16 @@ jobs:
       needs.pre_job.outputs.should_skip != 'true' &&
       (needs.changes.outputs.python == 'true' || github.ref == 'refs/heads/main')
     uses: ./.github/workflows/ci_python.yml
+    secrets: inherit
+
+  android:
+    needs: [pre_job, changes]
+    if:  |
+      needs.pre_job.outputs.should_skip != 'true' &&
+      (needs.changes.outputs.android == 'true' ||
+      needs.changes.outputs.miscs == 'true' ||
+      github.ref == 'refs/heads/main')
+    uses: ./.github/workflows/ci_android.yml
     secrets: inherit
 
   release-python:
