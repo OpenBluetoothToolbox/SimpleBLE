@@ -191,26 +191,23 @@ Android dependency module that includes some necessary bridge classes used by Si
 This is required because the Android JVM doesn't allow programatic definition of
 derived classes, which forces us to bring these definitions in externally.
 
-To include this dependency module, add the following to your `settings.gradle` file:
+To include this dependency module, add the following to your ``settings.gradle`` file::
 
-```groovy
-includeBuild("path/to/simpleble/src/backends/android/simpleble-bridge") {
-    dependencySubstitution {
-        substitute module("org.simpleble.android.bridge:simpleble-bridge") with project(":")
-    }
-}
-```
+   includeBuild("path/to/simpleble/src/backends/android/simpleble-bridge") {
+      dependencySubstitution {
+         substitute module("org.simpleble.android.bridge:simpleble-bridge") with project(":")
+      }
+   }
 
-```kotlin
-includeBuild("path/to/simpleble/src/backends/android/simpleble-bridge") {
-    dependencySubstitution {
-        substitute(module("org.simpleble.android.bridge:simpleble-bridge")).using(project(":"))
-    }
-}
-```
+Or, in ``settings.gradle.kts``::
+
+   includeBuild("path/to/simpleble/src/backends/android/simpleble-bridge") {
+      dependencySubstitution {
+         substitute(module("org.simpleble.android.bridge:simpleble-bridge")).using(project(":"))
+      }
+   }
 
 **NOTE:** We will provide Maven packages in the future.
-
 
 Build Examples
 ==============
