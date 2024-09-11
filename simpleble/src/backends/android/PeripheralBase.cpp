@@ -111,7 +111,7 @@ ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const
     }
 
     auto value = _btGattCallback.wait_flag_characteristicReadPending(characteristic_obj.getObject());
-    return ByteArray(value.begin(), value.end());
+    return{value};
 }
 
 void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic,
@@ -158,8 +158,8 @@ void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& c
                                             Android::BluetoothGattDescriptor::CLIENT_CHARACTERISTIC_CONFIG);
 
     _btGattCallback.set_callback_onCharacteristicChanged(characteristic_obj.getObject(),
-                                                         [callback](std::vector<uint8_t> data) {
-                                                             ByteArray payload(data.begin(), data.end());
+                                                         [callback](std::vector<uint8_t> const& data) {
+                                                             ByteArray payload(data);
                                                              callback(payload);
                                                          });
     bool success = _gatt.setCharacteristicNotification(characteristic_obj, true);
@@ -185,8 +185,8 @@ void PeripheralBase::indicate(BluetoothUUID const& service, BluetoothUUID const&
                                             Android::BluetoothGattDescriptor::CLIENT_CHARACTERISTIC_CONFIG);
 
     _btGattCallback.set_callback_onCharacteristicChanged(characteristic_obj.getObject(),
-                                                         [callback](std::vector<uint8_t> data) {
-                                                             ByteArray payload(data.begin(), data.end());
+                                                         [callback](std::vector<uint8_t> const& data) {
+                                                             ByteArray payload(data);
                                                              callback(payload);
                                                          });
     bool success = _gatt.setCharacteristicNotification(characteristic_obj, true);
@@ -237,7 +237,7 @@ ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const
     }
 
     auto value = _btGattCallback.wait_flag_descriptorReadPending(descriptor_obj.getObject().get());
-    return ByteArray(value.begin(), value.end());
+    return{value};
 }
 
 void PeripheralBase::write(BluetoothUUID const& service, BluetoothUUID const& characteristic,
