@@ -1,8 +1,7 @@
 name: Android Release
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
 
 jobs:
   build-aar:
@@ -11,39 +10,33 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: "17"
           distribution: "temurin"
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Build SimpleBLE-bridge AAR
-        working-directory: ./simpleble/src/backends/android/simpleble-bridge
-        run: |
-          ./gradlew --no-daemon assembleRelease
-          mv ./build/outputs/aar/simpleble-bridge-release.aar ../../../../../simpleble-bridge.aar
-      - name: Upload SimpleBLE-bridge AAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: simpleble-bridge.aar
-          path: ./simpleble-bridge.aar
-
-      - name: Build SimpleDroidBLE AAR
+      - name: Build simpleble-bridge & simpledroidble AARs
         working-directory: ./simpledroidble
         run: |
-          ./gradlew --no-daemon simpledroidble:assembleRelease
-          mv ./simpledroidble/build/outputs/aar/simpledroidble-release.aar ../simpledroidble.aar
-      - name: Upload SimpleDroidBLE AAR
+          ./gradlew simpleble-bridge:bundleReleaseAar \
+                    simpledroidble:bundleReleaseAar   \
+                    --no-daemon                       \
+                    -PbuildDir="${{ github.workspace }}"
+
+      - name: Upload simpleble-bridge & simpledroidble AARs to job
         uses: actions/upload-artifact@v4
         with:
-          name: simpledroidble.aar
-          path: ./simpledroidble.aar
+          name: simpleble-android-release
+          path: outputs/aar/*.aar
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
-          file: ./*.aar
+          file: outputs/aar/*.aar
           overwrite: true
           file_glob: true
