@@ -191,6 +191,9 @@ Android dependency module that includes some necessary bridge classes used by Si
 This is required because the Android JVM doesn't allow programatic definition of
 derived classes, which forces us to bring these definitions in externally.
 
+As a module
+-----------
+
 To include this dependency module, add the following to your ``settings.gradle`` file::
 
    includeBuild("path/to/simpleble/src/backends/android/simpleble-bridge") {
@@ -208,6 +211,17 @@ Or, in ``settings.gradle.kts``::
    }
 
 **NOTE:** We will provide Maven packages in the future.
+
+From AAR file
+-------------
+
+Place the package on your app's directory, and take note of its path. We'll use ``example-app/app/libs/simpleble-bridge.aar``.
+Then, declare the dependency on your app's ``build.gradle{.kts}`` file (note: relative paths begin from your app's module folder)::
+
+    dependencies {
+      /* ... */
+      implementation(files('libs/simpleble-bridge.aar'))
+    }
 
 Build Examples
 ==============
