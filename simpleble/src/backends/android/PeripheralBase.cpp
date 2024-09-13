@@ -111,7 +111,7 @@ ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const
     }
 
     auto value = _btGattCallback.wait_flag_characteristicReadPending(characteristic_obj.getObject());
-    return{value};
+    return {value};
 }
 
 void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic,
@@ -237,7 +237,7 @@ ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const
     }
 
     auto value = _btGattCallback.wait_flag_descriptorReadPending(descriptor_obj.getObject().get());
-    return{value};
+    return {value};
 }
 
 void PeripheralBase::write(BluetoothUUID const& service, BluetoothUUID const& characteristic,
