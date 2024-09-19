@@ -38,10 +38,10 @@ jobs:
           name: simplepyble
           path: dist/*.tar.gz
 
-      - name: Check packages
+      - name: Check source distribution
         run: twine check dist/*.tar.gz
 
-      - name: Publish packages
+      - name: Publish source distribution
         run: twine upload --skip-existing dist/*.tar.gz --verbose
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USER }}
