@@ -75,14 +75,14 @@ jobs:
           path: artifacts/simpleble_${{ matrix.type }}_macos-${{ matrix.arch }}.zip
 
   python:
-    needs: [build]
+    needs: [tests, examples]
     uses: ./.github/workflows/ci_wheels.yml
     with:
       os: macos-12
 
   rust:
     runs-on: ${{ matrix.os }}
-    needs: [build]
+    needs: [tests, examples]
 
     strategy:
       fail-fast: false

@@ -172,14 +172,14 @@ jobs:
           path: artifacts/${{ matrix.library }}_${{ matrix.type }}_${{ matrix.options.target }}.zip
 
   python:
-    needs: [build]
+    needs: [tests, examples]
     uses: ./.github/workflows/ci_wheels.yml
     with:
       os: ubuntu-22.04
 
   rust:
     runs-on: ${{ matrix.os }}
-    needs: [build]
+    needs: [tests, examples]
 
     strategy:
       fail-fast: false
