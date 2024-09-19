@@ -78,7 +78,7 @@ jobs:
           path: artifacts/simpleble_${{ matrix.type }}_windows-${{ matrix.arch }}.zip
 
   python:
-    needs: [build]
+    needs: [tests, examples]
     uses: ./.github/workflows/ci_wheels.yml
     with:
       os: windows-2022
