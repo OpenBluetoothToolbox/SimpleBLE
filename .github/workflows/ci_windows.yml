@@ -80,5 +80,6 @@ jobs:
   python:
     needs: [tests, examples]
     uses: ./.github/workflows/ci_wheels.yml
+    secrets: inherit
     with:
       os: windows-2022
