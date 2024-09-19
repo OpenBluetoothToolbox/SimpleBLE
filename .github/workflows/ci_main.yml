@@ -44,7 +44,7 @@ jobs:
       python: ${{ steps.filter.outputs.python }}
       rust: ${{ steps.filter.outputs.rust }}
       docs: ${{ steps.filter.outputs.docs }}
-      ci: ${{ steps.filter.outputs.ci }}
+      miscs: ${{ steps.filter.outputs.miscs }}
       changes: ${{ steps.filter.outputs.changes }}
     steps:
       - name: Clone Repository 
@@ -55,24 +55,22 @@ jobs:
         with:
           list-files: shell
           filters: |
-            ci: &ci
+            miscs:
               - '.github/workflows/**'
               - '.github/actions/**'
-            common: &common
               - 'examples/simpleble/**'
+              - 'cmake/**'
+            common: &common
               - 'simpleble/include/**'
               - 'simpleble/src/builders/**'
               - 'simpleble/src/external/**'
               - 'simpleble/src/frontends/**'
               - 'simpleble/src/backends/common/**'
               - 'external/**'
-              - 'cmake/**'
             windows: &windows
-              - *ci
               - *common
               - 'simpleble/src/backends/windows/**'
             linux: &linux
-              - *ci
               - *common
               - 'simpleble/src/backends/linux/**'
               - 'simpledbus/**'
@@ -80,24 +78,20 @@ jobs:
               - 'simplebluez/**'
               - 'examples/simplebluez/**'
             macos: &macos
-              - *ci
               - *common
               - 'simpleble/src/backends/macos/**'
             python:
-              - *ci
               - 'simpleble/src/backends/plain/**'
               - 'simpleble/src/frontends/**'
               - 'simplepyble/**'
               - 'setup.py'
             rust:
-              - *ci
               - *linux
               - *macos
               - 'simplersble/**'
               - 'Cargo.lock'
               - 'Cargo.toml'
             docs:
-              - *ci
               - 'docs/**'
               - '**/*.md'
               - '**/*.rst'
@@ -151,14 +145,18 @@ jobs:
     needs: [pre_job, changes]
     if: |
       needs.pre_job.outputs.should_skip != 'true' &&
-      (needs.changes.outputs.windows == 'true' || github.ref == 'refs/heads/main')
+      (needs.changes.outputs.windows == 'true' ||
+      needs.changes.outputs.miscs == 'true' ||
+      github.ref == 'refs/heads/main')
     uses: ./.github/workflows/ci_windows.yml
 
   linux:
     needs: [pre_job, changes, libraries]
     if: |
       needs.pre_job.outputs.should_skip != 'true' &&
-      (needs.changes.outputs.linux == 'true' || github.ref == 'refs/heads/main')
+      (needs.changes.outputs.linux == 'true' ||
+      needs.changes.outputs.miscs == 'true' ||
+      github.ref == 'refs/heads/main')
     uses: ./.github/workflows/ci_linux.yml
     with:
       libraries: ${{ needs.libraries.outputs.values }}
@@ -167,7 +165,9 @@ jobs:
     needs: [pre_job, changes]
     if: |
       needs.pre_job.outputs.should_skip != 'true' &&
-      (needs.changes.outputs.macos == 'true' || github.ref == 'refs/heads/main')
+      needs.changes.outputs.macos == 'true' ||
+      needs.changes.outputs.miscs == 'true' ||
+      github.ref == 'refs/heads/main')
     uses: ./.github/workflows/ci_macos.yml
   
   python:
@@ -182,22 +182,25 @@ jobs:
     needs: [pre_job, changes, windows, linux, macos, python]
     if: |
       needs.pre_job.outputs.should_skip != 'true' &&
-      needs.changes.outputs.python == 'true' &&
+      (needs.changes.outputs.python == 'true' ||
+      needs.changes.outputs.windows == 'true' ||
+      needs.changes.outputs.linux == 'true' ||
+      needs.changes.outputs.macos == 'true') &&
       github.ref == 'refs/heads/main'
     steps:
 
-      - name: "Download Python Source Dist"
+      - name: "Download Python source distribution"
         uses: actions/download-artifact@v4
         with:
           name: 'simplepyble'
           path: 'sdist'
   
-      - name: Check packages
+      - name: Check source distribution
         run: |
           pip3 install twine
           twine check sdist/simplepyble*.tar.gz
 
-      - name: Publish packages
+      - name: Publish source distribution
         run: twine upload --skip-existing sdist/simplepyble*.tar.gz --verbose
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USER }}
@@ -213,7 +216,7 @@ jobs:
       - name: Check Packages
         run: twine check wheels/*.whl
 
-      - name: Publish packages to PyPi
+      - name: Publish packages
         run: twine upload --skip-existing wheels/*.whl --verbose
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USER }}
