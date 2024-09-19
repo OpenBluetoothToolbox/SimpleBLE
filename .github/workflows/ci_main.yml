@@ -165,7 +165,7 @@ jobs:
     needs: [pre_job, changes]
     if: |
       needs.pre_job.outputs.should_skip != 'true' &&
-      needs.changes.outputs.macos == 'true' ||
+      (needs.changes.outputs.macos == 'true' ||
       needs.changes.outputs.miscs == 'true' ||
       github.ref == 'refs/heads/main')
     uses: ./.github/workflows/ci_macos.yml
@@ -176,6 +176,7 @@ jobs:
       needs.pre_job.outputs.should_skip != 'true' &&
       (needs.changes.outputs.python == 'true' || github.ref == 'refs/heads/main')
     uses: ./.github/workflows/ci_python.yml
+    secrets: inherit
 
   release-python:
     runs-on: ubuntu-22.04
