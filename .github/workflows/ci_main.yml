@@ -27,6 +27,14 @@ jobs:
         with:
           concurrent_skipping: 'same_content_newer'
           skip_after_successful_duplicate: 'true'
+      - name: Clone Repository 
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Perform version check
+        run: |
+          ./scripts/check_version.sh
 
   # This job detects changes in the diff and set some ouput variables accordingly.
   # It is use to conditionaly run different jobs and steps of the pipeline
