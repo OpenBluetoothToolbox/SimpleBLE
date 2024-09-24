@@ -49,15 +49,13 @@ int main() {
         std::vector<SimpleBLE::Service> services = peripherals[i].services();
         for (auto& service : services) {
             std::cout << "    Service UUID: " << service.uuid() << std::endl;
-            std::cout << "    Service data: ";
-            Utils::print_byte_array(service.data());
+            std::cout << "    Service data: " << service.data() << std::endl;
         }
 
         std::map<uint16_t, SimpleBLE::ByteArray> manufacturer_data = peripherals[i].manufacturer_data();
         for (auto& [manufacturer_id, data] : manufacturer_data) {
             std::cout << "    Manufacturer ID: " << manufacturer_id << std::endl;
-            std::cout << "    Manufacturer data: ";
-            Utils::print_byte_array(data);
+            std::cout << "    Manufacturer data: " << data << std::endl;
         }
     }
     return EXIT_SUCCESS;

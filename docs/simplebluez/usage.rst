@@ -45,23 +45,23 @@ Building SimpleBluez
 
 You can use the following commands to build SimpleBluez: ::
 
-   cmake -H <path-to-simplebluez> -B build_simplebluez
+   cmake -S <path-to-simplebluez> -B build_simplebluez
    cmake --build build_simplebluez -j7
 
 Note that if you want to modify the build configuration, you can do so by passing
 additional arguments to the ``cmake`` command. For example, to build a shared library
 set the ``BUILD_SHARED_LIBS`` CMake variable to ``TRUE`` ::
 
-   cmake -H <path-to-simplebluez> -B build_simplebluez -DBUILD_SHARED_LIBS=TRUE
+   cmake -S <path-to-simplebluez> -B build_simplebluez -DBUILD_SHARED_LIBS=TRUE
 
 To modify the log level, set the ``SIMPLEBLUEZ_LOG_LEVEL`` CMake variable to one of the
 following values: ``VERBOSE``, ``DEBUG``, ``INFO``, ``WARN``, ``ERROR``, ``FATAL`` ::
 
-   cmake -H <path-to-simplebluez> -B build_simplebluez -DSIMPLEBLUEZ_LOG_LEVEL=DEBUG
+   cmake -S <path-to-simplebluez> -B build_simplebluez -DSIMPLEBLUEZ_LOG_LEVEL=DEBUG
 
 To force the usage of the DBus session bus, enable the ``SIMPLEBLUEZ_USE_SESSION_DBUS`` flag ::
 
-   cmake -H <path-to-simplebluez> -B build_simplebluez -DSIMPLEBLUEZ_USE_SESSION_DBUS=TRUE
+   cmake -S <path-to-simplebluez> -B build_simplebluez -DSIMPLEBLUEZ_USE_SESSION_DBUS=TRUE
 
 Installing SimpleBluez
 ----------------------
@@ -161,7 +161,7 @@ Build Examples
 
 Use the following instructions to build the provided SimpleBluez examples: ::
 
-   cmake -H <path-to-simplebluez>/examples/simplebluez -B build_simplebluez_examples -DSIMPLEBLUEZ_LOCAL=ON
+   cmake -S <path-to-simplebluez>/examples/simplebluez -B build_simplebluez_examples -DSIMPLEBLUEZ_LOCAL=ON
    cmake --build build_simplebluez_examples -j7
 
 
@@ -180,7 +180,7 @@ Unit Tests
 
 To run the unit tests, run the following command: ::
 
-   cmake -H <path-to-simplebluez> -B build_simplebluez_test -DSIMPLEBLUEZ_TEST=ON
+   cmake -S <path-to-simplebluez> -B build_simplebluez_test -DSIMPLEBLUEZ_TEST=ON
    cmake --build build_simplebluez_test -j7
    ./build_simplebluez_test/bin/simplebluez_test
 
@@ -190,7 +190,7 @@ Address Sanitizer Tests
 
 To run the address sanitizer tests, run the following command: ::
 
-   cmake -H <path-to-simplebluez> -B build_simplebluez_test -DSIMPLEBLUEZ_SANITIZE=Address -DSIMPLEBLUEZ_TEST=ON
+   cmake -S <path-to-simplebluez> -B build_simplebluez_test -DSIMPLEBLUEZ_SANITIZE=Address -DSIMPLEBLUEZ_TEST=ON
    cmake --build build_simplebluez_test -j7
    PYTHONMALLOC=malloc ./build_simplebluez_test/bin/simplebluez_test
 
@@ -203,12 +203,14 @@ Thread Sanitizer Tests
 
 To run the thread sanitizer tests, run the following command: ::
 
-   cmake -H <path-to-simplebluez> -B build_simplebluez_test -DSIMPLEBLUEZ_SANITIZE=Thread -DSIMPLEBLUEZ_TEST=ON
+   cmake -S <path-to-simplebluez> -B build_simplebluez_test -DSIMPLEBLUEZ_SANITIZE=Thread -DSIMPLEBLUEZ_TEST=ON
    cmake --build build_simplebluez_test -j7
    ./build_simplebluez_test/bin/simplebluez_test
 
 
 .. Links
+
+.. _CMake: https://cmake.org/
 
 .. _cmake-init-fetchcontent: https://github.com/friendlyanon/cmake-init-fetchcontent
 

@@ -214,7 +214,7 @@ SIMPLEBLE_EXPORT simpleble_err_t simpleble_peripheral_write_command(simpleble_pe
  */
 SIMPLEBLE_EXPORT simpleble_err_t
 simpleble_peripheral_notify(simpleble_peripheral_t handle, simpleble_uuid_t service, simpleble_uuid_t characteristic,
-                            void (*callback)(simpleble_uuid_t service, simpleble_uuid_t characteristic,
+                            void (*callback)(simpleble_peripheral_t handle, simpleble_uuid_t service, simpleble_uuid_t characteristic,
                                              const uint8_t* data, size_t data_length, void* userdata),
                             void* userdata);
 
@@ -229,7 +229,7 @@ simpleble_peripheral_notify(simpleble_peripheral_t handle, simpleble_uuid_t serv
  */
 SIMPLEBLE_EXPORT simpleble_err_t
 simpleble_peripheral_indicate(simpleble_peripheral_t handle, simpleble_uuid_t service, simpleble_uuid_t characteristic,
-                              void (*callback)(simpleble_uuid_t service, simpleble_uuid_t characteristic,
+                              void (*callback)(simpleble_peripheral_t handle, simpleble_uuid_t service, simpleble_uuid_t characteristic,
                                                const uint8_t* data, size_t data_length, void* userdata),
                               void* userdata);
 

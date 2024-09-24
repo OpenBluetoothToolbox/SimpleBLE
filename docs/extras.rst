@@ -1,6 +1,9 @@
-======================
+Extras
+======
+
 Building documentation
-======================
+----------------------
+
 
 To build documentation for the projects in this repository,
 you first need to install Sphynx, using the following commands: ::
@@ -13,10 +16,8 @@ by calling the following commands: ::
    cd <path-to-repository>/docs
    make html
 
-
-=================
 Release checklist
-=================
+-----------------
 
 Before releasing a new version of the project, the following steps should be
 performed:

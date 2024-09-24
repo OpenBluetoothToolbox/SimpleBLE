@@ -37,7 +37,8 @@ set(SIMPLEBLE_PRIVATE_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/builders
     ${CMAKE_CURRENT_SOURCE_DIR}/src/external
     ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/common
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/safe)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/safe
+    ${CMAKE_CURRENT_SOURCE_DIR}/../external/include)
 
 set(SIMPLEBLE_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/base/Adapter.cpp
@@ -122,6 +123,7 @@ target_include_directories(simpleble-c PRIVATE ${SIMPLEBLE_PRIVATE_INCLUDES})
 
 target_include_directories(simpleble INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../external/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_include_directories(simpleble-c INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -349,6 +351,10 @@ install(
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpleble)
 
 install(
+    DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/../external/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpleble)
+
+install(
     DIRECTORY ${PROJECT_BINARY_DIR}/export/simpleble/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/simpleble)
 
@@ -367,6 +373,7 @@ if(SIMPLEBLE_TEST)
     add_executable(simpleble_test
         ${CMAKE_CURRENT_SOURCE_DIR}/test/src/main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/test/src/test_utils.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/test/src/test_bytearray.cpp
     )
 
     set_target_properties(simpleble_test PROPERTIES

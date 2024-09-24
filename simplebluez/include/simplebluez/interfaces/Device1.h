@@ -6,6 +6,8 @@
 
 #include <string>
 
+#include "simplebluez/Types.h"
+
 namespace SimpleBluez {
 
 class Device1 : public SimpleDBus::Interface {

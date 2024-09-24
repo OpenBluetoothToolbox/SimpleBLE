@@ -44,6 +44,12 @@ MacOS
 
    - `Xcode Command Line Tools` (install via ``xcode-select --install``)
 
+Android
+-------
+
+   - `Android Studio`
+   - `Android NDK` (Version 25 or higher. Older versions might work but haven't been thoroughly tested.)
+
 
 Building and Installing SimpleBLE (Source)
 ============================================
@@ -58,28 +64,28 @@ Building SimpleBLE
 
 You can use the following commands to build SimpleBLE: ::
 
-   cmake -H <path-to-simpleble> -B build_simpleble
+   cmake -S <path-to-simpleble> -B build_simpleble
    cmake --build build_simpleble -j7
 
 Note that if you want to modify the build configuration, you can do so by passing
 additional arguments to the ``cmake`` command. For example, to build a shared library
 set the ``BUILD_SHARED_LIBS`` CMake variable to ``TRUE`` ::
 
-   cmake -H <path-to-simpleble> -B build_simpleble -DBUILD_SHARED_LIBS=TRUE
+   cmake -S <path-to-simpleble> -B build_simpleble -DBUILD_SHARED_LIBS=TRUE
 
 To build a plain-flavored version of the library, set the ``SIMPLEBLE_PLAIN`` CMake
 variable to ``TRUE`` ::
 
-   cmake -H <path-to-simpleble> -B build_simpleble -DSIMPLEBLE_PLAIN=TRUE
+   cmake -S <path-to-simpleble> -B build_simpleble -DSIMPLEBLE_PLAIN=TRUE
 
 To modify the log level, set the ``SIMPLEBLE_LOG_LEVEL`` CMake variable to one of the
 following values: ``VERBOSE``, ``DEBUG``, ``INFO``, ``WARN``, ``ERROR``, ``FATAL`` ::
 
-   cmake -H <path-to-simpleble> -B build_simpleble -DSIMPLEBLE_LOG_LEVEL=DEBUG
+   cmake -S <path-to-simpleble> -B build_simpleble -DSIMPLEBLE_LOG_LEVEL=DEBUG
 
 **(Linux only)** To force the usage of the DBus session bus, enable the ``SIMPLEBLE_USE_SESSION_DBUS`` flag ::
 
-   cmake -H <path-to-simplebluez> -B build_simplebluez -DSIMPLEBLE_USE_SESSION_DBUS=TRUE
+   cmake -S <path-to-simplebluez> -B build_simplebluez -DSIMPLEBLE_USE_SESSION_DBUS=TRUE
 
 Installing SimpleBLE
 --------------------
@@ -177,12 +183,41 @@ the following CMake options available:
   - ``LIBFMT_LOCAL_PATH``: The local path to use for fmtlib. *(Default: None)*
 
 
+Usage alongside native code in Android
+======================================
+
+When using SimpleBLE alongside native code in Android, you must include a small
+Android dependency module that includes some necessary bridge classes used by SimpleBLE.
+This is required because the Android JVM doesn't allow programatic definition of
+derived classes, which forces us to bring these definitions in externally.
+
+To include this dependency module, add the following to your `settings.gradle` file:
+
+```groovy
+includeBuild("path/to/simpleble/src/backends/android/simpleble-bridge") {
+    dependencySubstitution {
+        substitute module("org.simpleble.android.bridge:simpleble-bridge") with project(":")
+    }
+}
+```
+
+```kotlin
+includeBuild("path/to/simpleble/src/backends/android/simpleble-bridge") {
+    dependencySubstitution {
+        substitute(module("org.simpleble.android.bridge:simpleble-bridge")).using(project(":"))
+    }
+}
+```
+
+**NOTE:** We will provide Maven packages in the future.
+
+
 Build Examples
 ==============
 
 Use the following instructions to build the provided SimpleBLE examples: ::
 
-   cmake -H <path-to-simpleble>/examples/simpleble -B build_simpleble_examples -DSIMPLEBLE_LOCAL=ON
+   cmake -S <path-to-simpleble>/examples/simpleble -B build_simpleble_examples -DSIMPLEBLE_LOCAL=ON
    cmake --build build_simpleble_examples -j7
 
 
@@ -201,7 +236,7 @@ Unit Tests
 
 To run the unit tests, run the following command: ::
 
-   cmake -H <path-to-simpleble> -B build_simpleble_test -DSIMPLEBLE_TEST=ON
+   cmake -S <path-to-simpleble> -B build_simpleble_test -DSIMPLEBLE_TEST=ON
    cmake --build build_simpleble_test -j7
    ./build_simpleble_test/bin/simpleble_test
 
@@ -211,7 +246,7 @@ Address Sanitizer Tests
 
 To run the address sanitizer tests, run the following command: ::
 
-   cmake -H <path-to-simpleble> -B build_simpleble_test -DSIMPLEBLE_SANITIZE=Address -DSIMPLEBLE_TEST=ON
+   cmake -S <path-to-simpleble> -B build_simpleble_test -DSIMPLEBLE_SANITIZE=Address -DSIMPLEBLE_TEST=ON
    cmake --build build_simpleble_test -j7
    PYTHONMALLOC=malloc ./build_simpleble_test/bin/simpleble_test
 
@@ -224,7 +259,7 @@ Thread Sanitizer Tests
 
 To run the thread sanitizer tests, run the following command: ::
 
-   cmake -H <path-to-simpleble> -B build_simpleble_test -DSIMPLEBLE_SANITIZE=Thread -DSIMPLEBLE_TEST=ON
+   cmake -S <path-to-simpleble> -B build_simpleble_test -DSIMPLEBLE_SANITIZE=Thread -DSIMPLEBLE_TEST=ON
    cmake --build build_simpleble_test -j7
    ./build_simpleble_test/bin/simpleble_test
 
