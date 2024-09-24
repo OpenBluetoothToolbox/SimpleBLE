@@ -33,11 +33,11 @@ std::string Adapter::identifier() const {
     return _path.substr(start + 1);
 }
 
-std::string Adapter::address() { return adapter1()->Address(); }
+std::string Adapter::address() { return adapter1()->Address.get(); }
 
-bool Adapter::discovering() { return adapter1()->Discovering(); }
+bool Adapter::discovering() { return adapter1()->Discovering.refresh_and_get(); }
 
-bool Adapter::powered() { return adapter1()->Powered(); }
+bool Adapter::powered() { return adapter1()->Powered.refresh_and_get(); }
 
 void Adapter::discovery_filter(const DiscoveryFilter& filter) { adapter1()->SetDiscoveryFilter(filter); }
 

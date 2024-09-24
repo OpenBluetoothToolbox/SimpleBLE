@@ -452,6 +452,12 @@ Holder Holder::create(uint8_t value) {
 }
 
 template <>
+Holder Holder::create(int8_t value) {
+    return create_byte(value);
+}
+
+
+template <>
 Holder Holder::create(int16_t value) {
     return create_int16(value);
 }
@@ -488,6 +494,11 @@ Holder Holder::create(double value) {
 
 template <>
 Holder Holder::create(const std::string& value) {
+    return create_string(value);
+}
+
+template <>
+Holder Holder::create(std::string value) {
     return create_string(value);
 }
 
@@ -596,6 +607,11 @@ bool Holder::get() const {
 
 template <>
 uint8_t Holder::get() const {
+    return get_byte();
+}
+
+template <>
+int8_t Holder::get() const {
     return get_byte();
 }
 
