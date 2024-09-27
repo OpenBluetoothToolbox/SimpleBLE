@@ -48,17 +48,6 @@ std::shared_ptr<RemoteInterface> RemoteProxy::interface_get(const std::string& n
     return _interfaces[name];
 }
 
-size_t RemoteProxy::interfaces_count() {
-    size_t count = 0;
-    std::scoped_lock lock(_interface_access_mutex);
-    for (auto& [iface_name, interface] : _interfaces) {
-        if (interface->is_loaded()) {
-            count++;
-        }
-    }
-    return count;
-}
-
 void RemoteProxy::interfaces_load(Holder managed_interfaces) {
     auto managed_interface = managed_interfaces.get_dict_string();
 
@@ -71,15 +60,6 @@ void RemoteProxy::interfaces_load(Holder managed_interfaces) {
 
         _interfaces[iface_name]->load(options);
     }
-}
-
-void RemoteProxy::interfaces_reload(Holder managed_interfaces) {
-    std::scoped_lock lock(_interface_access_mutex);
-    for (auto& [iface_name, interface] : _interfaces) {
-        interface->unload();
-    }
-
-    interfaces_load(managed_interfaces);
 }
 
 void RemoteProxy::interfaces_unload(SimpleDBus::Holder removed_interfaces) {

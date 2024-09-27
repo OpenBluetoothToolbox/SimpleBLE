@@ -4,7 +4,7 @@
 
 using namespace SimpleDBus;
 
-TEST(ProxyLifetime, Validity) {
+TEST(RemoteProxyLifetime, Validity) {
     RemoteProxy p = RemoteProxy(nullptr, "", "/");
 
     // A newly created proxy should always be valid.

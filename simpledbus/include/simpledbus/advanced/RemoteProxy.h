@@ -32,10 +32,8 @@ class RemoteProxy : public ProxyBase {
     std::string introspect();
 
     // ----- INTERFACE HANDLING -----
-    size_t interfaces_count();
     bool interfaces_loaded();
     void interfaces_load(Holder managed_interfaces);
-    void interfaces_reload(Holder managed_interfaces);
     void interfaces_unload(Holder removed_interfaces);
 
     // ----- CHILD HANDLING -----
@@ -76,12 +74,6 @@ class RemoteProxy : public ProxyBase {
     }
 
   protected:
-    bool _valid;
-    std::string _path;
-    std::string _bus_name;
-
-    std::shared_ptr<Connection> _conn;
-
     std::map<std::string, std::shared_ptr<RemoteInterface>> _interfaces;
     std::map<std::string, std::shared_ptr<RemoteProxy>> _children;
 

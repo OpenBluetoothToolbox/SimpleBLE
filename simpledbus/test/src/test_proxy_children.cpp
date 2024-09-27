@@ -4,7 +4,17 @@
 
 using namespace SimpleDBus;
 
-TEST(ProxyChildren, AppendChild) {
+static size_t count_interfaces(RemoteProxy& proxy) {
+    size_t count = 0;
+    for (auto& [iface_name, interface] : proxy.interfaces()) {
+        if (interface->is_loaded()) {
+            count++;
+        }
+    }
+    return count;
+}
+
+TEST(RemoteProxyChildren, AppendChild) {
     RemoteProxy p = RemoteProxy(nullptr, "", "/a/b");
 
     p.path_add("/a/b/c", Holder());
@@ -13,7 +23,7 @@ TEST(ProxyChildren, AppendChild) {
     EXPECT_EQ("/a/b/c", p.children().at("/a/b/c")->path());
 }
 
-TEST(ProxyChildren, AppendRepeatedChild) {
+TEST(RemoteProxyChildren, AppendRepeatedChild) {
     RemoteProxy p = RemoteProxy(nullptr, "", "/a/b");
     p.path_add("/a/b/c", Holder());
 
@@ -22,7 +32,7 @@ TEST(ProxyChildren, AppendRepeatedChild) {
     EXPECT_EQ(1, p.children().size());
 }
 
-TEST(ProxyChildren, AppendExtendedChild) {
+TEST(RemoteProxyChildren, AppendExtendedChild) {
     RemoteProxy p = RemoteProxy(nullptr, "", "/");
     p.path_add("/a/b/c/d", Holder());
 
@@ -42,7 +52,7 @@ TEST(ProxyChildren, AppendExtendedChild) {
     ASSERT_EQ(1, p_a_b_c->children().count("/a/b/c/d"));
 }
 
-TEST(ProxyChildren, RemoveSelf) {
+TEST(RemoteProxyChildren, RemoveSelf) {
     RemoteProxy p = RemoteProxy(nullptr, "", "/");
 
     // Should notify that the proxy can be safely deleted, as nothing worth keeping is left
@@ -64,7 +74,7 @@ TEST(ProxyChildren, RemoveSelf) {
     ASSERT_EQ(0, p.children().size());
 }
 
-TEST(ProxyChildren, RemoveChildNoInterfaces) {
+TEST(RemoteProxyChildren, RemoveChildNoInterfaces) {
     RemoteProxy p = RemoteProxy(nullptr, "", "/");
     p.path_add("/a", Holder());
 
@@ -81,7 +91,7 @@ TEST(ProxyChildren, RemoveChildNoInterfaces) {
     ASSERT_EQ(0, p.children().size());
 }
 
-TEST(ProxyChildren, RemoveChildWithInterfaces) {
+TEST(RemoteProxyChildren, RemoveChildWithInterfaces) {
     RemoteProxy p = RemoteProxy(nullptr, "", "/");
 
     Holder managed_interfaces = Holder::create_dict();
@@ -97,7 +107,7 @@ TEST(ProxyChildren, RemoveChildWithInterfaces) {
     ASSERT_EQ(1, p.children().size());
     {
         std::shared_ptr<RemoteProxy> p_a = std::dynamic_pointer_cast<RemoteProxy>(p.children().at("/a"));
-        ASSERT_EQ(1, p_a->interfaces_count());
+        ASSERT_EQ(1, count_interfaces(*p_a));
         ASSERT_EQ(1, p_a->interfaces().count("i.1"));
     }
 
