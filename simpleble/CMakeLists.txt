@@ -208,6 +208,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
 
     target_sources(simpleble PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/advanced/ProxyBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/advanced/InterfaceBase.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/advanced/RemoteInterface.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/advanced/RemoteProxy.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Connection.cpp
