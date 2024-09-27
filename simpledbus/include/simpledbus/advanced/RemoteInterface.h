@@ -1,6 +1,6 @@
 #pragma once
 
-#include <simpledbus/base/Connection.h>
+#include <simpledbus/advanced/InterfaceBase.h>
 
 #include <atomic>
 #include <map>
@@ -10,7 +10,7 @@
 
 namespace SimpleDBus {
 
-class RemoteInterface {
+class RemoteInterface : public InterfaceBase {
   public:
     RemoteInterface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
               const std::string& interface_name);
@@ -41,11 +41,6 @@ class RemoteInterface {
 
   protected:
     std::atomic_bool _loaded{true};
-
-    std::string _path;
-    std::string _bus_name;
-    std::string _interface_name;
-    std::shared_ptr<Connection> _conn;
 
     std::recursive_mutex _property_update_mutex;
     std::map<std::string, bool> _property_valid_map;

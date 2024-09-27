@@ -5,7 +5,7 @@ using namespace SimpleDBus;
 
 RemoteInterface::RemoteInterface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
                      const std::string& interface_name)
-    : _conn(conn), _bus_name(bus_name), _path(path), _interface_name(interface_name), _loaded(true) {}
+    : InterfaceBase(conn, bus_name, path, interface_name), _loaded(true) {}
 
 // ----- LIFE CYCLE -----
 
