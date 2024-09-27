@@ -14,8 +14,8 @@ Proxy::~Proxy() {
     on_child_signal_received.unload();
 }
 
-std::shared_ptr<Interface> Proxy::interfaces_create(const std::string& name) {
-    return std::make_unique<Interface>(_conn, _bus_name, _path, name);
+std::shared_ptr<RemoteInterface> Proxy::interfaces_create(const std::string& name) {
+    return std::make_unique<RemoteInterface>(_conn, _bus_name, _path, name);
 }
 
 std::shared_ptr<Proxy> Proxy::path_create(const std::string& path) {
@@ -28,7 +28,7 @@ std::string Proxy::path() const { return _path; }
 
 const std::map<std::string, std::shared_ptr<Proxy>>& Proxy::children() { return _children; }
 
-const std::map<std::string, std::shared_ptr<Interface>>& Proxy::interfaces() { return _interfaces; }
+const std::map<std::string, std::shared_ptr<RemoteInterface>>& Proxy::interfaces() { return _interfaces; }
 
 // ----- INTROSPECTION -----
 std::string Proxy::introspect() {
@@ -44,7 +44,7 @@ bool Proxy::interface_exists(const std::string& name) {
     return _interfaces.find(name) != _interfaces.end();
 }
 
-std::shared_ptr<Interface> Proxy::interface_get(const std::string& name) {
+std::shared_ptr<RemoteInterface> Proxy::interface_get(const std::string& name) {
     std::scoped_lock lock(_interface_access_mutex);
     if (!interface_exists(name)) {
         throw Exception::InterfaceNotFoundException(_path, name);

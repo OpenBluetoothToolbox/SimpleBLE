@@ -33,7 +33,7 @@ endif()
 set(SIMPLEDBUS_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(SIMPLEDBUS_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/advanced/Interface.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/advanced/RemoteInterface.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/advanced/Proxy.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/base/Connection.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/base/Exceptions.cpp

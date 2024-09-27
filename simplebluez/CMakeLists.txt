@@ -63,7 +63,7 @@ set(SIMPLEBLUEZ_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Device1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Battery1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/AgentManager1.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/advanced/Interface.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/advanced/RemoteInterface.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/advanced/Proxy.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Connection.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Exceptions.cpp

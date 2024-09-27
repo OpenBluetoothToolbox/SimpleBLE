@@ -10,12 +10,12 @@
 
 namespace SimpleDBus {
 
-class Interface {
+class RemoteInterface {
   public:
-    Interface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
+    RemoteInterface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
               const std::string& interface_name);
 
-    virtual ~Interface() = default;
+    virtual ~RemoteInterface() = default;
 
     // ----- LIFE CYCLE -----
     void load(Holder options);

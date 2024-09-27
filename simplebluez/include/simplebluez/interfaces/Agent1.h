@@ -1,6 +1,6 @@
 #pragma once
 
-#include <simpledbus/advanced/Interface.h>
+#include <simpledbus/advanced/RemoteInterface.h>
 #include <simpledbus/external/kvn_safe_callback.hpp>
 
 #include <cstdint>
@@ -8,7 +8,7 @@
 
 namespace SimpleBluez {
 
-class Agent1 : public SimpleDBus::Interface {
+class Agent1 : public SimpleDBus::RemoteInterface {
   public:
     Agent1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path);
     virtual ~Agent1() = default;

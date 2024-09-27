@@ -15,13 +15,13 @@ std::shared_ptr<SimpleDBus::Proxy> Adapter::path_create(const std::string& path)
     return std::static_pointer_cast<SimpleDBus::Proxy>(child);
 }
 
-std::shared_ptr<SimpleDBus::Interface> Adapter::interfaces_create(const std::string& interface_name) {
+std::shared_ptr<SimpleDBus::RemoteInterface> Adapter::interfaces_create(const std::string& interface_name) {
     if (interface_name == "org.bluez.Adapter1") {
-        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Adapter1>(_conn, _path));
+        return std::static_pointer_cast<SimpleDBus::RemoteInterface>(std::make_shared<Adapter1>(_conn, _path));
     }
 
-    auto interface = std::make_shared<SimpleDBus::Interface>(_conn, _bus_name, _path, interface_name);
-    return std::static_pointer_cast<SimpleDBus::Interface>(interface);
+    auto interface = std::make_shared<SimpleDBus::RemoteInterface>(_conn, _bus_name, _path, interface_name);
+    return std::static_pointer_cast<SimpleDBus::RemoteInterface>(interface);
 }
 
 std::shared_ptr<Adapter1> Adapter::adapter1() {

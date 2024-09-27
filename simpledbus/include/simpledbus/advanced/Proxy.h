@@ -1,6 +1,6 @@
 #pragma once
 
-#include <simpledbus/advanced/Interface.h>
+#include <simpledbus/advanced/RemoteInterface.h>
 #include <simpledbus/external/kvn_safe_callback.hpp>
 #include <simpledbus/base/Path.h>
 
@@ -22,12 +22,12 @@ class Proxy {
     std::shared_ptr<Proxy> path_get(const std::string& path);
 
     bool interface_exists(const std::string& name);
-    std::shared_ptr<Interface> interface_get(const std::string& name);
+    std::shared_ptr<RemoteInterface> interface_get(const std::string& name);
 
     const std::map<std::string, std::shared_ptr<Proxy>>& children();
-    const std::map<std::string, std::shared_ptr<Interface>>& interfaces();
+    const std::map<std::string, std::shared_ptr<RemoteInterface>>& interfaces();
 
-    virtual std::shared_ptr<Interface> interfaces_create(const std::string& name);
+    virtual std::shared_ptr<RemoteInterface> interfaces_create(const std::string& name);
     virtual std::shared_ptr<Proxy> path_create(const std::string& path);
 
     // ----- INTROSPECTION -----
@@ -84,7 +84,7 @@ class Proxy {
 
     std::shared_ptr<Connection> _conn;
 
-    std::map<std::string, std::shared_ptr<Interface>> _interfaces;
+    std::map<std::string, std::shared_ptr<RemoteInterface>> _interfaces;
     std::map<std::string, std::shared_ptr<Proxy>> _children;
 
     std::recursive_mutex _interface_access_mutex;

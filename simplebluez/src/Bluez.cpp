@@ -13,7 +13,7 @@ using namespace SimpleBluez;
 #endif
 
 Bluez::Bluez() : Proxy(std::make_shared<SimpleDBus::Connection>(DBUS_BUS), "org.bluez", "/") {
-    _interfaces["org.freedesktop.DBus.ObjectManager"] = std::static_pointer_cast<SimpleDBus::Interface>(
+    _interfaces["org.freedesktop.DBus.ObjectManager"] = std::static_pointer_cast<SimpleDBus::RemoteInterface>(
         std::make_shared<SimpleDBus::ObjectManager>(_conn, "org.bluez", "/"));
 
     object_manager()->InterfacesAdded = [&](std::string path, SimpleDBus::Holder options) { path_add(path, options); };

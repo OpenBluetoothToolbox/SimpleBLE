@@ -13,7 +13,7 @@
 namespace SimpleDBus {
 
 class Connection;
-class Interface;
+class RemoteInterface;
 
 class Message {
   public:

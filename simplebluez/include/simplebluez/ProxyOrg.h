@@ -17,7 +17,7 @@ class ProxyOrg : public SimpleDBus::Proxy {
 
   private:
     std::shared_ptr<SimpleDBus::Proxy> path_create(const std::string& path) override;
-    std::shared_ptr<SimpleDBus::Interface> interfaces_create(const std::string& interface_name) override;
+    std::shared_ptr<SimpleDBus::RemoteInterface> interfaces_create(const std::string& interface_name) override;
 };
 
 }  // namespace SimpleBluez
