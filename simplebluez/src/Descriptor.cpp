@@ -4,7 +4,7 @@ using namespace SimpleBluez;
 
 Descriptor::Descriptor(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name,
                        const std::string& path)
-    : Proxy(conn, bus_name, path) {}
+    : RemoteProxy(conn, bus_name, path) {}
 
 Descriptor::~Descriptor() {}
 

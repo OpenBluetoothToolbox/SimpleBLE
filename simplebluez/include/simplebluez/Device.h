@@ -1,6 +1,6 @@
 #pragma once
 
-#include <simpledbus/advanced/Proxy.h>
+#include <simpledbus/advanced/RemoteProxy.h>
 
 #include <simplebluez/Characteristic.h>
 #include <simplebluez/Service.h>
@@ -9,7 +9,7 @@
 
 namespace SimpleBluez {
 
-class Device : public SimpleDBus::Proxy {
+class Device : public SimpleDBus::RemoteProxy {
   public:
     Device(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~Device();
@@ -55,7 +55,7 @@ class Device : public SimpleDBus::Proxy {
     void clear_on_battery_percentage_changed();
 
   private:
-    std::shared_ptr<SimpleDBus::Proxy> path_create(const std::string& path) override;
+    std::shared_ptr<SimpleDBus::RemoteProxy> path_create(const std::string& path) override;
     std::shared_ptr<SimpleDBus::RemoteInterface> interfaces_create(const std::string& interface_name) override;
 
     std::shared_ptr<Device1> device1();

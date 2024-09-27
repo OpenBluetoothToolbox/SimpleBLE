@@ -10,25 +10,25 @@
 
 namespace SimpleDBus {
 
-class Proxy {
+class RemoteProxy {
   public:
-    Proxy(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path);
-    virtual ~Proxy();
+    RemoteProxy(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path);
+    virtual ~RemoteProxy();
 
     bool valid() const;
     std::string path() const;
 
     bool path_exists(const std::string& path);
-    std::shared_ptr<Proxy> path_get(const std::string& path);
+    std::shared_ptr<RemoteProxy> path_get(const std::string& path);
 
     bool interface_exists(const std::string& name);
     std::shared_ptr<RemoteInterface> interface_get(const std::string& name);
 
-    const std::map<std::string, std::shared_ptr<Proxy>>& children();
+    const std::map<std::string, std::shared_ptr<RemoteProxy>>& children();
     const std::map<std::string, std::shared_ptr<RemoteInterface>>& interfaces();
 
     virtual std::shared_ptr<RemoteInterface> interfaces_create(const std::string& name);
-    virtual std::shared_ptr<Proxy> path_create(const std::string& path);
+    virtual std::shared_ptr<RemoteProxy> path_create(const std::string& path);
 
     // ----- INTROSPECTION -----
     std::string introspect();
@@ -44,7 +44,7 @@ class Proxy {
     void path_add(const std::string& path, Holder managed_interfaces);
     bool path_remove(const std::string& path, Holder removed_interfaces);
     bool path_prune();
-    void path_append_child(const std::string& path, std::shared_ptr<Proxy> child);
+    void path_append_child(const std::string& path, std::shared_ptr<RemoteProxy> child);
 
     // ----- MESSAGE HANDLING -----
     void message_forward(Message& msg);
@@ -85,7 +85,7 @@ class Proxy {
     std::shared_ptr<Connection> _conn;
 
     std::map<std::string, std::shared_ptr<RemoteInterface>> _interfaces;
-    std::map<std::string, std::shared_ptr<Proxy>> _children;
+    std::map<std::string, std::shared_ptr<RemoteProxy>> _children;
 
     std::recursive_mutex _interface_access_mutex;
     std::recursive_mutex _child_access_mutex;

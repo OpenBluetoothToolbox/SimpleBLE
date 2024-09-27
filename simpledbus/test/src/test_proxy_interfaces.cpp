@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <simpledbus/advanced/Proxy.h>
+#include <simpledbus/advanced/RemoteProxy.h>
 
 using namespace SimpleDBus;
 
@@ -8,7 +8,7 @@ TEST(ProxyInterfaces, LoadInterfaces) {
     Holder managed_interfaces = Holder::create_dict();
     managed_interfaces.dict_append(Holder::STRING, "i.1", Holder());
 
-    Proxy h = Proxy(nullptr, "", "/");
+    RemoteProxy h = RemoteProxy(nullptr, "", "/");
     EXPECT_FALSE(h.interfaces_loaded());
 
     // TODO: Check that all properties of the interface are correctly loaded.
@@ -26,7 +26,7 @@ TEST(ProxyInterfaces, UnloadInterfaces) {
     managed_interfaces.dict_append(Holder::STRING, "i.2", Holder());
     managed_interfaces.dict_append(Holder::STRING, "i.3", Holder());
 
-    Proxy h = Proxy(nullptr, "", "/");
+    RemoteProxy h = RemoteProxy(nullptr, "", "/");
     h.interfaces_load(managed_interfaces);
     EXPECT_EQ(3, h.interfaces_count());
 
@@ -61,7 +61,7 @@ TEST(ProxyInterfaces, ReloadInterfaces) {
     managed_interfaces.dict_append(Holder::STRING, "i.2", Holder());
     managed_interfaces.dict_append(Holder::STRING, "i.3", Holder());
 
-    Proxy h = Proxy(nullptr, "", "/");
+    RemoteProxy h = RemoteProxy(nullptr, "", "/");
     h.interfaces_load(managed_interfaces);
     EXPECT_EQ(3, h.interfaces_count());
 

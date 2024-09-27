@@ -1,6 +1,6 @@
 #pragma once
 
-#include <simpledbus/advanced/Proxy.h>
+#include <simpledbus/advanced/RemoteProxy.h>
 
 #include <simplebluez/Device.h>
 #include <simplebluez/interfaces/Adapter1.h>
@@ -9,7 +9,7 @@
 
 namespace SimpleBluez {
 
-class Adapter : public SimpleDBus::Proxy {
+class Adapter : public SimpleDBus::RemoteProxy {
   public:
     typedef Adapter1::DiscoveryFilter DiscoveryFilter;
 
@@ -34,7 +34,7 @@ class Adapter : public SimpleDBus::Proxy {
     void clear_on_device_updated();
 
   private:
-    std::shared_ptr<SimpleDBus::Proxy> path_create(const std::string& path) override;
+    std::shared_ptr<SimpleDBus::RemoteProxy> path_create(const std::string& path) override;
     std::shared_ptr<SimpleDBus::RemoteInterface> interfaces_create(const std::string& interface_name) override;
 
     std::shared_ptr<Adapter1> adapter1();

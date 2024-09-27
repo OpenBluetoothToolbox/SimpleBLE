@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
-#include <simpledbus/advanced/Proxy.h>
+#include <simpledbus/advanced/RemoteProxy.h>
 
 using namespace SimpleDBus;
 
 TEST(ProxyLifetime, Validity) {
-    Proxy p = Proxy(nullptr, "", "/");
+    RemoteProxy p = RemoteProxy(nullptr, "", "/");
 
     // A newly created proxy should always be valid.
     ASSERT_TRUE(p.valid());

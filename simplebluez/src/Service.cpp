@@ -5,11 +5,11 @@
 using namespace SimpleBluez;
 
 Service::Service(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path)
-    : Proxy(conn, bus_name, path) {}
+    : RemoteProxy(conn, bus_name, path) {}
 
-std::shared_ptr<SimpleDBus::Proxy> Service::path_create(const std::string& path) {
+std::shared_ptr<SimpleDBus::RemoteProxy> Service::path_create(const std::string& path) {
     auto child = std::make_shared<Characteristic>(_conn, _bus_name, path);
-    return std::static_pointer_cast<SimpleDBus::Proxy>(child);
+    return std::static_pointer_cast<SimpleDBus::RemoteProxy>(child);
 }
 
 std::shared_ptr<SimpleDBus::RemoteInterface> Service::interfaces_create(const std::string& interface_name) {
