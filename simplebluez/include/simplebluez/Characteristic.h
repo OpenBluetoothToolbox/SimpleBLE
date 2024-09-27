@@ -38,8 +38,8 @@ class Characteristic : public SimpleDBus::Proxy {
     void clear_on_value_changed();
 
   private:
-    std::shared_ptr<SimpleDBus::Proxy> path_create(const std::string& path) override;
-    std::shared_ptr<SimpleDBus::Interface> interfaces_create(const std::string& interface_name) override;
+    std::shared_ptr<SimpleDBus::ProxyBase> path_create(const std::string& path) override;
+    std::shared_ptr<SimpleDBus::InterfaceBase> interfaces_create(const std::string& interface_name) override;
 
     std::shared_ptr<GattCharacteristic1> gattcharacteristic1();
 };

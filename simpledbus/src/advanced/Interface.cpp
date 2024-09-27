@@ -131,4 +131,3 @@ void Interface::signal_property_changed(Holder changed_properties, Holder invali
 
 // ----- MESSAGES -----
 
-void Interface::message_handle(Message& msg) {}

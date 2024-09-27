@@ -1,6 +1,7 @@
 #pragma once
 
 #include <simpledbus/base/Connection.h>
+#include <simpledbus/advanced/InterfaceBase.h>
 
 #include <atomic>
 #include <map>
@@ -10,10 +11,9 @@
 
 namespace SimpleDBus {
 
-class Interface {
+class Interface : public InterfaceBase {
   public:
-    Interface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
-              const std::string& interface_name);
+    Interface(std::shared_ptr<Connection> conn, std::shared_ptr<ProxyBase> proxy, const std::string& interface_name);
 
     virtual ~Interface() = default;
 
@@ -37,15 +37,10 @@ class Interface {
     void signal_property_changed(Holder changed_properties, Holder invalidated_properties);
 
     // ----- MESSAGES -----
-    virtual void message_handle(Message& msg);
+  
 
   protected:
     std::atomic_bool _loaded{true};
-
-    std::string _path;
-    std::string _bus_name;
-    std::string _interface_name;
-    std::shared_ptr<Connection> _conn;
 
     std::recursive_mutex _property_update_mutex;
     std::map<std::string, bool> _property_valid_map;

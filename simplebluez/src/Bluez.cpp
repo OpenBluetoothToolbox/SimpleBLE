@@ -16,7 +16,10 @@ Bluez::Bluez() : Proxy(std::make_shared<SimpleDBus::Connection>(DBUS_BUS), "org.
     _interfaces["org.freedesktop.DBus.ObjectManager"] = std::static_pointer_cast<SimpleDBus::Interface>(
         std::make_shared<SimpleDBus::ObjectManager>(_conn, "org.bluez", "/"));
 
-    object_manager()->InterfacesAdded = [&](std::string path, SimpleDBus::Holder options) { path_add(path, options); };
+    object_manager()->InterfacesAdded = [&](std::string path, SimpleDBus::Holder options) {
+        std::cout << "InterfacesAdded: " << path << std::endl;
+         path_add(path, options);
+    };
     object_manager()->InterfacesRemoved = [&](std::string path, SimpleDBus::Holder options) {
         path_remove(path, options);
     };
@@ -48,6 +51,7 @@ void Bluez::run_async() {
     _conn->read_write();
     SimpleDBus::Message message = _conn->pop_message();
     while (message.is_valid()) {
+        std::cout << "Message: " << message.to_string() << std::endl;
         message_forward(message);
         message = _conn->pop_message();
     }
@@ -55,6 +59,12 @@ void Bluez::run_async() {
 
 std::vector<std::shared_ptr<Adapter>> Bluez::get_adapters() {
     return std::dynamic_pointer_cast<ProxyOrg>(path_get("/org"))->get_adapters();
+}
+
+std::shared_ptr<LEAdvertisement> Bluez::make_le_advertisement(const std::string& path) {
+    std::shared_ptr<LEAdvertisement> advertisement = std::make_shared<LEAdvertisement>(_conn, "org.simpleble", path);
+    path_append_child(path, std::static_pointer_cast<SimpleDBus::Proxy>(advertisement));
+    return advertisement;
 }
 
 std::shared_ptr<Agent> Bluez::get_agent() { return std::dynamic_pointer_cast<Agent>(path_get("/agent")); }

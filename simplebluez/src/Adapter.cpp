@@ -2,6 +2,7 @@
 #include <simplebluez/Device.h>
 
 #include <simplebluez/interfaces/Adapter1.h>
+#include <simplebluez/interfaces/LEAdvertisingManager1.h>
 
 using namespace SimpleBluez;
 
@@ -18,6 +19,8 @@ std::shared_ptr<SimpleDBus::Proxy> Adapter::path_create(const std::string& path)
 std::shared_ptr<SimpleDBus::Interface> Adapter::interfaces_create(const std::string& interface_name) {
     if (interface_name == "org.bluez.Adapter1") {
         return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Adapter1>(_conn, _path));
+    } else if (interface_name == "org.bluez.LEAdvertisingManager1") {
+        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<LEAdvertisingManager1>(_conn, _path));
     }
 
     auto interface = std::make_shared<SimpleDBus::Interface>(_conn, _bus_name, _path, interface_name);
@@ -26,6 +29,10 @@ std::shared_ptr<SimpleDBus::Interface> Adapter::interfaces_create(const std::str
 
 std::shared_ptr<Adapter1> Adapter::adapter1() {
     return std::dynamic_pointer_cast<Adapter1>(interface_get("org.bluez.Adapter1"));
+}
+
+std::shared_ptr<LEAdvertisingManager1> Adapter::le_advertising_manager1() {
+    return std::dynamic_pointer_cast<LEAdvertisingManager1>(interface_get("org.bluez.LEAdvertisingManager1"));
 }
 
 std::string Adapter::identifier() const {
@@ -84,4 +91,8 @@ void Adapter::set_on_device_updated(std::function<void(std::shared_ptr<Device> d
 void Adapter::clear_on_device_updated() {
     on_child_created.unload();
     on_child_signal_received.unload();
+}
+
+void Adapter::register_le_advertisement(std::shared_ptr<LEAdvertisement> advertisement) {
+    le_advertising_manager1()->RegisterAdvertisement(advertisement->path());
 }
