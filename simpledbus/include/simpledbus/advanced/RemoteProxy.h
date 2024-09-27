@@ -1,6 +1,7 @@
 #pragma once
 
 #include <simpledbus/advanced/RemoteInterface.h>
+#include <simpledbus/advanced/ProxyBase.h>
 #include <simpledbus/external/kvn_safe_callback.hpp>
 #include <simpledbus/base/Path.h>
 
@@ -10,13 +11,10 @@
 
 namespace SimpleDBus {
 
-class RemoteProxy {
+class RemoteProxy : public ProxyBase {
   public:
     RemoteProxy(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~RemoteProxy();
-
-    bool valid() const;
-    std::string path() const;
 
     bool path_exists(const std::string& path);
     std::shared_ptr<RemoteProxy> path_get(const std::string& path);

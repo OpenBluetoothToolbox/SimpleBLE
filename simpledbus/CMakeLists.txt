@@ -34,6 +34,7 @@ set(SIMPLEDBUS_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(SIMPLEDBUS_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/advanced/InterfaceBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/advanced/ProxyBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/advanced/RemoteInterface.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/advanced/RemoteProxy.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/base/Connection.cpp

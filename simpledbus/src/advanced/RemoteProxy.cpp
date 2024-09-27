@@ -7,7 +7,7 @@
 using namespace SimpleDBus;
 
 RemoteProxy::RemoteProxy(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path)
-    : _conn(conn), _bus_name(bus_name), _path(path), _valid(true) {}
+    : ProxyBase(conn, bus_name, path) {}
 
 RemoteProxy::~RemoteProxy() {
     on_child_created.unload();
@@ -21,10 +21,6 @@ std::shared_ptr<RemoteInterface> RemoteProxy::interfaces_create(const std::strin
 std::shared_ptr<RemoteProxy> RemoteProxy::path_create(const std::string& path) {
     return std::make_shared<RemoteProxy>(_conn, _bus_name, path);
 }
-
-bool RemoteProxy::valid() const { return _valid; }
-
-std::string RemoteProxy::path() const { return _path; }
 
 const std::map<std::string, std::shared_ptr<RemoteProxy>>& RemoteProxy::children() { return _children; }
 
