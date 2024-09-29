@@ -18,38 +18,22 @@ class LocalInterface : public InterfaceBase {
     virtual ~LocalInterface() = default;
 
     // ----- LIFE CYCLE -----
-    void load(Holder options);
-    void unload();
-    bool is_loaded() const;
 
     // ----- METHODS -----
     Message create_method_call(const std::string& method_name);
 
     // ----- PROPERTIES -----
-    virtual void property_changed(std::string option_name);
-
-    Holder property_get_all();
     Holder property_get(const std::string& property_name);
     void property_set(const std::string& property_name, const Holder& value);
-    void property_refresh(const std::string& property_name);
 
     // ----- SIGNALS -----
-    void signal_property_changed(Holder changed_properties, Holder invalidated_properties);
 
     // ----- MESSAGES -----
     virtual void message_handle(Message& msg);
 
   protected:
-    std::atomic_bool _loaded{true};
-
     std::recursive_mutex _property_update_mutex;
     std::map<std::string, bool> _property_valid_map;
-
-    /**
-     * @brief Dictionary containing all properties.
-     *
-     * @note: When accessing this object, the _property_update_mutex must be locked.
-     */
     std::map<std::string, Holder> _properties;
 };
 

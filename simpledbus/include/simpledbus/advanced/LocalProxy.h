@@ -32,17 +32,16 @@ class LocalProxy : public ProxyBase {
     std::string introspect();
 
     // ----- INTERFACE HANDLING -----
-    bool interfaces_loaded();
-    void interfaces_load(Holder managed_interfaces);
-    void interfaces_unload(Holder removed_interfaces);
+    void interfaces_load(const std::string& interface_name, std::shared_ptr<LocalInterface> interface);
+    void interfaces_unload(const std::string& interface_name);
 
     // ----- CHILD HANDLING -----
-    void path_add(const std::string& path, Holder managed_interfaces);
-    bool path_remove(const std::string& path, Holder removed_interfaces);
+    void path_add(const std::string& path, std::shared_ptr<LocalProxy> child);
+    bool path_remove(const std::string& path);
     bool path_prune();
-    void path_append_child(const std::string& path, std::shared_ptr<LocalProxy> child);
 
     // ----- MESSAGE HANDLING -----
+    virtual void message_handle(Message& msg);
     void message_forward(Message& msg);
 
     // ----- CALLBACKS -----

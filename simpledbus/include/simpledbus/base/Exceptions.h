@@ -51,6 +51,15 @@ class PathNotFoundException : public BaseException {
     std::string _message;
 };
 
+class PropertyNotFoundException : public BaseException {
+  public:
+    PropertyNotFoundException(const std::string& path, const std::string& interface, const std::string& property);
+    const char* what() const noexcept override;
+
+  private:
+    std::string _message;
+};
+
 }  // namespace Exception
 
 }  // namespace SimpleDBus
