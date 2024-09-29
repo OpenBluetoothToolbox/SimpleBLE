@@ -37,6 +37,8 @@ set(SIMPLEDBUS_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/advanced/ProxyBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/advanced/RemoteInterface.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/advanced/RemoteProxy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/advanced/LocalInterface.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/advanced/LocalProxy.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/base/Connection.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/base/Exceptions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/base/Holder.cpp
