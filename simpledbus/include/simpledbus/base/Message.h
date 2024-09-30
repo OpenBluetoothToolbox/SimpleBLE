@@ -51,6 +51,7 @@ class Message {
     Type get_type() const;
 
     bool is_signal(std::string interface, std::string signal_name);
+    bool is_method_call(const std::string& interface, const std::string& method);
 
     static Message create_method_call(std::string bus_name, std::string path, std::string interface,
                                       std::string method);

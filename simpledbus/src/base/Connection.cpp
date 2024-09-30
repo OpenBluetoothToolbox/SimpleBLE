@@ -120,7 +120,10 @@ Message Connection::pop_message() {
     if (msg == nullptr) {
         return Message();
     } else {
-        return Message(msg);
+        auto msg_wrapped = Message(msg);
+        // Ownership of the DBusMessage* is transferred to the Message object, we can reduce the reference count.
+        dbus_message_unref(msg);
+        return msg_wrapped;
     }
 }
 

@@ -29,6 +29,7 @@ Message::Message() : Message(nullptr) {}
 
 Message::Message(DBusMessage* msg) : _msg(msg), _iter_initialized(false), _is_extracted(false), indent(0) {
     if (is_valid()) {
+        dbus_message_ref(_msg);
         _unique_id = creation_counter++;
     } else {
         _unique_id = -1;
@@ -344,6 +345,10 @@ std::string Message::get_member() {
 
 bool Message::is_signal(std::string interface, std::string signal_name) {
     return is_valid() && dbus_message_is_signal(_msg, interface.c_str(), signal_name.c_str());
+}
+
+bool Message::is_method_call(const std::string& interface, const std::string& method) {
+    return get_type() == Type::METHOD_CALL && get_interface() == interface && get_member() == method;
 }
 
 static const char* type_to_name(int message_type) {
