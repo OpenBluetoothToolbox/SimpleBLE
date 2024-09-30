@@ -22,11 +22,16 @@ constexpr auto kDocsServiceCharacteristics = R"pbdoc(
     Characteristics of the service
 )pbdoc";
 
+constexpr auto kDocsServiceIncludedServices = R"pbdoc(
+    Included services of the service
+)pbdoc";
+
 void wrap_service(py::module& m) {
     // TODO: Add __str__ and __repr__ methods
     py::class_<SimpleBLE::Service>(m, "Service", kDocsService)
         .def("uuid", &SimpleBLE::Service::uuid, kDocsServiceUuid)
         .def(
             "data", [](SimpleBLE::Service& s) { return py::bytes(s.data()); }, kDocsServiceData)
-        .def("characteristics", &SimpleBLE::Service::characteristics, kDocsServiceCharacteristics);
+        .def("characteristics", &SimpleBLE::Service::characteristics, kDocsServiceCharacteristics)
+        .def("included_services", &SimpleBLE::Service::included_services, kDocsServiceIncludedServices);
 }

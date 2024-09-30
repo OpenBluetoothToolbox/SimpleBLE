@@ -182,6 +182,7 @@ mod ffi {
         fn uuid(self: &RustyService) -> String;
         fn data(self: &RustyService) -> Vec<u8>;
         fn characteristics(self: &RustyService) -> Vec<RustyCharacteristicWrapper>;
+        fn included_services(self: &RustyService) -> Vec<String>;
 
         // RustyCharacteristic functions
 
@@ -690,6 +691,16 @@ impl Service {
         }
 
         return characteristics;
+    }
+
+    pub fn included_services(&self) -> Vec<Pin<Box<String>>> {
+        let mut included_services = Vec::<Pin<Box<String>>>::new();
+
+        for included_service in self.internal.included_services().iter_mut() {
+            included_services.push(included_service);
+        }
+
+        return included_services;
     }
 }
 

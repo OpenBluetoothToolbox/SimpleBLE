@@ -10,3 +10,5 @@ BluetoothUUID Service::uuid() { return internal_->uuid(); }
 ByteArray Service::data() { return internal_->data(); }
 
 std::vector<Characteristic> Service::characteristics() { return internal_->characteristics(); }
+
+std::vector<BluetoothUUID> Service::included_services() { return internal_->included_services(); }
