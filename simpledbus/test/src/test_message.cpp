@@ -321,3 +321,49 @@ TEST_F(MessageTest, ReceiveMethodCallFailure) {
     }
     EXPECT_TRUE(method_called);
 }
+
+TEST_F(MessageTest, CopyAndMoveOperations) {
+    // Create an original message
+    Message original = Message::create_method_call("org.example.Bus", "/org/example/Path", "org.example.Interface", "ExampleMethod");
+    original.append_argument(Holder::create_string("Test argument"), "s");
+
+    // Test copy constructor
+    Message copy_constructed(original);
+    EXPECT_TRUE(copy_constructed.is_valid());
+    EXPECT_NE(copy_constructed.get_unique_id(), original.get_unique_id());
+    EXPECT_EQ(copy_constructed.get_path(), original.get_path());
+    EXPECT_EQ(copy_constructed.get_interface(), original.get_interface());
+    EXPECT_EQ(copy_constructed.get_member(), original.get_member());
+
+    // Test copy assignment
+    Message copy_assigned;
+    copy_assigned = original;
+    EXPECT_TRUE(copy_assigned.is_valid());
+    EXPECT_NE(copy_assigned.get_unique_id(), original.get_unique_id());
+    EXPECT_EQ(copy_assigned.get_path(), original.get_path());
+    EXPECT_EQ(copy_assigned.get_interface(), original.get_interface());
+    EXPECT_EQ(copy_assigned.get_member(), original.get_member());
+
+    // Test move constructor
+    Message move_constructed(std::move(copy_constructed));
+    EXPECT_TRUE(move_constructed.is_valid());
+    EXPECT_FALSE(copy_constructed.is_valid());  // Original should be invalidated
+    EXPECT_EQ(move_constructed.get_path(), original.get_path());
+    EXPECT_EQ(move_constructed.get_interface(), original.get_interface());
+    EXPECT_EQ(move_constructed.get_member(), original.get_member());
+
+    // Test move assignment
+    Message move_assigned;
+    move_assigned = std::move(copy_assigned);
+    EXPECT_TRUE(move_assigned.is_valid());
+    EXPECT_FALSE(copy_assigned.is_valid());  // Original should be invalidated
+    EXPECT_EQ(move_assigned.get_path(), original.get_path());
+    EXPECT_EQ(move_assigned.get_interface(), original.get_interface());
+    EXPECT_EQ(move_assigned.get_member(), original.get_member());
+
+    // Verify that the original message is still valid and unchanged
+    EXPECT_TRUE(original.is_valid());
+    EXPECT_EQ(original.get_path(), "/org/example/Path");
+    EXPECT_EQ(original.get_interface(), "org.example.Interface");
+    EXPECT_EQ(original.get_member(), "ExampleMethod");
+}

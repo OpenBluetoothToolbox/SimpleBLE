@@ -42,6 +42,7 @@ class Message {
     void extract_next();
     std::string to_string(bool append_arguments = false) const;
 
+    uint32_t get_ref_count();
     int32_t get_unique_id();
     uint32_t get_serial();
     std::string get_signature();

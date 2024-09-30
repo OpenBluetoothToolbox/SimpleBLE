@@ -43,7 +43,8 @@ Message::~Message() {
 }
 
 Message::Message(Message&& other) : Message() {
-    // Move constructor: Other needs to be completely cleared.
+    // Move constructor: Transfer ownership of resources from 'other' to this object.
+    // After the move, 'other' will be left in a valid but unspecified state.
     // Copy all fields over directly.
     indent = other.indent;
 
@@ -60,8 +61,8 @@ Message::Message(Message&& other) : Message() {
 }
 
 Message::Message(const Message& other) : Message() {
-    // Copy assignment: We need a completely new message and preserve the old one.
-    // After a safe deletion, a copy only needs to be made if the other message is valid.
+    // Copy constructor: Create a new Message as a deep copy of 'other'.
+    // If 'other' is valid, all its contents are duplicated.
     if (other.is_valid()) {
         // Copy all fields over directly
         indent = other.indent;
@@ -75,7 +76,9 @@ Message::Message(const Message& other) : Message() {
 }
 
 Message& Message::operator=(Message&& other) {
-    // Move assignment: Other needs to be completely cleared.
+    // Move assignment operator: Transfer ownership of resources from 'other' to this object.
+    // Any existing resources in this object are safely deleted before the transfer.
+    // After the move, 'other' will be left in a valid but unspecified state.
     if (this != &other) {
         _safe_delete();
         // Copy all fields over directly.
@@ -97,7 +100,9 @@ Message& Message::operator=(Message&& other) {
 }
 
 Message& Message::operator=(const Message& other) {
-    // Copy assignment: We need a completely new message and preserve the old one.
+    // Copy assignment operator: Replace the contents of this Message with a deep copy of 'other'.
+    // Any existing resources in this object are safely deleted before the copy.
+    // If 'other' is valid, all its contents are duplicated.
     if (this != &other) {
         _safe_delete();
         // After a safe deletion, a copy only needs to be made if the other message is valid.
@@ -291,6 +296,17 @@ void Message::append_argument(Holder argument, std::string signature) {
     dbus_message_iter_init_append(_msg, &_iter);
     _append_argument(&_iter, argument, signature);
     _arguments.push_back(argument);
+}
+
+uint32_t Message::get_ref_count() {
+    // NOTE: This is a hack based on the DBusMessage structure documentation that says that
+    // the first 4 bytes of the DBusMessage structure is the ref count.
+    // https://dbus.freedesktop.org/doc/api/html/structDBusMessage.html#a324c5377e0be18dd84ac519ab2d23f0d
+    if (is_valid()) {
+        return *reinterpret_cast<uint32_t*>(this->_msg);
+    } else {
+        return 0;
+    }
 }
 
 int32_t Message::get_unique_id() { return _unique_id; }
