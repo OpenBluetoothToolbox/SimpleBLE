@@ -22,6 +22,7 @@ class Proxy : public std::enable_shared_from_this<Proxy> {
     virtual ~Proxy();
 
     bool valid() const;
+    void invalidate();
     std::string path() const;
     std::string bus_name() const;
 
@@ -36,6 +37,10 @@ class Proxy : public std::enable_shared_from_this<Proxy> {
 
     virtual std::shared_ptr<Interface> interfaces_create(const std::string& name);
     virtual std::shared_ptr<Proxy> path_create(const std::string& path);
+
+    // ----- PATH HANDLING -----
+    void register_object_path();
+    void unregister_object_path();
 
     // ----- INTROSPECTION -----
     std::string introspect();
@@ -54,7 +59,7 @@ class Proxy : public std::enable_shared_from_this<Proxy> {
     void path_append_child(const std::string& path, std::shared_ptr<Proxy> child);
 
     // ----- MESSAGE HANDLING -----
-    void message_forward(Message& msg);
+    void message_handle(Message& msg);
 
     // ----- CALLBACKS -----
     kvn::safe_callback<void(std::string)> on_child_created;
@@ -86,10 +91,13 @@ class Proxy : public std::enable_shared_from_this<Proxy> {
 
   protected:
     bool _valid;
+    bool _registered;
     std::string _path;
     std::string _bus_name;
 
     std::shared_ptr<Connection> _conn;
+
+    std::weak_ptr<Proxy> _parent; // TODO: We need a cleaner way to handle object hierarchies.
 
     std::map<std::string, std::shared_ptr<Interface>> _interfaces;
     std::map<std::string, std::shared_ptr<Proxy>> _children;

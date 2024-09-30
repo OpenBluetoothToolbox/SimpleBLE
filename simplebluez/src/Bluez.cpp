@@ -2,8 +2,6 @@
 #include <simplebluez/ProxyOrg.h>
 #include <simpledbus/interfaces/ObjectManager.h>
 
-#include <iostream>
-
 using namespace SimpleBluez;
 
 #ifdef SIMPLEBLUEZ_USE_SESSION_DBUS
@@ -23,6 +21,12 @@ Bluez::~Bluez() {
 
 void Bluez::init() {
     _conn->init();
+
+    // FIXME: This a hack that we have to do to ensure that the root object path is registered. The underlying
+    // problem is that the Proxy object owns the Connection object and can't register while the constructor is running.
+    // The proper solution is is to split the Bluez class into a ProxyRoot object that doesn't have a connection and
+    // some sort of controller object that owns the connection separately.
+    register_object_path();
 
     const std::shared_ptr<SimpleDBus::Proxy> proxy = std::static_pointer_cast<SimpleDBus::Proxy>(shared_from_this());
 
@@ -49,12 +53,7 @@ void Bluez::init() {
 }
 
 void Bluez::run_async() {
-    _conn->read_write();
-    SimpleDBus::Message message = _conn->pop_message();
-    while (message.is_valid()) {
-        message_forward(message);
-        message = _conn->pop_message();
-    }
+    _conn->read_write_dispatch();
 }
 
 std::vector<std::shared_ptr<Adapter>> Bluez::get_adapters() {
