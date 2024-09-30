@@ -1,4 +1,4 @@
-#include "simpledbus/advanced/Proxy.h"
+#include "simpledbus/advanced/RemoteProxy.h"
 
 #include <simpledbus/base/Exceptions.h>
 #include <simpledbus/base/Path.h>
@@ -6,32 +6,28 @@
 
 using namespace SimpleDBus;
 
-Proxy::Proxy(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path)
-    : _conn(conn), _bus_name(bus_name), _path(path), _valid(true) {}
+RemoteProxy::RemoteProxy(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path)
+    : ProxyBase(conn, bus_name, path) {}
 
-Proxy::~Proxy() {
+RemoteProxy::~RemoteProxy() {
     on_child_created.unload();
     on_child_signal_received.unload();
 }
 
-std::shared_ptr<Interface> Proxy::interfaces_create(const std::string& name) {
-    return std::make_unique<Interface>(_conn, _bus_name, _path, name);
+std::shared_ptr<RemoteInterface> RemoteProxy::interfaces_create(const std::string& name) {
+    return std::make_unique<RemoteInterface>(_conn, _bus_name, _path, name);
 }
 
-std::shared_ptr<Proxy> Proxy::path_create(const std::string& path) {
-    return std::make_shared<Proxy>(_conn, _bus_name, path);
+std::shared_ptr<RemoteProxy> RemoteProxy::path_create(const std::string& path) {
+    return std::make_shared<RemoteProxy>(_conn, _bus_name, path);
 }
 
-bool Proxy::valid() const { return _valid; }
+const std::map<std::string, std::shared_ptr<RemoteProxy>>& RemoteProxy::children() { return _children; }
 
-std::string Proxy::path() const { return _path; }
-
-const std::map<std::string, std::shared_ptr<Proxy>>& Proxy::children() { return _children; }
-
-const std::map<std::string, std::shared_ptr<Interface>>& Proxy::interfaces() { return _interfaces; }
+const std::map<std::string, std::shared_ptr<RemoteInterface>>& RemoteProxy::interfaces() { return _interfaces; }
 
 // ----- INTROSPECTION -----
-std::string Proxy::introspect() {
+std::string RemoteProxy::introspect() {
     auto query_msg = Message::create_method_call(_bus_name, _path, "org.freedesktop.DBus.Introspectable", "Introspect");
     auto reply_msg = _conn->send_with_reply_and_block(query_msg);
     return reply_msg.extract().get_string();
@@ -39,12 +35,12 @@ std::string Proxy::introspect() {
 
 // ----- INTERFACE HANDLING -----
 
-bool Proxy::interface_exists(const std::string& name) {
+bool RemoteProxy::interface_exists(const std::string& name) {
     std::scoped_lock lock(_interface_access_mutex);
     return _interfaces.find(name) != _interfaces.end();
 }
 
-std::shared_ptr<Interface> Proxy::interface_get(const std::string& name) {
+std::shared_ptr<RemoteInterface> RemoteProxy::interface_get(const std::string& name) {
     std::scoped_lock lock(_interface_access_mutex);
     if (!interface_exists(name)) {
         throw Exception::InterfaceNotFoundException(_path, name);
@@ -52,18 +48,7 @@ std::shared_ptr<Interface> Proxy::interface_get(const std::string& name) {
     return _interfaces[name];
 }
 
-size_t Proxy::interfaces_count() {
-    size_t count = 0;
-    std::scoped_lock lock(_interface_access_mutex);
-    for (auto& [iface_name, interface] : _interfaces) {
-        if (interface->is_loaded()) {
-            count++;
-        }
-    }
-    return count;
-}
-
-void Proxy::interfaces_load(Holder managed_interfaces) {
+void RemoteProxy::interfaces_load(Holder managed_interfaces) {
     auto managed_interface = managed_interfaces.get_dict_string();
 
     std::scoped_lock lock(_interface_access_mutex);
@@ -77,16 +62,7 @@ void Proxy::interfaces_load(Holder managed_interfaces) {
     }
 }
 
-void Proxy::interfaces_reload(Holder managed_interfaces) {
-    std::scoped_lock lock(_interface_access_mutex);
-    for (auto& [iface_name, interface] : _interfaces) {
-        interface->unload();
-    }
-
-    interfaces_load(managed_interfaces);
-}
-
-void Proxy::interfaces_unload(SimpleDBus::Holder removed_interfaces) {
+void RemoteProxy::interfaces_unload(SimpleDBus::Holder removed_interfaces) {
     std::scoped_lock lock(_interface_access_mutex);
     for (auto& option : removed_interfaces.get_array()) {
         std::string iface_name = option.get_string();
@@ -96,7 +72,7 @@ void Proxy::interfaces_unload(SimpleDBus::Holder removed_interfaces) {
     }
 }
 
-bool Proxy::interfaces_loaded() {
+bool RemoteProxy::interfaces_loaded() {
     std::scoped_lock lock(_interface_access_mutex);
     for (auto& [iface_name, interface] : _interfaces) {
         if (interface->is_loaded()) {
@@ -108,12 +84,12 @@ bool Proxy::interfaces_loaded() {
 
 // ----- CHILD HANDLING -----
 
-bool Proxy::path_exists(const std::string& path) {
+bool RemoteProxy::path_exists(const std::string& path) {
     std::scoped_lock lock(_child_access_mutex);
     return _children.find(path) != _children.end();
 }
 
-std::shared_ptr<Proxy> Proxy::path_get(const std::string& path) {
+std::shared_ptr<RemoteProxy> RemoteProxy::path_get(const std::string& path) {
     std::scoped_lock lock(_child_access_mutex);
     if (!path_exists(path)) {
         throw Exception::PathNotFoundException(_path, path);
@@ -121,7 +97,7 @@ std::shared_ptr<Proxy> Proxy::path_get(const std::string& path) {
     return _children[path];
 }
 
-void Proxy::path_add(const std::string& path, SimpleDBus::Holder managed_interfaces) {
+void RemoteProxy::path_add(const std::string& path, SimpleDBus::Holder managed_interfaces) {
     // If the path is not a child of the current path, then we can't add it.
     if (!Path::is_descendant(_path, path)) {
         // TODO: Should an exception be thrown here?
@@ -139,7 +115,7 @@ void Proxy::path_add(const std::string& path, SimpleDBus::Holder managed_interfa
 
     if (Path::is_child(_path, path)) {
         // If the path is a direct child of the proxy path, create a new proxy for it.
-        std::shared_ptr<Proxy> child = path_create(path);
+        std::shared_ptr<RemoteProxy> child = path_create(path);
         child->interfaces_load(managed_interfaces);
         _children.emplace(std::make_pair(path, child));
         on_child_created(path);
@@ -147,7 +123,7 @@ void Proxy::path_add(const std::string& path, SimpleDBus::Holder managed_interfa
         // If the new path is for a descendant of the current proxy, check if there is a child proxy for it.
         auto child_result = std::find_if(
             _children.begin(), _children.end(),
-            [path](const std::pair<std::string, std::shared_ptr<Proxy>>& child_data) -> bool {
+            [path](const std::pair<std::string, std::shared_ptr<RemoteProxy>>& child_data) -> bool {
                 return Path::is_descendant(child_data.first, path);
             });
 
@@ -158,7 +134,7 @@ void Proxy::path_add(const std::string& path, SimpleDBus::Holder managed_interfa
             // If there is no child proxy for the new path, create the child and forward the path to it.
             // This path will be taken if an empty proxy object needs to be created for an intermediate path.
             std::string child_path = Path::next_child(_path, path);
-            std::shared_ptr<Proxy> child = path_create(child_path);
+            std::shared_ptr<RemoteProxy> child = path_create(child_path);
             _children.emplace(std::make_pair(child_path, child));
             child->path_add(path, managed_interfaces);
             on_child_created(child_path);
@@ -166,7 +142,7 @@ void Proxy::path_add(const std::string& path, SimpleDBus::Holder managed_interfa
     }
 }
 
-bool Proxy::path_remove(const std::string& path, SimpleDBus::Holder options) {
+bool RemoteProxy::path_remove(const std::string& path, SimpleDBus::Holder options) {
     // `options` contains an array of strings of the interfaces that need to be removed.
 
     if (path == _path) {
@@ -198,7 +174,7 @@ bool Proxy::path_remove(const std::string& path, SimpleDBus::Holder options) {
     return false;
 }
 
-bool Proxy::path_prune() {
+bool RemoteProxy::path_prune() {
     // As children will be extensively accessed, we need to lock the child access mutex.
     std::scoped_lock lock(_child_access_mutex);
 
@@ -223,7 +199,7 @@ bool Proxy::path_prune() {
     return false;
 }
 
-void Proxy::path_append_child(const std::string& path, std::shared_ptr<Proxy> child) {
+void RemoteProxy::path_append_child(const std::string& path, std::shared_ptr<RemoteProxy> child) {
     // If the provided path is not a child of the current path, return silently.
     if (!Path::is_child(_path, path)) {
         // TODO: Should an exception be thrown here?
@@ -236,7 +212,7 @@ void Proxy::path_append_child(const std::string& path, std::shared_ptr<Proxy> ch
 }
 
 // ----- MESSAGE HANDLING -----
-void Proxy::message_forward(Message& msg) {
+void RemoteProxy::message_forward(Message& msg) {
     // If the message is for the current proxy, then forward it to the message handler.
     if (msg.get_path() == _path) {
         // If the message is involves a property change, forward it to the correct interface.

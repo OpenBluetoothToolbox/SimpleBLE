@@ -1,6 +1,6 @@
 #pragma once
 
-#include <simpledbus/advanced/Interface.h>
+#include <simpledbus/advanced/RemoteInterface.h>
 #include <simpledbus/external/kvn_safe_callback.hpp>
 
 #include <simplebluez/Types.h>
@@ -9,7 +9,7 @@
 
 namespace SimpleBluez {
 
-class GattDescriptor1 : public SimpleDBus::Interface {
+class GattDescriptor1 : public SimpleDBus::RemoteInterface {
   public:
     GattDescriptor1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path);
     virtual ~GattDescriptor1();

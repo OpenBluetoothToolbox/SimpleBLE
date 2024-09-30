@@ -1,13 +1,13 @@
 #pragma once
 
-#include <simpledbus/advanced/Proxy.h>
+#include <simpledbus/advanced/RemoteProxy.h>
 
 #include <simplebluez/Adapter.h>
 #include <simplebluez/Agent.h>
 
 namespace SimpleBluez {
 
-class ProxyOrg : public SimpleDBus::Proxy {
+class ProxyOrg : public SimpleDBus::RemoteProxy {
   public:
     ProxyOrg(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~ProxyOrg() = default;
@@ -16,8 +16,8 @@ class ProxyOrg : public SimpleDBus::Proxy {
     void register_agent(std::shared_ptr<Agent> agent);
 
   private:
-    std::shared_ptr<SimpleDBus::Proxy> path_create(const std::string& path) override;
-    std::shared_ptr<SimpleDBus::Interface> interfaces_create(const std::string& interface_name) override;
+    std::shared_ptr<SimpleDBus::RemoteProxy> path_create(const std::string& path) override;
+    std::shared_ptr<SimpleDBus::RemoteInterface> interfaces_create(const std::string& interface_name) override;
 };
 
 }  // namespace SimpleBluez

@@ -6,22 +6,22 @@ using namespace SimpleBluez;
 
 Characteristic::Characteristic(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name,
                                const std::string& path)
-    : Proxy(conn, bus_name, path) {}
+    : RemoteProxy(conn, bus_name, path) {}
 
 Characteristic::~Characteristic() {}
 
-std::shared_ptr<SimpleDBus::Proxy> Characteristic::path_create(const std::string& path) {
+std::shared_ptr<SimpleDBus::RemoteProxy> Characteristic::path_create(const std::string& path) {
     auto child = std::make_shared<Descriptor>(_conn, _bus_name, path);
-    return std::static_pointer_cast<SimpleDBus::Proxy>(child);
+    return std::static_pointer_cast<SimpleDBus::RemoteProxy>(child);
 }
 
-std::shared_ptr<SimpleDBus::Interface> Characteristic::interfaces_create(const std::string& interface_name) {
+std::shared_ptr<SimpleDBus::RemoteInterface> Characteristic::interfaces_create(const std::string& interface_name) {
     if (interface_name == "org.bluez.GattCharacteristic1") {
-        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<GattCharacteristic1>(_conn, _path));
+        return std::static_pointer_cast<SimpleDBus::RemoteInterface>(std::make_shared<GattCharacteristic1>(_conn, _path));
     }
 
-    auto interface = std::make_shared<SimpleDBus::Interface>(_conn, _bus_name, _path, interface_name);
-    return std::static_pointer_cast<SimpleDBus::Interface>(interface);
+    auto interface = std::make_shared<SimpleDBus::RemoteInterface>(_conn, _bus_name, _path, interface_name);
+    return std::static_pointer_cast<SimpleDBus::RemoteInterface>(interface);
 }
 
 std::vector<std::shared_ptr<Descriptor>> Characteristic::descriptors() { return children_casted<Descriptor>(); }

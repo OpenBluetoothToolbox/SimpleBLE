@@ -1,13 +1,13 @@
 #pragma once
 
-#include <simpledbus/advanced/Proxy.h>
+#include <simpledbus/advanced/RemoteProxy.h>
 
 #include <simplebluez/Characteristic.h>
 #include <simplebluez/interfaces/GattService1.h>
 
 namespace SimpleBluez {
 
-class Service : public SimpleDBus::Proxy {
+class Service : public SimpleDBus::RemoteProxy {
   public:
     Service(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~Service() = default;
@@ -20,8 +20,8 @@ class Service : public SimpleDBus::Proxy {
     std::string uuid();
 
   private:
-    std::shared_ptr<SimpleDBus::Proxy> path_create(const std::string& path) override;
-    std::shared_ptr<SimpleDBus::Interface> interfaces_create(const std::string& interface_name) override;
+    std::shared_ptr<SimpleDBus::RemoteProxy> path_create(const std::string& path) override;
+    std::shared_ptr<SimpleDBus::RemoteInterface> interfaces_create(const std::string& interface_name) override;
 
     std::shared_ptr<GattService1> gattservice1();
 };

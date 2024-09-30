@@ -1,15 +1,15 @@
-#include <simpledbus/advanced/Interface.h>
+#include <simpledbus/advanced/RemoteInterface.h>
 #include <simpledbus/base/Exceptions.h>
 
 using namespace SimpleDBus;
 
-Interface::Interface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
+RemoteInterface::RemoteInterface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
                      const std::string& interface_name)
-    : _conn(conn), _bus_name(bus_name), _path(path), _interface_name(interface_name), _loaded(true) {}
+    : InterfaceBase(conn, bus_name, path, interface_name), _loaded(true) {}
 
 // ----- LIFE CYCLE -----
 
-void Interface::load(Holder options) {
+void RemoteInterface::load(Holder options) {
     _property_update_mutex.lock();
     auto changed_options = options.get_dict_string();
     for (auto& [name, value] : changed_options) {
@@ -26,19 +26,19 @@ void Interface::load(Holder options) {
     _loaded = true;
 }
 
-void Interface::unload() { _loaded = false; }
+void RemoteInterface::unload() { _loaded = false; }
 
-bool Interface::is_loaded() const { return _loaded; }
+bool RemoteInterface::is_loaded() const { return _loaded; }
 
 // ----- METHODS -----
 
-Message Interface::create_method_call(const std::string& method_name) {
+Message RemoteInterface::create_method_call(const std::string& method_name) {
     return Message::create_method_call(_bus_name, _path, _interface_name, method_name);
 }
 
 // ----- PROPERTIES -----
 
-Holder Interface::property_get_all() {
+Holder RemoteInterface::property_get_all() {
     Message query_msg = Message::create_method_call(_bus_name, _path, "org.freedesktop.DBus.Properties", "GetAll");
 
     Holder h_interface = Holder::create_string(_interface_name);
@@ -49,7 +49,7 @@ Holder Interface::property_get_all() {
     return result;
 }
 
-Holder Interface::property_get(const std::string& property_name) {
+Holder RemoteInterface::property_get(const std::string& property_name) {
     Message query_msg = Message::create_method_call(_bus_name, _path, "org.freedesktop.DBus.Properties", "Get");
 
     Holder h_interface = Holder::create_string(_interface_name);
@@ -63,7 +63,7 @@ Holder Interface::property_get(const std::string& property_name) {
     return result;
 }
 
-void Interface::property_set(const std::string& property_name, const Holder& value) {
+void RemoteInterface::property_set(const std::string& property_name, const Holder& value) {
     Message query_msg = Message::create_method_call(_bus_name, _path, "org.freedesktop.DBus.Properties", "Set");
 
     Holder h_interface = Holder::create_string(_interface_name);
@@ -77,7 +77,7 @@ void Interface::property_set(const std::string& property_name, const Holder& val
     _conn->send_with_reply_and_block(query_msg);
 }
 
-void Interface::property_refresh(const std::string& property_name) {
+void RemoteInterface::property_refresh(const std::string& property_name) {
     if (!_loaded || !_property_valid_map[property_name]) {
         return;
     }
@@ -105,11 +105,11 @@ void Interface::property_refresh(const std::string& property_name) {
     }
 }
 
-void Interface::property_changed(std::string option_name) {}
+void RemoteInterface::property_changed(std::string option_name) {}
 
 // ----- SIGNALS -----
 
-void Interface::signal_property_changed(Holder changed_properties, Holder invalidated_properties) {
+void RemoteInterface::signal_property_changed(Holder changed_properties, Holder invalidated_properties) {
     _property_update_mutex.lock();
     auto changed_options = changed_properties.get_dict_string();
     for (auto& [name, value] : changed_options) {
@@ -131,4 +131,4 @@ void Interface::signal_property_changed(Holder changed_properties, Holder invali
 
 // ----- MESSAGES -----
 
-void Interface::message_handle(Message& msg) {}
+void RemoteInterface::message_handle(Message& msg) {}

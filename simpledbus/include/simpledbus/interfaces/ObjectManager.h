@@ -1,12 +1,12 @@
 #pragma once
 
-#include <simpledbus/advanced/Interface.h>
+#include <simpledbus/advanced/RemoteInterface.h>
 
 #include <functional>
 
 namespace SimpleDBus {
 
-class ObjectManager : public Interface {
+class ObjectManager : public RemoteInterface {
   public:
     ObjectManager(std::shared_ptr<Connection> conn, std::string bus_name, std::string path);
     virtual ~ObjectManager() = default;

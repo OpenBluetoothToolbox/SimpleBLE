@@ -3,7 +3,7 @@
 using namespace SimpleBluez;
 
 GattDescriptor1::GattDescriptor1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path)
-    : SimpleDBus::Interface(conn, "org.bluez", path, "org.bluez.GattDescriptor1") {}
+    : SimpleDBus::RemoteInterface(conn, "org.bluez", path, "org.bluez.GattDescriptor1") {}
 
 GattDescriptor1::~GattDescriptor1() { OnValueChanged.unload(); }
 

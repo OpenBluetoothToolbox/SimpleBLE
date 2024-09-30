@@ -1,6 +1,6 @@
 #pragma once
 
-#include <simpledbus/advanced/Proxy.h>
+#include <simpledbus/advanced/RemoteProxy.h>
 
 #include <simplebluez/Types.h>
 #include <simplebluez/interfaces/GattDescriptor1.h>
@@ -9,7 +9,7 @@
 
 namespace SimpleBluez {
 
-class Descriptor : public SimpleDBus::Proxy {
+class Descriptor : public SimpleDBus::RemoteProxy {
   public:
     Descriptor(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~Descriptor();
@@ -27,7 +27,7 @@ class Descriptor : public SimpleDBus::Proxy {
     void clear_on_value_changed();
 
   private:
-    std::shared_ptr<SimpleDBus::Interface> interfaces_create(const std::string& interface_name) override;
+    std::shared_ptr<SimpleDBus::RemoteInterface> interfaces_create(const std::string& interface_name) override;
 
     std::shared_ptr<GattDescriptor1> gattdescriptor1();
 };

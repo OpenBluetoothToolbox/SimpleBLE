@@ -12,8 +12,8 @@ using namespace SimpleBluez;
 #define DBUS_BUS DBUS_BUS_SYSTEM
 #endif
 
-Bluez::Bluez() : Proxy(std::make_shared<SimpleDBus::Connection>(DBUS_BUS), "org.bluez", "/") {
-    _interfaces["org.freedesktop.DBus.ObjectManager"] = std::static_pointer_cast<SimpleDBus::Interface>(
+Bluez::Bluez() : RemoteProxy(std::make_shared<SimpleDBus::Connection>(DBUS_BUS), "org.bluez", "/") {
+    _interfaces["org.freedesktop.DBus.ObjectManager"] = std::static_pointer_cast<SimpleDBus::RemoteInterface>(
         std::make_shared<SimpleDBus::ObjectManager>(_conn, "org.bluez", "/"));
 
     object_manager()->InterfacesAdded = [&](std::string path, SimpleDBus::Holder options) { path_add(path, options); };
@@ -41,7 +41,7 @@ void Bluez::init() {
 
     // Create the agent that will handle pairing.
     _agent = std::make_shared<Agent>(_conn, "org.bluez", "/agent");
-    path_append_child("/agent", std::static_pointer_cast<SimpleDBus::Proxy>(_agent));
+    path_append_child("/agent", std::static_pointer_cast<SimpleDBus::RemoteProxy>(_agent));
 }
 
 void Bluez::run_async() {
@@ -61,9 +61,9 @@ std::shared_ptr<Agent> Bluez::get_agent() { return std::dynamic_pointer_cast<Age
 
 void Bluez::register_agent() { std::dynamic_pointer_cast<ProxyOrg>(path_get("/org"))->register_agent(_agent); }
 
-std::shared_ptr<SimpleDBus::Proxy> Bluez::path_create(const std::string& path) {
+std::shared_ptr<SimpleDBus::RemoteProxy> Bluez::path_create(const std::string& path) {
     auto child = std::make_shared<ProxyOrg>(_conn, _bus_name, path);
-    return std::static_pointer_cast<SimpleDBus::Proxy>(child);
+    return std::static_pointer_cast<SimpleDBus::RemoteProxy>(child);
 }
 
 std::shared_ptr<SimpleDBus::ObjectManager> Bluez::object_manager() {

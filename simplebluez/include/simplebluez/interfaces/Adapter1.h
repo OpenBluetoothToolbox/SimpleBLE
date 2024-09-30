@@ -1,6 +1,6 @@
 #pragma once
 
-#include <simpledbus/advanced/Interface.h>
+#include <simpledbus/advanced/RemoteInterface.h>
 
 #include <optional>
 #include <string>
@@ -8,7 +8,7 @@
 
 namespace SimpleBluez {
 
-class Adapter1 : public SimpleDBus::Interface {
+class Adapter1 : public SimpleDBus::RemoteInterface {
   public:
     // ----- TYPES -----
     struct DiscoveryFilter {

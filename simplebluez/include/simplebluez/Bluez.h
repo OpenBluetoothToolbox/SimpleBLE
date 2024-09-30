@@ -1,6 +1,6 @@
 #pragma once
 
-#include <simpledbus/advanced/Proxy.h>
+#include <simpledbus/advanced/RemoteProxy.h>
 #include <simpledbus/interfaces/ObjectManager.h>
 
 #include <simplebluez/Adapter.h>
@@ -10,7 +10,7 @@
 
 namespace SimpleBluez {
 
-class Bluez : public SimpleDBus::Proxy {
+class Bluez : public SimpleDBus::RemoteProxy {
   public:
     Bluez();
     virtual ~Bluez();
@@ -23,7 +23,7 @@ class Bluez : public SimpleDBus::Proxy {
     void register_agent();
 
   private:
-    std::shared_ptr<SimpleDBus::Proxy> path_create(const std::string& path) override;
+    std::shared_ptr<SimpleDBus::RemoteProxy> path_create(const std::string& path) override;
 
     std::shared_ptr<SimpleDBus::ObjectManager> object_manager();
 
