@@ -18,4 +18,10 @@ void wrap_types(py::module& m) {
         .value("RANDOM", SimpleBLE::BluetoothAddressType::RANDOM)
         .value("UNSPECIFIED", SimpleBLE::BluetoothAddressType::UNSPECIFIED)
         .export_values();
+
+    py::enum_<SimpleBLE::PowerState>(m, "PowerState")
+        .value("UNKNOWN", SimpleBLE::PowerState::UNKNOWN)
+        .value("POWERED_OFF", SimpleBLE::PowerState::POWERED_OFF)
+        .value("POWERED_ON", SimpleBLE::PowerState::POWERED_ON)
+        .export_values();
 }
