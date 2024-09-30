@@ -12,10 +12,22 @@ namespace SimpleBluez {
 
 class Bluez : public SimpleDBus::Proxy {
   public:
-    Bluez();
+
+    // Note: This class MUST be consumed as a shared_ptr, as internally objects
+    // are linked together and proper usage of `shared_from_this()` is relied upon.
+    static std::shared_ptr<Bluez> create() {
+        static std::shared_ptr<Bluez> instance = std::shared_ptr<Bluez>(new Bluez());
+        instance->init();
+        return instance;
+    }
     virtual ~Bluez();
 
-    void init();
+    // Delete copy and move operations
+    Bluez(const Bluez&) = delete;
+    Bluez& operator=(const Bluez&) = delete;
+    Bluez(Bluez&&) = delete;
+    Bluez& operator=(Bluez&&) = delete;
+
     void run_async();
 
     std::vector<std::shared_ptr<Adapter>> get_adapters();
@@ -23,8 +35,11 @@ class Bluez : public SimpleDBus::Proxy {
     void register_agent();
 
   private:
-    std::shared_ptr<SimpleDBus::Proxy> path_create(const std::string& path) override;
 
+    Bluez();
+    void init();
+
+    std::shared_ptr<SimpleDBus::Proxy> path_create(const std::string& path) override;
     std::shared_ptr<SimpleDBus::ObjectManager> object_manager();
 
     std::shared_ptr<Agent> _agent;

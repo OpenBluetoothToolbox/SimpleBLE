@@ -1,6 +1,7 @@
 #pragma once
 
 #include <simpledbus/base/Connection.h>
+#include <simpledbus/advanced/Proxy.h>
 
 #include <atomic>
 #include <map>
@@ -10,9 +11,11 @@
 
 namespace SimpleDBus {
 
+class Proxy;
+
 class Interface {
   public:
-    Interface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
+    Interface(std::shared_ptr<Connection> conn, std::shared_ptr<Proxy> proxy,
               const std::string& interface_name);
 
     virtual ~Interface() = default;
@@ -42,8 +45,7 @@ class Interface {
   protected:
     std::atomic_bool _loaded{true};
 
-    std::string _path;
-    std::string _bus_name;
+    std::weak_ptr<Proxy> _proxy;
     std::string _interface_name;
     std::shared_ptr<Connection> _conn;
 

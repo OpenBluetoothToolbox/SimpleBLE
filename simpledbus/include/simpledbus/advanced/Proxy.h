@@ -10,13 +10,20 @@
 
 namespace SimpleDBus {
 
-class Proxy {
+class Interface;
+
+class Proxy : public std::enable_shared_from_this<Proxy> {
   public:
+    static std::shared_ptr<Proxy> create(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path) {
+        return std::make_shared<Proxy>(conn, bus_name, path);
+    }
+
     Proxy(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~Proxy();
 
     bool valid() const;
     std::string path() const;
+    std::string bus_name() const;
 
     bool path_exists(const std::string& path);
     std::shared_ptr<Proxy> path_get(const std::string& path);

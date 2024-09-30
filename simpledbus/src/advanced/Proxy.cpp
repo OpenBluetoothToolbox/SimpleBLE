@@ -15,7 +15,7 @@ Proxy::~Proxy() {
 }
 
 std::shared_ptr<Interface> Proxy::interfaces_create(const std::string& name) {
-    return std::make_unique<Interface>(_conn, _bus_name, _path, name);
+    return std::make_shared<Interface>(_conn, shared_from_this(), name);
 }
 
 std::shared_ptr<Proxy> Proxy::path_create(const std::string& path) {
@@ -25,6 +25,8 @@ std::shared_ptr<Proxy> Proxy::path_create(const std::string& path) {
 bool Proxy::valid() const { return _valid; }
 
 std::string Proxy::path() const { return _path; }
+
+std::string Proxy::bus_name() const { return _bus_name; }
 
 const std::map<std::string, std::shared_ptr<Proxy>>& Proxy::children() { return _children; }
 

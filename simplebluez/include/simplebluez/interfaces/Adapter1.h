@@ -23,7 +23,7 @@ class Adapter1 : public SimpleDBus::Interface {
     };
 
     // ----- CONSTRUCTORS -----
-    Adapter1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path);
+    Adapter1(std::shared_ptr<SimpleDBus::Connection> conn, std::shared_ptr<SimpleDBus::Proxy> proxy);
     virtual ~Adapter1() = default;
 
     // ----- METHODS -----

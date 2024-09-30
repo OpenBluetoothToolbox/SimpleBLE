@@ -18,6 +18,8 @@ class Agent : public SimpleDBus::Proxy {
     Agent(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~Agent() = default;
 
+    void init();
+
     // ----- PROPERTIES -----
     std::string capabilities() const;
     void set_capabilities(Capabilities capabilities);

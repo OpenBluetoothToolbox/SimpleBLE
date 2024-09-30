@@ -8,7 +8,7 @@ namespace SimpleDBus {
 
 class ObjectManager : public Interface {
   public:
-    ObjectManager(std::shared_ptr<Connection> conn, std::string bus_name, std::string path);
+    ObjectManager(std::shared_ptr<Connection> conn, std::shared_ptr<Proxy> proxy);
     virtual ~ObjectManager() = default;
 
     // Names are made matching the ones from the DBus specification

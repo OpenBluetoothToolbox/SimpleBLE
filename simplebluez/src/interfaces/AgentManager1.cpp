@@ -4,8 +4,8 @@ using namespace SimpleBluez;
 
 #include <iostream>
 
-AgentManager1::AgentManager1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path)
-    : SimpleDBus::Interface(conn, "org.bluez", path, "org.bluez.AgentManager1") {}
+AgentManager1::AgentManager1(std::shared_ptr<SimpleDBus::Connection> conn, std::shared_ptr<SimpleDBus::Proxy> proxy)
+    : SimpleDBus::Interface(conn, proxy, "org.bluez.AgentManager1") {}
 
 void AgentManager1::RegisterAgent(std::string agent, std::string capability) {
     auto msg = create_method_call("RegisterAgent");
