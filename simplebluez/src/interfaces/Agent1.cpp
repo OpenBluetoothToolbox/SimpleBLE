@@ -2,8 +2,8 @@
 
 using namespace SimpleBluez;
 
-Agent1::Agent1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path)
-    : SimpleDBus::Interface(conn, "org.bluez", path, "org.bluez.Agent1") {}
+Agent1::Agent1(std::shared_ptr<SimpleDBus::Connection> conn, std::shared_ptr<SimpleDBus::Proxy> proxy)
+    : SimpleDBus::Interface(conn, proxy, "org.bluez.Agent1") {}
 
 void Agent1::message_handle(SimpleDBus::Message& msg) {
     if (msg.get_type() == SimpleDBus::Message::Type::METHOD_CALL) {

@@ -13,7 +13,7 @@ class GattCharacteristic1 : public SimpleDBus::Interface {
   public:
     typedef enum { REQUEST = 0, COMMAND } WriteType;
 
-    GattCharacteristic1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path);
+    GattCharacteristic1(std::shared_ptr<SimpleDBus::Connection> conn, std::shared_ptr<SimpleDBus::Proxy> proxy);
     virtual ~GattCharacteristic1();
 
     // ----- METHODS -----

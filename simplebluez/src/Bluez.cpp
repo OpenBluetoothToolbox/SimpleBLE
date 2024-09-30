@@ -13,13 +13,6 @@ using namespace SimpleBluez;
 #endif
 
 Bluez::Bluez() : Proxy(std::make_shared<SimpleDBus::Connection>(DBUS_BUS), "org.bluez", "/") {
-    _interfaces["org.freedesktop.DBus.ObjectManager"] = std::static_pointer_cast<SimpleDBus::Interface>(
-        std::make_shared<SimpleDBus::ObjectManager>(_conn, "org.bluez", "/"));
-
-    object_manager()->InterfacesAdded = [&](std::string path, SimpleDBus::Holder options) { path_add(path, options); };
-    object_manager()->InterfacesRemoved = [&](std::string path, SimpleDBus::Holder options) {
-        path_remove(path, options);
-    };
 }
 
 Bluez::~Bluez() {
@@ -31,6 +24,16 @@ Bluez::~Bluez() {
 void Bluez::init() {
     _conn->init();
 
+    const std::shared_ptr<SimpleDBus::Proxy> proxy = std::static_pointer_cast<SimpleDBus::Proxy>(shared_from_this());
+
+    _interfaces["org.freedesktop.DBus.ObjectManager"] = std::static_pointer_cast<SimpleDBus::Interface>(
+        std::make_shared<SimpleDBus::ObjectManager>(_conn, proxy));
+
+    object_manager()->InterfacesAdded = [&](std::string path, SimpleDBus::Holder options) { path_add(path, options); };
+    object_manager()->InterfacesRemoved = [&](std::string path, SimpleDBus::Holder options) {
+        path_remove(path, options);
+    };
+
     // Load all managed objects
     SimpleDBus::Holder managed_objects = object_manager()->GetManagedObjects();
     for (auto& [path, managed_interfaces] : managed_objects.get_dict_object_path()) {
@@ -41,6 +44,7 @@ void Bluez::init() {
 
     // Create the agent that will handle pairing.
     _agent = std::make_shared<Agent>(_conn, "org.bluez", "/agent");
+    _agent->init();
     path_append_child("/agent", std::static_pointer_cast<SimpleDBus::Proxy>(_agent));
 }
 
