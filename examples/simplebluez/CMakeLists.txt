@@ -15,6 +15,7 @@ else()
     find_package(simplebluez CONFIG REQUIRED)
 endif()
 
+add_subdirectory(advertise)
 add_subdirectory(list_adapters)
 add_subdirectory(list_paired)
 add_subdirectory(scan)

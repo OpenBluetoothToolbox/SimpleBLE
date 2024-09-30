@@ -23,6 +23,7 @@ class LocalInterface : public InterfaceBase {
     Message create_method_call(const std::string& method_name);
 
     // ----- PROPERTIES -----
+    Holder property_get_all();
     Holder property_get(const std::string& property_name);
     void property_set(const std::string& property_name, const Holder& value);
 

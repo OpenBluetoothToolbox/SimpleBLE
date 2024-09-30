@@ -17,6 +17,16 @@ Message LocalInterface::create_method_call(const std::string& method_name) {
 
 // ----- PROPERTIES -----
 
+Holder LocalInterface::property_get_all() {
+    _property_update_mutex.lock();
+    Holder result = Holder::create_dict();
+    for (const auto& [name, value] : _properties) {
+        result.dict_append(Holder::Type::STRING, name, value);
+    }
+    _property_update_mutex.unlock();
+    return result;
+}
+
 Holder LocalInterface::property_get(const std::string& property_name) {
     _property_update_mutex.lock();
     auto property = _properties.find(property_name);

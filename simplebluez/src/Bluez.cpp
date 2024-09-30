@@ -1,7 +1,7 @@
 #include <simplebluez/Bluez.h>
 #include <simplebluez/ProxyOrg.h>
 #include <simpledbus/interfaces/ObjectManager.h>
-
+#include <simplebluez/interfaces/LEAdvertisement1.h>
 #include <iostream>
 
 using namespace SimpleBluez;
@@ -20,6 +20,12 @@ Bluez::Bluez() : RemoteProxy(std::make_shared<SimpleDBus::Connection>(DBUS_BUS),
     object_manager()->InterfacesRemoved = [&](std::string path, SimpleDBus::Holder options) {
         path_remove(path, options);
     };
+
+    _simplebluez_root_proxy = std::make_shared<SimpleDBus::LocalProxy>(_conn, "org.simplebluez", "/simplebluez");
+
+    auto advertisement = std::make_shared<SimpleBluez::LEAdvertisement1>(_conn, "/simplebluez");
+    _simplebluez_root_proxy->interfaces_load("org.bluez.LEAdvertisement1",
+                                              std::static_pointer_cast<SimpleDBus::LocalInterface>(advertisement));
 }
 
 Bluez::~Bluez() {
@@ -48,7 +54,14 @@ void Bluez::run_async() {
     _conn->read_write();
     SimpleDBus::Message message = _conn->pop_message();
     while (message.is_valid()) {
-        message_forward(message);
+        std::cout << "Message: " << message.to_string() << " on path " << message.get_path() << std::endl;
+
+        if (_simplebluez_root_proxy->path_belongs(message.get_path())) {
+            _simplebluez_root_proxy->message_handle(message);
+        } else {
+            message_forward(message);
+        }
+
         message = _conn->pop_message();
     }
 }

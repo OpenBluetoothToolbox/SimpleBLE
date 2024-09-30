@@ -36,6 +36,7 @@ class LocalProxy : public ProxyBase {
     void interfaces_unload(const std::string& interface_name);
 
     // ----- CHILD HANDLING -----
+    bool path_belongs(const std::string& path);
     void path_add(const std::string& path, std::shared_ptr<LocalProxy> child);
     bool path_remove(const std::string& path);
     bool path_prune();
@@ -78,6 +79,8 @@ class LocalProxy : public ProxyBase {
 
     std::recursive_mutex _interface_access_mutex;
     std::recursive_mutex _child_access_mutex;
+
+    SimpleDBus::Holder _collect_managed_objects(const std::string& base_path);
 };
 
 }  // namespace SimpleDBus

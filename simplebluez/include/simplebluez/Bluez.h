@@ -1,6 +1,8 @@
 #pragma once
 
 #include <simpledbus/advanced/RemoteProxy.h>
+#include <simpledbus/advanced/LocalProxy.h>
+
 #include <simpledbus/interfaces/ObjectManager.h>
 
 #include <simplebluez/Adapter.h>
@@ -28,6 +30,7 @@ class Bluez : public SimpleDBus::RemoteProxy {
     std::shared_ptr<SimpleDBus::ObjectManager> object_manager();
 
     std::shared_ptr<Agent> _agent;
+    std::shared_ptr<SimpleDBus::LocalProxy> _simplebluez_root_proxy;
 };
 
 }  // namespace SimpleBluez

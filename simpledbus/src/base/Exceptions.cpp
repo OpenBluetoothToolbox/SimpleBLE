@@ -34,6 +34,13 @@ PathNotFoundException::PathNotFoundException(const std::string& path, const std:
 
 const char* PathNotFoundException::what() const noexcept { return _message.c_str(); }
 
+PropertyNotFoundException::PropertyNotFoundException(const std::string& path, const std::string& interface, const std::string& property) {
+    _message = fmt::format("Property {} not found in interface {} at path {}", property, interface, path);
+}
+
+const char* PropertyNotFoundException::what() const noexcept { return _message.c_str(); }
+
+
 }  // namespace Exception
 
 }  // namespace SimpleDBus

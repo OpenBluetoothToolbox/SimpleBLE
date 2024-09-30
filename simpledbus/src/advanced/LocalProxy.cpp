@@ -60,6 +60,10 @@ void LocalProxy::interfaces_unload(const std::string& interface_name) {
 
 // ----- CHILD HANDLING -----
 
+bool LocalProxy::path_belongs(const std::string& path) {
+    return _path == path || Path::is_descendant(_path, path);
+}
+
 bool LocalProxy::path_exists(const std::string& path) {
     std::scoped_lock lock(_child_access_mutex);
     return _children.find(path) != _children.end();
@@ -170,9 +174,56 @@ void LocalProxy::message_handle(Message& msg) {
     if (interface_exists(msg.get_interface())) {
         interface_get(msg.get_interface())->message_handle(msg);
         return;
+    } else if (msg.is_method_call("org.freedesktop.DBus.ObjectManager", "GetManagedObjects")) {
+        SimpleDBus::Holder result = _collect_managed_objects(_path);
+
+        std::cout << "Sending managed objects: " << result.represent() << std::endl;
+
+        SimpleDBus::Message reply = SimpleDBus::Message::create_method_return(msg);
+        reply.append_argument(result, "a{oa{sa{sv}}}");
+        _conn->send(reply);
+
+        std::cout << "Sent managed objects" << std::endl;
+        return;
+    } else if (msg.is_method_call("org.freedesktop.DBus.Properties", "GetAll")) {
+        Holder interface_h = msg.extract();
+        std::string iface_name = interface_h.get_string();
+        std::cout << "GetAll: " << iface_name << std::endl;
+
+        SimpleDBus::Holder result = interface_get(iface_name)->property_get_all();
+
+        std::cout << "Result: " << result.represent() << std::endl;
+
+        SimpleDBus::Message reply = SimpleDBus::Message::create_method_return(msg);
+        reply.append_argument(result, "a{sv}");
+        _conn->send(reply);
+        return;
+    } else if (msg.is_method_call("org.freedesktop.DBus.Properties", "Set")) {
+        Holder interface_h = msg.extract();
+        std::string iface_name = interface_h.get_string();
+        msg.extract_next();
+
+        Holder property_h = msg.extract();
+        std::string property_name = property_h.get_string();
+        msg.extract_next();
+        
+        Holder value_h = msg.extract();
+
+        std::cout << "Set: " << iface_name << "." << property_name << " = " << value_h.represent() << std::endl;
+
+
+
+        // SimpleDBus::Holder result = interface_get(iface_name)->property_get_all();
+
+        // std::cout << "Result: " << result.represent() << std::endl;
+
+        // SimpleDBus::Message reply = SimpleDBus::Message::create_method_return(msg);
+        // reply.append_argument(result, "a{sv}");
+        // _conn->send(reply);
+        return;
     }
 
-    std::cout << "LocalProxy::Unhandled message: " << msg.get_path() << std::endl;
+    std::cout << "LocalProxy::Unhandled message: " << msg.to_string() << std::endl;
 }
 
 void LocalProxy::message_forward(Message& msg) {
@@ -197,4 +248,29 @@ void LocalProxy::message_forward(Message& msg) {
             return;
         }
     }
+}
+
+
+SimpleDBus::Holder LocalProxy::_collect_managed_objects(const std::string& base_path) {
+    SimpleDBus::Holder result = SimpleDBus::Holder::create_dict();
+    SimpleDBus::Holder interfaces = SimpleDBus::Holder::create_dict();
+
+    for (const auto& [interface_name, interface_ptr] : _interfaces) {
+        SimpleDBus::Holder properties = interface_ptr->property_get_all();
+        interfaces.dict_append(SimpleDBus::Holder::Type::STRING, interface_name, std::move(properties));
+    }
+
+    if (!interfaces.get_dict_string().empty()) {
+        result.dict_append(SimpleDBus::Holder::Type::OBJ_PATH, _path, std::move(interfaces));
+    }
+
+    for (const auto& [child_path, child] : _children) {
+        SimpleDBus::Holder child_result = child->_collect_managed_objects(base_path);
+        // Merge child_result into result
+        for (auto&& [path, child_interfaces] : child_result.get_dict_object_path()) {
+            result.dict_append(SimpleDBus::Holder::Type::OBJ_PATH, std::move(path), std::move(child_interfaces));
+        }
+    }
+
+    return std::move(result);
 }
