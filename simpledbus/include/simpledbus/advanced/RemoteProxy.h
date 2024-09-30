@@ -43,7 +43,7 @@ class RemoteProxy : public ProxyBase {
     void path_append_child(const std::string& path, std::shared_ptr<RemoteProxy> child);
 
     // ----- MESSAGE HANDLING -----
-    void message_forward(Message& msg);
+    void message_handle(Message& msg) override;
 
     // ----- CALLBACKS -----
     kvn::safe_callback<void(std::string)> on_child_created;
@@ -79,6 +79,9 @@ class RemoteProxy : public ProxyBase {
 
     std::recursive_mutex _interface_access_mutex;
     std::recursive_mutex _child_access_mutex;
+
+    // TODO: This is a hack, should be handled as a weak_ptr<RemoteProxy>
+    RemoteProxy* _parent = nullptr;
 };
 
 }  // namespace SimpleDBus

@@ -117,6 +117,7 @@ void RemoteProxy::path_add(const std::string& path, SimpleDBus::Holder managed_i
         // If the path is a direct child of the proxy path, create a new proxy for it.
         std::shared_ptr<RemoteProxy> child = path_create(path);
         child->interfaces_load(managed_interfaces);
+        child->_parent = this;
         _children.emplace(std::make_pair(path, child));
         on_child_created(path);
     } else {
@@ -137,6 +138,7 @@ void RemoteProxy::path_add(const std::string& path, SimpleDBus::Holder managed_i
             std::shared_ptr<RemoteProxy> child = path_create(child_path);
             _children.emplace(std::make_pair(child_path, child));
             child->path_add(path, managed_interfaces);
+            child->_parent = this;
             on_child_created(child_path);
         }
     }
@@ -146,7 +148,7 @@ bool RemoteProxy::path_remove(const std::string& path, SimpleDBus::Holder option
     // `options` contains an array of strings of the interfaces that need to be removed.
 
     if (path == _path) {
-        _valid = false;
+        invalidate();
         interfaces_unload(options);
         return path_prune();
     }
@@ -212,45 +214,30 @@ void RemoteProxy::path_append_child(const std::string& path, std::shared_ptr<Rem
 }
 
 // ----- MESSAGE HANDLING -----
-void RemoteProxy::message_forward(Message& msg) {
-    // If the message is for the current proxy, then forward it to the message handler.
-    if (msg.get_path() == _path) {
-        // If the message is involves a property change, forward it to the correct interface.
-        if (msg.is_signal("org.freedesktop.DBus.Properties", "PropertiesChanged")) {
-            Holder interface_h = msg.extract();
-            std::string iface_name = interface_h.get_string();
-            msg.extract_next();
-            Holder changed_properties = msg.extract();
-            msg.extract_next();
-            Holder invalidated_properties = msg.extract();
 
-            // If the interface is not loaded, then ignore the message.
-            if (!interface_exists(iface_name)) {
-                return;
-            }
+void RemoteProxy::message_handle(Message& msg) {
+    if (msg.is_signal("org.freedesktop.DBus.Properties", "PropertiesChanged")) {
+        Holder interface_h = msg.extract();
+        std::string iface_name = interface_h.get_string();
+        msg.extract_next();
+        Holder changed_properties = msg.extract();
+        msg.extract_next();
+        Holder invalidated_properties = msg.extract();
 
-            interface_get(iface_name)->signal_property_changed(changed_properties, invalidated_properties);
-
-        } else if (interface_exists(msg.get_interface())) {
-            interface_get(msg.get_interface())->message_handle(msg);
-        }
-
-        return;
-    }
-
-    // If the message is for a child proxy or a descendant, forward it to that child proxy.
-    for (auto& [child_path, child] : _children) {
-        if (child_path == msg.get_path()) {
-            child->message_forward(msg);
-
-            if (msg.get_type() == Message::Type::SIGNAL) {
-                on_child_signal_received(child_path);
-            }
-
-            return;
-        } else if (Path::is_descendant(child_path, msg.get_path())) {
-            child->message_forward(msg);
+        // If the interface is not loaded, then ignore the message.
+        if (!interface_exists(iface_name)) {
             return;
         }
+
+        interface_get(iface_name)->signal_property_changed(changed_properties, invalidated_properties);
+
+        if (msg.get_type() == Message::Type::SIGNAL) {
+            if (_parent != nullptr) {
+                _parent->on_child_signal_received(_path);
+            }
+        }
+
+    } else if (interface_exists(msg.get_interface())) {
+        interface_get(msg.get_interface())->message_handle(msg);
     }
 }

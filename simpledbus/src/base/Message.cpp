@@ -29,6 +29,7 @@ Message::Message() : Message(nullptr) {}
 
 Message::Message(DBusMessage* msg) : _msg(msg), _iter_initialized(false), _is_extracted(false), indent(0) {
     if (is_valid()) {
+        dbus_message_ref(_msg);
         _unique_id = creation_counter++;
     } else {
         _unique_id = -1;

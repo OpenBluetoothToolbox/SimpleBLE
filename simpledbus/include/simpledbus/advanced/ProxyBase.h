@@ -12,6 +12,7 @@ class ProxyBase : public std::enable_shared_from_this<ProxyBase> {
     virtual ~ProxyBase();
 
     bool valid() const;
+    void invalidate();
     std::string path() const;
 
   protected:
@@ -20,6 +21,12 @@ class ProxyBase : public std::enable_shared_from_this<ProxyBase> {
     std::string _path;
     std::string _bus_name;
     std::shared_ptr<Connection> _conn;
+
+    bool _registered;
+    void register_object_path();
+    void unregister_object_path();
+
+    virtual void message_handle(Message& msg);
 };
 
 }  // namespace SimpleDBus

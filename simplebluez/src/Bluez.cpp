@@ -45,12 +45,7 @@ void Bluez::init() {
 }
 
 void Bluez::run_async() {
-    _conn->read_write();
-    SimpleDBus::Message message = _conn->pop_message();
-    while (message.is_valid()) {
-        message_forward(message);
-        message = _conn->pop_message();
-    }
+    _conn->read_write_dispatch();
 }
 
 std::vector<std::shared_ptr<Adapter>> Bluez::get_adapters() {
