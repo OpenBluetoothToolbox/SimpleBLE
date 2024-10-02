@@ -217,6 +217,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Message.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Path.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/interfaces/ObjectManager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/interfaces/Properties.cpp
     )
 
     target_link_libraries(simpleble PUBLIC pthread)

@@ -251,7 +251,34 @@ bool Proxy::path_prune() {
     return false;
 }
 
+Holder Proxy::path_collect() {
+    SimpleDBus::Holder result = SimpleDBus::Holder::create_dict();
+    SimpleDBus::Holder interfaces = SimpleDBus::Holder::create_dict();
+
+    for (const auto& [interface_name, interface_ptr] : _interfaces) {
+        SimpleDBus::Holder properties = interface_ptr->property_collect();
+        interfaces.dict_append(SimpleDBus::Holder::Type::STRING, interface_name, std::move(properties));
+    }
+
+    if (!interfaces.get_dict_string().empty()) {
+        result.dict_append(SimpleDBus::Holder::Type::OBJ_PATH, _path, std::move(interfaces));
+    }
+
+    for (const auto& [child_path, child] : _children) {
+        SimpleDBus::Holder child_result = child->path_collect();
+        // Merge child_result into result
+        for (auto&& [path, child_interfaces] : child_result.get_dict_object_path()) {
+            result.dict_append(SimpleDBus::Holder::Type::OBJ_PATH, std::move(path), std::move(child_interfaces));
+        }
+    }
+    return std::move(result);
+}
+
+// ----- MANUAL CHILD HANDLING -----
+
 void Proxy::path_append_child(const std::string& path, std::shared_ptr<Proxy> child) {
+    // ! This function is used to manually add children to the proxy.
+
     // If the provided path is not a child of the current path, return silently.
     if (!Path::is_child(_path, path)) {
         // TODO: Should an exception be thrown here?
@@ -282,14 +309,16 @@ void Proxy::message_handle(Message& msg) {
 
         interface_get(iface_name)->signal_property_changed(changed_properties, invalidated_properties);
 
-        if (msg.get_type() == Message::Type::SIGNAL) {
-            auto parent = _parent.lock();
-            if (parent != nullptr) {
-                parent->on_child_signal_received(_path);
-            }
-        }
+
 
     } else if (interface_exists(msg.get_interface())) {
         interface_get(msg.get_interface())->message_handle(msg);
+    }
+
+    if (msg.get_type() == Message::Type::SIGNAL) {
+        auto parent = _parent.lock();
+        if (parent != nullptr) {
+            parent->on_child_signal_received(_path);
+        }
     }
 }

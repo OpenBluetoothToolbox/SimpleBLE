@@ -31,6 +31,8 @@ void ObjectManager::message_handle(Message& msg) {
         if (InterfacesAdded) {
             InterfacesAdded(path, options);
         }
+        // TODO: Make a call directly to the proxy to do this?
+
     } else if (msg.is_signal(_interface_name, "InterfacesRemoved")) {
         std::string path = msg.extract().get_string();
         msg.extract_next();
@@ -38,30 +40,14 @@ void ObjectManager::message_handle(Message& msg) {
         if (InterfacesRemoved) {
             InterfacesRemoved(path, options);
         }
-    }
-}
+        // TODO: Make a call directly to the proxy to do this?
 
-bool ObjectManager::process_received_signal(Message& message) {
-    auto proxy = _proxy.lock();
+    } else if (msg.is_method_call(_interface_name, "GetManagedObjects")) {
+        auto proxy = _proxy.lock();
+        SimpleDBus::Holder result = proxy->path_collect();
 
-    if (message.get_path() == proxy->path()) {
-        if (message.is_signal(_interface_name, "InterfacesAdded")) {
-            std::string path = message.extract().get_string();
-            message.extract_next();
-            Holder options = message.extract();
-            if (InterfacesAdded) {
-                InterfacesAdded(path, options);
-            }
-            return true;
-        } else if (message.is_signal(_interface_name, "InterfacesRemoved")) {
-            std::string path = message.extract().get_string();
-            message.extract_next();
-            Holder options = message.extract();
-            if (InterfacesRemoved) {
-                InterfacesRemoved(path, options);
-            }
-            return true;
-        }
+        SimpleDBus::Message reply = SimpleDBus::Message::create_method_return(msg);
+        reply.append_argument(result, "a{oa{sa{sv}}}");
+        _conn->send(reply);
     }
-    return false;
 }
