@@ -1,5 +1,7 @@
 #pragma once
 
+#include <simpledbus/base/Connection.h>
+
 #include <simpledbus/advanced/Interface.h>
 #include <simpledbus/external/kvn_safe_callback.hpp>
 #include <simpledbus/base/Path.h>
@@ -56,6 +58,10 @@ class Proxy : public std::enable_shared_from_this<Proxy> {
     void path_add(const std::string& path, Holder managed_interfaces);
     bool path_remove(const std::string& path, Holder removed_interfaces);
     bool path_prune();
+    Holder path_collect();
+
+    // ----- MANUAL CHILD HANDLING -----
+    // ! This function is used to manually add children to the proxy.
     void path_append_child(const std::string& path, std::shared_ptr<Proxy> child);
 
     // ----- MESSAGE HANDLING -----

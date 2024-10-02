@@ -41,7 +41,8 @@ set(SIMPLEDBUS_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/base/Logging.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/base/Message.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/base/Path.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/ObjectManager.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/ObjectManager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Properties.cpp)
 
 # Configure the build targets
 
