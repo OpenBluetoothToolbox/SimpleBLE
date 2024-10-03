@@ -8,7 +8,7 @@ namespace SimpleDBus {
 
 class Properties : public Interface {
   public:
-    Properties(std::shared_ptr<Connection> conn, std::shared_ptr<Proxy> proxy);
+    Properties(std::shared_ptr<Connection> conn, Proxy* proxy);
     virtual ~Properties() = default;
 
     Holder Get(const std::string& interface_name, const std::string& property_name);

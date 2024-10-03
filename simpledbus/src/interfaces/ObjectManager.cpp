@@ -2,13 +2,11 @@
 
 using namespace SimpleDBus;
 
-ObjectManager::ObjectManager(std::shared_ptr<Connection> conn, std::shared_ptr<Proxy> proxy)
+ObjectManager::ObjectManager(std::shared_ptr<Connection> conn, Proxy* proxy)
     : Interface(conn, proxy, "org.freedesktop.DBus.ObjectManager") {}
 
 Holder ObjectManager::GetManagedObjects(bool use_callbacks) {
-    auto proxy = _proxy.lock();
-
-    Message query_msg = Message::create_method_call(proxy->bus_name(), proxy->path(), _interface_name, "GetManagedObjects");
+    Message query_msg = Message::create_method_call(_proxy->bus_name(), _proxy->path(), _interface_name, "GetManagedObjects");
     Message reply_msg = _conn->send_with_reply_and_block(query_msg);
     Holder managed_objects = reply_msg.extract();
     // TODO: Remove immediate callback support.
@@ -43,8 +41,7 @@ void ObjectManager::message_handle(Message& msg) {
         // TODO: Make a call directly to the proxy to do this?
 
     } else if (msg.is_method_call(_interface_name, "GetManagedObjects")) {
-        auto proxy = _proxy.lock();
-        SimpleDBus::Holder result = proxy->path_collect();
+        SimpleDBus::Holder result = _proxy->path_collect();
 
         SimpleDBus::Message reply = SimpleDBus::Message::create_method_return(msg);
         reply.append_argument(result, "a{oa{sa{sv}}}");

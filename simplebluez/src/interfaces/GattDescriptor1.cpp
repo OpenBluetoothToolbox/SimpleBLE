@@ -2,7 +2,7 @@
 
 using namespace SimpleBluez;
 
-GattDescriptor1::GattDescriptor1(std::shared_ptr<SimpleDBus::Connection> conn, std::shared_ptr<SimpleDBus::Proxy> proxy)
+GattDescriptor1::GattDescriptor1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* proxy)
     : SimpleDBus::Interface(conn, proxy, "org.bluez.GattDescriptor1") {}
 
 GattDescriptor1::~GattDescriptor1() { OnValueChanged.unload(); }

@@ -45,9 +45,15 @@ class Proxy : public std::enable_shared_from_this<Proxy> {
     void unregister_object_path();
 
     // ----- INTROSPECTION -----
+    // ! TODO: This should be moved to the Introspectable interface.
     std::string introspect();
 
     // ----- INTERFACE HANDLING -----
+    // ! We are making the assumption that the Properties interface is always available.
+    // std::shared_ptr<Properties> properties() {
+    //     return std::dynamic_pointer_cast<Properties>(interface_get("org.freedesktop.DBus.Properties"));
+    // }
+
     size_t interfaces_count();
     bool interfaces_loaded();
     void interfaces_load(Holder managed_interfaces);
@@ -72,6 +78,7 @@ class Proxy : public std::enable_shared_from_this<Proxy> {
     kvn::safe_callback<void(std::string)> on_child_signal_received;
 
     // ----- TEMPLATE METHODS -----
+    // ! This method returns a Proxy descendant object.
     template <typename T>
     std::vector<std::shared_ptr<T>> children_casted() {
         std::vector<std::shared_ptr<T>> result;
@@ -82,6 +89,7 @@ class Proxy : public std::enable_shared_from_this<Proxy> {
         return result;
     }
 
+    // ! This method returns a Proxy descendant object.
     template <typename T>
     std::vector<std::shared_ptr<T>> children_casted_with_prefix(const std::string& prefix) {
         std::vector<std::shared_ptr<T>> result;

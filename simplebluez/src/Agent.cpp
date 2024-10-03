@@ -10,7 +10,7 @@ Agent::Agent(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bu
 
 void Agent::init() {
     _interfaces.emplace(std::make_pair(
-        "org.bluez.Agent1", std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Agent1>(_conn, shared_from_this()))));
+        "org.bluez.Agent1", std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Agent1>(_conn, this))));
 }
 
 std::string Agent::capabilities() const {

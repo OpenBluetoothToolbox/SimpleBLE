@@ -28,10 +28,8 @@ void Bluez::init() {
     // some sort of controller object that owns the connection separately.
     register_object_path();
 
-    const std::shared_ptr<SimpleDBus::Proxy> proxy = std::static_pointer_cast<SimpleDBus::Proxy>(shared_from_this());
-
     _interfaces["org.freedesktop.DBus.ObjectManager"] = std::static_pointer_cast<SimpleDBus::Interface>(
-        std::make_shared<SimpleDBus::ObjectManager>(_conn, proxy));
+        std::make_shared<SimpleDBus::ObjectManager>(_conn, this));
 
     object_manager()->InterfacesAdded = [&](std::string path, SimpleDBus::Holder options) { path_add(path, options); };
     object_manager()->InterfacesRemoved = [&](std::string path, SimpleDBus::Holder options) {

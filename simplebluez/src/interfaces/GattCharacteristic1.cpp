@@ -2,7 +2,7 @@
 
 using namespace SimpleBluez;
 
-GattCharacteristic1::GattCharacteristic1(std::shared_ptr<SimpleDBus::Connection> conn, std::shared_ptr<SimpleDBus::Proxy> proxy)
+GattCharacteristic1::GattCharacteristic1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* proxy)
     : SimpleDBus::Interface(conn, proxy, "org.bluez.GattCharacteristic1") {}
 
 GattCharacteristic1::~GattCharacteristic1() { OnValueChanged.unload(); }

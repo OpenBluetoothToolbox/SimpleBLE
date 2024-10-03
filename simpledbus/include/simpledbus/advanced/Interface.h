@@ -15,7 +15,7 @@ class Proxy;
 
 class Interface {
   public:
-    Interface(std::shared_ptr<Connection> conn, std::shared_ptr<Proxy> proxy, const std::string& interface_name);
+    Interface(std::shared_ptr<Connection> conn, Proxy* proxy, const std::string& interface_name);
 
     virtual ~Interface() = default;
 
@@ -54,7 +54,7 @@ class Interface {
     // NOTE: We should probably keep a copy of the proxy fields that are used often to avoid locking
     //       the proxy mutex for too long. Proxy should be locked only when a call is required, not to read
     //       a static property.
-    std::weak_ptr<Proxy> _proxy;
+    Proxy* _proxy;
     std::string _interface_name;
     std::shared_ptr<Connection> _conn;
 
