@@ -2,8 +2,6 @@
 
 #include <simpledbus/advanced/Interface.h>
 
-#include <functional>
-
 namespace SimpleDBus {
 
 class Properties : public Interface {
