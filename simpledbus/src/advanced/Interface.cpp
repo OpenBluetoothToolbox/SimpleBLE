@@ -3,8 +3,12 @@
 
 using namespace SimpleDBus;
 
-Interface::Interface(std::shared_ptr<Connection> conn, std::shared_ptr<Proxy> proxy, const std::string& interface_name)
-    : _conn(conn), _proxy(proxy), _interface_name(interface_name), _loaded(true) {}
+Interface::Interface(std::shared_ptr<Connection> conn, Proxy* proxy, const std::string& interface_name)
+    : _conn(conn), _proxy(proxy), _interface_name(interface_name), _loaded(true) {
+    if (proxy == nullptr) {
+        throw std::invalid_argument("Interface must belong to a valid proxy.");
+    }
+}
 
 // ----- LIFE CYCLE -----
 
@@ -32,8 +36,7 @@ bool Interface::is_loaded() const { return _loaded; }
 // ----- METHODS -----
 
 Message Interface::create_method_call(const std::string& method_name) {
-    auto proxy = _proxy.lock();
-    return Message::create_method_call(proxy->bus_name(), proxy->path(), _interface_name, method_name);
+    return Message::create_method_call(_proxy->bus_name(), _proxy->path(), _interface_name, method_name);
 }
 
 // ----- PROPERTIES -----
@@ -54,8 +57,7 @@ Holder Interface::property_collect_single(const std::string& property_name) {
 }
 
 Holder Interface::property_get_all() {
-    auto proxy = _proxy.lock();
-    Message query_msg = Message::create_method_call(proxy->bus_name(), proxy->path(), "org.freedesktop.DBus.Properties",
+    Message query_msg = Message::create_method_call(_proxy->bus_name(), _proxy->path(), "org.freedesktop.DBus.Properties",
                                                     "GetAll");
 
     Holder h_interface = Holder::create_string(_interface_name);
@@ -67,8 +69,7 @@ Holder Interface::property_get_all() {
 }
 
 Holder Interface::property_get(const std::string& property_name) {
-    auto proxy = _proxy.lock();
-    Message query_msg = Message::create_method_call(proxy->bus_name(), proxy->path(), "org.freedesktop.DBus.Properties",
+    Message query_msg = Message::create_method_call(_proxy->bus_name(), _proxy->path(), "org.freedesktop.DBus.Properties",
                                                     "Get");
 
     Holder h_interface = Holder::create_string(_interface_name);
@@ -83,8 +84,7 @@ Holder Interface::property_get(const std::string& property_name) {
 }
 
 void Interface::property_set(const std::string& property_name, const Holder& value) {
-    auto proxy = _proxy.lock();
-    Message query_msg = Message::create_method_call(proxy->bus_name(), proxy->path(), "org.freedesktop.DBus.Properties",
+    Message query_msg = Message::create_method_call(_proxy->bus_name(), _proxy->path(), "org.freedesktop.DBus.Properties",
                                                     "Set");
 
     Holder h_interface = Holder::create_string(_interface_name);

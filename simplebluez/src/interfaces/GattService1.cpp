@@ -2,7 +2,7 @@
 
 using namespace SimpleBluez;
 
-GattService1::GattService1(std::shared_ptr<SimpleDBus::Connection> conn, std::shared_ptr<SimpleDBus::Proxy> proxy)
+GattService1::GattService1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* proxy)
     : SimpleDBus::Interface(conn, proxy, "org.bluez.GattService1") {}
 
 std::string GattService1::UUID() {

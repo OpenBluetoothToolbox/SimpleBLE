@@ -13,13 +13,11 @@ std::shared_ptr<SimpleDBus::Proxy> ProxyOrgBluez::path_create(const std::string&
 }
 
 std::shared_ptr<SimpleDBus::Interface> ProxyOrgBluez::interfaces_create(const std::string& interface_name) {
-    const std::shared_ptr<SimpleDBus::Proxy> proxy = std::static_pointer_cast<SimpleDBus::Proxy>(shared_from_this());
-
     if (interface_name == "org.bluez.AgentManager1") {
-        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<AgentManager1>(_conn, proxy));
+        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<AgentManager1>(_conn, this));
     }
 
-    return std::make_shared<SimpleDBus::Interface>(_conn, proxy, interface_name);
+    return std::make_shared<SimpleDBus::Interface>(_conn, this, interface_name);
 }
 
 std::shared_ptr<AgentManager1> ProxyOrgBluez::agentmanager1() {

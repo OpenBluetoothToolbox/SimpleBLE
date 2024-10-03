@@ -63,6 +63,8 @@ set(SIMPLEBLUEZ_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Device1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Battery1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/AgentManager1.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/LEAdvertisingManager1.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/LEAdvertisement1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/advanced/Interface.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/advanced/Proxy.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Connection.cpp
@@ -72,7 +74,7 @@ set(SIMPLEBLUEZ_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Message.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Path.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/interfaces/ObjectManager.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/interfaces/Properties.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/interfaces/Properties.cpp
 )
 
 # Configure the build targets

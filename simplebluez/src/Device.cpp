@@ -23,15 +23,13 @@ std::shared_ptr<SimpleDBus::Proxy> Device::path_create(const std::string& path) 
 }
 
 std::shared_ptr<SimpleDBus::Interface> Device::interfaces_create(const std::string& interface_name) {
-    const std::shared_ptr<SimpleDBus::Proxy> proxy = std::static_pointer_cast<SimpleDBus::Proxy>(shared_from_this());
-
     if (interface_name == "org.bluez.Device1") {
-        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Device1>(_conn, proxy));
+        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Device1>(_conn, this));
     } else if (interface_name == "org.bluez.Battery1") {
-        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Battery1>(_conn, proxy));
+        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Battery1>(_conn, this));
     }
 
-    return std::make_shared<SimpleDBus::Interface>(_conn, proxy, interface_name);
+    return std::make_shared<SimpleDBus::Interface>(_conn, this, interface_name);
 }
 
 std::shared_ptr<Device1> Device::device1() {

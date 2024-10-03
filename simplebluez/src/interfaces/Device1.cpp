@@ -2,7 +2,7 @@
 
 using namespace SimpleBluez;
 
-Device1::Device1(std::shared_ptr<SimpleDBus::Connection> conn, std::shared_ptr<SimpleDBus::Proxy> proxy)
+Device1::Device1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* proxy)
     : SimpleDBus::Interface(conn, proxy, "org.bluez.Device1") {}
 
 Device1::~Device1() {
