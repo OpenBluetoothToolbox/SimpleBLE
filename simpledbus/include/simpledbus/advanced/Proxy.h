@@ -49,7 +49,7 @@ class Proxy : public std::enable_shared_from_this<Proxy> {
     std::string introspect();
 
     // ----- INTERFACE HANDLING -----
-    // ! We are making the assumption that the Properties interface is always available.
+    // // ! We are making the assumption that the Properties interface is always available.
     // std::shared_ptr<Properties> properties() {
     //     return std::dynamic_pointer_cast<Properties>(interface_get("org.freedesktop.DBus.Properties"));
     // }

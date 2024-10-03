@@ -56,6 +56,12 @@ Holder Interface::property_collect_single(const std::string& property_name) {
     return _properties[property_name];
 }
 
+void Interface::property_modify(const std::string& property_name, const Holder& value) {
+    _property_update_mutex.lock();
+    _properties[property_name] = value;
+    property_changed(property_name);
+}
+
 Holder Interface::property_get_all() {
     Message query_msg = Message::create_method_call(_proxy->bus_name(), _proxy->path(), "org.freedesktop.DBus.Properties",
                                                     "GetAll");

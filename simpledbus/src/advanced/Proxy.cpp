@@ -4,11 +4,15 @@
 #include <simpledbus/base/Path.h>
 #include <algorithm>
 
+#include <simpledbus/interfaces/Properties.h>
+
 using namespace SimpleDBus;
 
 Proxy::Proxy(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path)
     : _conn(conn), _bus_name(bus_name), _path(path), _valid(true), _registered(false) {
     register_object_path();
+
+    _interfaces.emplace(std::make_pair("org.freedesktop.DBus.Properties", std::make_shared<Properties>(conn, this)));
 }
 
 Proxy::~Proxy() {
@@ -293,25 +297,7 @@ void Proxy::path_append_child(const std::string& path, std::shared_ptr<Proxy> ch
 // ----- MESSAGE HANDLING -----
 
 void Proxy::message_handle(Message& msg) {
-    // If the message is involves a property change, forward it to the correct interface.
-    if (msg.is_signal("org.freedesktop.DBus.Properties", "PropertiesChanged")) {
-        Holder interface_h = msg.extract();
-        std::string iface_name = interface_h.get_string();
-        msg.extract_next();
-        Holder changed_properties = msg.extract();
-        msg.extract_next();
-        Holder invalidated_properties = msg.extract();
-
-        // If the interface is not loaded, then ignore the message.
-        if (!interface_exists(iface_name)) {
-            return;
-        }
-
-        interface_get(iface_name)->signal_property_changed(changed_properties, invalidated_properties);
-
-
-
-    } else if (interface_exists(msg.get_interface())) {
+   if (interface_exists(msg.get_interface())) {
         interface_get(msg.get_interface())->message_handle(msg);
     }
 
