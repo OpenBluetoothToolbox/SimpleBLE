@@ -1,6 +1,5 @@
 #pragma once
 
-#include <simpledbus/advanced/Proxy.h>
 #include <simpledbus/base/Connection.h>
 
 #include <atomic>

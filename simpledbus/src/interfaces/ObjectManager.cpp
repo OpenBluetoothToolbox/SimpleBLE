@@ -1,4 +1,5 @@
 #include <simpledbus/interfaces/ObjectManager.h>
+#include <simpledbus/advanced/Proxy.h>
 
 using namespace SimpleDBus;
 

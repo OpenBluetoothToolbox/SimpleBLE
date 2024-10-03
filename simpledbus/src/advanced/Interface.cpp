@@ -1,4 +1,5 @@
 #include <simpledbus/advanced/Interface.h>
+#include <simpledbus/advanced/Proxy.h>
 #include <simpledbus/base/Exceptions.h>
 
 using namespace SimpleDBus;
