@@ -10,11 +10,11 @@
 
 namespace SimpleBluez {
 
-class ProxyRoot : public SimpleDBus::Proxy {
+class BluezRoot : public SimpleDBus::Proxy {
   public:
 
-    ProxyRoot(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path);
-    virtual ~ProxyRoot() = default;
+    BluezRoot(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path);
+    virtual ~BluezRoot() = default;
 
     void load_managed_objects();
 

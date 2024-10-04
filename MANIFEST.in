@@ -98,8 +98,8 @@ include simplebluez/include/simplebluez/Characteristic.h
 include simplebluez/include/simplebluez/Descriptor.h
 include simplebluez/include/simplebluez/Device.h
 include simplebluez/include/simplebluez/Exceptions.h
-include simplebluez/include/simplebluez/ProxyOrg.h
-include simplebluez/include/simplebluez/ProxyOrgBluez.h
+include simplebluez/include/simplebluez/BluezOrg.h
+include simplebluez/include/simplebluez/BluezOrgBluez.h
 include simplebluez/include/simplebluez/Service.h
 include simplebluez/include/simplebluez/Types.h
 include simplebluez/include/simplebluez/interfaces/Adapter1.h
@@ -119,8 +119,8 @@ include simplebluez/src/Device.cpp
 include simplebluez/src/Exceptions.cpp
 include simplebluez/src/Logging.cpp
 include simplebluez/src/Logging.h
-include simplebluez/src/ProxyOrg.cpp
-include simplebluez/src/ProxyOrgBluez.cpp
+include simplebluez/src/BluezOrg.cpp
+include simplebluez/src/BluezOrgBluez.cpp
 include simplebluez/src/Service.cpp
 include simplebluez/src/interfaces/Adapter1.cpp
 include simplebluez/src/interfaces/Agent1.cpp

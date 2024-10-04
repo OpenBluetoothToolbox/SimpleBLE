@@ -1,6 +1,6 @@
 #pragma once
 
-#include <simplebluez/ProxyRoot.h>
+#include <simplebluez/BluezRoot.h>
 #include <simpledbus/base/Connection.h>
 
 namespace SimpleBluez {
@@ -35,7 +35,7 @@ class Bluez {
     void init();
 
     std::shared_ptr<SimpleDBus::Connection> _conn;
-    std::shared_ptr<SimpleBluez::ProxyRoot> _bluez_root;
+    std::shared_ptr<SimpleBluez::BluezRoot> _bluez_root;
 };
 
 }  // namespace SimpleBluez

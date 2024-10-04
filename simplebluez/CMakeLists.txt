@@ -44,14 +44,14 @@ set(SIMPLEBLUEZ_INCLUDE
     ${CMAKE_CURRENT_SOURCE_DIR}/../external/include)
 
 set(SIMPLEBLUEZ_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ProxyRoot.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ProxyOrg.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/BluezRoot.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/BluezOrg.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logging.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Agent.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Characteristic.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Exceptions.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ProxyOrgBluez.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/BluezOrgBluez.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Service.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Adapter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Bluez.cpp
