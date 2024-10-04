@@ -1,5 +1,4 @@
 #include <simplebluez/Bluez.h>
-#include <simplebluez/ProxyOrg.h>
 #include <simpledbus/interfaces/ObjectManager.h>
 
 using namespace SimpleBluez;
@@ -24,7 +23,7 @@ void Bluez::init() {
     _conn->init();
     _conn->add_match("type='signal',sender='org.bluez'");
 
-    _bluez_root = std::make_shared<ProxyRoot>(_conn, "org.bluez", "/");
+    _bluez_root = std::make_shared<BluezRoot>(_conn, "org.bluez", "/");
     _bluez_root->load_managed_objects();
 }
 
