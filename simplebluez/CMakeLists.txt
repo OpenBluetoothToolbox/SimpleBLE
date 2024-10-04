@@ -44,6 +44,7 @@ set(SIMPLEBLUEZ_INCLUDE
     ${CMAKE_CURRENT_SOURCE_DIR}/../external/include)
 
 set(SIMPLEBLUEZ_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ProxyRoot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ProxyOrg.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logging.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Agent.cpp

@@ -186,6 +186,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/Bluez.cpp)
 
     target_sources(simpleble PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/ProxyRoot.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/ProxyOrg.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/Logging.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/Agent.cpp
