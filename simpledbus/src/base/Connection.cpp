@@ -157,7 +157,9 @@ Message Connection::send_with_reply_and_block(Message& msg) {
         throw Exception::SendFailed(err_name, err_message, msg.to_string());
     }
 
-    return Message(msg_tmp);
+    auto msg_return = Message(msg_tmp);
+    dbus_message_unref(msg_tmp);
+    return msg_return;
 }
 
 std::string Connection::unique_name() {
