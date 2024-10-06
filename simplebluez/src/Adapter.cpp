@@ -18,6 +18,8 @@ std::shared_ptr<SimpleDBus::Proxy> Adapter::path_create(const std::string& path)
 std::shared_ptr<SimpleDBus::Interface> Adapter::interfaces_create(const std::string& interface_name) {
     if (interface_name == "org.bluez.Adapter1") {
         return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Adapter1>(_conn, this));
+    } else if (interface_name == "org.bluez.LEAdvertisingManager1") {
+        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<LEAdvertisingManager1>(_conn, this));
     }
 
     return std::make_shared<SimpleDBus::Interface>(_conn, this, interface_name);

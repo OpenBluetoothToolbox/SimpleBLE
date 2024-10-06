@@ -33,8 +33,8 @@ class Bluez {
     std::shared_ptr<Agent> get_agent();
     void register_agent();
 
-    std::shared_ptr<CustomAdvertisementManager> get_custom_advertisements();
-    std::shared_ptr<CustomServiceManager> get_custom_services();
+    std::shared_ptr<CustomAdvertisementManager> get_custom_advertisement_manager();
+    std::shared_ptr<CustomServiceManager> get_custom_service_manager();
   private:
 
     Bluez();

@@ -45,10 +45,10 @@ int main(int argc, char* argv[]) {
     auto adapter = adapters[0];
     std::cout << "Advertising on " << adapter->identifier() << " [" << adapter->address() << "]" << std::endl;
 
-    auto advertisements = bluez->get_custom_advertisements();
+    auto advertisement_manager = bluez->get_custom_advertisement_manager();
+    auto advertisement = advertisement_manager->create_advertisement("potato");
 
-    // auto advertisement = bluez.make_le_advertisement("/potato");
-    // adapter->register_le_advertisement(advertisement);
+    adapter->register_advertisement(advertisement->path());
 
     // Sleep for a bit to allow the adapter to stop discovering.
     millisecond_delay(3000);

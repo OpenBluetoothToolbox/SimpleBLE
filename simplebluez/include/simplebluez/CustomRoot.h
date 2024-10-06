@@ -15,8 +15,8 @@ class CustomRoot : public SimpleDBus::Proxy {
     CustomRoot(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~CustomRoot() = default;
 
-    std::shared_ptr<CustomAdvertisementManager> get_custom_advertisements();
-    std::shared_ptr<CustomServiceManager> get_custom_services();
+    std::shared_ptr<CustomAdvertisementManager> get_custom_advertisement_manager();
+    std::shared_ptr<CustomServiceManager> get_custom_service_manager();
 
   private:
     std::shared_ptr<SimpleDBus::ObjectManager> object_manager();

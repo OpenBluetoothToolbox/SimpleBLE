@@ -12,7 +12,7 @@ class CustomAdvertisement : public SimpleDBus::Proxy {
     virtual ~CustomAdvertisement() = default;
 
   private:
-    std::shared_ptr<SimpleBluez::LEAdvertisement1> le_advertisement1();
+    std::shared_ptr<LEAdvertisement1> le_advertisement1();
 };
 
 }  // namespace SimpleBluez

@@ -42,10 +42,10 @@ std::shared_ptr<Agent> Bluez::get_agent() { return _bluez_root->get_agent(); }
 
 void Bluez::register_agent() { _bluez_root->register_agent(); }
 
-std::shared_ptr<CustomAdvertisementManager> Bluez::get_custom_advertisements() {
-    return _custom_root->get_custom_advertisements();
+std::shared_ptr<CustomAdvertisementManager> Bluez::get_custom_advertisement_manager() {
+    return _custom_root->get_custom_advertisement_manager();
 }
 
-std::shared_ptr<CustomServiceManager> Bluez::get_custom_services() {
-    return _custom_root->get_custom_services();
+std::shared_ptr<CustomServiceManager> Bluez::get_custom_service_manager() {
+    return _custom_root->get_custom_service_manager();
 }
