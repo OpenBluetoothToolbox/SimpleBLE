@@ -25,7 +25,10 @@ void Bluez::init() {
 
     _bluez_root = std::make_shared<BluezRoot>(_conn, "org.bluez", "/");
     _bluez_root->load_managed_objects();
+
+    _custom_root = std::make_shared<CustomRoot>(_conn, "org.simplebluez", "/custom");
 }
+
 
 void Bluez::run_async() {
     _conn->read_write_dispatch();
@@ -38,3 +41,11 @@ std::vector<std::shared_ptr<Adapter>> Bluez::get_adapters() {
 std::shared_ptr<Agent> Bluez::get_agent() { return _bluez_root->get_agent(); }
 
 void Bluez::register_agent() { _bluez_root->register_agent(); }
+
+std::shared_ptr<CustomAdvertisementManager> Bluez::get_custom_advertisements() {
+    return _custom_root->get_custom_advertisements();
+}
+
+std::shared_ptr<CustomServiceManager> Bluez::get_custom_services() {
+    return _custom_root->get_custom_services();
+}

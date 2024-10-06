@@ -27,6 +27,10 @@ std::shared_ptr<Adapter1> Adapter::adapter1() {
     return std::dynamic_pointer_cast<Adapter1>(interface_get("org.bluez.Adapter1"));
 }
 
+std::shared_ptr<LEAdvertisingManager1> Adapter::le_advertising_manager1() {
+    return std::dynamic_pointer_cast<LEAdvertisingManager1>(interface_get("org.bluez.LEAdvertisingManager1"));
+}
+
 std::string Adapter::identifier() const {
     std::size_t start = _path.find_last_of("/");
     return _path.substr(start + 1);
@@ -66,6 +70,14 @@ std::vector<std::shared_ptr<Device>> Adapter::device_paired_get() {
     }
 
     return paired_devices;
+}
+
+void Adapter::register_advertisement(const std::string& advertisement_path) {
+    le_advertising_manager1()->RegisterAdvertisement(advertisement_path);
+}
+
+void Adapter::unregister_advertisement(const std::string& advertisement_path) {
+    le_advertising_manager1()->UnregisterAdvertisement(advertisement_path);
 }
 
 void Adapter::set_on_device_updated(std::function<void(std::shared_ptr<Device> device)> callback) {

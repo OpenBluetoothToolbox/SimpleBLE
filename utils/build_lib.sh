@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # Some portions of this file where inspired from:
 #   https://medium.com/@Drew_Stokes/bash-argument-parsing-54f3b81a6a8f
 

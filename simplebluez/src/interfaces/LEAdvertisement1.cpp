@@ -2,8 +2,8 @@
 
 using namespace SimpleBluez;
 
-LEAdvertisement1::LEAdvertisement1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path)
-    : SimpleDBus::LocalInterface(conn, "org.bluez", path, "org.bluez.LEAdvertisement1") {
+LEAdvertisement1::LEAdvertisement1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* proxy)
+    : SimpleDBus::Interface(conn, proxy, "org.bluez.LEAdvertisement1") {
 
     // Set all fields to null or empty values
     SetType("peripheral"); // This is the only required field, so we set a default
@@ -69,39 +69,6 @@ void LEAdvertisement1::SetIncludeTxPower(bool include) {
 void LEAdvertisement1::Release() {
     // This method is called when the advertisement is unregistered
     // Implement any cleanup logic here
-}
-
-#include <iostream>
-
-void LEAdvertisement1::message_handle(SimpleDBus::Message& msg) {
-    std::cout << "LEAdvertisement1::message_handle: " << msg.to_string() << std::endl;
-    // if (msg.get_type() == SimpleDBus::Message::Type::METHOD_CALL) {
-    //     SimpleDBus::Message reply = SimpleDBus::Message::create_method_return(msg);
-
-    //     if (msg.get_member() == "GetAll" && msg.get_interface() == "org.freedesktop.DBus.Properties") {
-    //         SimpleDBus::Holder properties = SimpleDBus::Holder::create_dict();
-    //         for (const auto& [key, value] : _properties) {
-    //             properties.dict_append(SimpleDBus::Holder::Type::STRING, key, value);
-    //         }
-    //         reply.append_argument(properties, "a{sv}");
-    //     } else if (msg.get_member() == "Get" && msg.get_interface() == "org.freedesktop.DBus.Properties") {
-    //         std::string interface_name = msg.extract().get_string();
-    //         std::string property_name = msg.extract().get_string();
-    //         if (_properties.find(property_name) != _properties.end()) {
-    //             reply.append_argument(_properties[property_name], "v");
-    //         } else {
-    //             // Property not found, create an error reply
-    //             reply = SimpleDBus::Message::create_error(msg, "org.freedesktop.DBus.Error.UnknownProperty", "Unknown property: " + property_name);
-    //         }
-    //     } else if (msg.get_member() == "Release") {
-    //         Release();
-    //     } else {
-    //         // Unknown method, create an error reply
-    //         reply = SimpleDBus::Message::create_error(msg, "org.freedesktop.DBus.Error.UnknownMethod", "Unknown method: " + msg.get_member());
-    //     }
-
-    //     _conn->send(reply);
-    // }
 }
 
 void LEAdvertisement1::SetSolicitUUIDs(const std::vector<std::string>& uuids) {

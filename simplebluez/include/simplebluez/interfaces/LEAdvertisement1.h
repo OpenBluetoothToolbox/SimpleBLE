@@ -12,7 +12,7 @@ class LEAdvertisement1 : public SimpleDBus::Interface {
   public:
     // ----- CONSTRUCTORS -----
 
-    LEAdvertisement1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path);
+    LEAdvertisement1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* proxy);
     virtual ~LEAdvertisement1() = default;
 
     // ----- PROPERTIES -----

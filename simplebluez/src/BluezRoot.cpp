@@ -4,12 +4,6 @@
 
 using namespace SimpleBluez;
 
-#ifdef SIMPLEBLUEZ_USE_SESSION_DBUS
-#define DBUS_BUS DBUS_BUS_SESSION
-#else
-#define DBUS_BUS DBUS_BUS_SYSTEM
-#endif
-
 BluezRoot::BluezRoot(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path)
     : Proxy(conn, bus_name, path) {
 
