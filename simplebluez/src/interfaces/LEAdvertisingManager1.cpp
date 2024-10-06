@@ -2,8 +2,8 @@
 
 using namespace SimpleBluez;
 
-LEAdvertisingManager1::LEAdvertisingManager1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path)
-    : SimpleDBus::RemoteInterface(conn, "org.bluez", path, "org.bluez.LEAdvertisingManager1") {}
+LEAdvertisingManager1::LEAdvertisingManager1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* proxy)
+    : SimpleDBus::Interface(conn, proxy, "org.bluez.LEAdvertisingManager1") {}
 
 void LEAdvertisingManager1::RegisterAdvertisement(std::string advertisement_path) {
     SimpleDBus::Holder properties = SimpleDBus::Holder::create_dict();

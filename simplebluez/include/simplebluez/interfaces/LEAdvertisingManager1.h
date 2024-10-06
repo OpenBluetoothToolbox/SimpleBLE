@@ -1,12 +1,12 @@
 #pragma once
-#include <simpledbus/advanced/RemoteInterface.h>
+#include <simpledbus/advanced/Interface.h>
 #include <optional>
 #include <string>
 #include <vector>
 
 namespace SimpleBluez {
 
-class LEAdvertisingManager1 : public SimpleDBus::RemoteInterface {
+class LEAdvertisingManager1 : public SimpleDBus::Interface {
 
   public:
 
@@ -14,7 +14,7 @@ class LEAdvertisingManager1 : public SimpleDBus::RemoteInterface {
 
     // ----- CONSTRUCTORS -----
 
-    LEAdvertisingManager1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path);
+    LEAdvertisingManager1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* proxy);
     virtual ~LEAdvertisingManager1() = default;
 
     // ----- METHODS -----

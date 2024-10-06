@@ -1,7 +1,11 @@
 #pragma once
 
-#include <simplebluez/BluezRoot.h>
 #include <simpledbus/base/Connection.h>
+#include <simplebluez/BluezRoot.h>
+#include <simplebluez/CustomRoot.h>
+#include <simplebluez/CustomAdvertisementManager.h>
+#include <simplebluez/Adapter.h>
+#include <simplebluez/Agent.h>
 
 namespace SimpleBluez {
 
@@ -29,6 +33,8 @@ class Bluez {
     std::shared_ptr<Agent> get_agent();
     void register_agent();
 
+    std::shared_ptr<CustomAdvertisementManager> get_custom_advertisements();
+    std::shared_ptr<CustomServiceManager> get_custom_services();
   private:
 
     Bluez();
@@ -36,6 +42,8 @@ class Bluez {
 
     std::shared_ptr<SimpleDBus::Connection> _conn;
     std::shared_ptr<SimpleBluez::BluezRoot> _bluez_root;
+    std::shared_ptr<SimpleBluez::CustomRoot> _custom_root;
+
 };
 
 }  // namespace SimpleBluez
