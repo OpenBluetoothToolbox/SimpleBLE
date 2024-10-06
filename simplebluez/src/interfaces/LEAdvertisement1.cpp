@@ -8,7 +8,10 @@ LEAdvertisement1::LEAdvertisement1(std::shared_ptr<SimpleDBus::Connection> conn,
     // Set all fields to null or empty values
     SetType("peripheral"); // This is the only required field, so we set a default
     // SetServiceUUIDs({}); // Empty vector
-    // SetManufacturerData({}); // Empty map
+
+    std::map<uint16_t, std::vector<uint8_t>> data;
+    data[0x1024] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
+    SetManufacturerData(data); // Empty map
     // SetServiceData({}); // Empty map
     // SetSolicitUUIDs({}); // Empty vector
     // SetData({}); // Empty map

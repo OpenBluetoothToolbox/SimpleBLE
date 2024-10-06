@@ -79,6 +79,7 @@ void Adapter::register_advertisement(const std::string& advertisement_path) {
 }
 
 void Adapter::unregister_advertisement(const std::string& advertisement_path) {
+    // TODO: We should keep track of all registered advertisements and unregister them when the adapter is destroyed.
     le_advertising_manager1()->UnregisterAdvertisement(advertisement_path);
 }
 
