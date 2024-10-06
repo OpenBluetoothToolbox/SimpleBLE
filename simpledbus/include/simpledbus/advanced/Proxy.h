@@ -69,7 +69,7 @@ class Proxy : public std::enable_shared_from_this<Proxy> {
     // ----- MANUAL CHILD HANDLING -----
     // ! This function is used to manually add children to the proxy.
     void path_append_child(const std::string& path, std::shared_ptr<Proxy> child);
-
+    void path_remove_child(const std::string& path);
     // ----- MESSAGE HANDLING -----
     void message_handle(Message& msg);
 

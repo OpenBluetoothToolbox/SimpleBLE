@@ -294,6 +294,19 @@ void Proxy::path_append_child(const std::string& path, std::shared_ptr<Proxy> ch
     _children.emplace(std::make_pair(path, child));
 }
 
+void Proxy::path_remove_child(const std::string& path) {
+    // ! This function is used to manually add children to the proxy.
+
+    // If the provided path is not a child of the current path, return silently.
+    if (!Path::is_child(_path, path)) {
+        // TODO: Should an exception be thrown here?
+        return;
+    }
+
+    std::scoped_lock lock(_child_access_mutex);
+    _children.erase(path);
+}
+
 // ----- MESSAGE HANDLING -----
 
 void Proxy::message_handle(Message& msg) {

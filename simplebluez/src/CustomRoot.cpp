@@ -25,10 +25,10 @@ std::shared_ptr<SimpleDBus::ObjectManager> CustomRoot::object_manager() {
     return std::dynamic_pointer_cast<SimpleDBus::ObjectManager>(interface_get("org.freedesktop.DBus.ObjectManager"));
 }
 
-std::shared_ptr<CustomAdvertisementManager> CustomRoot::get_custom_advertisements() {
+std::shared_ptr<CustomAdvertisementManager> CustomRoot::get_custom_advertisement_manager() {
     return _custom_advertisements;
 }
 
-std::shared_ptr<CustomServiceManager> CustomRoot::get_custom_services() {
+std::shared_ptr<CustomServiceManager> CustomRoot::get_custom_service_manager() {
     return _custom_services;
 }

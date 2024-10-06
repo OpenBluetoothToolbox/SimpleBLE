@@ -41,7 +41,7 @@ class LEAdvertisement1 : public SimpleDBus::Interface {
     void Release();
 
   protected:
-    void message_handle(SimpleDBus::Message& msg) override;
+
 
   private:
 };
