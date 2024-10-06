@@ -19,7 +19,7 @@ class CustomAdvertisementManager : public SimpleDBus::Proxy {
     void remove_advertisement(const std::string& path);
 
   private:
-    std::shared_ptr<SimpleDBus::ObjectManager> object_manager();
+
 };
 
 }  // namespace SimpleBluez
