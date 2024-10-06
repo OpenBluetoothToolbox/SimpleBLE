@@ -48,6 +48,12 @@ int main(int argc, char* argv[]) {
     auto advertisement_manager = bluez->get_custom_advertisement_manager();
     auto advertisement = advertisement_manager->create_advertisement("potato");
 
+    std::map<uint16_t, std::vector<uint8_t>> data;
+    data[0x1024] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
+    advertisement->manufacturer_data(data);
+    advertisement->timeout(180);
+    advertisement->local_name("SimpleBluez");
+
     adapter->register_advertisement(advertisement->path());
 
     // Sleep for a bit to allow the adapter to stop discovering.
