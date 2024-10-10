@@ -60,11 +60,15 @@ set(SIMPLEBLUEZ_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomAdvertisementManager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomServiceManager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomRoot.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomService.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomCharacteristic.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomDescriptor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Adapter1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Agent1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattDescriptor1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattCharacteristic1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattService1.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattManager1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Device1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Battery1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/AgentManager1.cpp

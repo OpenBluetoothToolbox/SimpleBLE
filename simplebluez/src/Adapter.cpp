@@ -20,6 +20,8 @@ std::shared_ptr<SimpleDBus::Interface> Adapter::interfaces_create(const std::str
         return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Adapter1>(_conn, this));
     } else if (interface_name == "org.bluez.LEAdvertisingManager1") {
         return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<LEAdvertisingManager1>(_conn, this));
+    } else if (interface_name == "org.bluez.GattManager1") {
+        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<GattManager1>(_conn, this));
     }
 
     return std::make_shared<SimpleDBus::Interface>(_conn, this, interface_name);
@@ -31,6 +33,10 @@ std::shared_ptr<Adapter1> Adapter::adapter1() {
 
 std::shared_ptr<LEAdvertisingManager1> Adapter::le_advertising_manager1() {
     return std::dynamic_pointer_cast<LEAdvertisingManager1>(interface_get("org.bluez.LEAdvertisingManager1"));
+}
+
+std::shared_ptr<GattManager1> Adapter::gatt_manager1() {
+    return std::dynamic_pointer_cast<GattManager1>(interface_get("org.bluez.GattManager1"));
 }
 
 std::string Adapter::identifier() const {
@@ -81,6 +87,14 @@ void Adapter::register_advertisement(const std::string& advertisement_path) {
 void Adapter::unregister_advertisement(const std::string& advertisement_path) {
     // TODO: We should keep track of all registered advertisements and unregister them when the adapter is destroyed.
     le_advertising_manager1()->UnregisterAdvertisement(advertisement_path);
+}
+
+void Adapter::register_application(const std::string& application_path) {
+    gatt_manager1()->RegisterApplication(application_path);
+}
+
+void Adapter::unregister_application(const std::string& application_path) {
+    gatt_manager1()->UnregisterApplication(application_path);
 }
 
 void Adapter::set_on_device_updated(std::function<void(std::shared_ptr<Device> device)> callback) {
