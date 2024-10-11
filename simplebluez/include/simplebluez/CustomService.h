@@ -12,16 +12,17 @@ class CustomService : public SimpleDBus::Proxy {
     CustomService(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~CustomService() = default;
 
-    std::shared_ptr<CustomCharacteristic> get_characteristic(const std::string& uuid);
+    std::shared_ptr<CustomCharacteristic> create_characteristic();
+    void remove_characteristic(const std::string& path);
 
     // ----- PROPERTIES -----
-    std::vector<std::shared_ptr<CustomCharacteristic>> characteristics();
-
     std::string uuid();
+    void uuid(const std::string& uuid);
+
+    bool primary();
+    void primary(bool primary);
 
   private:
-    std::shared_ptr<SimpleDBus::Proxy> path_create(const std::string& path) override;
-    std::shared_ptr<SimpleDBus::Interface> interfaces_create(const std::string& interface_name) override;
 
     std::shared_ptr<GattService1> gattservice1();
 };

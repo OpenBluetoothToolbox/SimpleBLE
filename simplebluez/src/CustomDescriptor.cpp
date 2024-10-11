@@ -3,18 +3,12 @@
 using namespace SimpleBluez;
 
 CustomDescriptor::CustomDescriptor(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name,
-                       const std::string& path)
-    : Proxy(conn, bus_name, path) {}
+                                   const std::string& path)
+    : Proxy(conn, bus_name, path) {
+    _interfaces.emplace(std::make_pair("org.bluez.GattDescriptor1", std::make_shared<GattDescriptor1>(conn, this)));
+}
 
 CustomDescriptor::~CustomDescriptor() {}
-
-std::shared_ptr<SimpleDBus::Interface> CustomDescriptor::interfaces_create(const std::string& interface_name) {
-    if (interface_name == "org.bluez.GattDescriptor1") {
-        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<GattDescriptor1>(_conn, this));
-    }
-
-    return std::make_shared<SimpleDBus::Interface>(_conn, this, interface_name);
-}
 
 std::shared_ptr<GattDescriptor1> CustomDescriptor::gattdescriptor1() {
     return std::dynamic_pointer_cast<GattDescriptor1>(interface_get("org.bluez.GattDescriptor1"));

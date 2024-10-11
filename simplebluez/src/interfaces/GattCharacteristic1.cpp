@@ -56,6 +56,22 @@ std::string GattCharacteristic1::UUID() {
     return _uuid;
 }
 
+void GattCharacteristic1::UUID(const std::string& uuid) {
+    std::scoped_lock lock(_property_update_mutex);
+    _properties["UUID"] = SimpleDBus::Holder::create_string(uuid);
+    _uuid = uuid;
+}
+
+std::string GattCharacteristic1::Service() {
+    std::scoped_lock lock(_property_update_mutex);
+    return _properties["Service"].get_string();
+}
+
+void GattCharacteristic1::Service(const std::string& service) {
+    std::scoped_lock lock(_property_update_mutex);
+    _properties["Service"] = SimpleDBus::Holder::create_object_path(service);
+}
+
 ByteArray GattCharacteristic1::Value() {
     std::scoped_lock lock(_property_update_mutex);
     return _value;
@@ -72,9 +88,23 @@ std::vector<std::string> GattCharacteristic1::Flags() {
     return flags;
 }
 
+void GattCharacteristic1::Flags(const std::vector<std::string>& flags) {
+    std::scoped_lock lock(_property_update_mutex);
+    SimpleDBus::Holder flags_array = SimpleDBus::Holder::create_array();
+    for (const std::string& flag : flags) {
+        flags_array.array_append(SimpleDBus::Holder::create_string(flag));
+    }
+    _properties["Flags"] = flags_array;
+}
+
 uint16_t GattCharacteristic1::MTU() {
     std::scoped_lock lock(_property_update_mutex);
     return _properties["MTU"].get_uint16();
+}
+
+void GattCharacteristic1::MTU(uint16_t mtu) {
+    std::scoped_lock lock(_property_update_mutex);
+    _properties["MTU"] = SimpleDBus::Holder::create_uint16(mtu);
 }
 
 bool GattCharacteristic1::Notifying(bool refresh) {
