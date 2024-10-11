@@ -24,10 +24,19 @@ class GattCharacteristic1 : public SimpleDBus::Interface {
 
     // ----- PROPERTIES -----
     std::string UUID();
+    void UUID(const std::string& uuid);
+
+    std::string Service();
+    void Service(const std::string& service);
+
     ByteArray Value();
     bool Notifying(bool refresh = true);
+
     std::vector<std::string> Flags();
+    void Flags(const std::vector<std::string>& flags);
+
     uint16_t MTU();
+    void MTU(uint16_t mtu);
 
     // ----- CALLBACKS -----
     kvn::safe_callback<void()> OnValueChanged;

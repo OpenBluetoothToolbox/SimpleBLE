@@ -5,37 +5,34 @@
 using namespace SimpleBluez;
 
 CustomService::CustomService(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path)
-    : Proxy(conn, bus_name, path) {}
+    : Proxy(conn, bus_name, path) {
 
-std::shared_ptr<SimpleDBus::Proxy> CustomService::path_create(const std::string& path) {
-    auto child = std::make_shared<CustomCharacteristic>(_conn, _bus_name, path);
-    return std::static_pointer_cast<SimpleDBus::Proxy>(child);
+    _interfaces.emplace(std::make_pair("org.bluez.GattService1", std::make_shared<GattService1>(conn, this)));
 }
 
-std::shared_ptr<SimpleDBus::Interface> CustomService::interfaces_create(const std::string& interface_name) {
-    if (interface_name == "org.bluez.GattService1") {
-        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<GattService1>(_conn, this));
-    }
+std::shared_ptr<CustomCharacteristic> CustomService::create_characteristic() {
+    const std::string characteristic_path = _path + "/characteristic" + std::to_string(_children.size());
+    auto characteristic = std::make_shared<CustomCharacteristic>(_conn, _bus_name, characteristic_path);
+    path_append_child(characteristic_path, std::static_pointer_cast<SimpleDBus::Proxy>(characteristic));
 
-    return std::make_shared<SimpleDBus::Interface>(_conn, this, interface_name);
+    characteristic->service(this->path());
+
+    return characteristic;
+}
+
+void CustomService::remove_characteristic(const std::string& path) {
+    const std::string characteristic_path = _path + "/" + path;
+    path_remove_child(characteristic_path);
 }
 
 std::shared_ptr<GattService1> CustomService::gattservice1() {
     return std::dynamic_pointer_cast<GattService1>(interface_get("org.bluez.GattService1"));
 }
 
-std::vector<std::shared_ptr<CustomCharacteristic>> CustomService::characteristics() { return children_casted<CustomCharacteristic>(); }
-
-std::shared_ptr<CustomCharacteristic> CustomService::get_characteristic(const std::string& uuid) {
-    auto characteristics_all = characteristics();
-
-    for (auto& characteristic : characteristics_all) {
-        if (characteristic->uuid() == uuid) {
-            return characteristic;
-        }
-    }
-
-    throw Exception::CharacteristicNotFoundException(uuid);
-}
-
 std::string CustomService::uuid() { return gattservice1()->UUID(); }
+
+void CustomService::uuid(const std::string& uuid) { gattservice1()->UUID(uuid); }
+
+bool CustomService::primary() { return gattservice1()->Primary(); }
+
+void CustomService::primary(bool primary) { gattservice1()->Primary(primary); }

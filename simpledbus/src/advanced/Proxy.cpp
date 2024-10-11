@@ -309,9 +309,14 @@ void Proxy::path_remove_child(const std::string& path) {
 
 // ----- MESSAGE HANDLING -----
 
+#include <iostream>
+
 void Proxy::message_handle(Message& msg) {
+    bool handled = false;
+
    if (interface_exists(msg.get_interface())) {
         interface_get(msg.get_interface())->message_handle(msg);
+        handled = true;
     }
 
     if (msg.get_type() == Message::Type::SIGNAL) {
@@ -319,5 +324,9 @@ void Proxy::message_handle(Message& msg) {
         if (parent != nullptr) {
             parent->on_child_signal_received(_path);
         }
+    }
+
+    if (!handled) {
+        std::cout << "Unhandled message: " << msg.to_string() << std::endl;
     }
 }
