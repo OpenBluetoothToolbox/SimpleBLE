@@ -593,30 +593,9 @@ Message Message::create_error(const Message& msg, const std::string& error_name,
     return Message::from_acquired(msg_error);
 }
 
-Message Message::create_signal(const std::string& path, const std::string& interface, const std::string& signal) {
+Message Message::create_signal(std::string path, std::string interface, std::string signal) {
     DBusMessage* msg_signal = dbus_message_new_signal(path.c_str(), interface.c_str(), signal.c_str());
-    return Message::from_acquired(msg_signal);
-}
-
-void Message::_invalidate() {
-    _unique_id = INVALID_UNIQUE_ID;
-    _msg = nullptr;
-    _iter_initialized = false;
-    _is_extracted = false;
-    _extracted = Holder();
-
-#ifdef DBUS_MESSAGE_ITER_INIT_CLOSED
-    _iter = DBUS_MESSAGE_ITER_INIT_CLOSED;
-#else
-    // For older versions of DBus, DBUS_MESSAGE_ITER_INIT_CLOSED is not defined.
-    _iter = DBusMessageIter();
-#endif
-    _arguments.clear();
-}
-
-void Message::_safe_delete() {
-    if (is_valid()) {
-        dbus_message_unref(this->_msg);
-        _invalidate();
-    }
+    Message message(msg_signal);
+    dbus_message_unref(msg_signal);
+    return message;
 }

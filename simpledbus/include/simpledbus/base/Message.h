@@ -57,7 +57,7 @@ class Message {
     static Message create_error(const Message& msg, const std::string& error_name, const std::string& error_message);
     static Message create_signal(const std::string& path, const std::string& interface, const std::string& signal);
 
-  private:
+   private:
     static std::atomic_int32_t _creation_counter;
 
     int _indent = 0;

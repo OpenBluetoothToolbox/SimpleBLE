@@ -35,6 +35,8 @@ class CustomCharacteristic : public SimpleDBus::Proxy {
     void service(const std::string& service);
 
     ByteArray value();
+    void value(const ByteArray& value);
+
     bool notifying();
     std::vector<std::string> flags();
     void flags(const std::vector<std::string>& flags);
