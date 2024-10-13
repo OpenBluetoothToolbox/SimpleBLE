@@ -2,6 +2,8 @@
 #include <simplebluez/CustomDescriptor.h>
 #include <simplebluez/Exceptions.h>
 
+#include <simpledbus/interfaces/Properties.h>
+
 using namespace SimpleBluez;
 
 CustomCharacteristic::CustomCharacteristic(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name,
@@ -40,6 +42,20 @@ std::string CustomCharacteristic::service() { return gattcharacteristic1()->Serv
 void CustomCharacteristic::service(const std::string& service) { gattcharacteristic1()->Service(service); }
 
 ByteArray CustomCharacteristic::value() { return gattcharacteristic1()->Value(); }
+
+void CustomCharacteristic::value(const ByteArray& value) {
+    gattcharacteristic1()->Value(value);
+    SimpleDBus::Holder value_h = SimpleDBus::Holder::create_array();
+    for (uint8_t byte : value) {
+        value_h.array_append(SimpleDBus::Holder::create_byte(byte));
+    }
+
+    std::map<std::string, SimpleDBus::Holder> changed_properties;
+    changed_properties["Value"] = value_h;
+
+    std::shared_ptr<SimpleDBus::Properties> properties = std::dynamic_pointer_cast<SimpleDBus::Properties>(interface_get("org.freedesktop.DBus.Properties"));
+    properties->PropertiesChanged("org.bluez.GattCharacteristic1", changed_properties);
+ }
 
 std::vector<std::string> CustomCharacteristic::flags() { return gattcharacteristic1()->Flags(); }
 

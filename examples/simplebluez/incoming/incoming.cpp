@@ -54,8 +54,10 @@ int main(int argc, char* argv[]) {
     auto characteristic = service->create_characteristic();
     characteristic->uuid("12345678-AAAA-5678-1234-567812345678");
     characteristic->flags({"read", "notify", "write"});
+    characteristic->value({0x42, 0x69, 0x74});
 
     adapter->register_application(service_manager->path());
+    millisecond_delay(1000);
 
     auto advertisement_manager = bluez->get_custom_advertisement_manager();
     auto advertisement = advertisement_manager->create_advertisement("potato");
@@ -69,7 +71,12 @@ int main(int argc, char* argv[]) {
     adapter->register_advertisement(advertisement->path());
 
     // Sleep for a bit to allow the adapter to stop discovering.
-    millisecond_delay(15000);
+    uint8_t value = 0;
+    for (uint8_t i = 0; i < 30; i++) {
+        millisecond_delay(1000);
+        value += i;
+        characteristic->value({value});
+    }
 
     adapter->unregister_advertisement(advertisement->path());
     adapter->unregister_application(service_manager->path());

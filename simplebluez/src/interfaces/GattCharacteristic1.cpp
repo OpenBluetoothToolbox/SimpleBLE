@@ -77,6 +77,19 @@ ByteArray GattCharacteristic1::Value() {
     return _value;
 }
 
+void GattCharacteristic1::Value(const ByteArray& value) {
+    SimpleDBus::Holder value_array = SimpleDBus::Holder::create_array();
+    for (size_t i = 0; i < value.size(); i++) {
+        value_array.array_append(SimpleDBus::Holder::create_byte(value[i]));
+    }
+
+    {
+        std::scoped_lock lock(_property_update_mutex);
+        _properties["Value"] = value_array;
+        _value = value;
+    }
+}
+
 std::vector<std::string> GattCharacteristic1::Flags() {
     std::scoped_lock lock(_property_update_mutex);
 

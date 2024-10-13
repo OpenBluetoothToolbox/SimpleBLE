@@ -628,3 +628,10 @@ Message Message::create_error(const Message& msg, std::string error_name, std::s
     dbus_message_unref(msg_error);
     return message;
 }
+
+Message Message::create_signal(std::string path, std::string interface, std::string signal) {
+    DBusMessage* msg_signal = dbus_message_new_signal(path.c_str(), interface.c_str(), signal.c_str());
+    Message message(msg_signal);
+    dbus_message_unref(msg_signal);
+    return message;
+}

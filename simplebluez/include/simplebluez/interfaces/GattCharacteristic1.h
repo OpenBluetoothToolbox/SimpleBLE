@@ -30,6 +30,8 @@ class GattCharacteristic1 : public SimpleDBus::Interface {
     void Service(const std::string& service);
 
     ByteArray Value();
+    void Value(const ByteArray& value);
+
     bool Notifying(bool refresh = true);
 
     std::vector<std::string> Flags();

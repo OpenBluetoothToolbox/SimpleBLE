@@ -61,6 +61,8 @@ class Message {
 
     static Message create_error(const Message& msg, std::string error_name, std::string error_message);
 
+    static Message create_signal(std::string path, std::string interface, std::string signal);
+
   private:
     friend class Connection;
 
