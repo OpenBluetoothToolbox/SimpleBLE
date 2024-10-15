@@ -230,7 +230,12 @@ bool LEAdvertisement1::IncludeTxPower() {
     return _properties["IncludeTxPower"].get_boolean();
 }
 
-void LEAdvertisement1::Release() {
-    // This method is called when the advertisement is unregistered
-    // Implement any cleanup logic here
+void LEAdvertisement1::message_handle(SimpleDBus::Message& msg) {
+    if (msg.is_method_call(_interface_name, "Release")) {
+        OnRelease();
+
+        SimpleDBus::Message reply = SimpleDBus::Message::create_method_return(msg);
+        _conn->send(reply);
+
+    }
 }

@@ -80,13 +80,16 @@ std::vector<std::shared_ptr<Device>> Adapter::device_paired_get() {
     return paired_devices;
 }
 
-void Adapter::register_advertisement(const std::string& advertisement_path) {
-    le_advertising_manager1()->RegisterAdvertisement(advertisement_path);
+void Adapter::register_advertisement(const std::shared_ptr<CustomAdvertisement>& advertisement) {
+    le_advertising_manager1()->RegisterAdvertisement(advertisement->path());
+    advertisement->activate();
 }
 
-void Adapter::unregister_advertisement(const std::string& advertisement_path) {
-    // TODO: We should keep track of all registered advertisements and unregister them when the adapter is destroyed.
-    le_advertising_manager1()->UnregisterAdvertisement(advertisement_path);
+void Adapter::unregister_advertisement(const std::shared_ptr<CustomAdvertisement>& advertisement) {
+    if (advertisement->active()) {
+        le_advertising_manager1()->UnregisterAdvertisement(advertisement->path());
+        advertisement->deactivate();
+    }
 }
 
 void Adapter::register_application(const std::string& application_path) {

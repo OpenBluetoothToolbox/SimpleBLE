@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <simpledbus/advanced/Proxy.h>
 
 #include <simplebluez/interfaces/LEAdvertisement1.h>
@@ -12,6 +13,10 @@ class CustomAdvertisement : public SimpleDBus::Proxy {
 
     CustomAdvertisement(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path);
     virtual ~CustomAdvertisement() = default;
+
+    bool active();
+    void activate();
+    void deactivate();
 
     std::string adv_type();
     void adv_type(const std::string& type);
@@ -68,6 +73,8 @@ class CustomAdvertisement : public SimpleDBus::Proxy {
     void include_tx_power(bool include);
 
   private:
+    std::atomic_bool _active;
+
     std::shared_ptr<LEAdvertisement1> le_advertisement1();
     std::shared_ptr<SimpleDBus::ObjectManager> object_manager();
 };

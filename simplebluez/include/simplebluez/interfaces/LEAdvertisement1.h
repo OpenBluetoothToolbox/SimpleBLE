@@ -1,5 +1,7 @@
 #pragma once
 #include <simpledbus/advanced/Interface.h>
+#include <simpledbus/external/kvn_safe_callback.hpp>
+
 #include <cstdint>
 #include <map>
 #include <optional>
@@ -14,6 +16,8 @@ class LEAdvertisement1 : public SimpleDBus::Interface {
 
     LEAdvertisement1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* proxy);
     virtual ~LEAdvertisement1() = default;
+
+    kvn::safe_callback<void()> OnRelease;
 
     // ----- PROPERTIES -----
 
@@ -70,9 +74,8 @@ class LEAdvertisement1 : public SimpleDBus::Interface {
 
     bool IncludeTxPower();
     void IncludeTxPower(bool include);
-    // ----- METHODS -----
 
-    void Release();
+    void message_handle(SimpleDBus::Message& msg) override;
 
   protected:
   private:

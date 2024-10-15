@@ -3,6 +3,7 @@
 #include <simpledbus/advanced/Proxy.h>
 
 #include <simplebluez/Device.h>
+#include <simplebluez/CustomAdvertisement.h>
 #include <simplebluez/interfaces/Adapter1.h>
 #include <simplebluez/interfaces/LEAdvertisingManager1.h>
 #include <simplebluez/interfaces/GattManager1.h>
@@ -35,8 +36,8 @@ class Adapter : public SimpleDBus::Proxy {
     void set_on_device_updated(std::function<void(std::shared_ptr<Device> device)> callback);
     void clear_on_device_updated();
 
-    void register_advertisement(const std::string& advertisement_path);
-    void unregister_advertisement(const std::string& advertisement_path);
+    void register_advertisement(const std::shared_ptr<CustomAdvertisement>& advertisement);
+    void unregister_advertisement(const std::shared_ptr<CustomAdvertisement>& advertisement);
 
     void register_application(const std::string& application_path);
     void unregister_application(const std::string& application_path);
