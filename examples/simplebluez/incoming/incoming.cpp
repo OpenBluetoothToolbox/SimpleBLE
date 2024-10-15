@@ -37,8 +37,21 @@ int main(int argc, char* argv[]) {
     auto advertisement_manager = bluez->get_custom_advertisement_manager();
 
     // --- ADAPTER SETUP ---
+    std::map<std::string, std::shared_ptr<SimpleBluez::Device>> peripherals;
+    adapter->set_on_device_updated([&peripherals](std::shared_ptr<SimpleBluez::Device> device) {
+        const bool device_connected = device->connected();
+        const bool is_new_device = peripherals.find(device->address()) == peripherals.end();
 
-    // TODO: Set up all relevant adapter properties and callbacks.
+        if (device_connected && is_new_device) {
+            peripherals[device->address()] = device;
+            std::cout << "New peripheral: " << device->name() << " [" << device->address() << "]" << std::endl;
+
+            // NOTE: This moment can also be used to deregister the advertisement if only one connection is needed.
+        } else if (!device_connected && !is_new_device) {
+            peripherals.erase(device->address());
+            std::cout << "Lost peripheral: " << device->name() << " [" << device->address() << "]" << std::endl;
+        }
+    });
 
     // --- SERVICE DEFINITION ---
     auto service0 = service_manager->create_service();
@@ -93,7 +106,10 @@ int main(int argc, char* argv[]) {
 
     // --- CLEANUP ---
 
-    // TODO: This section should also handle any lingering device connections.
+    for (auto& peripheral : peripherals) {
+        std::cout << "Disconnecting from " << peripheral.second->name() << " [" << peripheral.second->address() << "]" << std::endl;
+        peripheral.second->disconnect();
+    }
 
     adapter->unregister_advertisement(advertisement->path());
     adapter->unregister_application(service_manager->path());
