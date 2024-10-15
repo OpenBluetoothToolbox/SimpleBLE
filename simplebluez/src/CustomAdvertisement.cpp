@@ -8,6 +8,10 @@ CustomAdvertisement::CustomAdvertisement(std::shared_ptr<SimpleDBus::Connection>
 
     _interfaces.emplace(std::make_pair("org.bluez.LEAdvertisement1", std::make_shared<LEAdvertisement1>(conn, this)));
     _interfaces.emplace(std::make_pair("org.freedesktop.DBus.ObjectManager", std::make_shared<SimpleDBus::ObjectManager>(conn, this)));
+
+    le_advertisement1()->OnRelease.load([this]() {
+        _active.store(false);
+    });
 }
 
 std::shared_ptr<LEAdvertisement1> CustomAdvertisement::le_advertisement1() {
@@ -17,6 +21,19 @@ std::shared_ptr<LEAdvertisement1> CustomAdvertisement::le_advertisement1() {
 std::shared_ptr<SimpleDBus::ObjectManager> CustomAdvertisement::object_manager() {
     return std::dynamic_pointer_cast<SimpleDBus::ObjectManager>(interface_get("org.freedesktop.DBus.ObjectManager"));
 }
+
+bool CustomAdvertisement::active() {
+    return _active.load();
+}
+
+void CustomAdvertisement::activate() {
+    _active.store(true);
+}
+
+void CustomAdvertisement::deactivate() {
+    _active.store(false);
+}
+
 
 std::string CustomAdvertisement::adv_type() {
     return le_advertisement1()->Type();

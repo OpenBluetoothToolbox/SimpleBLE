@@ -78,20 +78,16 @@ int main(int argc, char* argv[]) {
     std::map<uint16_t, std::vector<uint8_t>> data;
     data[0x1024] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
     advertisement->manufacturer_data(data);
-    advertisement->timeout(180);
+    advertisement->timeout(5);
     advertisement->local_name("SimpleBluez");
 
     // --- MAIN EVENT LOOP ---
-
-    // NOTE: Right now we're registering the advertisement prior to entering the main loop,
-    // but will be better handled if we figure out a way of knowing if the advertisement is
-    // still active or not.
-
-    adapter->register_advertisement(advertisement->path());
-    std::cout << "Advertising on " << adapter->identifier() << " [" << adapter->address() << "]" << std::endl;
-
     while (app_running) {
-        // TODO: Handle advertising state.
+        // Handle advertising state.
+        if (!advertisement->active()) {
+            adapter->register_advertisement(advertisement);
+            std::cout << "Advertising on " << adapter->identifier() << " [" << adapter->address() << "]" << std::endl;
+        }
 
         // TODO: Handle connection events.
 
@@ -111,7 +107,7 @@ int main(int argc, char* argv[]) {
         peripheral.second->disconnect();
     }
 
-    adapter->unregister_advertisement(advertisement->path());
+    adapter->unregister_advertisement(advertisement);
     adapter->unregister_application(service_manager->path());
 
     async_thread_active = false;

@@ -54,12 +54,12 @@ int main(int argc, char* argv[]) {
     advertisement->timeout(180);
     advertisement->local_name("SimpleBluez");
 
-    adapter->register_advertisement(advertisement->path());
+    adapter->register_advertisement(advertisement);
 
     // Sleep for a bit to allow the adapter to stop discovering.
     millisecond_delay(8000);
 
-    adapter->unregister_advertisement(advertisement->path());
+    adapter->unregister_advertisement(advertisement);
 
     async_thread_active = false;
     while (!async_thread->joinable()) {
