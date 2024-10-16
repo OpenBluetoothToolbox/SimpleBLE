@@ -11,7 +11,7 @@ CustomCharacteristic::CustomCharacteristic(std::shared_ptr<SimpleDBus::Connectio
     : Proxy(conn, bus_name, path) {
 
     _interfaces.emplace(std::make_pair("org.bluez.GattCharacteristic1", std::make_shared<GattCharacteristic1>(conn, this)));
-    }
+}
 
 CustomCharacteristic::~CustomCharacteristic() {}
 
@@ -31,8 +31,6 @@ std::shared_ptr<GattCharacteristic1> CustomCharacteristic::gattcharacteristic1()
     return std::dynamic_pointer_cast<GattCharacteristic1>(interface_get("org.bluez.GattCharacteristic1"));
 }
 
-bool CustomCharacteristic::notifying() { return gattcharacteristic1()->Notifying(); }
-
 std::string CustomCharacteristic::uuid() { return gattcharacteristic1()->UUID(); }
 
 void CustomCharacteristic::uuid(const std::string& uuid) { gattcharacteristic1()->UUID(uuid); }
@@ -43,19 +41,9 @@ void CustomCharacteristic::service(const std::string& service) { gattcharacteris
 
 ByteArray CustomCharacteristic::value() { return gattcharacteristic1()->Value(); }
 
-void CustomCharacteristic::value(const ByteArray& value) {
-    gattcharacteristic1()->Value(value);
-    SimpleDBus::Holder value_h = SimpleDBus::Holder::create_array();
-    for (uint8_t byte : value) {
-        value_h.array_append(SimpleDBus::Holder::create_byte(byte));
-    }
+void CustomCharacteristic::value(const ByteArray& value) { gattcharacteristic1()->Value(value); }
 
-    std::map<std::string, SimpleDBus::Holder> changed_properties;
-    changed_properties["Value"] = value_h;
-
-    std::shared_ptr<SimpleDBus::Properties> properties = std::dynamic_pointer_cast<SimpleDBus::Properties>(interface_get("org.freedesktop.DBus.Properties"));
-    properties->PropertiesChanged("org.bluez.GattCharacteristic1", changed_properties);
- }
+bool CustomCharacteristic::notifying() { return gattcharacteristic1()->Notifying(false); }
 
 std::vector<std::string> CustomCharacteristic::flags() { return gattcharacteristic1()->Flags(); }
 
@@ -65,22 +53,24 @@ uint16_t CustomCharacteristic::mtu() { return gattcharacteristic1()->MTU(); }
 
 void CustomCharacteristic::mtu(uint16_t mtu) { gattcharacteristic1()->MTU(mtu); }
 
-ByteArray CustomCharacteristic::read() { return gattcharacteristic1()->ReadValue(); }
-
-void CustomCharacteristic::write_request(ByteArray value) {
-    gattcharacteristic1()->WriteValue(value, GattCharacteristic1::WriteType::REQUEST);
+void CustomCharacteristic::set_on_read_value(std::function<void()> callback) {
+    gattcharacteristic1()->OnReadValue.load([this, callback]() { callback(); });
 }
 
-void CustomCharacteristic::write_command(ByteArray value) {
-    gattcharacteristic1()->WriteValue(value, GattCharacteristic1::WriteType::COMMAND);
+void CustomCharacteristic::clear_on_read_value() { gattcharacteristic1()->OnReadValue.unload(); }
+
+void CustomCharacteristic::set_on_write_value(std::function<void(ByteArray value)> callback) {
+    gattcharacteristic1()->OnWriteValue.load([this, callback](const ByteArray& value) { callback(value); });
 }
 
-void CustomCharacteristic::start_notify() { gattcharacteristic1()->StartNotify(); }
+void CustomCharacteristic::clear_on_write_value() { gattcharacteristic1()->OnWriteValue.unload(); }
 
-void CustomCharacteristic::stop_notify() { gattcharacteristic1()->StopNotify(); }
-
-void CustomCharacteristic::set_on_value_changed(std::function<void(ByteArray new_value)> callback) {
-    gattcharacteristic1()->OnValueChanged.load([this, callback]() { callback(gattcharacteristic1()->Value()); });
+void CustomCharacteristic::set_on_notify(std::function<void(bool)> callback) {
+    gattcharacteristic1()->OnStartNotify.load([this, callback]() { callback(true); });
+    gattcharacteristic1()->OnStopNotify.load([this, callback]() { callback(false); });
 }
 
-void CustomCharacteristic::clear_on_value_changed() { gattcharacteristic1()->OnValueChanged.unload(); }
+void CustomCharacteristic::clear_on_notify() {
+    gattcharacteristic1()->OnStartNotify.unload();
+    gattcharacteristic1()->OnStopNotify.unload();
+}

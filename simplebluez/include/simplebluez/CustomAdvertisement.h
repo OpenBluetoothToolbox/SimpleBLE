@@ -73,7 +73,7 @@ class CustomAdvertisement : public SimpleDBus::Proxy {
     void include_tx_power(bool include);
 
   private:
-    std::atomic_bool _active;
+    std::atomic_bool _active = false;
 
     std::shared_ptr<LEAdvertisement1> le_advertisement1();
     std::shared_ptr<SimpleDBus::ObjectManager> object_manager();
