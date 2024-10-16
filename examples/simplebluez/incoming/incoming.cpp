@@ -64,6 +64,18 @@ int main(int argc, char* argv[]) {
     // NOTE: Setting an initial value is not required, as this value doesn't get sent
     // to the central until it attempts to read or notify.
 
+    characteristic0->set_on_read_value([characteristic0]() {
+        std::cout << "ReadValue called" << std::endl;
+    });
+
+    characteristic0->set_on_write_value([characteristic0](const SimpleBluez::ByteArray& value) {
+        std::cout << "WriteValue called with value: " << value.toHex() << std::endl;
+    });
+
+    characteristic0->set_on_notify([characteristic0](bool notify) {
+        std::cout << "Notify called with notify: " << notify << std::endl;
+    });
+
     // Register the services and characteristics.
     adapter->register_application(service_manager->path());
 
@@ -78,7 +90,7 @@ int main(int argc, char* argv[]) {
     std::map<uint16_t, std::vector<uint8_t>> data;
     data[0x1024] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
     advertisement->manufacturer_data(data);
-    advertisement->timeout(5);
+    advertisement->timeout(10);
     advertisement->local_name("SimpleBluez");
 
     // --- MAIN EVENT LOOP ---
@@ -97,7 +109,7 @@ int main(int argc, char* argv[]) {
         value = (value * 1103515245 + 12345) & 0xFFFFFF;
 
         // This should eventually become a yield.
-        millisecond_delay(1000);
+        millisecond_delay(100);
     }
 
     // --- CLEANUP ---

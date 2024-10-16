@@ -18,13 +18,6 @@ class CustomCharacteristic : public SimpleDBus::Proxy {
     std::shared_ptr<CustomDescriptor> create_descriptor();
     void remove_descriptor(const std::string& path);
 
-    // ----- METHODS -----
-    ByteArray read();
-    void write_request(ByteArray value);
-    void write_command(ByteArray value);
-    void start_notify();
-    void stop_notify();
-
     // ----- PROPERTIES -----
     std::vector<std::shared_ptr<CustomDescriptor>> descriptors();
 
@@ -38,14 +31,21 @@ class CustomCharacteristic : public SimpleDBus::Proxy {
     void value(const ByteArray& value);
 
     bool notifying();
+
     std::vector<std::string> flags();
     void flags(const std::vector<std::string>& flags);
     uint16_t mtu();
     void mtu(uint16_t mtu);
 
     // ----- CALLBACKS -----
-    void set_on_value_changed(std::function<void(ByteArray new_value)> callback);
-    void clear_on_value_changed();
+    void set_on_read_value(std::function<void()> callback);
+    void clear_on_read_value();
+
+    void set_on_write_value(std::function<void(ByteArray value)> callback);
+    void clear_on_write_value();
+
+    void set_on_notify(std::function<void(bool)> callback);
+    void clear_on_notify();
 
   private:
     std::shared_ptr<GattCharacteristic1> gattcharacteristic1();
