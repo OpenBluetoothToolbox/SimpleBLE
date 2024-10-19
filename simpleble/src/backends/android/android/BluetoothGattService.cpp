@@ -62,24 +62,21 @@ void BluetoothGattService::initialize() {
 
 BluetoothGattService::BluetoothGattService() { initialize(); }
 
+BluetoothGattService::BluetoothGattService(JNI::Object obj) : BluetoothGattService() { _obj = obj; }
 
-BluetoothGattService::BluetoothGattService(JNI::Object obj) : BluetoothGattService() {
-    _obj = obj;
-}
-
-//bool BluetoothGattService::addCharacteristic(BluetoothGattCharacteristic characteristic) {
-//    return _obj.call_boolean_method(_method_addCharacteristic, characteristic.getObject());
-//}
+// bool BluetoothGattService::addCharacteristic(BluetoothGattCharacteristic characteristic) {
+//     return _obj.call_boolean_method(_method_addCharacteristic, characteristic.getObject());
+// }
 //
-//bool BluetoothGattService::addService(BluetoothGattService service) {
-//    return _obj.call_boolean_method(_method_addService, service.getObject());
-//}
+// bool BluetoothGattService::addService(BluetoothGattService service) {
+//     return _obj.call_boolean_method(_method_addService, service.getObject());
+// }
 //
-//BluetoothGattCharacteristic BluetoothGattService::getCharacteristic(std::string uuid) {
-//    JNI::Env env;
-//    JNI::Object charObj = _obj.call_object_method(_method_getCharacteristic, env->NewStringUTF(uuid.c_str()));
-//    return BluetoothGattCharacteristic(charObj);
-//}
+// BluetoothGattCharacteristic BluetoothGattService::getCharacteristic(std::string uuid) {
+//     JNI::Env env;
+//     JNI::Object charObj = _obj.call_object_method(_method_getCharacteristic, env->NewStringUTF(uuid.c_str()));
+//     return BluetoothGattCharacteristic(charObj);
+// }
 //
 std::vector<BluetoothGattCharacteristic> BluetoothGattService::getCharacteristics() {
     if (!_obj) return std::vector<BluetoothGattCharacteristic>();
@@ -99,7 +96,7 @@ std::vector<BluetoothGattCharacteristic> BluetoothGattService::getCharacteristic
     return result;
 }
 //
-//std::vector<BluetoothGattService> BluetoothGattService::getIncludedServices() {
+// std::vector<BluetoothGattService> BluetoothGattService::getIncludedServices() {
 //    JNI::Env env;
 //    JNI::Object listObj = _obj.call_object_method(_method_getIncludedServices);
 //    return JNI::convert_list<BluetoothGattService>(listObj);
