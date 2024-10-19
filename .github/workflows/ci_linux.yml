@@ -126,13 +126,15 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
+        # For testing purposes only static libraries are built to reduce run time.
+        # In release workflow all combinations are build.
         options: [
           {container: dockcross/linux-x64, target: linux-x64},
           {container: dockcross/linux-x86, target: linux-x86},
           {container: dockcross/linux-armv6-lts, target: linux-armv6},
         ]
         library: ${{ fromJSON(inputs.libraries) }}
-        type: [shared, static]
+        type: [static] 
 
     container:
       image: ${{ matrix.options.container }}
