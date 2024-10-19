@@ -13,8 +13,8 @@
 #include <string>
 #include <vector>
 
-#include "jni/Common.hpp"
 #include "bridge/ScanCallback.h"
+#include "jni/Common.hpp"
 
 namespace SimpleBLE {
 
@@ -47,11 +47,11 @@ class AdapterBase {
     // NOTE: The following methods have been made public to allow the JNI layer to call them, but
     // should not be called directly by the user.
 
-    void onScanResultCallback(JNIEnv *env, jobject thiz, jint callback_type, jobject result);
-    void onBatchScanResultsCallback(JNIEnv *env, jobject thiz, jobject results);
-    void onScanFailedCallback(JNIEnv *env, jobject thiz, jint error_code);
+    void onScanResultCallback(JNIEnv* env, jobject thiz, jint callback_type, jobject result);
+    void onBatchScanResultsCallback(JNIEnv* env, jobject thiz, jobject results);
+    void onScanFailedCallback(JNIEnv* env, jobject thiz, jint error_code);
 
-    //static std::map<jobject, AdapterBase*, JNI::JObjectComparator> _scanCallbackMap;
+    // static std::map<jobject, AdapterBase*, JNI::JObjectComparator> _scanCallbackMap;
 
   private:
     // NOTE: The correct way to request a BluetoothAdapter is to go though the BluetoothManager,
@@ -79,8 +79,6 @@ class AdapterBase {
     kvn::safe_callback<void(Peripheral)> callback_on_scan_found_;
 
     std::atomic<bool> scanning_{false};
-
-
 };
 
 }  // namespace SimpleBLE
