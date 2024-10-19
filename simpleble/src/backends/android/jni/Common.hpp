@@ -65,6 +65,7 @@ class Object {
     template <typename... Args>
     std::string call_string_method(jmethodID method, Args&&... args) {
         JNIEnv* env = VM::env();
+        // cppcheck-suppress cppcheckError
         jstring jstr = (jstring)env->CallObjectMethod(_obj.get(), method, std::forward<Args>(args)...);
 
         if (jstr == nullptr) {
