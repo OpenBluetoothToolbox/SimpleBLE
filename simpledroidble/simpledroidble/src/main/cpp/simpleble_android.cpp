@@ -708,6 +708,8 @@ extern "C" JNIEXPORT jbyteArray JNICALL Java_org_simpleble_android_Peripheral_na
     JNIEnv* env, jobject thiz, jlong adapter_id, jlong instance_id, jstring service, jstring characteristic,
     jstring descriptor) {
     // TODO: implement nativePeripheralDescriptorRead()
+    jbyteArray result = env->NewByteArray(0);
+    return result;
 }
 extern "C" JNIEXPORT void JNICALL Java_org_simpleble_android_Peripheral_nativePeripheralDescriptorWrite(
     JNIEnv* env, jobject thiz, jlong adapter_id, jlong instance_id, jstring service, jstring characteristic,
