@@ -133,6 +133,8 @@ jobs:
         ]
         library: ${{ fromJSON(inputs.libraries) }}
         type: [shared, static]
+        exclude:
+          - type: ${{ github.event_name != 'release' && 'shared' }}
 
     container:
       image: ${{ matrix.options.container }}

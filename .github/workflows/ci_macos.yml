@@ -44,6 +44,8 @@ jobs:
       matrix:
         type: [shared, static]
         arch: [arm64, x86_64]
+        exclude:
+            - type: ${{ github.event_name != 'release' && 'shared' }}
 
     steps:
       - name: Clone repository
