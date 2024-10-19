@@ -324,7 +324,8 @@ TEST_F(MessageTest, ReceiveMethodCallFailure) {
 
 TEST_F(MessageTest, CopyConstructor) {
     // Create an original message
-    Message original = Message::create_method_call("org.example.Bus", "/org/example/Path", "org.example.Interface", "ExampleMethod");
+    Message original = Message::create_method_call("org.example.Bus", "/org/example/Path", "org.example.Interface",
+                                                   "ExampleMethod");
     original.append_argument(Holder::create_string("Test argument"), "s");
 
     // Test copy constructor

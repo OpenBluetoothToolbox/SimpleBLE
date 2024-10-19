@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <simpleble/Types.h>
+#include <string>
 #include "jni/Common.hpp"
 
 namespace SimpleBLE {
@@ -23,7 +23,6 @@ class BluetoothGattDescriptor {
     static const std::vector<uint8_t> DISABLE_NOTIFICATION_VALUE;
     static const std::vector<uint8_t> ENABLE_NOTIFICATION_VALUE;
     static const std::vector<uint8_t> ENABLE_INDICATION_VALUE;
-
 
   private:
     JNI::Object _obj;

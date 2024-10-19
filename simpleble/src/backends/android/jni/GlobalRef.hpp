@@ -12,11 +12,11 @@ class GlobalRef {
   public:
     GlobalRef() = default;
 
-    GlobalRef(T obj) {_obj = (T) VM::env()->NewGlobalRef(obj);}
+    GlobalRef(T obj) { _obj = (T)VM::env()->NewGlobalRef(obj); }
 
     GlobalRef(const GlobalRef& other) {
         // Custom copy constructor
-        _obj = (T) VM::env()->NewGlobalRef(other._obj);
+        _obj = (T)VM::env()->NewGlobalRef(other._obj);
     }
 
     GlobalRef& operator=(const GlobalRef& other) {
@@ -25,7 +25,7 @@ class GlobalRef {
             if (_obj != nullptr) {
                 VM::env()->DeleteGlobalRef(_obj);
             }
-            _obj = (T) VM::env()->NewGlobalRef(other._obj);
+            _obj = (T)VM::env()->NewGlobalRef(other._obj);
         }
         return *this;
     }
