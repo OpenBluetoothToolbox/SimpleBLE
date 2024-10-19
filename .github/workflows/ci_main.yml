@@ -3,6 +3,8 @@ name: CI Main
 on:
   push:
   pull_request:
+  release:
+      types: [published]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
@@ -186,16 +188,41 @@ jobs:
     uses: ./.github/workflows/ci_python.yml
     secrets: inherit
 
+  release-cpp:
+    runs-on: ubuntu-22.04
+    needs: [pre_job, changes, windows, linux, macos, python]
+    if: needs.pre_job.outputs.should_skip != 'true' && github.event_name == 'release'
+    steps:
+      - name: Download job artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: 'simpleble_*'
+          path: 'artifacts'
+          merge-multiple: true
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        env:
+          TAG: ${{ inputs.tag || github.ref }}
+        with:
+          file: artifacts/**/*
+          tag: ${{ env.TAG }}
+          overwrite: true
+          file_glob: true
+      
   release-python:
     runs-on: ubuntu-22.04
     needs: [pre_job, changes, windows, linux, macos, python]
+    # Note that Python is released on every commit in main branch with relevant
+    # changes (python, linux, windows, or macos filters). While cpp binaries are
+    # only published on manual releases.
     if: |
       needs.pre_job.outputs.should_skip != 'true' &&
-      (needs.changes.outputs.python == 'true' ||
+      github.event_name == 'release' ||
+      ((needs.changes.outputs.python == 'true' ||
       needs.changes.outputs.windows == 'true' ||
       needs.changes.outputs.linux == 'true' ||
       needs.changes.outputs.macos == 'true') &&
-      github.ref == 'refs/heads/main'
+      github.ref == 'refs/heads/main')
     steps:
 
       - name: "Download Python source distribution"
@@ -209,11 +236,22 @@ jobs:
           pip3 install twine
           twine check sdist/simplepyble*.tar.gz
 
-      - name: Publish source distribution
+      - name: Publish source distribution to PyPI
         run: twine upload --skip-existing sdist/simplepyble*.tar.gz --verbose
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USER }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+
+      - name: Upload source to release
+        uses: svenstaro/upload-release-action@v2
+        if: github.event_name == 'release'
+        env:
+          TAG: ${{ inputs.tag || github.ref }}
+        with:
+          file: dist/*.tar.gz
+          tag: ${{ env.TAG }}
+          overwrite: true
+          file_glob: true
 
       - name: "Download Python Wheels"
         uses: actions/download-artifact@v4
@@ -230,4 +268,15 @@ jobs:
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USER }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+
+      - name: Upload wheels to release
+        uses: svenstaro/upload-release-action@v2
+        if: github.event_name == 'release'
+        env:
+          TAG: ${{ inputs.tag || github.ref }}
+        with:
+          file: wheelhouse/*.whl
+          tag: ${{ env.TAG }}
+          overwrite: true
+          file_glob: true
       
