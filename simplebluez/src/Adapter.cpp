@@ -50,6 +50,8 @@ bool Adapter::discovering() { return adapter1()->Discovering(); }
 
 bool Adapter::powered() { return adapter1()->Powered(); }
 
+void Adapter::powered(bool powered) { adapter1()->Powered(powered); }
+
 void Adapter::discovery_filter(const DiscoveryFilter& filter) { adapter1()->SetDiscoveryFilter(filter); }
 
 void Adapter::discovery_start() { adapter1()->StartDiscovery(); }

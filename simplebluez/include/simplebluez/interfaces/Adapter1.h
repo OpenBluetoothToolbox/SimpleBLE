@@ -35,7 +35,8 @@ class Adapter1 : public SimpleDBus::Interface {
 
     // ----- PROPERTIES -----
     bool Discovering(bool refresh = true);
-    bool Powered(bool refresh = true);
+    bool Powered();
+    void Powered(bool powered);
     std::string Address();
 
   protected:

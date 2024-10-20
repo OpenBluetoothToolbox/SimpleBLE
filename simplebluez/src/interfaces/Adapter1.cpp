@@ -1,5 +1,8 @@
 #include "simplebluez/interfaces/Adapter1.h"
 
+#include "simpledbus/interfaces/Properties.h"
+#include "simpledbus/advanced/Proxy.h"
+
 using namespace SimpleBluez;
 
 Adapter1::Adapter1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* proxy)
@@ -97,13 +100,21 @@ bool Adapter1::Discovering(bool refresh) {
     return _properties["Discovering"].get_boolean();
 }
 
-bool Adapter1::Powered(bool refresh) {
-    if (refresh) {
-        property_refresh("Powered");
-    }
-
+bool Adapter1::Powered() {
     std::scoped_lock lock(_property_update_mutex);
     return _properties["Powered"].get_boolean();
+}
+
+void Adapter1::Powered(bool powered) {
+    SimpleDBus::Holder powered_h = SimpleDBus::Holder::create_boolean(powered);
+
+    {
+        std::scoped_lock lock(_property_update_mutex);
+        _properties["Powered"] = powered_h;
+    }
+
+    std::shared_ptr<SimpleDBus::Properties> properties = std::dynamic_pointer_cast<SimpleDBus::Properties>(_proxy->interface_get("org.freedesktop.DBus.Properties"));
+    properties->Set("org.bluez.Adapter1", "Powered", powered_h);
 }
 
 std::string Adapter1::Address() {

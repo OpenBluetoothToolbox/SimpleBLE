@@ -23,6 +23,7 @@ class Adapter : public SimpleDBus::Proxy {
     std::string address();
     bool discovering();
     bool powered();
+    void powered(bool powered);
 
     void discovery_filter(const DiscoveryFilter& filter);
     void discovery_start();

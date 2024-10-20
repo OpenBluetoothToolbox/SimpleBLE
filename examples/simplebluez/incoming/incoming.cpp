@@ -32,6 +32,11 @@ int main(int argc, char* argv[]) {
     std::thread* async_thread = new std::thread(async_thread_function);
     auto adapter = bluez->get_adapters()[0];
 
+    if (!adapter->powered()) {
+        std::cout << "Powering on adapter..." << std::endl;
+        adapter->powered(true);
+    }
+
     std::cout << "Initializing SimpleBluez Peripheral Mode Demo" << std::endl;
     auto service_manager = bluez->get_custom_service_manager();
     auto advertisement_manager = bluez->get_custom_advertisement_manager();
@@ -105,6 +110,7 @@ int main(int argc, char* argv[]) {
     data[0x1024] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
     advertisement->manufacturer_data(data);
     advertisement->timeout(10);
+    advertisement->discoverable(true);
     advertisement->local_name("SimpleBluez");
 
     // --- MAIN EVENT LOOP ---
@@ -135,6 +141,9 @@ int main(int argc, char* argv[]) {
 
     adapter->unregister_advertisement(advertisement);
     adapter->unregister_application(service_manager->path());
+
+    std::cout << "Powering off adapter..." << std::endl;
+    adapter->powered(false);
 
     async_thread_active = false;
     async_thread->join();
