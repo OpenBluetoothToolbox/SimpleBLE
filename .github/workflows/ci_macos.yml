@@ -55,7 +55,7 @@ jobs:
       - name: Compile SimpleBLE
         run: |
 
-          if [ "${{ matrix.type }}" = "shared" ]; then
+          if [ "${{ matrix.type }}" == "shared" ]; then
             BUILD_SHARED_LIBS=ON
           else
             BUILD_SHARED_LIBS=OFF

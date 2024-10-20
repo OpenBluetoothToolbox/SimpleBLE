@@ -13,7 +13,7 @@ jobs:
   # (For example when pushing a commit to an open pull request)
   # See: https://github.com/fkirc/skip-duplicate-actions?tab=readme-ov-file#skip-concurrent-workflow-runs
   pre_job:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
@@ -41,7 +41,7 @@ jobs:
   changes:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       pull-requests: read
     outputs:
@@ -112,7 +112,7 @@ jobs:
   libraries:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       pull-requests: read
     outputs:
@@ -187,8 +187,10 @@ jobs:
     secrets: inherit
 
   release-python:
-    runs-on: ubuntu-22.04
     needs: [pre_job, changes, windows, linux, macos, python]
+    # Note that Python is released on every commit in main branch with relevant
+    # changes (python, linux, windows, or macos filters). While cpp binaries are
+    # only published on manual releases.
     if: |
       needs.pre_job.outputs.should_skip != 'true' &&
       (needs.changes.outputs.python == 'true' ||
@@ -196,38 +198,7 @@ jobs:
       needs.changes.outputs.linux == 'true' ||
       needs.changes.outputs.macos == 'true') &&
       github.ref == 'refs/heads/main'
-    steps:
-
-      - name: "Download Python source distribution"
-        uses: actions/download-artifact@v4
-        with:
-          name: 'simplepyble'
-          path: 'sdist'
-  
-      - name: Check source distribution
-        run: |
-          pip3 install twine
-          twine check sdist/simplepyble*.tar.gz
-
-      - name: Publish source distribution
-        run: twine upload --skip-existing sdist/simplepyble*.tar.gz --verbose
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USER }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-
-      - name: "Download Python Wheels"
-        uses: actions/download-artifact@v4
-        with:
-          pattern: 'simpleble-wheels-*'
-          path: 'wheels'
-          merge-multiple: true
-      
-      - name: Check Packages
-        run: twine check wheels/*.whl
-
-      - name: Publish packages
-        run: twine upload --skip-existing wheels/*.whl --verbose
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USER }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      
+    uses: ./.github/workflows/ci_python_publish.yml
+    with:
+      tag: ${{ github.ref }}
+    secrets: inherit
