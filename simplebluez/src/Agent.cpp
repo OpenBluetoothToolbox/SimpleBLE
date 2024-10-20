@@ -73,3 +73,11 @@ void Agent::set_on_authorize_service(std::function<bool(const std::string&)> cal
 void Agent::clear_on_authorize_service() { agent1()->OnAuthorizeService.unload(); }
 
 std::shared_ptr<Agent1> Agent::agent1() { return std::dynamic_pointer_cast<Agent1>(interface_get("org.bluez.Agent1")); }
+
+void Agent::set_on_release(std::function<void()> callback) { agent1()->OnRelease.load(callback); }
+
+void Agent::clear_on_release() { agent1()->OnRelease.unload(); }
+
+void Agent::set_on_cancel(std::function<void()> callback) { agent1()->OnCancel.load(callback); }
+
+void Agent::clear_on_cancel() { agent1()->OnCancel.unload(); }

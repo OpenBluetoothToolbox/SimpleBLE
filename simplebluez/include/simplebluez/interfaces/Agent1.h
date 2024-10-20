@@ -21,6 +21,12 @@ class Agent1 : public SimpleDBus::Interface {
 
     /**
      * @brief This method gets called when the service daemon
+     *        needs to release the agent.
+     */
+    kvn::safe_callback<void()> OnRelease;
+
+    /**
+     * @brief This method gets called when the service daemon
      *        needs to get the passkey for an authentication.
      *        The return value should be a string of 1-16 characters
      *        length. The string can be alphanumeric.
@@ -85,6 +91,12 @@ class Agent1 : public SimpleDBus::Interface {
      * @return false if the request should be rejected.
      */
     kvn::safe_callback<bool(const std::string&)> OnAuthorizeService;
+
+    /**
+     * @brief This method gets called when the service daemon
+     *        needs to cancel an ongoing request.
+     */
+    kvn::safe_callback<void()> OnCancel;
 
   protected:
     void message_handle(SimpleDBus::Message& msg) override;

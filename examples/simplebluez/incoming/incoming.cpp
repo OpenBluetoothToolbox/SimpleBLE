@@ -36,6 +36,20 @@ int main(int argc, char* argv[]) {
     auto service_manager = bluez->get_custom_service_manager();
     auto advertisement_manager = bluez->get_custom_advertisement_manager();
 
+    // --- AGENT SETUP ---
+    auto agent = bluez->get_agent();
+    agent->set_capabilities(SimpleBluez::Agent::Capabilities::DisplayOnly);
+    bluez->register_agent();
+
+    agent->set_on_cancel([agent]() {
+        std::cout << "Cancel called" << std::endl;
+    });
+
+    agent->set_on_display_passkey([agent](uint32_t passkey, uint16_t entered) {
+        std::cout << "DisplayPasskey called with passkey: " << passkey << std::endl;
+    });
+
+
     // --- ADAPTER SETUP ---
     std::map<std::string, std::shared_ptr<SimpleBluez::Device>> peripherals;
     adapter->set_on_device_updated([&peripherals](std::shared_ptr<SimpleBluez::Device> device) {

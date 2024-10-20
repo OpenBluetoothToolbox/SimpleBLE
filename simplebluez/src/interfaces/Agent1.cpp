@@ -13,6 +13,9 @@ void Agent1::message_handle(SimpleDBus::Message& msg) {
 
         if (msg.get_member() == "Release") {
             // Nothing to do
+            if (OnRelease) {
+                OnRelease();
+            }
 
         } else if (msg.get_member() == "RequestPinCode") {
             // std::cout << "Agent1::message_handle() RequestPinCode" << std::endl;
@@ -48,6 +51,7 @@ void Agent1::message_handle(SimpleDBus::Message& msg) {
         } else if (msg.get_member() == "DisplayPinCode") {
             // std::cout << "Agent1::message_handle() DisplayPinCode" << std::endl;
             SimpleDBus::Holder arg_device = msg.extract();
+            msg.extract_next();
             SimpleDBus::Holder arg_pin_code = msg.extract();
 
             bool success = true;
@@ -63,7 +67,9 @@ void Agent1::message_handle(SimpleDBus::Message& msg) {
         } else if (msg.get_member() == "DisplayPasskey") {
             // std::cout << "Agent1::message_handle() DisplayPasskey" << std::endl;
             SimpleDBus::Holder arg_device = msg.extract();
+            msg.extract_next();
             SimpleDBus::Holder arg_passkey = msg.extract();
+            msg.extract_next();
             SimpleDBus::Holder arg_entered = msg.extract();
 
             if (OnDisplayPasskey) {
@@ -73,6 +79,7 @@ void Agent1::message_handle(SimpleDBus::Message& msg) {
         } else if (msg.get_member() == "RequestConfirmation") {
             // std::cout << "Agent1::message_handle() RequestConfirmation" << std::endl;
             SimpleDBus::Holder arg_device = msg.extract();
+            msg.extract_next();
             SimpleDBus::Holder arg_passkey = msg.extract();
 
             bool success = true;
@@ -103,6 +110,7 @@ void Agent1::message_handle(SimpleDBus::Message& msg) {
             // std::cout << "Agent1::message_handle() AuthorizeService" << std::endl;
 
             SimpleDBus::Holder arg_device = msg.extract();
+            msg.extract_next();
             SimpleDBus::Holder arg_uuid = msg.extract();
 
             bool success = true;
@@ -119,6 +127,9 @@ void Agent1::message_handle(SimpleDBus::Message& msg) {
             // std::cout << "Agent1::message_handle() Cancel" << std::endl;
             // NOTE: Due to the blocking nature of this interface, the Cancel method won't
             //       have any real impact on any of the callbacks, and thus will be ignored.
+            if (OnCancel) {
+                OnCancel();
+            }
 
         } else {
             // std::cout << "Agent1::message_handle() Unknown method: " << msg.get_member() << std::endl;
