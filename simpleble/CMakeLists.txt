@@ -173,6 +173,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         set(SIMPLEBLUEZ_LOG_LEVEL "FATAL")
     endif()
 
+    list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLE_BACKEND_LINUX_ENABLED)
+
     list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEDBUS_LOG_LEVEL=${SIMPLEDBUS_LOG_LEVEL})
     list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLUEZ_LOG_LEVEL=${SIMPLEBLUEZ_LOG_LEVEL})
 
@@ -181,8 +183,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     endif()
 
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/AdapterBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/PeripheralBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/AdapterLinux.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/PeripheralLinux.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/Bluez.cpp)
 
     target_sources(simpleble PRIVATE

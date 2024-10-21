@@ -1,6 +1,9 @@
 #include <simpleble/Adapter.h>
 
-#include "AdapterBase.h"
+#ifdef SIMPLEBLE_BACKEND_LINUX_ENABLED
+#include "backends/linux/AdapterLinux.h"
+#endif
+
 #include "AdapterBuilder.h"
 #include "LoggingInternal.h"
 
@@ -8,17 +11,20 @@ using namespace SimpleBLE;
 
 std::vector<Adapter> Adapter::get_adapters() {
     std::vector<Adapter> available_adapters;
-    auto internal_adapters = AdapterBase::get_adapters();
 
-    for (auto& internal_adapter : internal_adapters) {
+#ifdef SIMPLEBLE_BACKEND_LINUX_ENABLED
+    for (auto& internal_adapter : AdapterLinux::get_adapters()) {
         AdapterBuilder adapter(internal_adapter);
         available_adapters.push_back(adapter);
     }
-
+#endif
     return available_adapters;
 }
 
-bool Adapter::bluetooth_enabled() { return AdapterBase::bluetooth_enabled(); }
+bool Adapter::bluetooth_enabled() {
+    // TODO: What's the best way to handle this check with multiple backends?
+    return true;
+}
 
 bool Adapter::initialized() const { return internal_ != nullptr; }
 

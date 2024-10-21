@@ -8,6 +8,8 @@
 #include <simplebluez/Characteristic.h>
 #include <simplebluez/Device.h>
 
+#include <backends/PeripheralBase.h>
+
 #include <kvn_safe_callback.hpp>
 
 #include <atomic>
@@ -16,10 +18,10 @@
 
 namespace SimpleBLE {
 
-class PeripheralBase {
+class PeripheralLinux : public PeripheralBase {
   public:
-    PeripheralBase(std::shared_ptr<SimpleBluez::Device> device, std::shared_ptr<SimpleBluez::Adapter> adapter);
-    virtual ~PeripheralBase();
+    PeripheralLinux(std::shared_ptr<SimpleBluez::Device> device, std::shared_ptr<SimpleBluez::Adapter> adapter);
+    virtual ~PeripheralLinux();
 
     void* underlying() const;
 
