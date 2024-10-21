@@ -4,6 +4,10 @@
 #include "backends/linux/AdapterLinux.h"
 #endif
 
+#ifdef SIMPLEBLE_BACKEND_PLAIN_ENABLED
+#include "backends/plain/AdapterPlain.h"
+#endif
+
 #include "AdapterBuilder.h"
 #include "LoggingInternal.h"
 
@@ -14,6 +18,12 @@ std::vector<Adapter> Adapter::get_adapters() {
 
 #ifdef SIMPLEBLE_BACKEND_LINUX_ENABLED
     for (auto& internal_adapter : AdapterLinux::get_adapters()) {
+        AdapterBuilder adapter(internal_adapter);
+        available_adapters.push_back(adapter);
+    }
+#endif
+#ifdef SIMPLEBLE_BACKEND_PLAIN_ENABLED
+    for (auto& internal_adapter : AdapterPlain::get_adapters()) {
         AdapterBuilder adapter(internal_adapter);
         available_adapters.push_back(adapter);
     }
