@@ -208,7 +208,7 @@ bool Connection::unregister_object_path(const std::string& path) {
 
 DBusHandlerResult Connection::static_message_handler(DBusConnection* connection, DBusMessage* message, void* user_data) {
     Connection* conn = static_cast<Connection*>(user_data);
-    Message msg(message);
+    Message msg = Message::from_retained(message);
     std::string path = msg.get_path();
 
     std::lock_guard<std::recursive_mutex> lock(conn->_mutex);
