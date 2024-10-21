@@ -1,4 +1,4 @@
-#include "PeripheralBase.h"
+#include "PeripheralPlain.h"
 
 #include "CharacteristicBuilder.h"
 #include "DescriptorBuilder.h"
@@ -15,23 +15,23 @@ using namespace std::chrono_literals;
 const SimpleBLE::BluetoothUUID BATTERY_SERVICE_UUID = "0000180f-0000-1000-8000-00805f9b34fb";
 const SimpleBLE::BluetoothUUID BATTERY_CHARACTERISTIC_UUID = "00002a19-0000-1000-8000-00805f9b34fb";
 
-PeripheralBase::PeripheralBase() {}
+PeripheralPlain::PeripheralPlain() {}
 
-PeripheralBase::~PeripheralBase() {}
+PeripheralPlain::~PeripheralPlain() {}
 
-void* PeripheralBase::underlying() const { return nullptr; }
+void* PeripheralPlain::underlying() const { return nullptr; }
 
-std::string PeripheralBase::identifier() { return "Plain Peripheral"; }
+std::string PeripheralPlain::identifier() { return "Plain Peripheral"; }
 
-BluetoothAddress PeripheralBase::address() { return "11:22:33:44:55:66"; }
+BluetoothAddress PeripheralPlain::address() { return "11:22:33:44:55:66"; }
 
-BluetoothAddressType PeripheralBase::address_type() { return BluetoothAddressType::PUBLIC; };
+BluetoothAddressType PeripheralPlain::address_type() { return BluetoothAddressType::PUBLIC; };
 
-int16_t PeripheralBase::rssi() { return -60; }
+int16_t PeripheralPlain::rssi() { return -60; }
 
-int16_t PeripheralBase::tx_power() { return 5; }
+int16_t PeripheralPlain::tx_power() { return 5; }
 
-uint16_t PeripheralBase::mtu() {
+uint16_t PeripheralPlain::mtu() {
     if (is_connected()) {
         return 247;
     } else {
@@ -39,25 +39,25 @@ uint16_t PeripheralBase::mtu() {
     }
 }
 
-void PeripheralBase::connect() {
+void PeripheralPlain::connect() {
     connected_ = true;
     paired_ = true;
-    SAFE_CALLBACK_CALL(this->callback_on_connected_);
+    SAFE_CALLBACK_CALL(callback_on_connected_);
 }
 
-void PeripheralBase::disconnect() {
+void PeripheralPlain::disconnect() {
     connected_ = false;
-    SAFE_CALLBACK_CALL(this->callback_on_disconnected_);
+    SAFE_CALLBACK_CALL(callback_on_disconnected_);
 }
-bool PeripheralBase::is_connected() { return connected_; }
+bool PeripheralPlain::is_connected() { return connected_; }
 
-bool PeripheralBase::is_connectable() { return true; }
+bool PeripheralPlain::is_connectable() { return true; }
 
-bool PeripheralBase::is_paired() { return paired_; }
+bool PeripheralPlain::is_paired() { return paired_; }
 
-void PeripheralBase::unpair() { paired_ = false; }
+void PeripheralPlain::unpair() { paired_ = false; }
 
-std::vector<Service> PeripheralBase::services() {
+std::vector<Service> PeripheralPlain::services() {
     if (!connected_) return {};
 
     std::vector<Service> service_list;
@@ -68,19 +68,19 @@ std::vector<Service> PeripheralBase::services() {
     return service_list;
 }
 
-std::vector<Service> PeripheralBase::advertised_services() { return {}; }
+std::vector<Service> PeripheralPlain::advertised_services() { return {}; }
 
-std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() { return {{0x004C, "test"}}; }
+std::map<uint16_t, ByteArray> PeripheralPlain::manufacturer_data() { return {{0x004C, "test"}}; }
 
-ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) { return {}; }
+ByteArray PeripheralPlain::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) { return {}; }
 
-void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+void PeripheralPlain::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                                    ByteArray const& data) {}
 
-void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+void PeripheralPlain::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                                    ByteArray const& data) {}
 
-void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+void PeripheralPlain::notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                             std::function<void(ByteArray payload)> callback) {
     if (callback) {
         callback_mutex_.lock();
@@ -103,7 +103,7 @@ void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& c
     }
 }
 
-void PeripheralBase::indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+void PeripheralPlain::indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                               std::function<void(ByteArray payload)> callback) {
     if (callback) {
         callback_mutex_.lock();
@@ -126,20 +126,20 @@ void PeripheralBase::indicate(BluetoothUUID const& service, BluetoothUUID const&
     }
 }
 
-void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
+void PeripheralPlain::unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     std::lock_guard<std::mutex> lock(callback_mutex_);
     callbacks_.erase({service, characteristic});
 }
 
-ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+ByteArray PeripheralPlain::read(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                                BluetoothUUID const& descriptor) {
     return {};
 }
 
-void PeripheralBase::write(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+void PeripheralPlain::write(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                            BluetoothUUID const& descriptor, ByteArray const& data) {}
 
-void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) {
+void PeripheralPlain::set_callback_on_connected(std::function<void()> on_connected) {
     if (on_connected) {
         callback_on_connected_.load(std::move(on_connected));
     } else {
@@ -147,7 +147,7 @@ void PeripheralBase::set_callback_on_connected(std::function<void()> on_connecte
     }
 }
 
-void PeripheralBase::set_callback_on_disconnected(std::function<void()> on_disconnected) {
+void PeripheralPlain::set_callback_on_disconnected(std::function<void()> on_disconnected) {
     if (on_disconnected) {
         callback_on_disconnected_.load(std::move(on_disconnected));
     } else {
