@@ -45,7 +45,7 @@ class Message {
     std::string get_path() const;
     std::string get_member() const;
     Type get_type() const;
-    
+
     bool is_signal(const std::string& interface, const std::string& signal_name) const;
     bool is_method_call(const std::string& interface, const std::string& method) const;
 
@@ -79,7 +79,7 @@ class Message {
      * @param argument  Argument to append.
      * @param signature Signature of the argument.
      */
-    void _append_argument(DBusMessageIter* iter, Holder& argument, std::string signature);
+    void _append_argument(DBusMessageIter* iter, const Holder& argument, const std::string& signature);
 
     void _invalidate();
     void _safe_delete();
