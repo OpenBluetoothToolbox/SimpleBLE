@@ -49,6 +49,7 @@ class Message {
     bool is_signal(const std::string& interface, const std::string& signal_name) const;
     bool is_method_call(const std::string& interface, const std::string& method) const;
 
+    static Message from_retained(DBusMessage* msg);
     static Message from_acquired(DBusMessage* msg);
     static Message create_method_call(const std::string& bus_name, const std::string& path,
                                       const std::string& interface, const std::string& method);

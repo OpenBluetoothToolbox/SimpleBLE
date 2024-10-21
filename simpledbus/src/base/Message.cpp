@@ -558,6 +558,16 @@ Holder Message::_extract_generic(DBusMessageIter* iter) {
     return Holder();
 }
 
+Message Message::from_retained(DBusMessage* msg) {
+    Message message;
+    if (msg) {
+        dbus_message_ref(msg);
+        message._msg = msg;
+        message._unique_id = _creation_counter++;
+    }
+    return message;
+}
+
 Message Message::from_acquired(DBusMessage* msg) {
     Message message;
     if (msg) {
