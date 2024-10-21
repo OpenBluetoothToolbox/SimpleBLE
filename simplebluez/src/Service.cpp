@@ -27,6 +27,8 @@ std::shared_ptr<GattService1> Service::gattservice1() {
 
 std::vector<std::shared_ptr<Characteristic>> Service::characteristics() { return children_casted<Characteristic>(); }
 
+std::vector<std::shared_ptr<Service>> Service::includes() { return children_casted<Service>(); }
+
 std::shared_ptr<Characteristic> Service::get_characteristic(const std::string& uuid) {
     auto characteristics_all = characteristics();
 

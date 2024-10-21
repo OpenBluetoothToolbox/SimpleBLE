@@ -176,6 +176,7 @@
                 _task.error = nil;
                 _task.pending = YES;
                 [self.peripheral discoverCharacteristics:nil forService:service];
+                [self.peripheral discoverIncludedServices:nil forService:service];
             }
 
             WAIT_UNTIL_FALSE(self, _task.pending);
@@ -266,7 +267,13 @@
             characteristic_list.push_back(SimpleBLE::CharacteristicBuilder(uuidToSimpleBLE(characteristic.UUID), descriptor_list, can_read,
                                                                            can_write_request, can_write_command, can_notify, can_indicate));
         }
-        service_list.push_back(SimpleBLE::ServiceBuilder(uuidToSimpleBLE(service.UUID), characteristic_list));
+
+        // Build the list of included services.
+        std::vector<SimpleBLE::BluetoothUUID> includedServices;
+        for (CBService* includedService in service.includedServices) {
+            includedServices.push_back(uuidToSimpleBLE(includedService.UUID));
+        }
+        service_list.push_back(SimpleBLE::ServiceBuilder(uuidToSimpleBLE(service.UUID), characteristic_list, includedServices));
     }
 
     return service_list;
@@ -604,6 +611,13 @@
 }
 
 - (void)peripheral:(CBPeripheral*)peripheral didDiscoverServices:(NSError*)error {
+    @synchronized(self) {
+        _task.error = error;
+        _task.pending = NO;
+    }
+}
+
+- (void)peripheral:(CBPeripheral*)peripheral didDiscoverIncludedServicesForService:(CBService *)service error:(NSError *)error {
     @synchronized(self) {
         _task.error = error;
         _task.pending = NO;
