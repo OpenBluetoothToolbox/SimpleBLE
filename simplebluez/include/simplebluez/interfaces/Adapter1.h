@@ -1,6 +1,7 @@
 #pragma once
 
 #include <simpledbus/advanced/Interface.h>
+#include <simpledbus/external/kvn_safe_callback.hpp>
 
 #include <optional>
 #include <string>
@@ -37,6 +38,10 @@ class Adapter1 : public SimpleDBus::Interface {
     bool Discovering(bool refresh = true);
     bool Powered(bool refresh = true);
     std::string Address();
+    std::string PowerState();
+
+    // ----- CALLBACKS -----
+    kvn::safe_callback<void()> OnPowerStateChanged;
 
   protected:
     void property_changed(std::string option_name) override;

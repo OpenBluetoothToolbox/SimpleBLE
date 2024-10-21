@@ -40,6 +40,7 @@ class RustyAdapter : private SimpleBLE::Adapter {
 
     rust::String identifier() const;
     rust::String address() const;
+    SimpleBLE::PowerState power_state() const;
 
     void scan_start() const;
     void scan_stop() const;
