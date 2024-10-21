@@ -7,13 +7,11 @@
 #include <string>
 #include <vector>
 
-#include "Connection.h"
 #include "Holder.h"
 
 namespace SimpleDBus {
 
-class Connection;
-class Interface;
+// class Interface;
 
 class Message {
   public:
@@ -25,13 +23,16 @@ class Message {
         SIGNAL = DBUS_MESSAGE_TYPE_SIGNAL,
     } Type;
 
+    const int INVALID_UNIQUE_ID = -1;
+
     Message();
-    Message(DBusMessage* msg);
     Message(Message&& other);                  // Custom move constructor
     Message(const Message& other);             // Custom copy constructor
     Message& operator=(Message&& other);       // Custom move assignment
     Message& operator=(const Message& other);  // Custom copy assignment
     ~Message();
+
+    operator DBusMessage*() const;
 
     bool is_valid() const;
     void append_argument(Holder argument, std::string signature);
@@ -54,6 +55,8 @@ class Message {
     bool is_signal(std::string interface, std::string signal_name);
     bool is_method_call(const std::string& interface, const std::string& method);
 
+    static Message from_acquired(DBusMessage*);
+
     static Message create_method_call(std::string bus_name, std::string path, std::string interface,
                                       std::string method);
 
@@ -61,16 +64,16 @@ class Message {
 
     static Message create_error(const Message& msg, std::string error_name, std::string error_message);
 
+    static Message create_signal(std::string path, std::string interface, std::string signal);
+
   private:
-    friend class Connection;
-
     static std::atomic_int32_t creation_counter;
-    int indent;
+    int indent = 0;
 
-    int _unique_id;
+    int _unique_id = INVALID_UNIQUE_ID;
     DBusMessageIter _iter;
-    bool _iter_initialized;
-    bool _is_extracted;
+    bool _iter_initialized = false;
+    bool _is_extracted = false;
     Holder _extracted;
     DBusMessage* _msg;
 

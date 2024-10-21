@@ -25,16 +25,7 @@ using namespace SimpleDBus;
 
 std::atomic_int32_t Message::creation_counter = 0;
 
-Message::Message() : Message(nullptr) {}
-
-Message::Message(DBusMessage* msg) : _msg(msg), _iter_initialized(false), _is_extracted(false), indent(0) {
-    if (is_valid()) {
-        dbus_message_ref(_msg);
-        _unique_id = creation_counter++;
-    } else {
-        _unique_id = -1;
-    }
-}
+Message::Message() {}
 
 Message::~Message() {
     if (is_valid()) {
@@ -143,6 +134,8 @@ void Message::_safe_delete() {
         _invalidate();
     }
 }
+
+Message::operator DBusMessage*() const { return _msg; }
 
 bool Message::is_valid() const { return _msg != nullptr; }
 
@@ -608,23 +601,31 @@ Holder Message::_extract_generic(DBusMessageIter* iter) {
     return Holder();
 }
 
+Message Message::from_acquired(DBusMessage* msg) {
+    Message message;
+    if (msg) {
+        message._msg = msg;
+        message._unique_id = creation_counter++;
+    }
+    return message;
+}
+
 Message Message::create_method_call(std::string bus_name, std::string path, std::string interface, std::string method) {
     DBusMessage* msg = dbus_message_new_method_call(bus_name.c_str(), path.c_str(), interface.c_str(), method.c_str());
-    Message message(msg);
-    dbus_message_unref(msg);
-    return message;
+    return Message::from_acquired(msg);
 }
 
 Message Message::create_method_return(const Message& msg) {
     DBusMessage* msg_return = dbus_message_new_method_return(msg._msg);
-    Message message(msg_return);
-    dbus_message_unref(msg_return);
-    return message;
+    return Message::from_acquired(msg_return);
 }
 
 Message Message::create_error(const Message& msg, std::string error_name, std::string error_message) {
     DBusMessage* msg_error = dbus_message_new_error(msg._msg, error_name.c_str(), error_message.c_str());
-    Message message(msg_error);
-    dbus_message_unref(msg_error);
-    return message;
+    return Message::from_acquired(msg_error);
+}
+
+Message Message::create_signal(std::string path, std::string interface, std::string signal) {
+    DBusMessage* msg_signal = dbus_message_new_signal(path.c_str(), interface.c_str(), signal.c_str());
+    return Message::from_acquired(msg_signal);
 }
