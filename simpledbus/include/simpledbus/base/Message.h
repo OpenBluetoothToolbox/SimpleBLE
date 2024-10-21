@@ -11,8 +11,6 @@
 
 namespace SimpleDBus {
 
-// class Interface;
-
 class Message {
   public:
     typedef enum {
@@ -75,7 +73,7 @@ class Message {
     bool _iter_initialized = false;
     bool _is_extracted = false;
     Holder _extracted;
-    DBusMessage* _msg;
+    DBusMessage* _msg = nullptr;
 
     Holder _extract_bytearray(DBusMessageIter* iter);
     Holder _extract_array(DBusMessageIter* iter);

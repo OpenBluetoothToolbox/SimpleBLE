@@ -607,7 +607,7 @@ Message Message::from_acquired(DBusMessage* msg) {
         message._msg = msg;
         message._unique_id = creation_counter++;
     }
-    return message;
+    return std::move(message);
 }
 
 Message Message::create_method_call(std::string bus_name, std::string path, std::string interface, std::string method) {
