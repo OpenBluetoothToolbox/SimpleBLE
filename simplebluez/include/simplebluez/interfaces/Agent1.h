@@ -10,7 +10,7 @@ namespace SimpleBluez {
 
 class Agent1 : public SimpleDBus::Interface {
   public:
-    Agent1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path);
+    Agent1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* proxy);
     virtual ~Agent1() = default;
 
     // ----- METHODS -----
@@ -18,6 +18,12 @@ class Agent1 : public SimpleDBus::Interface {
     // ----- PROPERTIES -----
 
     // ----- CALLBACKS -----
+
+    /**
+     * @brief This method gets called when the service daemon
+     *        needs to release the agent.
+     */
+    kvn::safe_callback<void()> OnRelease;
 
     /**
      * @brief This method gets called when the service daemon
@@ -85,6 +91,12 @@ class Agent1 : public SimpleDBus::Interface {
      * @return false if the request should be rejected.
      */
     kvn::safe_callback<bool(const std::string&)> OnAuthorizeService;
+
+    /**
+     * @brief This method gets called when the service daemon
+     *        needs to cancel an ongoing request.
+     */
+    kvn::safe_callback<void()> OnCancel;
 
   protected:
     void message_handle(SimpleDBus::Message& msg) override;

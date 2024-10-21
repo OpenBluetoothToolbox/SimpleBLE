@@ -8,7 +8,7 @@ using namespace SimpleBLE;
 
 std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
     std::vector<std::shared_ptr<AdapterBase>> adapter_list;
-    auto internal_adapters = Bluez::get()->bluez.get_adapters();
+    auto internal_adapters = Bluez::get()->bluez->get_adapters();
     for (auto& adapter : internal_adapters) {
         adapter_list.push_back(std::make_shared<AdapterBase>(adapter));
     }
@@ -18,7 +18,7 @@ std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
 bool AdapterBase::bluetooth_enabled() {
     bool enabled = false;
 
-    auto internal_adapters = Bluez::get()->bluez.get_adapters();
+    auto internal_adapters = Bluez::get()->bluez->get_adapters();
     for (auto& adapter : internal_adapters) {
         if (adapter->powered()) {
             enabled = true;

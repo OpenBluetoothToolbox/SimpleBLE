@@ -8,6 +8,14 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 [0.8.0] - XXXX-XX-XX
 --------------------
 
+This version brings a few important changes to the project, so please read the following carefully. The two main
+changes are the introduction of the Android backend and an important refactor of SimpleBluez and SimpleDBus.
+
+From an API perspective, SimpleBLE users won't notice any changes, but SimpleBluez users must now handle the
+SimpleBluez::Bluez object as a std::shared_ptr, due to the upcoming work supporting Peripheral mode on Linux.
+Some of these changes might have downstream effects that are hard to predict, so make sure to test after updating
+and please report any issues you find.
+
 **Added**
 
 - (Android) Alpha preview of Android support.
@@ -17,6 +25,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to `Semanti
 
 - Implemented standalone ByteArray class derived from `kvn::bytearray`. *(Thanks tlifschitz!)*
 -  **API CHANGE**: Notify and Indicate callback in C bindings now receive the peripheral handle as the first argument.
+-  **API CHANGE**: SimpleBluez::Bluez must now be handled as a std::shared_ptr.
 
 **Fixed**
 

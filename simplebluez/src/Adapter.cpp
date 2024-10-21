@@ -17,15 +17,26 @@ std::shared_ptr<SimpleDBus::Proxy> Adapter::path_create(const std::string& path)
 
 std::shared_ptr<SimpleDBus::Interface> Adapter::interfaces_create(const std::string& interface_name) {
     if (interface_name == "org.bluez.Adapter1") {
-        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Adapter1>(_conn, _path));
+        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Adapter1>(_conn, this));
+    } else if (interface_name == "org.bluez.LEAdvertisingManager1") {
+        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<LEAdvertisingManager1>(_conn, this));
+    } else if (interface_name == "org.bluez.GattManager1") {
+        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<GattManager1>(_conn, this));
     }
 
-    auto interface = std::make_shared<SimpleDBus::Interface>(_conn, _bus_name, _path, interface_name);
-    return std::static_pointer_cast<SimpleDBus::Interface>(interface);
+    return std::make_shared<SimpleDBus::Interface>(_conn, this, interface_name);
 }
 
 std::shared_ptr<Adapter1> Adapter::adapter1() {
     return std::dynamic_pointer_cast<Adapter1>(interface_get("org.bluez.Adapter1"));
+}
+
+std::shared_ptr<LEAdvertisingManager1> Adapter::le_advertising_manager1() {
+    return std::dynamic_pointer_cast<LEAdvertisingManager1>(interface_get("org.bluez.LEAdvertisingManager1"));
+}
+
+std::shared_ptr<GattManager1> Adapter::gatt_manager1() {
+    return std::dynamic_pointer_cast<GattManager1>(interface_get("org.bluez.GattManager1"));
 }
 
 std::string Adapter::identifier() const {
@@ -38,6 +49,8 @@ std::string Adapter::address() { return adapter1()->Address(); }
 bool Adapter::discovering() { return adapter1()->Discovering(); }
 
 bool Adapter::powered() { return adapter1()->Powered(); }
+
+void Adapter::powered(bool powered) { adapter1()->Powered(powered); }
 
 void Adapter::discovery_filter(const DiscoveryFilter& filter) { adapter1()->SetDiscoveryFilter(filter); }
 
@@ -67,6 +80,26 @@ std::vector<std::shared_ptr<Device>> Adapter::device_paired_get() {
     }
 
     return paired_devices;
+}
+
+void Adapter::register_advertisement(const std::shared_ptr<CustomAdvertisement>& advertisement) {
+    le_advertising_manager1()->RegisterAdvertisement(advertisement->path());
+    advertisement->activate();
+}
+
+void Adapter::unregister_advertisement(const std::shared_ptr<CustomAdvertisement>& advertisement) {
+    if (advertisement->active()) {
+        le_advertising_manager1()->UnregisterAdvertisement(advertisement->path());
+        advertisement->deactivate();
+    }
+}
+
+void Adapter::register_application(const std::string& application_path) {
+    gatt_manager1()->RegisterApplication(application_path);
+}
+
+void Adapter::unregister_application(const std::string& application_path) {
+    gatt_manager1()->UnregisterApplication(application_path);
 }
 
 void Adapter::set_on_device_updated(std::function<void(std::shared_ptr<Device> device)> callback) {

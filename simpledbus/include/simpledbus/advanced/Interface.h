@@ -10,10 +10,11 @@
 
 namespace SimpleDBus {
 
+class Proxy;
+
 class Interface {
   public:
-    Interface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
-              const std::string& interface_name);
+    Interface(std::shared_ptr<Connection> conn, Proxy* proxy, const std::string& interface_name);
 
     virtual ~Interface() = default;
 
@@ -28,9 +29,16 @@ class Interface {
     // ----- PROPERTIES -----
     virtual void property_changed(std::string option_name);
 
+    // ! These functions are used by the Properties interface. We need better nomenclature!
+    Holder property_collect();
+    Holder property_collect_single(const std::string& property_name);
+    void property_modify(const std::string& property_name, const Holder& value);
+
+    // ! TODO: We need to figure out a good architecture to let any generic interface access the Properties object of its Proxy.
     Holder property_get_all();
     Holder property_get(const std::string& property_name);
     void property_set(const std::string& property_name, const Holder& value);
+
     void property_refresh(const std::string& property_name);
 
     // ----- SIGNALS -----
@@ -42,8 +50,10 @@ class Interface {
   protected:
     std::atomic_bool _loaded{true};
 
-    std::string _path;
-    std::string _bus_name;
+    // NOTE: We should probably keep a copy of the proxy fields that are used often to avoid locking
+    //       the proxy mutex for too long. Proxy should be locked only when a call is required, not to read
+    //       a static property.
+    Proxy* _proxy;
     std::string _interface_name;
     std::shared_ptr<Connection> _conn;
 

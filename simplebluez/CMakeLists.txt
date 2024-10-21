@@ -44,25 +44,36 @@ set(SIMPLEBLUEZ_INCLUDE
     ${CMAKE_CURRENT_SOURCE_DIR}/../external/include)
 
 set(SIMPLEBLUEZ_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ProxyOrg.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/BluezRoot.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/BluezOrg.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logging.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Agent.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Characteristic.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Exceptions.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ProxyOrgBluez.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/BluezOrgBluez.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Service.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Adapter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Bluez.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Descriptor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomAdvertisement.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomAdvertisementManager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomServiceManager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomRoot.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomService.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomCharacteristic.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomDescriptor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Adapter1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Agent1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattDescriptor1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattCharacteristic1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattService1.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/GattManager1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Device1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/Battery1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/AgentManager1.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/LEAdvertisingManager1.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/interfaces/LEAdvertisement1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/advanced/Interface.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/advanced/Proxy.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Connection.cpp
@@ -72,6 +83,7 @@ set(SIMPLEBLUEZ_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Message.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/base/Path.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/interfaces/ObjectManager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/src/interfaces/Properties.cpp
 )
 
 # Configure the build targets

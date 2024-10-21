@@ -1,12 +1,13 @@
 #include <simpledbus/interfaces/ObjectManager.h>
+#include <simpledbus/advanced/Proxy.h>
 
 using namespace SimpleDBus;
 
-ObjectManager::ObjectManager(std::shared_ptr<Connection> conn, std::string bus_name, std::string path)
-    : Interface(conn, bus_name, path, "org.freedesktop.DBus.ObjectManager") {}
+ObjectManager::ObjectManager(std::shared_ptr<Connection> conn, Proxy* proxy)
+    : Interface(conn, proxy, "org.freedesktop.DBus.ObjectManager") {}
 
 Holder ObjectManager::GetManagedObjects(bool use_callbacks) {
-    Message query_msg = Message::create_method_call(_bus_name, _path, _interface_name, "GetManagedObjects");
+    Message query_msg = Message::create_method_call(_proxy->bus_name(), _proxy->path(), _interface_name, "GetManagedObjects");
     Message reply_msg = _conn->send_with_reply_and_block(query_msg);
     Holder managed_objects = reply_msg.extract();
     // TODO: Remove immediate callback support.
@@ -29,6 +30,8 @@ void ObjectManager::message_handle(Message& msg) {
         if (InterfacesAdded) {
             InterfacesAdded(path, options);
         }
+        // TODO: Make a call directly to the proxy to do this?
+
     } else if (msg.is_signal(_interface_name, "InterfacesRemoved")) {
         std::string path = msg.extract().get_string();
         msg.extract_next();
@@ -36,28 +39,13 @@ void ObjectManager::message_handle(Message& msg) {
         if (InterfacesRemoved) {
             InterfacesRemoved(path, options);
         }
-    }
-}
+        // TODO: Make a call directly to the proxy to do this?
 
-bool ObjectManager::process_received_signal(Message& message) {
-    if (message.get_path() == _path) {
-        if (message.is_signal(_interface_name, "InterfacesAdded")) {
-            std::string path = message.extract().get_string();
-            message.extract_next();
-            Holder options = message.extract();
-            if (InterfacesAdded) {
-                InterfacesAdded(path, options);
-            }
-            return true;
-        } else if (message.is_signal(_interface_name, "InterfacesRemoved")) {
-            std::string path = message.extract().get_string();
-            message.extract_next();
-            Holder options = message.extract();
-            if (InterfacesRemoved) {
-                InterfacesRemoved(path, options);
-            }
-            return true;
-        }
+    } else if (msg.is_method_call(_interface_name, "GetManagedObjects")) {
+        SimpleDBus::Holder result = _proxy->path_collect();
+
+        SimpleDBus::Message reply = SimpleDBus::Message::create_method_return(msg);
+        reply.append_argument(result, "a{oa{sa{sv}}}");
+        _conn->send(reply);
     }
-    return false;
 }

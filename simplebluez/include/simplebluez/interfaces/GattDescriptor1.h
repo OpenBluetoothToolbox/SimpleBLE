@@ -11,7 +11,7 @@ namespace SimpleBluez {
 
 class GattDescriptor1 : public SimpleDBus::Interface {
   public:
-    GattDescriptor1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path);
+    GattDescriptor1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* proxy);
     virtual ~GattDescriptor1();
 
     // ----- METHODS -----

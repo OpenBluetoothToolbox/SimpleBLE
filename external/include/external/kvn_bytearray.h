@@ -56,6 +56,12 @@ class bytearray {
     bytearray(const char* byteArr) : bytearray(std::string(byteArr)) {}
 
     /**
+     * @brief Constructs byte array from an initializer list of uint8_t.
+     * @param init An initializer list of uint8_t.
+     */
+    bytearray(std::initializer_list<uint8_t> init) : data_(init) {}
+
+    /**
      * @brief Creates a ByteArray from a hex string.
      *
      * Case is ignored and the string may have a '0x' hex prefix or not.

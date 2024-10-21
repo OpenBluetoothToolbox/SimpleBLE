@@ -6,8 +6,11 @@ using namespace SimpleBluez;
 
 Agent::Agent(std::shared_ptr<SimpleDBus::Connection> conn, const std::string& bus_name, const std::string& path)
     : Proxy(conn, bus_name, path) {
+}
+
+void Agent::init() {
     _interfaces.emplace(std::make_pair(
-        "org.bluez.Agent1", std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Agent1>(_conn, _path))));
+        "org.bluez.Agent1", std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Agent1>(_conn, this))));
 }
 
 std::string Agent::capabilities() const {
@@ -70,3 +73,11 @@ void Agent::set_on_authorize_service(std::function<bool(const std::string&)> cal
 void Agent::clear_on_authorize_service() { agent1()->OnAuthorizeService.unload(); }
 
 std::shared_ptr<Agent1> Agent::agent1() { return std::dynamic_pointer_cast<Agent1>(interface_get("org.bluez.Agent1")); }
+
+void Agent::set_on_release(std::function<void()> callback) { agent1()->OnRelease.load(callback); }
+
+void Agent::clear_on_release() { agent1()->OnRelease.unload(); }
+
+void Agent::set_on_cancel(std::function<void()> callback) { agent1()->OnCancel.load(callback); }
+
+void Agent::clear_on_cancel() { agent1()->OnCancel.unload(); }

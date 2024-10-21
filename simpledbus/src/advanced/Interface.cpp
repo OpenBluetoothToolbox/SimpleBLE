@@ -1,11 +1,15 @@
 #include <simpledbus/advanced/Interface.h>
+#include <simpledbus/advanced/Proxy.h>
 #include <simpledbus/base/Exceptions.h>
 
 using namespace SimpleDBus;
 
-Interface::Interface(std::shared_ptr<Connection> conn, const std::string& bus_name, const std::string& path,
-                     const std::string& interface_name)
-    : _conn(conn), _bus_name(bus_name), _path(path), _interface_name(interface_name), _loaded(true) {}
+Interface::Interface(std::shared_ptr<Connection> conn, Proxy* proxy, const std::string& interface_name)
+    : _conn(conn), _proxy(proxy), _interface_name(interface_name), _loaded(true) {
+    if (proxy == nullptr) {
+        throw std::invalid_argument("Interface must belong to a valid proxy.");
+    }
+}
 
 // ----- LIFE CYCLE -----
 
@@ -33,13 +37,35 @@ bool Interface::is_loaded() const { return _loaded; }
 // ----- METHODS -----
 
 Message Interface::create_method_call(const std::string& method_name) {
-    return Message::create_method_call(_bus_name, _path, _interface_name, method_name);
+    return Message::create_method_call(_proxy->bus_name(), _proxy->path(), _interface_name, method_name);
 }
 
 // ----- PROPERTIES -----
 
+Holder Interface::property_collect() {
+    std::scoped_lock lock(_property_update_mutex);
+    SimpleDBus::Holder properties = SimpleDBus::Holder::create_dict();
+    for (const auto& [key, value] : _properties) {
+        properties.dict_append(SimpleDBus::Holder::Type::STRING, key, value);
+    }
+    return properties;
+}
+
+Holder Interface::property_collect_single(const std::string& property_name) {
+    std::scoped_lock lock(_property_update_mutex);
+    // TODO: Check if property exists
+    return _properties[property_name];
+}
+
+void Interface::property_modify(const std::string& property_name, const Holder& value) {
+    std::scoped_lock lock(_property_update_mutex);
+    _properties[property_name] = value;
+    property_changed(property_name);
+}
+
 Holder Interface::property_get_all() {
-    Message query_msg = Message::create_method_call(_bus_name, _path, "org.freedesktop.DBus.Properties", "GetAll");
+    Message query_msg = Message::create_method_call(_proxy->bus_name(), _proxy->path(), "org.freedesktop.DBus.Properties",
+                                                    "GetAll");
 
     Holder h_interface = Holder::create_string(_interface_name);
     query_msg.append_argument(h_interface, "s");
@@ -50,7 +76,8 @@ Holder Interface::property_get_all() {
 }
 
 Holder Interface::property_get(const std::string& property_name) {
-    Message query_msg = Message::create_method_call(_bus_name, _path, "org.freedesktop.DBus.Properties", "Get");
+    Message query_msg = Message::create_method_call(_proxy->bus_name(), _proxy->path(), "org.freedesktop.DBus.Properties",
+                                                    "Get");
 
     Holder h_interface = Holder::create_string(_interface_name);
     query_msg.append_argument(h_interface, "s");
@@ -64,7 +91,8 @@ Holder Interface::property_get(const std::string& property_name) {
 }
 
 void Interface::property_set(const std::string& property_name, const Holder& value) {
-    Message query_msg = Message::create_method_call(_bus_name, _path, "org.freedesktop.DBus.Properties", "Set");
+    Message query_msg = Message::create_method_call(_proxy->bus_name(), _proxy->path(), "org.freedesktop.DBus.Properties",
+                                                    "Set");
 
     Holder h_interface = Holder::create_string(_interface_name);
     query_msg.append_argument(h_interface, "s");
