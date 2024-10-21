@@ -126,13 +126,15 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
+        # For testing purposes only static libraries are built to reduce run time.
+        # In release workflow all combinations are build.
         options: [
           {container: dockcross/linux-x64, target: linux-x64},
           {container: dockcross/linux-x86, target: linux-x86},
           {container: dockcross/linux-armv6-lts, target: linux-armv6},
         ]
         library: ${{ fromJSON(inputs.libraries) }}
-        type: [shared, static]
+        type: [static] 
 
     container:
       image: ${{ matrix.options.container }}
@@ -150,7 +152,7 @@ jobs:
         run: |
           GITHUB_WORKSPACE=$(pwd)
 
-          if [ "${{ matrix.type }}" = "shared" ]; then
+          if [ "${{ matrix.type }}" == "shared" ]; then
             BUILD_SHARED_LIBS=ON
           else
             BUILD_SHARED_LIBS=OFF
@@ -172,14 +174,15 @@ jobs:
           path: artifacts/${{ matrix.library }}_${{ matrix.type }}_${{ matrix.options.target }}.zip
 
   python:
-    needs: [build]
+    needs: [tests, examples]
     uses: ./.github/workflows/ci_wheels.yml
+    secrets: inherit
     with:
       os: ubuntu-22.04
 
   rust:
     runs-on: ${{ matrix.os }}
-    needs: [build]
+    needs: [tests, examples]
 
     strategy:
       fail-fast: false

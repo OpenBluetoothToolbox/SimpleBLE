@@ -42,7 +42,9 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        type: [shared, static]
+        # For testing purposes only static libraries are built to reduce run time.
+        # In release workflow all combinations are build.
+        type: [static]
         arch: [arm64, x86_64]
 
     steps:
@@ -55,7 +57,7 @@ jobs:
       - name: Compile SimpleBLE
         run: |
 
-          if [ "${{ matrix.type }}" = "shared" ]; then
+          if [ "${{ matrix.type }}" == "shared" ]; then
             BUILD_SHARED_LIBS=ON
           else
             BUILD_SHARED_LIBS=OFF
@@ -75,14 +77,15 @@ jobs:
           path: artifacts/simpleble_${{ matrix.type }}_macos-${{ matrix.arch }}.zip
 
   python:
-    needs: [build]
+    needs: [tests, examples]
     uses: ./.github/workflows/ci_wheels.yml
+    secrets: inherit
     with:
       os: macos-12
 
   rust:
     runs-on: ${{ matrix.os }}
-    needs: [build]
+    needs: [tests, examples]
 
     strategy:
       fail-fast: false
