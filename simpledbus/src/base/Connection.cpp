@@ -117,14 +117,7 @@ Message Connection::pop_message() {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
 
     DBusMessage* msg = dbus_connection_pop_message(_conn);
-    if (msg == nullptr) {
-        return Message();
-    } else {
-        auto msg_wrapped = Message(msg);
-        // Ownership of the DBusMessage* is transferred to the Message object, we can reduce the reference count.
-        dbus_message_unref(msg);
-        return msg_wrapped;
-    }
+    return Message::from_acquired(msg);
 }
 
 void Connection::send(Message& msg) {
@@ -135,7 +128,7 @@ void Connection::send(Message& msg) {
     std::lock_guard<std::recursive_mutex> lock(_mutex);
 
     uint32_t msg_serial = 0;
-    dbus_connection_send(_conn, msg._msg, &msg_serial);
+    dbus_connection_send(_conn, msg, &msg_serial);
     dbus_connection_flush(_conn);
 }
 
@@ -148,7 +141,7 @@ Message Connection::send_with_reply_and_block(Message& msg) {
 
     ::DBusError err;
     dbus_error_init(&err);
-    DBusMessage* msg_tmp = dbus_connection_send_with_reply_and_block(_conn, msg._msg, -1, &err);
+    DBusMessage* msg_tmp = dbus_connection_send_with_reply_and_block(_conn, msg, -1, &err);
 
     if (dbus_error_is_set(&err)) {
         std::string err_name = err.name;
@@ -157,9 +150,7 @@ Message Connection::send_with_reply_and_block(Message& msg) {
         throw Exception::SendFailed(err_name, err_message, msg.to_string());
     }
 
-    auto msg_return = Message(msg_tmp);
-    dbus_message_unref(msg_tmp);
-    return msg_return;
+    return Message::from_acquired(msg_tmp);
 }
 
 std::string Connection::unique_name() {
