@@ -14,6 +14,8 @@ class Bluez {
 
     // Note: This class MUST be consumed as a shared_ptr, as internally objects
     // are linked together and proper usage of `shared_from_this()` is relied upon.
+    // TODO: This restriction has been removed, but we'll leave this as-is for now.
+    // TODO: We need to separate the initialization procedure from the constructor to avoid crashes if init fails.
     static std::shared_ptr<Bluez> create() {
         static std::shared_ptr<Bluez> instance = std::shared_ptr<Bluez>(new Bluez());
         instance->init();
