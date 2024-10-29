@@ -91,6 +91,23 @@ void Adapter1::RemoveDevice(std::string device_path) {
     _conn->send_with_reply_and_block(msg);
 }
 
+std::string Adapter1::Alias() {
+    std::scoped_lock lock(_property_update_mutex);
+    return _properties["Alias"].get_string();
+}
+
+void Adapter1::Alias(std::string alias) {
+    SimpleDBus::Holder alias_h = SimpleDBus::Holder::create_string(alias);
+
+    {
+        std::scoped_lock lock(_property_update_mutex);
+        _properties["Alias"] = alias_h;
+    }
+
+    std::shared_ptr<SimpleDBus::Properties> properties = std::dynamic_pointer_cast<SimpleDBus::Properties>(_proxy->interface_get("org.freedesktop.DBus.Properties"));
+    properties->Set("org.bluez.Adapter1", "Alias", alias_h);
+}
+
 bool Adapter1::Discovering(bool refresh) {
     if (refresh) {
         property_refresh("Discovering");

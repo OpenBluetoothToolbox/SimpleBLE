@@ -48,6 +48,10 @@ std::string Adapter::identifier() const {
 
 std::string Adapter::address() { return adapter1()->Address(); }
 
+std::string Adapter::alias() { return adapter1()->Alias(); }
+
+void Adapter::alias(std::string alias) { adapter1()->Alias(alias); }
+
 bool Adapter::discovering() { return adapter1()->Discovering(); }
 
 bool Adapter::powered() { return adapter1()->Powered(); }

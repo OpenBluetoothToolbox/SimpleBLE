@@ -72,6 +72,8 @@ int main(int argc, char* argv[]) {
         }
     });
 
+    adapter->alias("Potato");
+
     // --- SERVICE DEFINITION ---
     auto service0 = service_manager->create_service();
     service0->uuid("12345678-1234-5678-1234-567812345678");
