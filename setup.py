@@ -36,9 +36,9 @@ def get_commit_since_hash(hash_cmd):
     if not hash:
         raise RuntimeError(f"Empty hash")
 
+    count_cmd = f"git rev-list --count {hash}..HEAD"
     result = subprocess.run(
-        [f"git rev-list --count {hash}..HEAD"], 
-        shell=True,
+        count_cmd.split(' '),
         capture_output=True,
         text=True
     )
