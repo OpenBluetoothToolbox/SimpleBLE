@@ -1,5 +1,5 @@
-#include "AdapterBase.h"
-#include "Bluez.h"
+#include "AdapterLinux.h"
+#include "BackendBluez.h"
 #include "CommonUtils.h"
 #include "PeripheralBase.h"
 #include "PeripheralBuilder.h"

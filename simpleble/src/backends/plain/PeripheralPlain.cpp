@@ -1,4 +1,4 @@
-#include "PeripheralBase.h"
+#include "PeripheralPlain.h"
 
 #include "CharacteristicBuilder.h"
 #include "DescriptorBuilder.h"

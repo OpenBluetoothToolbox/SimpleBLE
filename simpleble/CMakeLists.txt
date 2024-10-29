@@ -154,8 +154,8 @@ if(SIMPLEBLE_PLAIN)
     message(STATUS "Plain Flavor Requested")
 
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/AdapterBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/PeripheralBase.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/AdapterPlain.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/PeripheralPlain.cpp)
 
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain)
@@ -181,9 +181,9 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     endif()
 
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/AdapterBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/PeripheralBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/Bluez.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/AdapterLinux.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/PeripheralLinux.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/BackendBluez.cpp)
 
     target_sources(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/ProxyOrg.cpp
