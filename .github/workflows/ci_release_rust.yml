@@ -36,14 +36,9 @@ jobs:
       - run: cargo install cargo-release
         if: steps.cargo_release_cache.outputs.cache-hit != 'true'
 
-      - name: cargo login
-        run: cargo login ${{ secrets.CRATES_IO_API_TOKEN }}
-
-      # allow-branch HEAD is because GitHub actions switches
-      # to the tag while building, which is a detached head
-
-      - name: "cargo release publish"
-        run: |-
+      - name: cargo release publish
+        run: |
+          cargo login ${{ secrets.CRATES_IO_API_TOKEN }}
           cargo release \
             publish \
             --workspace \
@@ -52,3 +47,6 @@ jobs:
             --no-confirm \
             --no-verify \
             --execute
+        env:
+          HAS_CRATES_IO_API_TOKEN: ${{ secrets.CRATES_IO_API_TOKEN != '' }}
+        if: ${{ env.HAS_CRATES_IO_API_TOKEN == 'true' }}
