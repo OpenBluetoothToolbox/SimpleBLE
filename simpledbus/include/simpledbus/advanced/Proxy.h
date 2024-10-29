@@ -75,7 +75,7 @@ class Proxy : public std::enable_shared_from_this<Proxy> {
 
     // ----- CALLBACKS -----
     kvn::safe_callback<void(std::string)> on_child_created;
-    kvn::safe_callback<void(std::string)> on_child_signal_received;
+    kvn::safe_callback<void()> on_signal_received;
 
     // ----- TEMPLATE METHODS -----
     // ! This method returns a Proxy descendant object.
@@ -110,8 +110,6 @@ class Proxy : public std::enable_shared_from_this<Proxy> {
     std::string _bus_name;
 
     std::shared_ptr<Connection> _conn;
-
-    std::weak_ptr<Proxy> _parent; // TODO: We need a cleaner way to handle object hierarchies.
 
     std::map<std::string, std::shared_ptr<Interface>> _interfaces;
     std::map<std::string, std::shared_ptr<Proxy>> _children;

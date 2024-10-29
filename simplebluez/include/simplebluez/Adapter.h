@@ -50,6 +50,8 @@ class Adapter : public SimpleDBus::Proxy {
     std::shared_ptr<Adapter1> adapter1();
     std::shared_ptr<LEAdvertisingManager1> le_advertising_manager1();
     std::shared_ptr<GattManager1> gatt_manager1();
+
+    kvn::safe_callback<void(std::shared_ptr<Device> device)> _on_device_updated;
 };
 
 }  // namespace SimpleBluez

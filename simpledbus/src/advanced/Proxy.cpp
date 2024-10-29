@@ -18,7 +18,7 @@ Proxy::Proxy(std::shared_ptr<Connection> conn, const std::string& bus_name, cons
 Proxy::~Proxy() {
     unregister_object_path();
     on_child_created.unload();
-    on_child_signal_received.unload();
+    on_signal_received.unload();
 }
 
 std::shared_ptr<Interface> Proxy::interfaces_create(const std::string& name) {
@@ -171,7 +171,6 @@ void Proxy::path_add(const std::string& path, SimpleDBus::Holder managed_interfa
         // If the path is a direct child of the proxy path, create a new proxy for it.
         std::shared_ptr<Proxy> child = path_create(path);
         child->interfaces_load(managed_interfaces);
-        child->_parent = shared_from_this();
         _children.emplace(std::make_pair(path, child));
         on_child_created(path);
     } else {
@@ -192,7 +191,6 @@ void Proxy::path_add(const std::string& path, SimpleDBus::Holder managed_interfa
             std::shared_ptr<Proxy> child = path_create(child_path);
             _children.emplace(std::make_pair(child_path, child));
             child->path_add(path, managed_interfaces);
-            child->_parent = shared_from_this();
             on_child_created(child_path);
         }
     }
@@ -320,10 +318,7 @@ void Proxy::message_handle(Message& msg) {
     }
 
     if (msg.get_type() == Message::Type::SIGNAL) {
-        auto parent = _parent.lock();
-        if (parent != nullptr) {
-            parent->on_child_signal_received(_path);
-        }
+        on_signal_received();
     }
 
     if (!handled) {
