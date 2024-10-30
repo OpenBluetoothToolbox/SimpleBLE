@@ -1,11 +1,12 @@
 #include <iostream>
 
 #include "simpleble/Adapter.h"
+#include "simpleble/Backend.h"
 #include "simpleble/Utils.h"
 
 int main() {
     std::cout << "Using SimpleBLE version: " << SimpleBLE::get_simpleble_version() << std::endl;
-    std::cout << "Bluetooth enabled: " << SimpleBLE::Adapter::bluetooth_enabled() << std::endl;
+    std::cout << "Bluetooth enabled: " << SimpleBLE::Backend::first_bluetooth_enabled().has_value() << std::endl;
 
     auto adapter_list = SimpleBLE::Adapter::get_adapters();
 

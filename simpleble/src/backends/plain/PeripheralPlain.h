@@ -4,8 +4,10 @@
 #include <simpleble/Service.h>
 #include <simpleble/Types.h>
 
-#include <kvn_safe_callback.hpp>
+#include "PeripheralBase.h"
+
 #include <TaskRunner.hpp>
+#include <kvn_safe_callback.hpp>
 
 #include <atomic>
 #include <condition_variable>
@@ -15,45 +17,46 @@
 
 namespace SimpleBLE {
 
-class PeripheralBase {
+class PeripheralPlain : public PeripheralBase {
   public:
-    PeripheralBase();
-    virtual ~PeripheralBase();
+    PeripheralPlain();
+    virtual ~PeripheralPlain();
 
-    void* underlying() const;
+    // void* underlying() const;
 
-    std::string identifier();
-    BluetoothAddress address();
-    BluetoothAddressType address_type();
-    int16_t rssi();
-    int16_t tx_power();
-    uint16_t mtu();
+    virtual std::string identifier() const override;
+    virtual BluetoothAddress address() override;
+    virtual BluetoothAddressType address_type() override;
+    virtual int16_t rssi() override;
+    virtual int16_t tx_power() override;
+    virtual uint16_t mtu() override;
 
-    void connect();
-    void disconnect();
-    bool is_connected();
-    bool is_connectable();
-    bool is_paired();
-    void unpair();
+    virtual void connect() override;
+    virtual void disconnect() override;
+    virtual bool is_connected() override;
+    virtual bool is_connectable() override;
+    virtual bool is_paired() override;
+    virtual void unpair() override;
 
-    std::vector<Service> services();
-    std::vector<Service> advertised_services();
-    std::map<uint16_t, ByteArray> manufacturer_data();
+    virtual std::vector<std::shared_ptr<ServiceBase>> available_services() override;
+    virtual std::vector<std::shared_ptr<ServiceBase>> advertised_services() override;
+
+    virtual std::map<uint16_t, ByteArray> manufacturer_data() override;
 
     // clang-format off
-    ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic);
-    void write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data);
-    void write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data);
-    void notify(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback);
-    void indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback);
-    void unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic);
+    virtual ByteArray read_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic) override;
+    virtual void write_request_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) override;
+    virtual void write_command_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) override;
+    virtual void notify_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback) override;
+    virtual void indicate_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback) override;
+    virtual void unsubscribe_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic) override;
 
-    ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor);
-    void write(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor, ByteArray const& data);
+    virtual ByteArray read_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor) override;
+    virtual void write_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor, ByteArray const& data) override;
     // clang-format on
 
-    void set_callback_on_connected(std::function<void()> on_connected);
-    void set_callback_on_disconnected(std::function<void()> on_disconnected);
+    virtual void set_callback_on_connected(std::function<void()> on_connected) override;
+    virtual void set_callback_on_disconnected(std::function<void()> on_disconnected) override;
 
   private:
     std::atomic_bool connected_{false};
@@ -66,7 +69,6 @@ class PeripheralBase {
     std::map<std::pair<BluetoothUUID, BluetoothUUID>, std::function<void(ByteArray payload)>> callbacks_;
 
     TaskRunner task_runner_;
-
 };
 
 }  // namespace SimpleBLE

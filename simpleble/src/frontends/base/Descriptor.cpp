@@ -1,8 +1,7 @@
 #include <simpleble/Descriptor.h>
 
 #include "DescriptorBase.h"
-#include "DescriptorBuilder.h"
 
-using namespace SimpleBLE;
+bool SimpleBLE::Descriptor::initialized() const { return internal_ != nullptr; }
 
-BluetoothUUID Descriptor::uuid() { return internal_->uuid(); }
+SimpleBLE::BluetoothUUID SimpleBLE::Descriptor::uuid() { return initialized() ? internal_->uuid() : BluetoothUUID(); }

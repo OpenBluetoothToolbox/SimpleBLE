@@ -1,13 +1,9 @@
 #include <simpleble/Characteristic.h>
 
+#include "BuildVec.h"
 #include "CharacteristicBase.h"
-#include "CharacteristicBuilder.h"
 
 using namespace SimpleBLE;
-
-BluetoothUUID Characteristic::uuid() { return internal_->uuid(); }
-
-std::vector<Descriptor> Characteristic::descriptors() { return internal_->descriptors(); }
 
 std::vector<std::string> Characteristic::capabilities() {
     std::vector<std::string> capabilities;
@@ -35,8 +31,16 @@ std::vector<std::string> Characteristic::capabilities() {
     return capabilities;
 }
 
-bool Characteristic::can_read() { return internal_->can_read(); }
-bool Characteristic::can_write_request() { return internal_->can_write_request(); }
-bool Characteristic::can_write_command() { return internal_->can_write_command(); }
-bool Characteristic::can_notify() { return internal_->can_notify(); }
-bool Characteristic::can_indicate() { return internal_->can_indicate(); }
+bool Characteristic::initialized() const { return internal_ != nullptr; }
+
+bool Characteristic::can_read() { return initialized() && internal_->can_read(); }
+bool Characteristic::can_write_request() { return initialized() && internal_->can_write_request(); }
+bool Characteristic::can_write_command() { return initialized() && internal_->can_write_command(); }
+bool Characteristic::can_notify() { return initialized() && internal_->can_notify(); }
+bool Characteristic::can_indicate() { return initialized() && internal_->can_indicate(); }
+
+BluetoothUUID Characteristic::uuid() { return initialized() ? internal_->uuid() : BluetoothUUID(); }
+
+std::vector<Descriptor> Characteristic::descriptors() {
+    return initialized() ? build_vec(internal_->descriptors()) : std::vector<Descriptor>();
+}

@@ -3,9 +3,10 @@
 #include <simpleble/AdapterSafe.h>
 
 #include <cstring>
+#include "simpleble/BackendSafe.h"
 
 bool simpleble_adapter_is_bluetooth_enabled(void) {
-    return SimpleBLE::Safe::Adapter::bluetooth_enabled().value_or(false);
+    return SimpleBLE::Safe::Backend::any_bluetooth_enabled().has_value();
 }
 
 size_t simpleble_adapter_get_count(void) {

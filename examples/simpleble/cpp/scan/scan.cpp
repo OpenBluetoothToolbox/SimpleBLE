@@ -1,3 +1,4 @@
+#include <sys/cdefs.h>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -5,6 +6,12 @@
 #include "../common/utils.hpp"
 
 #include "simpleble/Adapter.h"
+
+namespace SimpleBLE {
+class BackendBluez;
+
+extern std::shared_ptr<BackendBluez> _nodisc_keep();
+}
 
 int main() {
     auto adapter_optional = Utils::getAdapter();

@@ -1,7 +1,7 @@
-#include <simpleble/Service.h>
 
 #include "ServiceBase.h"
-#include "ServiceBuilder.h"
+#include "BuilderBase.h"
+#include "simpleble/Characteristic.h"
 
 using namespace SimpleBLE;
 
@@ -9,8 +9,12 @@ ServiceBase::ServiceBase(const BluetoothUUID& uuid) : uuid_(uuid) {}
 
 ServiceBase::ServiceBase(const BluetoothUUID& uuid, const ByteArray& data) : uuid_(uuid), data_(data) {}
 
-ServiceBase::ServiceBase(const BluetoothUUID& uuid, std::vector<Characteristic>& characteristics)
-    : uuid_(uuid), characteristics_(characteristics) {}
+ServiceBase::ServiceBase(const BluetoothUUID& uuid, std::vector<std::shared_ptr<CharacteristicBase>>& characteristics)
+    : uuid_(uuid) {
+    for (auto& characteristic_base : characteristics) {
+        characteristics_.push_back(build(characteristic_base));
+    }
+}
 
 BluetoothUUID ServiceBase::uuid() { return uuid_; }
 

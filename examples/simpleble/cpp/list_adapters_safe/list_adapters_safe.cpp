@@ -1,9 +1,10 @@
 #include <iostream>
 
 #include "simpleble/AdapterSafe.h"
+#include "simpleble/BackendSafe.h"
 
 int main() {
-    auto bluetooth_enabled = SimpleBLE::Safe::Adapter::bluetooth_enabled();
+    auto bluetooth_enabled = SimpleBLE::Safe::Backend::any_bluetooth_enabled();
 
     if (!bluetooth_enabled.has_value()) {
         std::cout << "Failed to determine Bluetooth status" << std::endl;

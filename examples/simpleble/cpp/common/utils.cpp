@@ -22,7 +22,21 @@ std::optional<std::size_t> Utils::getUserInputInt(const std::string& line, std::
 }
 
 std::optional<SimpleBLE::Adapter> Utils::getAdapter() {
-    if (!SimpleBLE::Adapter::bluetooth_enabled()) {
+    auto backends = SimpleBLE::Backend::get_backends();
+
+    if (backends.empty()) {
+        std::cerr << "No backends were found." << std::endl;
+        return {};
+    }
+
+    bool bluetooth_enabled = false;
+    std::cout << "Available backends:" << std::endl;
+    for (auto& backend : backends) {
+        bluetooth_enabled = bluetooth_enabled || backend.bluetooth_enabled();
+        std::cout << backend.backend_name() << ", Enabled: " << backend.bluetooth_enabled() << std::endl;
+    }
+
+    if (!bluetooth_enabled) {
         std::cout << "Bluetooth is not enabled!" << std::endl;
         return {};
     }

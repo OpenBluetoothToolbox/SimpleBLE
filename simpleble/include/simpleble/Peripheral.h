@@ -23,7 +23,6 @@ class SIMPLEBLE_EXPORT Peripheral {
     virtual ~Peripheral() = default;
 
     bool initialized() const;
-    void* underlying() const;
 
     std::string identifier();
     BluetoothAddress address();
@@ -71,6 +70,9 @@ class SIMPLEBLE_EXPORT Peripheral {
     void set_callback_on_disconnected(std::function<void()> on_disconnected);
 
   protected:
+    PeripheralBase* operator->();
+    const PeripheralBase* operator->() const;
+
     std::shared_ptr<PeripheralBase> internal_;
 };
 

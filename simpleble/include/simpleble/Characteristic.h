@@ -17,6 +17,8 @@ class SIMPLEBLE_EXPORT Characteristic {
     Characteristic() = default;
     virtual ~Characteristic() = default;
 
+    bool initialized() const;
+
     BluetoothUUID uuid();
     std::vector<Descriptor> descriptors();
     std::vector<std::string> capabilities();
