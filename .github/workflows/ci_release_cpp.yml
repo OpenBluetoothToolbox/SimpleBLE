@@ -64,7 +64,7 @@ jobs:
           zip -r $GITHUB_WORKSPACE/artifacts/simpleble_${{ matrix.type }}_${{ matrix.options.target }}.zip $GITHUB_WORKSPACE/build_simpleble/install
 
       - name: Upload binaries to job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: simpleble_${{ matrix.type }}_${{ matrix.options.target }}
           path: artifacts/simpleble_${{ matrix.type }}_${{ matrix.options.target }}.zip
@@ -118,7 +118,7 @@ jobs:
           7z a -tzip %GITHUB_WORKSPACE%\artifacts\simpleble_${{ matrix.type }}_windows-${{ matrix.arch }}.zip %GITHUB_WORKSPACE%\build\install
 
       - name: Upload binaries to job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: simpleble_${{ matrix.type }}_windows-${{ matrix.arch }}
           path: artifacts/simpleble_${{ matrix.type }}_windows-${{ matrix.arch }}.zip
@@ -171,7 +171,7 @@ jobs:
           zip -r $GITHUB_WORKSPACE/artifacts/simpleble_${{ matrix.type }}_macos-${{ matrix.arch }}.zip $GITHUB_WORKSPACE/build/install
 
       - name: Upload binaries to job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: simpleble_${{ matrix.type }}_macos-${{ matrix.arch }}
           path: artifacts/simpleble_${{ matrix.type }}_macos-${{ matrix.arch }}.zip
