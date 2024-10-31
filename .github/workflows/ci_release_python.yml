@@ -43,20 +43,11 @@ jobs:
           path: dist/*.tar.gz
 
   build_wheels:
-    runs-on: ${{ matrix.options.os }}
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        options: [
-          {os: ubuntu-22.04, arch: x86_64},
-          {os: ubuntu-22.04, arch: i686},
-          {os: ubuntu-22.04, arch: aarch64},
-          {os: windows-2022, arch: AMD64},
-          {os: windows-2022, arch: x86},
-          {os: macos-12    , arch: x86_64},
-          {os: macos-12    , arch: universal2},
-          {os: macos-12    , arch: arm64},
-        ]
+        os: [ubuntu-22.04, windows-2022, macos-12]
 
     steps:
       - name: Clone repository
@@ -85,16 +76,16 @@ jobs:
         uses: pypa/cibuildwheel@v2.19.2
         env:
           CIBW_BEFORE_ALL_LINUX: "yum update -y && yum group install -y \"Development Tools\" && yum install -y dbus-devel"
-          CIBW_ARCHS_LINUX: ${{ matrix.options.arch }}
-          CIBW_ARCHS_MACOS: ${{ matrix.options.arch }}
-          CIBW_ARCHS_WINDOWS: ${{ matrix.options.arch }}
+          CIBW_ARCHS_LINUX: x86_64 i686 aarch64
+          CIBW_ARCHS_MACOS: x86_64 universal2 arm64
+          CIBW_ARCHS_WINDOWS: AMD64 x86
           CIBW_SKIP: "*musllinux_* pp*"
           MACOSX_DEPLOYMENT_TARGET: 10.15
 
       - name: Upload wheels to job
         uses: actions/upload-artifact@v4
         with:
-          name: simpleble-wheels
+          name: simpleble-wheels-${{ matrix.os }}
           path: wheelhouse/*.whl
 
   publish:
