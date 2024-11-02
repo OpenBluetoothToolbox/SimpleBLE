@@ -21,9 +21,9 @@ jobs:
       max-parallel: 4
       matrix:
         options: [
-          {container: dockcross/linux-x64, target: linux-x64},
-          {container: dockcross/linux-x86, target: linux-x86},
-          {container: dockcross/linux-armv6-lts, target: linux-armv6},
+          {container: dockcross/linux-x64, target: x86_64},
+          {container: dockcross/linux-x86, target: i386},
+          {container: dockcross/linux-armv6-lts, target: armv6},
         ]
         type: [shared, static]
 
@@ -73,13 +73,14 @@ jobs:
           cmake --install $GITHUB_WORKSPACE/build_simpleble --prefix $GITHUB_WORKSPACE/build_simpleble/install
 
           mkdir -p $GITHUB_WORKSPACE/artifacts
-          zip -r $GITHUB_WORKSPACE/artifacts/simpleble_${{ matrix.type }}_${{ matrix.options.target }}.zip $GITHUB_WORKSPACE/build_simpleble/install
+          cd $GITHUB_WORKSPACE/build_simpleble/install
+          zip -r $GITHUB_WORKSPACE/artifacts/simpleble_${{ matrix.type }}_linux-${{ matrix.options.target }}.zip .
 
       - name: Upload binaries to job
         uses: actions/upload-artifact@v3
         with:
-          name: simpleble_${{ matrix.type }}_${{ matrix.options.target }}
-          path: artifacts/simpleble_${{ matrix.type }}_${{ matrix.options.target }}.zip
+          name: simpleble_${{ matrix.type }}_linux-${{ matrix.options.target }}
+          path: artifacts/simpleble_${{ matrix.type }}_linux-${{ matrix.options.target }}.zip
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
@@ -100,7 +101,7 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        arch: [Win32, x64]
+        arch: [x32, x64]
         type: [shared, static]
 
     steps:
@@ -129,7 +130,8 @@ jobs:
           cmake --install %GITHUB_WORKSPACE%\build --prefix %GITHUB_WORKSPACE%\build\install
 
           mkdir -p $GITHUB_WORKSPACE\artifacts
-          7z a -tzip %GITHUB_WORKSPACE%\artifacts\simpleble_${{ matrix.type }}_windows-${{ matrix.arch }}.zip %GITHUB_WORKSPACE%\build\install
+          cd %GITHUB_WORKSPACE%\build\install
+          7z a -tzip %GITHUB_WORKSPACE%\artifacts\simpleble_${{ matrix.type }}_windows-${{ matrix.arch }}.zip .
 
       - name: Upload binaries to job
         uses: actions/upload-artifact@v3
@@ -186,7 +188,8 @@ jobs:
           cmake --install $GITHUB_WORKSPACE/build --prefix $GITHUB_WORKSPACE/build/install
 
           mkdir -p $GITHUB_WORKSPACE/artifacts
-          zip -r $GITHUB_WORKSPACE/artifacts/simpleble_${{ matrix.type }}_macos-${{ matrix.arch }}.zip $GITHUB_WORKSPACE/build/install
+          cd $GITHUB_WORKSPACE/build/install
+          zip -r $GITHUB_WORKSPACE/artifacts/simpleble_${{ matrix.type }}_macos-${{ matrix.arch }}.zip .
 
       - name: Upload binaries to job
         uses: actions/upload-artifact@v3
