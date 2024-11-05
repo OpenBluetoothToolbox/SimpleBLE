@@ -78,11 +78,11 @@ assert_return_value() {
     local command="$1"
     local expected=$2
     local description="$3"
-    
+
     # Run command and redirect output to /dev/null
     eval "$command" > /dev/null 2>&1
     local actual=$?
-    
+
     if [ $actual -ne $expected ]; then
         echo "UNIT TEST FAILED: $command (expected: $expected, got: $actual) Check code logic"
         return 1
@@ -99,7 +99,7 @@ assert_return_value 'check_tag_version_match "" "1.1.1" "1.1.1"' 1 || exit 1
 assert_return_value 'check_tag_version_match "" "1.1.0" "1.1.1"' 1 || exit 1
 assert_return_value 'check_tag_version_match "" "1.1.2" "1.1.1"' 0 || exit 1
 assert_return_value 'check_changelog "1.1.9" ' 1 || exit 1
-assert_return_value 'check_changelog "0.8.0" ' 0 || exit 1
+assert_return_value 'check_changelog "0.7.0" ' 0 || exit 1
 assert_return_value 'check_changelog "" ' 0 || exit 1
 ###############################################################################
 
