@@ -34,7 +34,7 @@ performed:
    - ``VERSION``
    - ``Cargo.toml``
    - ``docs/changelog.rst``
-   - ``setup.py`` (Add or remove the ``.devX`` suffix as needed.)
+   - ``setup.py``
 
 #. Commit the changes to the repository.
 
