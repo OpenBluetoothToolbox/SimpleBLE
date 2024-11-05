@@ -122,6 +122,9 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [tests, examples]
 
+    # Skip the job if input is empty. If not there is an error building the matrix and depending jobs will not run:
+    # 'Error when evaluating 'strategy' for job 'build'. Matrix vector 'library' does not contain any values'
+    if: ${{ inputs.libraries != '[]' && inputs.libraries != '' }}
     strategy:
       fail-fast: false
       max-parallel: 4

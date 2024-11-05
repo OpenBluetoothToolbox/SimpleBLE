@@ -134,7 +134,7 @@ jobs:
           file_glob: true
 
   macos:
-    runs-on: macos-12
+    runs-on: macos-14
 
     strategy:
       fail-fast: false

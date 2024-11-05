@@ -109,6 +109,7 @@ jobs:
   # This is not inside pre-job because 'changes' variable is set by dorny/paths-filter to ALL the filters 
   # that match, so we need to have a job with only these three filters.
   # Note that the filters are defined in a way that makes each of them depend on the previous one.
+  # If in main branch, all libraries are listed in the output even if there are no matching changes.
   libraries:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true'
@@ -116,7 +117,7 @@ jobs:
     permissions:
       pull-requests: read
     outputs:
-      values: ${{ steps.filter.outputs.changes }}
+      values: ${{ github.ref == 'refs/heads/main' && '["simpledbus","simplebluez","simpleble"]' || steps.filter.outputs.changes }}
     steps:
       - name: Clone Repository 
         uses: actions/checkout@v4
@@ -126,8 +127,6 @@ jobs:
         with:
           filters: |
             simpledbus: &simpledbus
-              - '.github/workflows/**'
-              - '.github/actions/**'
               - 'simpledbus/**'
             simplebluez: &simplebluez
               - *simpledbus
@@ -135,6 +134,12 @@ jobs:
             simpleble: &simpleble
               - *simplebluez
               - 'simpleble/**'
+      - name: Debug Output
+        run: |
+          echo "Current branch: ${{ github.ref }}"
+          echo "Is main branch? ${{ github.ref == 'refs/heads/main' }}"
+          echo "Path filter changes: ${{ steps.filter.outputs.changes }}"
+          echo "Final libraries output: ${{ github.ref == 'refs/heads/main' && '["simpledbus","simplebluez","simpleble"]' || steps.filter.outputs.changes }}"
 
   lint:
     needs: pre_job

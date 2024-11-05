@@ -52,7 +52,9 @@ jobs:
           merge-multiple: true
       
       - name: Check Packages
-        run: twine check wheels/*.whl
+        run: |
+          pip3 install twine
+          twine check wheels/*.whl
 
       - name: Publish packages
         run: twine upload --skip-existing wheels/*.whl --verbose
