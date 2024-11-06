@@ -36,7 +36,7 @@ jobs:
         env:
           TAG: ${{ inputs.tag }}
         with:
-          file: dist/*.tar.gz
+          file: sdist/*.tar.gz
           tag: ${{ env.TAG }}
           overwrite: true
           file_glob: true
@@ -68,7 +68,7 @@ jobs:
         env:
           TAG: ${{ inputs.tag }}
         with:
-          file: wheelhouse/*.whl
+          file: wheels/*.whl
           tag: ${{ env.TAG }}
           overwrite: true
           file_glob: true
