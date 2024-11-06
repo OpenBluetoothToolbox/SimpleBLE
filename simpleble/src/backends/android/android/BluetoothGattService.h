@@ -13,11 +13,11 @@ class BluetoothGattService {
     BluetoothGattService();
     BluetoothGattService(JNI::Object obj);
 
-//    bool addCharacteristic(BluetoothGattCharacteristic characteristic);
-//    bool addService(BluetoothGattService service);
-//    BluetoothGattCharacteristic getCharacteristic(std::string uuid);
+    //    bool addCharacteristic(BluetoothGattCharacteristic characteristic);
+    //    bool addService(BluetoothGattService service);
+    //    BluetoothGattCharacteristic getCharacteristic(std::string uuid);
     std::vector<BluetoothGattCharacteristic> getCharacteristics();
-//    std::vector<BluetoothGattService> getIncludedServices();
+    //    std::vector<BluetoothGattService> getIncludedServices();
     int getInstanceId();
     int getType();
     std::string getUuid();

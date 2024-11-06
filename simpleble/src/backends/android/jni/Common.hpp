@@ -1,9 +1,9 @@
 #pragma once
 
 #include <jni.h>
+#include <cstdint>
 #include <string>
 #include <vector>
-#include <cstdint>
 
 #include "GlobalRef.hpp"
 #include "VM.hpp"
@@ -27,9 +27,7 @@ class Object {
 
     jobject get() const { return _obj.get(); }
 
-    explicit operator bool() const {
-        return _obj.get() != nullptr;
-    }
+    explicit operator bool() const { return _obj.get() != nullptr; }
 
     jmethodID get_method(const char* name, const char* signature) {
         JNIEnv* env = VM::env();
@@ -67,6 +65,7 @@ class Object {
     template <typename... Args>
     std::string call_string_method(jmethodID method, Args&&... args) {
         JNIEnv* env = VM::env();
+        // cppcheck-suppress cppcheckError
         jstring jstr = (jstring)env->CallObjectMethod(_obj.get(), method, std::forward<Args>(args)...);
 
         if (jstr == nullptr) {
@@ -79,7 +78,7 @@ class Object {
         return result;
     }
 
-    template<typename... Args>
+    template <typename... Args>
     std::vector<uint8_t> call_byte_array_method(jmethodID method, Args&&... args) {
         JNIEnv* env = VM::env();
         jbyteArray jarr = (jbyteArray)env->CallObjectMethod(_obj.get(), method, std::forward<Args>(args)...);
@@ -96,8 +95,6 @@ class Object {
         env->ReleaseByteArrayElements(jarr, arr, JNI_ABORT);
         return result;
     }
-    
-
 
     template <typename... Args>
     Object call_object_method(const char* name, const char* signature, Args&&... args) {
@@ -156,7 +153,7 @@ class Object {
         return result;
     }
 
-    template<typename... Args>
+    template <typename... Args>
     std::vector<uint8_t> call_byte_array_method(const char* name, const char* signature, Args&&... args) {
         JNIEnv* env = VM::env();
 
@@ -218,7 +215,7 @@ class Class {
 };
 
 class Env {
-public:
+  public:
     Env() { _env = VM::env(); }
     virtual ~Env() = default;
     Env(Env& other) = delete;             // Remove the copy constructor
@@ -236,7 +233,7 @@ public:
         return cls;
     }
 
-private:
+  private:
     JNIEnv* _env = nullptr;
 };
 
@@ -248,7 +245,7 @@ struct JObjectComparator {
             return false;  // Both are null, considered equal
         }
         if (lhs == nullptr) {
-            return true;   // lhs is null, rhs is not null, lhs < rhs
+            return true;  // lhs is null, rhs is not null, lhs < rhs
         }
         if (rhs == nullptr) {
             return false;  // rhs is null, lhs is not null, lhs > rhs
@@ -281,13 +278,13 @@ struct JniObjectComparator {
     bool operator()(const Object& lhs, const Object& rhs) const {
         // Handle null object comparisons
         if (!lhs && !rhs) {
-            return false; // Both are null, considered equal
+            return false;  // Both are null, considered equal
         }
         if (!lhs) {
-            return true; // lhs is null, rhs is not, lhs < rhs
+            return true;  // lhs is null, rhs is not, lhs < rhs
         }
         if (!rhs) {
-            return false; // rhs is null, lhs is not, lhs > rhs
+            return false;  // rhs is null, lhs is not, lhs > rhs
         }
 
         JNIEnv* env = VM::env();
@@ -298,7 +295,7 @@ struct JniObjectComparator {
 
         // Check if both jobject handles refer to the same object
         if (env->IsSameObject(lhsObject, rhsObject)) {
-            return false; // Both objects are the same
+            return false;  // Both objects are the same
         }
 
         // Use hashCode method to establish a consistent ordering
@@ -309,11 +306,11 @@ struct JniObjectComparator {
         jint rhsHashCode = env->CallIntMethod(rhsObject, hashCodeMethod);
 
         if (lhsHashCode != rhsHashCode) {
-            return lhsHashCode < rhsHashCode; // Use hash code for initial comparison
+            return lhsHashCode < rhsHashCode;  // Use hash code for initial comparison
         }
 
         // Use a direct pointer comparison as a fallback for objects with identical hash codes
-        return lhsObject < rhsObject; // This comparison is consistent within the same execution
+        return lhsObject < rhsObject;  // This comparison is consistent within the same execution
     }
 };
 

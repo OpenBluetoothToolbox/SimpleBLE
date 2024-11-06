@@ -30,9 +30,7 @@ void BluetoothDevice::initialize() {
     }
 }
 
-BluetoothDevice::BluetoothDevice(JNI::Object obj) : _obj(obj) {
-    initialize();
-};
+BluetoothDevice::BluetoothDevice(JNI::Object obj) : _obj(obj) { initialize(); };
 
 std::string BluetoothDevice::getAddress() { return _obj.call_string_method(_method_getAddress); }
 

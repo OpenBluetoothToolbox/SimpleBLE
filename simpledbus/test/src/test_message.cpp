@@ -324,7 +324,8 @@ TEST_F(MessageTest, ReceiveMethodCallFailure) {
 
 TEST_F(MessageTest, CopyConstructor) {
     // Create an original message
-    Message original = Message::create_method_call("org.example.Bus", "/org/example/Path", "org.example.Interface", "ExampleMethod");
+    Message original = Message::create_method_call("org.example.Bus", "/org/example/Path", "org.example.Interface",
+                                                   "ExampleMethod");
     original.append_argument(Holder::create_string("Test argument"), "s");
 
     // Test copy constructor
@@ -344,7 +345,8 @@ TEST_F(MessageTest, CopyConstructor) {
 
 TEST_F(MessageTest, CopyAssignment) {
     // Create an original message
-    Message original = Message::create_method_call("org.example.Bus", "/org/example/Path", "org.example.Interface", "ExampleMethod");
+    Message original = Message::create_method_call("org.example.Bus", "/org/example/Path", "org.example.Interface",
+                                                   "ExampleMethod");
     original.append_argument(Holder::create_string("Test argument"), "s");
 
     // Test copy assignment
@@ -365,7 +367,8 @@ TEST_F(MessageTest, CopyAssignment) {
 
 TEST_F(MessageTest, MoveConstructor) {
     // Create an original message
-    Message original = Message::create_method_call("org.example.Bus", "/org/example/Path", "org.example.Interface", "ExampleMethod");
+    Message original = Message::create_method_call("org.example.Bus", "/org/example/Path", "org.example.Interface",
+                                                   "ExampleMethod");
     original.append_argument(Holder::create_string("Test argument"), "s");
 
     // Test move constructor
@@ -379,7 +382,8 @@ TEST_F(MessageTest, MoveConstructor) {
 
 TEST_F(MessageTest, MoveAssignment) {
     // Create an original message
-    Message original = Message::create_method_call("org.example.Bus", "/org/example/Path", "org.example.Interface", "ExampleMethod");
+    Message original = Message::create_method_call("org.example.Bus", "/org/example/Path", "org.example.Interface",
+                                                   "ExampleMethod");
     original.append_argument(Holder::create_string("Test argument"), "s");
 
     // Test move assignment
