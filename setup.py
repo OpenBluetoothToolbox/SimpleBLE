@@ -9,6 +9,7 @@ import pybind11
 import skbuild
 
 from pathlib import Path
+from setuptools.command.sdist import sdist
 
 def exclude_unnecessary_files(cmake_manifest):
     def is_necessary(name):
@@ -92,6 +93,8 @@ def get_version():
             N = get_commits_since_version_bump()
             if N > 0:
                 version_str += f".dev{N-1}"
+	# If we are not in a git repo and running from a source distribution, the VERSION
+	# file has already been updated with the corresponding dev version if necessary.
     return version_str
 
 version_str = get_version()
@@ -113,6 +116,23 @@ if args.plain:
 
 if 'PIWHEELS_BUILD' in os.environ:
     cmake_options.append("-DLIBFMT_VENDORIZE=OFF")
+
+class CustomSdist(sdist):
+    def make_release_tree(self, base_dir, files):
+
+        # First, let the parent class create the release tree
+        super().make_release_tree(base_dir, files)
+
+        version = get_version()
+        
+        if "dev" in version:
+            # Dev versions are generated dynamically.
+            # Update the VERSION file in the release tree
+            # so it matches the one published on PyPi
+            version_file = Path(base_dir) / "VERSION"
+            if version_file.exists():
+                version_file.write_text(version + "\n", encoding="utf-8")
+                print(f"Updated VERSION file in sdist to: {version}")
 
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
@@ -153,4 +173,7 @@ skbuild.setup(
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3 :: Only",
     ],
+    cmdclass={
+        'sdist': CustomSdist,
+    },
 )
