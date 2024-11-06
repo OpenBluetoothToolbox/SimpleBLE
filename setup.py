@@ -8,6 +8,7 @@ import sys
 import pybind11
 import skbuild
 
+from pathlib import Path
 
 def exclude_unnecessary_files(cmake_manifest):
     def is_necessary(name):
@@ -22,6 +23,12 @@ def exclude_unnecessary_files(cmake_manifest):
 
     return list(filter(is_necessary, cmake_manifest))
 
+def is_git_repo():
+    try:
+        subprocess.check_output(['git', 'rev-parse', '--git-dir'], stderr=subprocess.DEVNULL)
+        return True
+    except (subprocess.SubprocessError, FileNotFoundError):
+        return False
 
 def get_commit_since_hash(hash_cmd):
     result = subprocess.run(hash_cmd.split(' '),
@@ -75,13 +82,19 @@ sys.argv = [sys.argv[0]] + unknown
 root = pathlib.Path(__file__).parent.resolve()
 
 # Generate the version string
-version_str = (root / "VERSION").read_text(encoding="utf-8").strip()
+def get_version():
+    root = Path(__file__).parent
+    
+    version_str = (root / "VERSION").read_text(encoding="utf-8").strip()
+    if is_git_repo():
+        is_tagged, tag = is_current_commit_tagged()
+        if not is_tagged:
+            N = get_commits_since_version_bump()
+            if N > 0:
+                version_str += f".dev{N-1}"
+    return version_str
 
-is_tagged, tag = is_current_commit_tagged()
-if not is_tagged:
-    N = get_commits_since_version_bump()
-    if N>0:
-        version_str += f".dev{N-1}"
+version_str = get_version()
 
 # Get the long description from the README file
 long_description = (root / "simplepyble" / "README.rst").read_text(encoding="utf-8")
