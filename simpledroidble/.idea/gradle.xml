@@ -4,10 +4,23 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/../simpleble/src/backends/android/simpleble-bridge" name="simpleble-bridge">
+                <projects>
+                  <project path="$PROJECT_DIR$/../simpleble/src/backends/android/simpleble-bridge" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
+        <option name="testRunner" value="CHOOSE_PER_TEST" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleJvm" value="#GRADLE_LOCAL_JAVA_HOME" />
         <option name="modules">
           <set>
+            <option value="$PROJECT_DIR$/../simpleble/src/backends/android/simpleble-bridge" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/simpledroidble" />
           </set>
