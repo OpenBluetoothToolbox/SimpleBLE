@@ -9,8 +9,6 @@
 #include "CommonUtils.h"
 #include "LoggingInternal.h"
 
-#include <android/log.h>
-
 using namespace SimpleBLE;
 using namespace std::chrono_literals;
 
@@ -21,7 +19,7 @@ PeripheralBase::PeripheralBase(Android::ScanResult scan_result) : _device(scan_r
             _gatt.discoverServices();
         } else {
             // TODO: Whatever cleanup is necessary when disconnected.
-            __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", "Disconnected from device");
+            SIMPLEBLE_LOG_INFO("Disconnected from device");
             SAFE_CALLBACK_CALL(callback_on_disconnected_);
         }
     });
@@ -100,8 +98,7 @@ std::vector<Service> PeripheralBase::advertised_services() { return std::vector<
 std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() { return std::map<uint16_t, ByteArray>(); }
 
 ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
-    auto msg = "Reading characteristic " + characteristic;
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+    SIMPLEBLE_LOG_INFO("Reading characteristic " + characteristic);
 
     auto characteristic_obj = _fetch_characteristic(service, characteristic);
 
@@ -116,8 +113,7 @@ ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const
 
 void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                                    ByteArray const& data) {
-    auto msg = "Writing request to characteristic " + characteristic;
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+    SIMPLEBLE_LOG_INFO("Writing request to characteristic " + characteristic);
 
     auto characteristic_obj = _fetch_characteristic(service, characteristic);
 
@@ -133,8 +129,7 @@ void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID c
 
 void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                                    ByteArray const& data) {
-    auto msg = "Writing command to characteristic " + characteristic;
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+    SIMPLEBLE_LOG_INFO("Writing command to characteristic " + characteristic);
 
     auto characteristic_obj = _fetch_characteristic(service, characteristic);
 
@@ -150,8 +145,7 @@ void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID c
 
 void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                             std::function<void(ByteArray payload)> callback) {
-    auto msg = "Subscribing to characteristic " + characteristic;
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+    SIMPLEBLE_LOG_INFO("Subscribing to characteristic " + characteristic);
 
     auto characteristic_obj = _fetch_characteristic(service, characteristic);
     auto descriptor_obj = _fetch_descriptor(service, characteristic,
@@ -177,8 +171,7 @@ void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& c
 
 void PeripheralBase::indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                               std::function<void(ByteArray payload)> callback) {
-    auto msg = "Subscribing to characteristic " + characteristic;
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+    SIMPLEBLE_LOG_INFO("Subscribing to characteristic " + characteristic);
 
     auto characteristic_obj = _fetch_characteristic(service, characteristic);
     auto descriptor_obj = _fetch_descriptor(service, characteristic,
@@ -203,8 +196,7 @@ void PeripheralBase::indicate(BluetoothUUID const& service, BluetoothUUID const&
 }
 
 void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
-    auto msg = "Unsubscribing from characteristic " + characteristic;
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+    SIMPLEBLE_LOG_INFO("Unsubscribing from characteristic " + characteristic);
 
     auto characteristic_obj = _fetch_characteristic(service, characteristic);
     auto descriptor_obj = _fetch_descriptor(service, characteristic,
@@ -226,8 +218,7 @@ void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID con
 
 ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                                BluetoothUUID const& descriptor) {
-    auto msg = "Reading descriptor " + descriptor;
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+    SIMPLEBLE_LOG_INFO("Reading descriptor " + descriptor);
 
     auto descriptor_obj = _fetch_descriptor(service, characteristic, descriptor);
 
@@ -242,8 +233,7 @@ ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const
 
 void PeripheralBase::write(BluetoothUUID const& service, BluetoothUUID const& characteristic,
                            BluetoothUUID const& descriptor, ByteArray const& data) {
-    auto msg = "Writing descriptor " + descriptor;
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", msg.c_str());
+    SIMPLEBLE_LOG_INFO("Writing descriptor " + descriptor);
 
     auto descriptor_obj = _fetch_descriptor(service, characteristic, descriptor);
 
