@@ -88,11 +88,11 @@ std::map<uint16_t, ByteArray> Device::manufacturer_data() { return device1()->Ma
 
 std::map<std::string, ByteArray> Device::service_data() { return device1()->ServiceData(); }
 
-bool Device::paired() { return device1()->Paired(); }
+bool Device::paired(bool refresh) { return device1()->Paired(refresh); }
 
-bool Device::connected() { return device1()->Connected(); }
+bool Device::connected(bool refresh) { return device1()->Connected(refresh); }
 
-bool Device::services_resolved() { return device1()->ServicesResolved(); }
+bool Device::services_resolved(bool refresh) { return device1()->ServicesResolved(refresh); }
 
 void Device::set_on_disconnected(std::function<void()> callback) { device1()->OnDisconnected.load(callback); }
 

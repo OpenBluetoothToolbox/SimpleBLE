@@ -89,6 +89,10 @@ std::vector<std::shared_ptr<Device>> Adapter::device_paired_get() {
 }
 
 void Adapter::register_advertisement(const std::shared_ptr<CustomAdvertisement>& advertisement) {
+    if (supported_advertisement_instances() == 0) {
+        throw std::runtime_error("No available advertisement instances");
+    }
+
     le_advertising_manager1()->RegisterAdvertisement(advertisement->path());
     advertisement->activate();
 }
@@ -98,6 +102,14 @@ void Adapter::unregister_advertisement(const std::shared_ptr<CustomAdvertisement
         le_advertising_manager1()->UnregisterAdvertisement(advertisement->path());
         advertisement->deactivate();
     }
+}
+
+uint8_t Adapter::active_advertisement_instances(bool refresh) {
+    return le_advertising_manager1()->ActiveInstances(refresh);
+}
+
+uint8_t Adapter::supported_advertisement_instances(bool refresh) {
+    return le_advertising_manager1()->SupportedInstances(refresh);
 }
 
 void Adapter::register_application(const std::string& application_path) {
