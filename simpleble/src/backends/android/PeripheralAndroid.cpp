@@ -1,4 +1,4 @@
-#include "PeripheralBase.h"
+#include "PeripheralAndroid.h"
 
 #include "CharacteristicBuilder.h"
 #include "DescriptorBuilder.h"

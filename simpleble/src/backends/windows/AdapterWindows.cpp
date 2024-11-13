@@ -1,6 +1,6 @@
 // This weird pragma is required for the compiler to properly include the necessary namespaces.
 #pragma comment(lib, "windowsapp")
-#include "AdapterBase.h"
+#include "AdapterWindows.h"
 
 #include "CommonUtils.h"
 #include "LoggingInternal.h"

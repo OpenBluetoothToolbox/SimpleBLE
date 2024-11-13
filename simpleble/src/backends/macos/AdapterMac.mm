@@ -1,7 +1,7 @@
-#import "AdapterBase.h"
+#import "AdapterMac.h"
 #import "AdapterBaseMacOS.h"
 #import "CommonUtils.h"
-#import "PeripheralBase.h"
+#import "PeripheralMac.h"
 #import "PeripheralBuilder.h"
 
 #include <chrono>

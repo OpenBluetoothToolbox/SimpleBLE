@@ -1,4 +1,4 @@
-#import "PeripheralBase.h"
+#import "PeripheralMac.h"
 #import "PeripheralBaseMacOS.h"
 #import "ServiceBuilder.h"
 

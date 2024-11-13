@@ -1,7 +1,7 @@
 // This weird pragma is required for the compiler to properly include the necessary namespaces.
 #pragma comment(lib, "windowsapp")
 
-#include "PeripheralBase.h"
+#include "PeripheralWindows.h"
 #include "CommonUtils.h"
 #include "Utils.h"
 

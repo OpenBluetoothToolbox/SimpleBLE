@@ -1,6 +1,6 @@
-#include "AdapterBase.h"
+#include "AdapterPlain.h"
 #include "CommonUtils.h"
-#include "PeripheralBase.h"
+#include "PeripheralPlain.h"
 #include "PeripheralBuilder.h"
 
 #include <thread>

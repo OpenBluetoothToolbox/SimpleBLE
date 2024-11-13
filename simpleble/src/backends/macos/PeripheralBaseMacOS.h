@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <functional>
 #include <vector>
-#include "PeripheralBase.h"
+#import "PeripheralMac.h"
 
 @interface PeripheralBaseMacOS : NSObject<CBPeripheralDelegate>
 

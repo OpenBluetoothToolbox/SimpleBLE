@@ -1,7 +1,7 @@
-#include "AdapterBase.h"
-#include "Bluez.h"
+#include "AdapterLinux.h"
+#include "BackendBluez.h"
 #include "CommonUtils.h"
-#include "PeripheralBase.h"
+#include "PeripheralLinux.h"
 #include "PeripheralBuilder.h"
 
 using namespace SimpleBLE;

@@ -1,6 +1,6 @@
-#include "AdapterBase.h"
+#include "AdapterAndroid.h"
 #include "CommonUtils.h"
-#include "PeripheralBase.h"
+#include "PeripheralAndroid.h"
 #include "PeripheralBuilder.h"
 
 #include <jni.h>
@@ -164,4 +164,3 @@ void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_
         callback_on_scan_found_.unload();
     }
 }
-

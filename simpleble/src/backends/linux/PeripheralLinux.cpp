@@ -1,4 +1,4 @@
-#include "PeripheralBase.h"
+#include "PeripheralLinux.h"
 
 #include "CharacteristicBuilder.h"
 #include "DescriptorBuilder.h"
@@ -10,7 +10,7 @@
 #include "CommonUtils.h"
 #include "LoggingInternal.h"
 
-#include "Bluez.h"
+#include "BackendBluez.h"
 
 const SimpleBLE::BluetoothUUID BATTERY_SERVICE_UUID = "0000180f-0000-1000-8000-00805f9b34fb";
 const SimpleBLE::BluetoothUUID BATTERY_CHARACTERISTIC_UUID = "00002a19-0000-1000-8000-00805f9b34fb";

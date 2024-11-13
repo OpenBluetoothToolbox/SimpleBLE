@@ -4,7 +4,7 @@
 #import <Foundation/Foundation.h>
 
 #include <functional>
-#include "AdapterBase.h"
+#import "AdapterMac.h"
 
 @interface AdapterBaseMacOS : NSObject<CBCentralManagerDelegate>
 
