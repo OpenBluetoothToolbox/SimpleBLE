@@ -102,6 +102,15 @@ bool Device1::Paired(bool refresh) {
     return _properties["Paired"].get_boolean();
 }
 
+bool Device1::Bonded(bool refresh) {
+    if (refresh) {
+        property_refresh("Bonded");
+    }
+
+    std::scoped_lock lock(_property_update_mutex);
+    return _properties["Bonded"].get_boolean();
+}
+
 bool Device1::Connected(bool refresh) {
     if (refresh) {
         property_refresh("Connected");

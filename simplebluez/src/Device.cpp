@@ -90,6 +90,8 @@ std::map<std::string, ByteArray> Device::service_data() { return device1()->Serv
 
 bool Device::paired(bool refresh) { return device1()->Paired(refresh); }
 
+bool Device::bonded(bool refresh) { return device1()->Bonded(refresh); }
+
 bool Device::connected(bool refresh) { return device1()->Connected(refresh); }
 
 bool Device::services_resolved(bool refresh) { return device1()->ServicesResolved(refresh); }

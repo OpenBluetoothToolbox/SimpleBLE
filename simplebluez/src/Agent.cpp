@@ -32,41 +32,43 @@ std::string Agent::capabilities() const {
 
 void Agent::set_capabilities(Agent::Capabilities capabilities) { _capabilities = capabilities; }
 
-void Agent::set_on_request_pin_code(std::function<std::string()> callback) {
+void Agent::set_on_request_pin_code(std::function<std::string(const std::string& device_path)> callback) {
     agent1()->OnRequestPinCode.load(callback);
 }
 
 void Agent::clear_on_request_pin_code() { agent1()->OnRequestPinCode.unload(); }
 
-void Agent::set_on_display_pin_code(std::function<bool(const std::string&)> callback) {
+void Agent::set_on_display_pin_code(std::function<bool(const std::string& device_path, const std::string& pin_code)> callback) {
     agent1()->OnDisplayPinCode.load(callback);
 }
 
 void Agent::clear_on_display_pin_code() { agent1()->OnDisplayPinCode.unload(); }
 
-void Agent::set_on_request_passkey(std::function<uint32_t()> callback) { agent1()->OnRequestPasskey.load(callback); }
+void Agent::set_on_request_passkey(std::function<uint32_t(const std::string& device_path)> callback) {
+    agent1()->OnRequestPasskey.load(callback);
+}
 
 void Agent::clear_on_request_passkey() { agent1()->OnRequestPasskey.unload(); }
 
-void Agent::set_on_display_passkey(std::function<void(uint32_t, uint16_t)> callback) {
+void Agent::set_on_display_passkey(std::function<void(const std::string& device_path, uint32_t passkey, uint16_t entered)> callback) {
     agent1()->OnDisplayPasskey.load(callback);
 }
 
 void Agent::clear_on_display_passkey() { agent1()->OnDisplayPasskey.unload(); }
 
-void Agent::set_on_request_confirmation(std::function<bool(uint32_t)> callback) {
+void Agent::set_on_request_confirmation(std::function<bool(const std::string& device_path, uint32_t passkey)> callback) {
     agent1()->OnRequestConfirmation.load(callback);
 }
 
 void Agent::clear_on_request_confirmation() { agent1()->OnRequestConfirmation.unload(); }
 
-void Agent::set_on_request_authorization(std::function<bool()> callback) {
+void Agent::set_on_request_authorization(std::function<bool(const std::string& device_path)> callback) {
     agent1()->OnRequestAuthorization.load(callback);
 }
 
 void Agent::clear_on_request_authorization() { agent1()->OnRequestAuthorization.unload(); }
 
-void Agent::set_on_authorize_service(std::function<bool(const std::string&)> callback) {
+void Agent::set_on_authorize_service(std::function<bool(const std::string& device_path, const std::string& uuid)> callback) {
     agent1()->OnAuthorizeService.load(callback);
 }
 

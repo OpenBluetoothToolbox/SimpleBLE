@@ -50,8 +50,8 @@ int main(int argc, char* argv[]) {
         std::cout << "Cancel called" << std::endl;
     });
 
-    agent->set_on_display_passkey([agent](uint32_t passkey, uint16_t entered) {
-        std::cout << "DisplayPasskey called with passkey: " << passkey << std::endl;
+    agent->set_on_display_passkey([agent](const std::string& device_path, uint32_t passkey, uint16_t entered) {
+        std::cout << "DisplayPasskey called with passkey: " << passkey << " for device: " << device_path << std::endl;
     });
 
 
@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
 
     auto characteristic0 = service0->create_characteristic();
     characteristic0->uuid("12345678-AAAA-5678-1234-567812345678");
-    characteristic0->flags({"read", "notify", "write"});
+    characteristic0->flags({"secure-read", "secure-write", "secure-notify"});
     // NOTE: Setting an initial value is not required, as this value doesn't get sent
     // to the central until it attempts to read or notify.
 
@@ -121,6 +121,11 @@ int main(int argc, char* argv[]) {
         if (!advertisement->active()) {
             adapter->register_advertisement(advertisement);
             std::cout << "Advertising on " << adapter->identifier() << " [" << adapter->address() << "]" << std::endl;
+
+            auto paired_devices = adapter->device_paired_get();
+            for (auto& device : paired_devices) {
+                std::cout << "Paired device: " << device->name() << " [" << device->address() << "]" << std::endl;
+            }
         }
 
         // TODO: Handle connection events.
