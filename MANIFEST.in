@@ -163,6 +163,7 @@ include simplepyble/src/wrap_descriptor.cpp
 include simplepyble/src/wrap_peripheral.cpp
 include simplepyble/src/wrap_service.cpp
 include simplepyble/src/wrap_types.cpp
+include external/include/external/kvn_bytearray.h
 prune .github
 prune docs
 prune examples
