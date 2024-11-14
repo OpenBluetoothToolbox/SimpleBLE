@@ -34,7 +34,9 @@ class Adapter : public SimpleDBus::Proxy {
     std::shared_ptr<Device> device_get(const std::string& path);
     void device_remove(const std::string& path);
     void device_remove(const std::shared_ptr<Device>& device);
+
     std::vector<std::shared_ptr<Device>> device_paired_get();
+    std::vector<std::shared_ptr<Device>> device_bonded_get();
 
     void set_on_device_updated(std::function<void(std::shared_ptr<Device> device)> callback);
     void clear_on_device_updated();

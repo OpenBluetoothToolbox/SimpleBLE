@@ -126,6 +126,11 @@ int main(int argc, char* argv[]) {
             for (auto& device : paired_devices) {
                 std::cout << "Paired device: " << device->name() << " [" << device->address() << "]" << std::endl;
             }
+
+            auto bonded_devices = adapter->device_bonded_get();
+            for (auto& device : bonded_devices) {
+                std::cout << "Bonded device: " << device->name() << " [" << device->address() << "]" << std::endl;
+            }
         }
 
         // TODO: Handle connection events.

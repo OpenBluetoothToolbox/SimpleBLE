@@ -88,6 +88,22 @@ std::vector<std::shared_ptr<Device>> Adapter::device_paired_get() {
     return paired_devices;
 }
 
+std::vector<std::shared_ptr<Device>> Adapter::device_bonded_get() {
+    // Traverse all child paths and return only those that are bonded.
+    std::vector<std::shared_ptr<Device>> bonded_devices;
+
+    for (auto& [path, child] : _children) {
+        if (!child->valid()) continue;
+
+        std::shared_ptr<Device> device = std::dynamic_pointer_cast<Device>(child);
+        if (device->bonded()) {
+            bonded_devices.push_back(device);
+        }
+    }
+
+    return bonded_devices;
+}
+
 void Adapter::register_advertisement(const std::shared_ptr<CustomAdvertisement>& advertisement) {
     if (supported_advertisement_instances() == 0) {
         throw std::runtime_error("No available advertisement instances");
