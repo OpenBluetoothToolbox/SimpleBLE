@@ -6,6 +6,7 @@
 
 #include <kvn_safe_callback.hpp>
 
+#include <backends/AdapterBase.h>
 #include <atomic>
 #include <functional>
 #include <memory>
@@ -15,10 +16,10 @@
 
 namespace SimpleBLE {
 
-class AdapterBase {
+class AdapterPlain : public AdapterBase {
   public:
-    AdapterBase();
-    virtual ~AdapterBase();
+    AdapterPlain();
+    virtual ~AdapterPlain();
 
     void* underlying() const;
 

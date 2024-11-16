@@ -7,6 +7,8 @@
 #include <kvn_safe_callback.hpp>
 #include <TaskRunner.hpp>
 
+#include <backends/PeripheralBase.h>
+
 #include <atomic>
 #include <condition_variable>
 #include <map>
@@ -15,10 +17,10 @@
 
 namespace SimpleBLE {
 
-class PeripheralBase {
+class PeripheralPlain : public PeripheralBase {
   public:
-    PeripheralBase();
-    virtual ~PeripheralBase();
+    PeripheralPlain();
+    virtual ~PeripheralPlain();
 
     void* underlying() const;
 

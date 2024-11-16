@@ -7,6 +7,7 @@
 #include <kvn_safe_callback.hpp>
 
 #include <simplebluez/Adapter.h>
+#include <backends/AdapterBase.h>
 
 #include <atomic>
 #include <functional>
@@ -17,10 +18,10 @@
 
 namespace SimpleBLE {
 
-class AdapterBase {
+class AdapterLinux : public AdapterBase {
   public:
-    AdapterBase(std::shared_ptr<SimpleBluez::Adapter> adapter);
-    virtual ~AdapterBase();
+    AdapterLinux(std::shared_ptr<SimpleBluez::Adapter> adapter);
+    virtual ~AdapterLinux();
 
     void* underlying() const;
 

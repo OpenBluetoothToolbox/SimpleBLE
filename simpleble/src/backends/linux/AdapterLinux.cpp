@@ -1,21 +1,21 @@
-#include "AdapterBase.h"
+#include "AdapterLinux.h"
 #include "Bluez.h"
 #include "CommonUtils.h"
-#include "PeripheralBase.h"
+#include "PeripheralLinux.h"
 #include "PeripheralBuilder.h"
 
 using namespace SimpleBLE;
 
-std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
+std::vector<std::shared_ptr<AdapterBase>> AdapterLinux::get_adapters() {
     std::vector<std::shared_ptr<AdapterBase>> adapter_list;
     auto internal_adapters = Bluez::get()->bluez.get_adapters();
     for (auto& adapter : internal_adapters) {
-        adapter_list.push_back(std::make_shared<AdapterBase>(adapter));
+        adapter_list.push_back(std::static_pointer_cast<AdapterBase>(std::make_shared<AdapterLinux>(adapter)));
     }
     return adapter_list;
 }
 
-bool AdapterBase::bluetooth_enabled() {
+bool AdapterLinux::bluetooth_enabled() {
     bool enabled = false;
 
     auto internal_adapters = Bluez::get()->bluez.get_adapters();
@@ -29,17 +29,17 @@ bool AdapterBase::bluetooth_enabled() {
     return enabled;
 }
 
-AdapterBase::AdapterBase(std::shared_ptr<SimpleBluez::Adapter> adapter) : adapter_(adapter) {}
+AdapterLinux::AdapterLinux(std::shared_ptr<SimpleBluez::Adapter> adapter) : adapter_(adapter) {}
 
-AdapterBase::~AdapterBase() { adapter_->clear_on_device_updated(); }
+AdapterLinux::~AdapterLinux() { adapter_->clear_on_device_updated(); }
 
-void* AdapterBase::underlying() const { return adapter_.get(); }
+void* AdapterLinux::underlying() const { return adapter_.get(); }
 
-std::string AdapterBase::identifier() { return adapter_->identifier(); }
+std::string AdapterLinux::identifier() { return adapter_->identifier(); }
 
-BluetoothAddress AdapterBase::address() { return adapter_->address(); }
+BluetoothAddress AdapterLinux::address() { return adapter_->address(); }
 
-void AdapterBase::scan_start() {
+void AdapterLinux::scan_start() {
     seen_peripherals_.clear();
 
     adapter_->set_on_device_updated([this](std::shared_ptr<SimpleBluez::Device> device) {
@@ -49,7 +49,7 @@ void AdapterBase::scan_start() {
 
         if (this->peripherals_.count(device->address()) == 0) {
             // If the incoming peripheral has never been seen before, create and save a reference to it.
-            auto base_peripheral = std::make_shared<PeripheralBase>(device, this->adapter_);
+            auto base_peripheral = std::static_pointer_cast<PeripheralBase>(std::make_shared<PeripheralLinux>(device, this->adapter_));
             this->peripherals_.insert(std::make_pair(device->address(), base_peripheral));
         }
 
@@ -78,7 +78,7 @@ void AdapterBase::scan_start() {
     is_scanning_ = true;
 }
 
-void AdapterBase::scan_stop() {
+void AdapterLinux::scan_stop() {
     adapter_->discovery_stop();
     is_scanning_ = false;
     SAFE_CALLBACK_CALL(this->callback_on_scan_stop_);
@@ -88,15 +88,15 @@ void AdapterBase::scan_stop() {
     // any scan updates to reach the user when not expected.
 }
 
-void AdapterBase::scan_for(int timeout_ms) {
+void AdapterLinux::scan_for(int timeout_ms) {
     scan_start();
     std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
     scan_stop();
 }
 
-bool AdapterBase::scan_is_active() { return is_scanning_ && adapter_->discovering(); }
+bool AdapterLinux::scan_is_active() { return is_scanning_ && adapter_->discovering(); }
 
-std::vector<Peripheral> AdapterBase::scan_get_results() {
+std::vector<Peripheral> AdapterLinux::scan_get_results() {
     std::vector<Peripheral> peripherals;
     for (auto& [address, peripheral] : this->seen_peripherals_) {
         PeripheralBuilder peripheral_builder(peripheral);
@@ -105,19 +105,19 @@ std::vector<Peripheral> AdapterBase::scan_get_results() {
     return peripherals;
 }
 
-std::vector<Peripheral> AdapterBase::get_paired_peripherals() {
+std::vector<Peripheral> AdapterLinux::get_paired_peripherals() {
     std::vector<Peripheral> peripherals;
 
     auto paired_list = adapter_->device_paired_get();
     for (auto& device : paired_list) {
-        PeripheralBuilder peripheral_builder(std::make_shared<PeripheralBase>(device, this->adapter_));
+        PeripheralBuilder peripheral_builder(std::static_pointer_cast<PeripheralBase>(std::make_shared<PeripheralLinux>(device, this->adapter_)));
         peripherals.push_back(peripheral_builder);
     }
 
     return peripherals;
 }
 
-void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start) {
+void AdapterLinux::set_callback_on_scan_start(std::function<void()> on_scan_start) {
     if (on_scan_start) {
         callback_on_scan_start_.load(std::move(on_scan_start));
     } else {
@@ -125,7 +125,7 @@ void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start
     }
 }
 
-void AdapterBase::set_callback_on_scan_stop(std::function<void()> on_scan_stop) {
+void AdapterLinux::set_callback_on_scan_stop(std::function<void()> on_scan_stop) {
     if (on_scan_stop) {
         callback_on_scan_stop_.load(std::move(on_scan_stop));
     } else {
@@ -133,7 +133,7 @@ void AdapterBase::set_callback_on_scan_stop(std::function<void()> on_scan_stop) 
     }
 }
 
-void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) {
+void AdapterLinux::set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) {
     if (on_scan_updated) {
         callback_on_scan_updated_.load(std::move(on_scan_updated));
     } else {
@@ -141,7 +141,7 @@ void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> o
     }
 }
 
-void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {
+void AdapterLinux::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {
     if (on_scan_found) {
         callback_on_scan_found_.load(std::move(on_scan_found));
     } else {

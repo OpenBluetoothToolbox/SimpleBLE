@@ -150,17 +150,18 @@ list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLE_LOG_LEVEL=SIMPLEBLE_LOG_LEVEL_
 list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLE_VERSION="${PROJECT_VERSION}")
 
 # Detect the operating system and load the necessary dependencies
-if(SIMPLEBLE_PLAIN)
-    message(STATUS "Plain Flavor Requested")
+message(STATUS "Plain Flavor Requested")
 
-    target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/AdapterBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/PeripheralBase.cpp)
+list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLE_BACKEND_PLAIN_ENABLED)
 
-    target_include_directories(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain)
+target_sources(simpleble PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/AdapterPlain.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/PeripheralPlain.cpp)
 
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+target_include_directories(simpleble PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message(STATUS "Linux Host Detected")
 
     find_package(DBus1 REQUIRED)
@@ -173,6 +174,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         set(SIMPLEBLUEZ_LOG_LEVEL "FATAL")
     endif()
 
+    list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLE_BACKEND_LINUX_ENABLED)
+
     list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEDBUS_LOG_LEVEL=${SIMPLEDBUS_LOG_LEVEL})
     list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLUEZ_LOG_LEVEL=${SIMPLEBLUEZ_LOG_LEVEL})
 
@@ -181,8 +184,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     endif()
 
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/AdapterBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/PeripheralBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/AdapterLinux.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/PeripheralLinux.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/Bluez.cpp)
 
     target_sources(simpleble PRIVATE
