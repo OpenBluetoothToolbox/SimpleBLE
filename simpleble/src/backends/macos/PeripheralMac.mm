@@ -1,6 +1,7 @@
 #import "PeripheralMac.h"
+#import "BuilderBase.h"
 #import "PeripheralBaseMacOS.h"
-#import "ServiceBuilder.h"
+#import "ServiceBase.h"
 
 #import "CommonUtils.h"
 
@@ -49,9 +50,7 @@ BluetoothAddress PeripheralBase::address() {
     return std::string([[internal address] UTF8String]);
 }
 
-BluetoothAddressType PeripheralBase::address_type() {
-    return BluetoothAddressType::UNSPECIFIED;
-}
+BluetoothAddressType PeripheralBase::address_type() { return BluetoothAddressType::UNSPECIFIED; }
 
 int16_t PeripheralBase::rssi() { return rssi_; }
 
@@ -109,7 +108,7 @@ std::vector<Service> PeripheralBase::services() {
 std::vector<Service> PeripheralBase::advertised_services() {
     std::vector<Service> service_list;
     for (auto& [service_uuid, data] : service_data_) {
-        service_list.push_back(ServiceBuilder(service_uuid, data));
+        service_list.push_back(Factory::Builder<Service>(service_uuid, data));
     }
 
     return service_list;
@@ -218,13 +217,13 @@ void PeripheralBase::delegate_did_connect() {
 void PeripheralBase::delegate_did_fail_to_connect(void* opaque_error) {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
     NSError* error = (__bridge NSError*)opaque_error;
-    [internal delegateDidFailToConnect : error];
+    [internal delegateDidFailToConnect:error];
 }
 
 void PeripheralBase::delegate_did_disconnect(void* opaque_error) {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
     NSError* error = (__bridge NSError*)opaque_error;
-    [internal delegateDidDisconnect : error];
+    [internal delegateDidDisconnect:error];
 
     // If the user manually disconnects the peripheral, don't call the callback at this point.
     if (callback_on_disconnected_ && !manual_disconnect_triggered_) {

@@ -1,21 +1,16 @@
 #include <simpleble/Adapter.h>
 
 #include "AdapterBase.h"
-#include "AdapterBuilder.h"
+#include "BuildVec.h"
+#include "CommonUtils.h"
 #include "LoggingInternal.h"
 
 using namespace SimpleBLE;
 
 std::vector<Adapter> Adapter::get_adapters() {
-    std::vector<Adapter> available_adapters;
     auto internal_adapters = AdapterBase::get_adapters();
 
-    for (auto& internal_adapter : internal_adapters) {
-        AdapterBuilder adapter(internal_adapter);
-        available_adapters.push_back(adapter);
-    }
-
-    return available_adapters;
+    return Factory::vector(internal_adapters);
 }
 
 bool Adapter::bluetooth_enabled() { return AdapterBase::bluetooth_enabled(); }

@@ -1,13 +1,15 @@
 #include "PeripheralAndroid.h"
 
-#include "CharacteristicBuilder.h"
-#include "DescriptorBuilder.h"
-#include "ServiceBuilder.h"
+#include "BuilderBase.h"
+#include "CharacteristicBase.h"
+#include "DescriptorBase.h"
+#include "ServiceBase.h"
 
 #include <simpleble/Exceptions.h>
 #include <algorithm>
 #include "CommonUtils.h"
 #include "LoggingInternal.h"
+#include "simpleble/Descriptor.h"
 
 using namespace SimpleBLE;
 using namespace std::chrono_literals;
@@ -71,7 +73,7 @@ std::vector<Service> PeripheralBase::services() {
             // Build the list of descriptors for the characteristic.
             std::vector<Descriptor> descriptor_list;
             for (auto descriptor : characteristic.getDescriptors()) {
-                descriptor_list.push_back(DescriptorBuilder(descriptor.getUuid()));
+                descriptor_list.push_back(Factory::Builder<Descriptor>(descriptor.getUuid()));
             }
 
             int flags = characteristic.getProperties();
@@ -82,12 +84,12 @@ std::vector<Service> PeripheralBase::services() {
             bool can_notify = flags & Android::BluetoothGattCharacteristic::PROPERTY_NOTIFY;
             bool can_indicate = flags & Android::BluetoothGattCharacteristic::PROPERTY_INDICATE;
 
-            characteristic_list.push_back(CharacteristicBuilder(characteristic.getUuid(), descriptor_list, can_read,
-                                                                can_write_request, can_write_command, can_notify,
-                                                                can_indicate));
+            characteristic_list.push_back(
+                Factory::Builder<Characteristic>(characteristic.getUuid(), descriptor_list, can_read, can_write_request,
+                                                 can_write_command, can_notify, can_indicate));
         }
 
-        service_list.push_back(ServiceBuilder(service.getUuid(), characteristic_list));
+        service_list.push_back(Factory::Builder<Service>(service.getUuid(), characteristic_list));
     }
 
     return service_list;

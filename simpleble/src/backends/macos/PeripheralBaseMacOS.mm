@@ -1,11 +1,15 @@
 #import "PeripheralBaseMacOS.h"
-#import "CharacteristicBuilder.h"
-#import "DescriptorBuilder.h"
+#import "BuilderBase.h"
+#import "CharacteristicBase.h"
+#import "DescriptorBase.h"
 #import "LoggingInternal.h"
-#import "ServiceBuilder.h"
+#import "ServiceBase.h"
 #import "Utils.h"
 
+#import <simpleble/Characteristic.h>
+#import <simpleble/Descriptor.h>
 #import <simpleble/Exceptions.h>
+#import <simpleble/Service.h>
 #import <optional>
 
 #define WAIT_UNTIL_FALSE(obj, var)                \
@@ -19,16 +23,16 @@
         }                                         \
     } while (0)
 
-#define WAIT_UNTIL_FALSE_WITH_TIMEOUT(obj, var, timeout)                                      \
-    do {                                                                                      \
-        BOOL _tmpVar = YES;                                                                   \
-        NSDate* endDate = [NSDate dateWithTimeInterval:timeout sinceDate:NSDate.now];         \
-        while (_tmpVar && [NSDate.now compare:endDate] == NSOrderedAscending) {               \
-            [NSThread sleepForTimeInterval:0.01];                                             \
-            @synchronized(obj) {                                                              \
-                _tmpVar = (var);                                                              \
-            }                                                                                 \
-        }                                                                                     \
+#define WAIT_UNTIL_FALSE_WITH_TIMEOUT(obj, var, timeout)                              \
+    do {                                                                              \
+        BOOL _tmpVar = YES;                                                           \
+        NSDate* endDate = [NSDate dateWithTimeInterval:timeout sinceDate:NSDate.now]; \
+        while (_tmpVar && [NSDate.now compare:endDate] == NSOrderedAscending) {       \
+            [NSThread sleepForTimeInterval:0.01];                                     \
+            @synchronized(obj) {                                                      \
+                _tmpVar = (var);                                                      \
+            }                                                                         \
+        }                                                                             \
     } while (0)
 
 // --------------------------------------------------
@@ -84,7 +88,8 @@
 
 // --------------------------------------------------
 
-@interface PeripheralBaseMacOS () {}
+@interface PeripheralBaseMacOS () {
+}
 
 @property(strong) CBPeripheral* peripheral;
 @property(strong) CBCentralManager* centralManager;
@@ -254,7 +259,7 @@
             // Build the list of descriptors for the characteristic.
             std::vector<SimpleBLE::Descriptor> descriptor_list;
             for (CBDescriptor* descriptor in characteristic.descriptors) {
-                descriptor_list.push_back(SimpleBLE::DescriptorBuilder(uuidToSimpleBLE(descriptor.UUID)));
+                descriptor_list.push_back(SimpleBLE::Factory::Builder<SimpleBLE::Descriptor>(uuidToSimpleBLE(descriptor.UUID)));
             }
 
             bool can_read = (characteristic.properties & CBCharacteristicPropertyRead) != 0;
@@ -263,10 +268,11 @@
             bool can_notify = (characteristic.properties & CBCharacteristicPropertyNotify) != 0;
             bool can_indicate = (characteristic.properties & CBCharacteristicPropertyIndicate) != 0;
 
-            characteristic_list.push_back(SimpleBLE::CharacteristicBuilder(uuidToSimpleBLE(characteristic.UUID), descriptor_list, can_read,
-                                                                           can_write_request, can_write_command, can_notify, can_indicate));
+            characteristic_list.push_back(
+                SimpleBLE::Factory::Builder<SimpleBLE::Characteristic>(uuidToSimpleBLE(characteristic.UUID), descriptor_list, can_read,
+                                                                       can_write_request, can_write_command, can_notify, can_indicate));
         }
-        service_list.push_back(SimpleBLE::ServiceBuilder(uuidToSimpleBLE(service.UUID), characteristic_list));
+        service_list.push_back(SimpleBLE::Factory::Builder<SimpleBLE::Service>(uuidToSimpleBLE(service.UUID), characteristic_list));
     }
 
     return service_list;

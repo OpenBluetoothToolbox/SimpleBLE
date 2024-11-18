@@ -128,8 +128,8 @@
     NSDictionary* rawServiceDataDict = advertisementData[CBAdvertisementDataServiceDataKey];
     for (CBUUID* serviceUuid in rawServiceDataDict) {
         NSData* rawServiceData = rawServiceDataDict[serviceUuid];
-        const char* rawServiceDataBytes = (const char*) rawServiceData.bytes;
-        size_t rawServiceDataLength = (size_t) rawServiceData.length;
+        const char* rawServiceDataBytes = (const char*)rawServiceData.bytes;
+        size_t rawServiceDataLength = (size_t)rawServiceData.length;
         SimpleBLE::ByteArray serviceData = SimpleBLE::ByteArray(rawServiceDataBytes, rawServiceDataLength);
         advertisingData.service_data[uuidToSimpleBLE(serviceUuid)] = serviceData;
     }

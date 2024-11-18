@@ -25,3 +25,29 @@
             SIMPLEBLE_LOG_ERROR("Unknown exception within code block");                     \
         }                                                                                   \
     } while (0)
+
+namespace SimpleBLE::Util {
+
+template <typename MAP>
+struct ValueCollector {
+  public:
+    template <typename VEC>
+    operator VEC() {
+        VEC vec;
+        vec.reserve(map.size());
+        std::transform(map.begin(), map.end(), std::back_inserter(vec), [](const auto& pair) { return pair.second; });
+        return vec;
+    }
+
+    const MAP& map;
+};
+
+/**
+ * Collect the values of a mapping like object into a vector-like object.
+ */
+template <typename MAP>
+auto values(const MAP& map) {
+    return ValueCollector<MAP>{map};
+}
+
+}  // namespace SimpleBLE::util

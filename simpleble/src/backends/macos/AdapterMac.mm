@@ -1,12 +1,14 @@
 #import "AdapterMac.h"
 #import "AdapterBaseMacOS.h"
+#import "BuildVec.h"
+#import "BuilderBase.h"
 #import "CommonUtils.h"
 #import "PeripheralMac.h"
-#import "PeripheralBuilder.h"
 
-#include <chrono>
-#include <thread>
 #include <fmt/core.h>
+#include <chrono>
+#include <memory>
+#include <thread>
 
 using namespace SimpleBLE;
 
@@ -35,13 +37,13 @@ bool AdapterBase::bluetooth_enabled() {
     return [internal isBluetoothEnabled];
 }
 
-std::vector<std::shared_ptr<AdapterBase> > AdapterBase::get_adapters() {
+std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
     // There doesn't seem to be a mechanism with Apple devices that openly
     // exposes more than the default Bluetooth device.
     // For this reason, the MacOS implementation of SimpleBLE will only
     // consider that single case, at least until better alternatives come up.
 
-    std::vector<std::shared_ptr<AdapterBase> > adapter_list;
+    std::vector<std::shared_ptr<AdapterBase>> adapter_list;
     adapter_list.push_back(std::make_shared<AdapterBase>());
     return adapter_list;
 }
@@ -52,9 +54,7 @@ void* AdapterBase::underlying() const {
     return [internal underlying];
 }
 
-std::string AdapterBase::identifier() {
-    return fmt::format("Default Adapter [{}]", this->address());
-}
+std::string AdapterBase::identifier() { return fmt::format("Default Adapter [{}]", this->address()); }
 
 BluetoothAddress AdapterBase::address() {
     AdapterBaseMacOS* internal = (__bridge AdapterBaseMacOS*)opaque_internal_;
@@ -90,12 +90,8 @@ bool AdapterBase::scan_is_active() {
 }
 
 std::vector<Peripheral> AdapterBase::scan_get_results() {
-    std::vector<Peripheral> peripherals;
-    for (auto& [opaque_peripheral, base_peripheral] : this->seen_peripherals_) {
-        PeripheralBuilder peripheral_builder(base_peripheral);
-        peripherals.push_back(peripheral_builder);
-    }
-    return peripherals;
+    std::vector<std::shared_ptr<PeripheralBase>> peripherals = Util::values(seen_peripherals_);
+    return Factory::vector(peripherals);
 }
 
 void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start) {
@@ -143,15 +139,15 @@ void AdapterBase::delegate_did_discover_peripheral(void* opaque_peripheral, void
     base_peripheral->update_advertising_data(advertising_data);
 
     // Convert the base object into an external-facing Peripheral object
-    PeripheralBuilder peripheral_builder(base_peripheral);
+    Peripheral peripheral = Factory::build(base_peripheral);
 
     // Check if the device has been seen before, to forward the correct call to the user.
     if (this->seen_peripherals_.count(opaque_peripheral) == 0) {
         // Store it in our table of seen peripherals
         this->seen_peripherals_.insert(std::make_pair(opaque_peripheral, base_peripheral));
-        SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral_builder);
+        SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral);
     } else {
-        SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral_builder);
+        SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral);
     }
 }
 

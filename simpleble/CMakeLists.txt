@@ -56,13 +56,7 @@ set(SIMPLEBLE_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logging.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/safe/AdapterSafe.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/safe/PeripheralSafe.cpp
-
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/AdapterBuilder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/PeripheralBuilder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/ServiceBuilder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/CharacteristicBuilder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/DescriptorBuilder.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/safe/PeripheralSafe.cpp)
 
 set(SIMPLEBLE_C_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src_c/simpleble.cpp
