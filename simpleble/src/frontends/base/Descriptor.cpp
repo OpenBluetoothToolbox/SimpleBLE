@@ -4,4 +4,18 @@
 
 using namespace SimpleBLE;
 
-BluetoothUUID Descriptor::uuid() { return internal_->uuid(); }
+bool Descriptor::initialized() const { return internal_ != nullptr; }
+
+DescriptorBase* Descriptor::operator->() {
+    if (!initialized()) throw Exception::NotInitialized();
+
+    return internal_.get();
+}
+
+const DescriptorBase* Descriptor::operator->() const {
+    if (!initialized()) throw Exception::NotInitialized();
+
+    return internal_.get();
+}
+
+BluetoothUUID Descriptor::uuid() { return (*this)->uuid(); }

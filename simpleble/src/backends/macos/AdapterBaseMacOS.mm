@@ -9,7 +9,7 @@
 }
 
 // Private properties
-@property() SimpleBLE::AdapterBase* adapter;
+@property() SimpleBLE::AdapterMac* adapter;
 @property(strong) dispatch_queue_t centralManagerQueue;
 @property(strong) CBCentralManager* centralManager;
 
@@ -21,7 +21,7 @@
     return CBCentralManager.authorization == CBManagerAuthorizationAllowedAlways && _centralManager.state == CBManagerStatePoweredOn;
 }
 
-- (instancetype)init:(SimpleBLE::AdapterBase*)adapter {
+- (instancetype)init:(SimpleBLE::AdapterMac*)adapter {
     self = [super init];
     if (self) {
         _adapter = adapter;

@@ -1,71 +1,64 @@
+#include <simpleble/Peripheral.h>
+
 #include "AdapterPlain.h"
 #include "BuilderBase.h"
 #include "CommonUtils.h"
+#include "PeripheralBase.h"
 #include "PeripheralPlain.h"
 
+#include <memory>
 #include <thread>
 
 using namespace SimpleBLE;
 
-std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
-    std::vector<std::shared_ptr<AdapterBase>> adapter_list;
-    adapter_list.push_back(std::make_shared<AdapterBase>());
-    return adapter_list;
-}
+bool AdapterPlain::bluetooth_enabled() { return true; }
 
-bool AdapterBase::bluetooth_enabled() { return true; }
+AdapterPlain::AdapterPlain() {}
 
-AdapterBase::AdapterBase() {}
+AdapterPlain::~AdapterPlain() {}
 
-AdapterBase::~AdapterBase() {}
+void* AdapterPlain::underlying() const { return nullptr; }
 
-void* AdapterBase::underlying() const { return nullptr; }
+std::string AdapterPlain::identifier() const { return "Plain Adapter"; }
 
-std::string AdapterBase::identifier() { return "Plain Adapter"; }
+BluetoothAddress AdapterPlain::address() { return "AA:BB:CC:DD:EE:FF"; }
 
-BluetoothAddress AdapterBase::address() { return "AA:BB:CC:DD:EE:FF"; }
-
-void AdapterBase::scan_start() {
+void AdapterPlain::scan_start() {
     is_scanning_ = true;
     SAFE_CALLBACK_CALL(this->callback_on_scan_start_);
 
-    Peripheral peripheral = Factory::build();
+    Peripheral peripheral = Factory::build(std::make_shared<PeripheralPlain>());
     SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral);
     SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral);
 }
 
-void AdapterBase::scan_stop() {
+void AdapterPlain::scan_stop() {
     is_scanning_ = false;
     SAFE_CALLBACK_CALL(this->callback_on_scan_stop_);
 }
 
-void AdapterBase::scan_for(int timeout_ms) {
+void AdapterPlain::scan_for(int timeout_ms) {
     scan_start();
     std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
     scan_stop();
 }
 
-bool AdapterBase::scan_is_active() { return is_scanning_; }
-
-std::vector<Peripheral> AdapterBase::scan_get_results() {
-    std::vector<Peripheral> peripherals;
-
-    Peripheral peripheral = Factory::build();
-    peripherals.push_back(peripheral);
+bool AdapterPlain::scan_is_active() { return is_scanning_; }
+vec_of_shared<PeripheralBase> AdapterPlain::scan_get_results() {
+    vec_of_shared<PeripheralBase> peripherals;
+    peripherals.push_back(std::make_shared<PeripheralPlain>());
 
     return peripherals;
 }
 
-std::vector<Peripheral> AdapterBase::get_paired_peripherals() {
-    std::vector<Peripheral> peripherals;
-
-    Peripheral peripheral = Factory::build();
-    peripherals.push_back(peripheral);
+vec_of_shared<PeripheralBase> AdapterPlain::get_paired_peripherals() {
+    vec_of_shared<PeripheralBase> peripherals;
+    peripherals.push_back(std::make_shared<PeripheralPlain>());
 
     return peripherals;
 }
 
-void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start) {
+void AdapterPlain::set_callback_on_scan_start(std::function<void()> on_scan_start) {
     if (on_scan_start) {
         callback_on_scan_start_.load(std::move(on_scan_start));
     } else {
@@ -73,7 +66,7 @@ void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start
     }
 }
 
-void AdapterBase::set_callback_on_scan_stop(std::function<void()> on_scan_stop) {
+void AdapterPlain::set_callback_on_scan_stop(std::function<void()> on_scan_stop) {
     if (on_scan_stop) {
         callback_on_scan_stop_.load(std::move(on_scan_stop));
     } else {
@@ -81,7 +74,7 @@ void AdapterBase::set_callback_on_scan_stop(std::function<void()> on_scan_stop) 
     }
 }
 
-void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) {
+void AdapterPlain::set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) {
     if (on_scan_updated) {
         callback_on_scan_updated_.load(std::move(on_scan_updated));
     } else {
@@ -89,7 +82,7 @@ void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> o
     }
 }
 
-void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {
+void AdapterPlain::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {
     if (on_scan_found) {
         callback_on_scan_found_.load(std::move(on_scan_found));
     } else {

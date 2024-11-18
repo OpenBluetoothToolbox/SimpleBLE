@@ -1,6 +1,6 @@
 #import "PeripheralBaseMacOS.h"
-#import "BuilderBase.h"
 #import "CharacteristicBase.h"
+#import "CommonUtils.h"
 #import "DescriptorBase.h"
 #import "LoggingInternal.h"
 #import "ServiceBase.h"
@@ -250,16 +250,16 @@
     return self.peripheral.state == CBPeripheralStateConnected;
 }
 
-- (std::vector<SimpleBLE::Service>)getServices {
-    std::vector<SimpleBLE::Service> service_list;
+- (SimpleBLE::vec_of_shared<SimpleBLE::ServiceBase>)getServices {
+    SimpleBLE::vec_of_shared<SimpleBLE::ServiceBase> service_list;
     for (CBService* service in self.peripheral.services) {
         // Build the list of characteristics for the service.
-        std::vector<SimpleBLE::Characteristic> characteristic_list;
+        SimpleBLE::vec_of_shared<SimpleBLE::CharacteristicBase> characteristic_list;
         for (CBCharacteristic* characteristic in service.characteristics) {
             // Build the list of descriptors for the characteristic.
-            std::vector<SimpleBLE::Descriptor> descriptor_list;
+            SimpleBLE::vec_of_shared<SimpleBLE::DescriptorBase> descriptor_list;
             for (CBDescriptor* descriptor in characteristic.descriptors) {
-                descriptor_list.push_back(SimpleBLE::Factory::Builder<SimpleBLE::Descriptor>(uuidToSimpleBLE(descriptor.UUID)));
+                descriptor_list.push_back(std::make_shared<SimpleBLE::DescriptorBase>(uuidToSimpleBLE(descriptor.UUID)));
             }
 
             bool can_read = (characteristic.properties & CBCharacteristicPropertyRead) != 0;
@@ -268,11 +268,11 @@
             bool can_notify = (characteristic.properties & CBCharacteristicPropertyNotify) != 0;
             bool can_indicate = (characteristic.properties & CBCharacteristicPropertyIndicate) != 0;
 
-            characteristic_list.push_back(
-                SimpleBLE::Factory::Builder<SimpleBLE::Characteristic>(uuidToSimpleBLE(characteristic.UUID), descriptor_list, can_read,
-                                                                       can_write_request, can_write_command, can_notify, can_indicate));
+            characteristic_list.push_back(std::make_shared<SimpleBLE::CharacteristicBase>(uuidToSimpleBLE(characteristic.UUID),
+                                                                                          descriptor_list, can_read, can_write_request,
+                                                                                          can_write_command, can_notify, can_indicate));
         }
-        service_list.push_back(SimpleBLE::Factory::Builder<SimpleBLE::Service>(uuidToSimpleBLE(service.UUID), characteristic_list));
+        service_list.push_back(std::make_shared<SimpleBLE::ServiceBase>(uuidToSimpleBLE(service.UUID), characteristic_list));
     }
 
     return service_list;
