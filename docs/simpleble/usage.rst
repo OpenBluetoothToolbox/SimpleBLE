@@ -194,7 +194,9 @@ derived classes, which forces us to bring these definitions in externally.
 As a module
 -----------
 
-To include this dependency module, add the following to your ``settings.gradle`` file::
+To include this dependency module, add the following to your ``settings.gradle`` file
+
+.. code-block:: groovy
 
    includeBuild("path/to/simpleble/src/backends/android/simpleble-bridge") {
       dependencySubstitution {
@@ -202,7 +204,9 @@ To include this dependency module, add the following to your ``settings.gradle``
       }
    }
 
-Or, in ``settings.gradle.kts``::
+Or, in ``settings.gradle.kts``
+
+.. code-block:: kotlin
 
    includeBuild("path/to/simpleble/src/backends/android/simpleble-bridge") {
       dependencySubstitution {
@@ -210,17 +214,21 @@ Or, in ``settings.gradle.kts``::
       }
    }
 
-**NOTE:** We will provide Maven packages in the future.
+.. note::
+   
+   We will provide Maven packages in the future.
 
 From AAR file
 -------------
 
 Place the package on your app's directory, and take note of its path. We'll use ``example-app/app/libs/simpleble-bridge.aar``.
-Then, declare the dependency on your app's ``build.gradle{.kts}`` file (note: relative paths begin from your app's module folder)::
+Then, declare the dependency on your app's ``build.gradle{.kts}`` file (note: relative paths begin from your app's module folder)
+
+.. code-block:: kotlin
 
     dependencies {
       /* ... */
-      implementation(files('libs/simpleble-bridge.aar'))
+      implementation(files("libs/simpleble-bridge.aar"))
     }
 
 Build Examples

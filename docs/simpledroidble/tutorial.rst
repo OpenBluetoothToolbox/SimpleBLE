@@ -23,7 +23,9 @@ which is then used by the Kotlin frontend to perform lower-level tasks.
 
 After this, you will be able to call ``SimpleDroidBle#requestPermissions`` successfully. 
 This requests the required Android app permissions to the user; namely Bluetooth 
-access, administration, scanning, and connection. ::
+access, administration, scanning, and connection.
+
+.. code-block:: kotlin
 
     import android.app.Activity
     import android.os.Bundle
@@ -57,28 +59,30 @@ static class in Java), which has two main methods.
    Having multiple instances (by unbounded calls to ``Adapter#getAdapters``, for example) may cause a memory leak.
    This can be accomplished by acquiring said instance either on your app's Application class, or, in a single activity app, on your Activity's viewmodel; and treating the Adapter as a global, singleton object.
 
-The following code snippet shows how to use these functions::
+The following code snippet shows how to use these functions
 
-   import android.util.Log
-   import org.simpleble.android.Adapter
+.. code-block:: kotlin
+    
+    import android.util.Log
+    import org.simpleble.android.Adapter
 
-   // We assume simpleble is already set-up
-   fun listBluetoothDevices() {
-      if (!Adapter.isBluetoothEnabled()) {
-         Log.e("Example", "Bluetooth is not enabled")
-         return
-      }
+    // We assume simpleble is already set-up
+    fun listBluetoothDevices() {
+        if (!Adapter.isBluetoothEnabled()) {
+            Log.e("Example", "Bluetooth is not enabled")
+            return
+        }
 
-      val adapters = Adapter.getAdapters()
-      if (adapters.isEmpty()) {
-         Log.e("Example", "No Bluetooth adapters found")
-         return
-      }
+        val adapters = Adapter.getAdapters()
+        if (adapters.isEmpty()) {
+            Log.e("Example", "No Bluetooth adapters found")
+            return
+        }
 
-      val adapter = adapters.first()
-      Log.i("Example", "Adapter identifier: ${adapter.identifier}")
-      Log.i("Example", "Adapter address: ${adapter.address}")
-   }
+        val adapter = adapters.first()
+        Log.i("Example", "Adapter identifier: ${adapter.identifier}")
+        Log.i("Example", "Adapter address: ${adapter.address}")
+    }
 
 The above code will print the identifier and address of the first adapter found
 using ``Adapter#identifier`` and ``Adapter#address``, respectively.
@@ -96,7 +100,9 @@ This means that events are emitted via ``Flow``s, and consumed mainly in `Kotlin
 Once you have a list of available adapters, you can start scanning for
 peripherals. To do so, you need to call the ``Adapter#scanFor(Int)`` method.
 This will start emitting ``Peripheral`` objects that are in range of the adapter 
-on the ``Adapter#onScanFound`` flow. ::
+on the ``Adapter#onScanFound`` flow.
+
+.. code-block:: kotlin
 
     import android.util.Log
     import kotlinx.coroutines.CoroutineScope
@@ -132,7 +138,9 @@ which emit a value when scanning either starts or stops, respectively; ``Adapter
 which emits whether the ``Adapter`` is currently scanning for devices; and
 ``Adapter#onScanUpdated``, which emits when a peripheral property has changed.
 
-The following code snippet shows how to use these functions::
+The following code snippet shows how to use these functions
+
+.. code-block:: kotlin
 
     import android.util.Log
     import kotlinx.coroutines.CoroutineScope
@@ -190,7 +198,9 @@ Connecting to a peripheral
 
 Once you have a list of peripherals, you can connect to one of them. To do so,
 you can call ``Peripheral#connect()`` on one of the ``Peripheral`` objects 
-obtained via your ``Adapter``. ::
+obtained via your ``Adapter``.
+
+.. code-block:: kotlin
 
     import android.util.Log
     import kotlinx.coroutines.CoroutineScope
@@ -217,7 +227,9 @@ Similarly to the ``Adapter`` class, the ``Peripheral`` class has several flows.
 (analogously to ``Adapter#onScanActive``), and ``Peripheral#onDisconnected`` will
 emit when the peripheral is finally disconnected from the adapter.
 
-Here is a code sample of the aforementioned flows ::
+Here is a code sample of the aforementioned flows 
+
+.. code-block:: kotlin
 
     import android.util.Log
     import kotlinx.coroutines.CoroutineScope

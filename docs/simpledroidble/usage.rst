@@ -31,11 +31,13 @@ From AAR file
 -------------
 
 Place the package on your app's directory, and take note of its path. We'll use ``example-app/app/libs/{simpledroidble,simpleble-bridge}.aar``.
-Then, declare the dependency on your app's ``build.gradle{.kts}`` file (note: relative paths begin from your app's module folder)::
+Then, declare the dependency on your app's ``build.gradle{.kts}`` file (note: relative paths begin from your app's module folder)
+
+.. code-block:: kotlin
 
     dependencies {
       /* ... */
-      implementation(files('libs/simpledroidble.aar', 'libs/simpleble-bridge.aar'))
+      implementation(files("libs/simpledroidble.aar", "libs/simpleble-bridge.aar"))
     }
 
 Consuming Locally
@@ -43,7 +45,9 @@ Consuming Locally
 
 If you want to use SimpleDroidBLE as part of your project from a local copy,
 you can do so by adding the following to your ``settings.gradle`` or ``settings.gradle.kts`` file.
-Make sure this include is before your ``include(":app")`` statement::
+Make sure this include is before your ``include(":app")`` statement
+
+.. code-block:: groovy
 
     includeBuild("path/to/simpledroidble") {
         dependencySubstitution {
@@ -51,7 +55,9 @@ Make sure this include is before your ``include(":app")`` statement::
         }
     }
 
-Or, in Kotlin::
+Or, in Kotlin
+
+.. code-block:: kotlin
 
     includeBuild("path/to/simpledroidble") {
         dependencySubstitution {
@@ -59,14 +65,17 @@ Or, in Kotlin::
         }
     }
 
-Then, inside your ``build.gradle`` or ``build.gradle.kts`` file, you can add the
-following dependency::
+Then, inside your ``build.gradle`` file, you can add the following dependency
+
+.. code-block:: groovy
 
     dependencies {
         implementation "org.simpleble.android:simpledroidble"
     }
 
-Kotlin::
+If you are using Kotlin (``build.gradle.kts``)
+
+.. code-block:: kotlin
 
     dependencies {
         implementation("org.simpleble.android:simpledroidble")
