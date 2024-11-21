@@ -6,6 +6,8 @@ Agent1::Agent1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* 
     : SimpleDBus::Interface(conn, proxy, "org.bluez.Agent1") {}
 
 void Agent1::message_handle(SimpleDBus::Message& msg) {
+    std::cout << "Agent1::message_handle()\n" << msg.to_string() << std::endl;
+
     if (msg.get_type() == SimpleDBus::Message::Type::METHOD_CALL) {
         // To minimize the amount of repeated code, create a method return object that will be
         // used to send the reply.

@@ -54,6 +54,21 @@ int main(int argc, char* argv[]) {
         std::cout << "DisplayPasskey called with passkey: " << passkey << " for device: " << device_path << std::endl;
     });
 
+    agent->set_on_display_pin_code([agent](const std::string& device_path, const std::string& pin_code) {
+        std::cout << "DisplayPinCode called with pin_code: " << pin_code << " for device: " << device_path << std::endl;
+        return true;
+    });
+
+    agent->set_on_request_confirmation([agent](const std::string& device_path, uint32_t passkey) {
+        std::cout << "RequestConfirmation called with passkey: " << passkey << " for device: " << device_path << std::endl;
+        return true;
+    });
+
+    agent->set_on_request_authorization([agent](const std::string& device_path) {
+        std::cout << "RequestAuthorization called for device: " << device_path << std::endl;
+        return true;
+    });
+
 
     // --- ADAPTER SETUP ---
     std::map<std::string, std::shared_ptr<SimpleBluez::Device>> peripherals;
