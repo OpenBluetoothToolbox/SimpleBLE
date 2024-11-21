@@ -44,8 +44,10 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
+        # For testing purposes only static libraries are built to reduce run time.
+        # In release workflow all combinations are build.
         arch: [Win32, x64]
-        type: [shared, static]
+        type: [static]
 
     steps:
       - name: Clone repository
@@ -78,7 +80,8 @@ jobs:
           path: artifacts/simpleble_${{ matrix.type }}_windows-${{ matrix.arch }}.zip
 
   python:
-    needs: [build]
+    needs: [tests, examples]
     uses: ./.github/workflows/ci_wheels.yml
+    secrets: inherit
     with:
       os: windows-2022

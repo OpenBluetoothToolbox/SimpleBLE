@@ -11,6 +11,9 @@ jobs:
     steps:
       - name: Clone Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -35,6 +38,9 @@ jobs:
     steps:
       - name: Clone Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -53,10 +59,10 @@ jobs:
           name: simplepyble
           path: dist/*.tar.gz
 
-      - name: Check packages
+      - name: Check source distribution
         run: twine check dist/*.tar.gz
 
-      - name: Publish packages
+      - name: Publish source distribution
         if: ${{ env.HAS_TWINE_USERNAME == 'true' }}
         run: |
           twine upload --repository testpypi --skip-existing dist/*.tar.gz --verbose

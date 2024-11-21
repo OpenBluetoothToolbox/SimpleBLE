@@ -6,7 +6,7 @@ on:
 
 jobs:
   tests:
-    runs-on: macos-12
+    runs-on: macos-14
 
     steps:
     - name: Clone Repository
@@ -22,7 +22,7 @@ jobs:
         $GITHUB_WORKSPACE/build_test/bin/simpleble_test
   
   examples:
-    runs-on: macos-12
+    runs-on: macos-14
 
     steps:
     - name: Clone Repository
@@ -35,14 +35,16 @@ jobs:
         cmake --build $GITHUB_WORKSPACE/build --config Release --parallel 4
 
   build:
-    runs-on: macos-12
+    runs-on: macos-14
     needs: [tests, examples]
 
     strategy:
       fail-fast: false
       max-parallel: 4
       matrix:
-        type: [shared, static]
+        # For testing purposes only static libraries are built to reduce run time.
+        # In release workflow all combinations are build.
+        type: [static]
         arch: [arm64, x86_64]
 
     steps:
@@ -55,7 +57,7 @@ jobs:
       - name: Compile SimpleBLE
         run: |
 
-          if [ "${{ matrix.type }}" = "shared" ]; then
+          if [ "${{ matrix.type }}" == "shared" ]; then
             BUILD_SHARED_LIBS=ON
           else
             BUILD_SHARED_LIBS=OFF
@@ -75,20 +77,21 @@ jobs:
           path: artifacts/simpleble_${{ matrix.type }}_macos-${{ matrix.arch }}.zip
 
   python:
-    needs: [build]
+    needs: [tests, examples]
     uses: ./.github/workflows/ci_wheels.yml
+    secrets: inherit
     with:
-      os: macos-12
+      os: macos-14
 
   rust:
     runs-on: ${{ matrix.os }}
-    needs: [build]
+    needs: [tests, examples]
 
     strategy:
       fail-fast: false
       max-parallel: 4
       matrix:
-        os: [macos-12]
+        os: [macos-14]
         arch: [arm64, x86_64]
 
     steps:

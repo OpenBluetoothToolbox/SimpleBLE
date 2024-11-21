@@ -13,7 +13,7 @@ jobs:
   # (For example when pushing a commit to an open pull request)
   # See: https://github.com/fkirc/skip-duplicate-actions?tab=readme-ov-file#skip-concurrent-workflow-runs
   pre_job:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
@@ -27,13 +27,21 @@ jobs:
         with:
           concurrent_skipping: 'same_content_newer'
           skip_after_successful_duplicate: 'true'
+      - name: Clone Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Perform version check
+        run: |
+          ./scripts/check_version.sh
 
   # This job detects changes in the diff and set some ouput variables accordingly.
   # It is use to conditionaly run different jobs and steps of the pipeline
   changes:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       pull-requests: read
     outputs:
@@ -44,10 +52,10 @@ jobs:
       python: ${{ steps.filter.outputs.python }}
       rust: ${{ steps.filter.outputs.rust }}
       docs: ${{ steps.filter.outputs.docs }}
-      ci: ${{ steps.filter.outputs.ci }}
+      miscs: ${{ steps.filter.outputs.miscs }}
       changes: ${{ steps.filter.outputs.changes }}
     steps:
-      - name: Clone Repository 
+      - name: Clone Repository
         uses: actions/checkout@v4
       - name: Detect file changes
         uses: dorny/paths-filter@v3
@@ -55,24 +63,22 @@ jobs:
         with:
           list-files: shell
           filters: |
-            ci: &ci
+            miscs:
               - '.github/workflows/**'
               - '.github/actions/**'
-            common: &common
               - 'examples/simpleble/**'
+              - 'cmake/**'
+            common: &common
               - 'simpleble/include/**'
               - 'simpleble/src/builders/**'
               - 'simpleble/src/external/**'
               - 'simpleble/src/frontends/**'
               - 'simpleble/src/backends/common/**'
               - 'external/**'
-              - 'cmake/**'
             windows: &windows
-              - *ci
               - *common
               - 'simpleble/src/backends/windows/**'
             linux: &linux
-              - *ci
               - *common
               - 'simpleble/src/backends/linux/**'
               - 'simpledbus/**'
@@ -80,43 +86,40 @@ jobs:
               - 'simplebluez/**'
               - 'examples/simplebluez/**'
             macos: &macos
-              - *ci
               - *common
               - 'simpleble/src/backends/macos/**'
             python:
-              - *ci
               - 'simpleble/src/backends/plain/**'
               - 'simpleble/src/frontends/**'
               - 'simplepyble/**'
               - 'setup.py'
             rust:
-              - *ci
               - *linux
               - *macos
               - 'simplersble/**'
               - 'Cargo.lock'
               - 'Cargo.toml'
             docs:
-              - *ci
               - 'docs/**'
               - '**/*.md'
               - '**/*.rst'
 
   # This job is used to dynamically generate the build matrix of 'build' job in 'ci_linux.yml'.
   # The output variable 'values' is a list of strings: 'simpledbus', 'simplebluez' and 'simpleble'.
-  # This is not inside pre-job because 'changes' variable is set by dorny/paths-filter to ALL the filters 
+  # This is not inside pre-job because 'changes' variable is set by dorny/paths-filter to ALL the filters
   # that match, so we need to have a job with only these three filters.
   # Note that the filters are defined in a way that makes each of them depend on the previous one.
+  # If in main branch, all libraries are listed in the output even if there are no matching changes.
   libraries:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       pull-requests: read
     outputs:
-      values: ${{ steps.filter.outputs.changes }}
+      values: ${{ github.ref == 'refs/heads/main' && '["simpledbus","simplebluez","simpleble"]' || steps.filter.outputs.changes }}
     steps:
-      - name: Clone Repository 
+      - name: Clone Repository
         uses: actions/checkout@v4
       - name: Detect file changes
         uses: dorny/paths-filter@v3
@@ -124,8 +127,6 @@ jobs:
         with:
           filters: |
             simpledbus: &simpledbus
-              - '.github/workflows/**'
-              - '.github/actions/**'
               - 'simpledbus/**'
             simplebluez: &simplebluez
               - *simpledbus
@@ -146,19 +147,23 @@ jobs:
       needs.pre_job.outputs.should_skip != 'true' &&
       (needs.changes.outputs.docs == 'true' || github.ref == 'refs/heads/main')
     uses: ./.github/workflows/ci_docs.yml
-  
+
   windows:
     needs: [pre_job, changes]
     if: |
       needs.pre_job.outputs.should_skip != 'true' &&
-      (needs.changes.outputs.windows == 'true' || github.ref == 'refs/heads/main')
+      (needs.changes.outputs.windows == 'true' ||
+      needs.changes.outputs.miscs == 'true' ||
+      github.ref == 'refs/heads/main')
     uses: ./.github/workflows/ci_windows.yml
 
   linux:
     needs: [pre_job, changes, libraries]
     if: |
       needs.pre_job.outputs.should_skip != 'true' &&
-      (needs.changes.outputs.linux == 'true' || github.ref == 'refs/heads/main')
+      (needs.changes.outputs.linux == 'true' ||
+      needs.changes.outputs.miscs == 'true' ||
+      github.ref == 'refs/heads/main')
     uses: ./.github/workflows/ci_linux.yml
     with:
       libraries: ${{ needs.libraries.outputs.values }}
@@ -167,55 +172,32 @@ jobs:
     needs: [pre_job, changes]
     if: |
       needs.pre_job.outputs.should_skip != 'true' &&
-      (needs.changes.outputs.macos == 'true' || github.ref == 'refs/heads/main')
+      (needs.changes.outputs.macos == 'true' ||
+      needs.changes.outputs.miscs == 'true' ||
+      github.ref == 'refs/heads/main')
     uses: ./.github/workflows/ci_macos.yml
-  
+
   python:
     needs: [pre_job, changes]
     if:  |
       needs.pre_job.outputs.should_skip != 'true' &&
       (needs.changes.outputs.python == 'true' || github.ref == 'refs/heads/main')
     uses: ./.github/workflows/ci_python.yml
+    secrets: inherit
 
   release-python:
-    runs-on: ubuntu-22.04
     needs: [pre_job, changes, windows, linux, macos, python]
+    # Note that Python is released on every commit in main branch with relevant
+    # changes (python, linux, windows, or macos filters). While cpp binaries are
+    # only published on manual releases.
     if: |
       needs.pre_job.outputs.should_skip != 'true' &&
-      needs.changes.outputs.python == 'true' &&
+      (needs.changes.outputs.python == 'true' ||
+      needs.changes.outputs.windows == 'true' ||
+      needs.changes.outputs.linux == 'true' ||
+      needs.changes.outputs.macos == 'true') &&
       github.ref == 'refs/heads/main'
-    steps:
-
-      - name: "Download Python Source Dist"
-        uses: actions/download-artifact@v4
-        with:
-          name: 'simplepyble'
-          path: 'sdist'
-  
-      - name: Check packages
-        run: |
-          pip3 install twine
-          twine check sdist/simplepyble*.tar.gz
-
-      - name: Publish packages
-        run: twine upload --skip-existing sdist/simplepyble*.tar.gz --verbose
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USER }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-
-      - name: "Download Python Wheels"
-        uses: actions/download-artifact@v4
-        with:
-          pattern: 'simpleble-wheels-*'
-          path: 'wheels'
-          merge-multiple: true
-      
-      - name: Check Packages
-        run: twine check wheels/*.whl
-
-      - name: Publish packages to PyPi
-        run: twine upload --skip-existing wheels/*.whl --verbose
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USER }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      
+    uses: ./.github/workflows/ci_python_publish.yml
+    with:
+      tag: ${{ github.ref }}
+    secrets: inherit

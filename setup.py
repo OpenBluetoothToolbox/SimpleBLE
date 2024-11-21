@@ -1,11 +1,15 @@
 import argparse
 import os
 import pathlib
+import subprocess
+
 import sys
 
 import pybind11
 import skbuild
 
+from pathlib import Path
+from setuptools.command.sdist import sdist
 
 def exclude_unnecessary_files(cmake_manifest):
     def is_necessary(name):
@@ -20,6 +24,54 @@ def exclude_unnecessary_files(cmake_manifest):
 
     return list(filter(is_necessary, cmake_manifest))
 
+def is_git_repo():
+    try:
+        subprocess.check_output(['git', 'rev-parse', '--git-dir'], stderr=subprocess.DEVNULL)
+        return True
+    except (subprocess.SubprocessError, FileNotFoundError):
+        return False
+
+def get_commit_since_hash(hash_cmd):
+    result = subprocess.run(hash_cmd.split(' '),
+        capture_output=True,
+        text=True)
+
+    if result.returncode != 0:
+        raise RuntimeError(f"Failed to get hash: {result.stderr}")
+
+    hash = result.stdout.strip()
+
+    if not hash:
+        raise RuntimeError(f"Empty hash")
+
+    count_cmd = f"git rev-list --count {hash}..HEAD"
+    result = subprocess.run(
+        count_cmd.split(' '),
+        capture_output=True,
+        text=True
+    )
+    if result.returncode == 0:
+        return int(result.stdout.strip())
+    else:
+        raise RuntimeError(f"Failed to count commits since last hash: {result.stderr}")
+
+def get_commits_since_last_tag():
+    return get_commit_since_hash("git describe --tags --abbrev=0")
+
+def get_commits_since_version_bump():
+    return get_commit_since_hash("git log -1 --format=%H -- VERSION")
+
+def is_current_commit_tagged():
+    result = subprocess.run(
+        ["git", "describe", "--exact-match", "--tags", "HEAD"],
+        capture_output=True,  
+        text=True
+    )
+    
+    if result.returncode == 0:
+        return True, result.stdout.strip()
+    else:
+        return False, None
 
 argparser = argparse.ArgumentParser(add_help=False)
 argparser.add_argument(
@@ -31,9 +83,21 @@ sys.argv = [sys.argv[0]] + unknown
 root = pathlib.Path(__file__).parent.resolve()
 
 # Generate the version string
-# TODO: Make the dev portion smarter by looking at tags.
-version_str = (root / "VERSION").read_text(encoding="utf-8").strip()
-version_str += ".dev1"  # ! Ensure it matches the intended release version!
+def get_version():
+    root = Path(__file__).parent
+    
+    version_str = (root / "VERSION").read_text(encoding="utf-8").strip()
+    if is_git_repo():
+        is_tagged, tag = is_current_commit_tagged()
+        if not is_tagged:
+            N = get_commits_since_version_bump()
+            if N > 0:
+                version_str += f".dev{N-1}"
+	# If we are not in a git repo and running from a source distribution, the VERSION
+	# file has already been updated with the corresponding dev version if necessary.
+    return version_str
+
+version_str = get_version()
 
 # Get the long description from the README file
 long_description = (root / "simplepyble" / "README.rst").read_text(encoding="utf-8")
@@ -52,6 +116,23 @@ if args.plain:
 
 if 'PIWHEELS_BUILD' in os.environ:
     cmake_options.append("-DLIBFMT_VENDORIZE=OFF")
+
+class CustomSdist(sdist):
+    def make_release_tree(self, base_dir, files):
+
+        # First, let the parent class create the release tree
+        super().make_release_tree(base_dir, files)
+
+        version = get_version()
+        
+        if "dev" in version:
+            # Dev versions are generated dynamically.
+            # Update the VERSION file in the release tree
+            # so it matches the one published on PyPi
+            version_file = Path(base_dir) / "VERSION"
+            if version_file.exists():
+                version_file.write_text(version + "\n", encoding="utf-8")
+                print(f"Updated VERSION file in sdist to: {version}")
 
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
@@ -92,4 +173,7 @@ skbuild.setup(
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3 :: Only",
     ],
+    cmdclass={
+        'sdist': CustomSdist,
+    },
 )
