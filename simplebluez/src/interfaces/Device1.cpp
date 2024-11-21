@@ -2,8 +2,8 @@
 
 using namespace SimpleBluez;
 
-Device1::Device1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path)
-    : SimpleDBus::Interface(conn, "org.bluez", path, "org.bluez.Device1") {}
+Device1::Device1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* proxy)
+    : SimpleDBus::Interface(conn, proxy, "org.bluez.Device1") {}
 
 Device1::~Device1() {
     OnDisconnected.unload();
@@ -100,6 +100,15 @@ bool Device1::Paired(bool refresh) {
 
     std::scoped_lock lock(_property_update_mutex);
     return _properties["Paired"].get_boolean();
+}
+
+bool Device1::Bonded(bool refresh) {
+    if (refresh) {
+        property_refresh("Bonded");
+    }
+
+    std::scoped_lock lock(_property_update_mutex);
+    return _properties["Bonded"].get_boolean();
 }
 
 bool Device1::Connected(bool refresh) {

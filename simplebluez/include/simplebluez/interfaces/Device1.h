@@ -11,7 +11,7 @@ namespace SimpleBluez {
 
 class Device1 : public SimpleDBus::Interface {
   public:
-    Device1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path);
+    Device1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* proxy);
     virtual ~Device1();
 
     // ----- METHODS -----
@@ -32,6 +32,7 @@ class Device1 : public SimpleDBus::Interface {
     std::map<uint16_t, ByteArray> ManufacturerData(bool refresh = true);
     std::map<std::string, ByteArray> ServiceData(bool refresh = true);
     bool Paired(bool refresh = true);
+    bool Bonded(bool refresh = true);
     bool Connected(bool refresh = true);
     bool ServicesResolved(bool refresh = true);
 

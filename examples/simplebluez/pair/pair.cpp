@@ -8,12 +8,12 @@
 #include <iostream>
 #include <thread>
 
-SimpleBluez::Bluez bluez;
+std::shared_ptr<SimpleBluez::Bluez> bluez = SimpleBluez::Bluez::create();
 
 std::atomic_bool async_thread_active = true;
 void async_thread_function() {
     while (async_thread_active) {
-        bluez.run_async();
+        bluez->run_async();
         std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
 }
@@ -29,50 +29,50 @@ std::vector<std::shared_ptr<SimpleBluez::Device>> peripherals;
 int main(int argc, char* argv[]) {
     int selection = -1;
 
-    bluez.init();
     std::thread* async_thread = new std::thread(async_thread_function);
 
-    auto agent = bluez.get_agent();
+    auto agent = bluez->get_agent();
     agent->set_capabilities(SimpleBluez::Agent::Capabilities::KeyboardDisplay);
 
     // Configure all callback handlers for the agent, as part of this example.
-    agent->set_on_request_pin_code([&]() {
-        std::cout << "Agent::RequestPinCode" << std::endl;
+    agent->set_on_request_pin_code([&](const std::string& device_path) {
+        std::cout << "Agent::RequestPinCode for device: " << device_path << std::endl;
         return "123456";
     });
 
-    agent->set_on_display_pin_code([&](const std::string& pin_code) {
-        std::cout << "Agent::DisplayPinCode: " << pin_code << std::endl;
+    agent->set_on_display_pin_code([&](const std::string& device_path, const std::string& pin_code) {
+        std::cout << "Agent::DisplayPinCode for device: " << device_path << " with pin_code: " << pin_code << std::endl;
         return true;
     });
 
-    agent->set_on_request_passkey([&]() {
-        std::cout << "Agent::RequestPasskey" << std::endl;
+    agent->set_on_request_passkey([&](const std::string& device_path) {
+        std::cout << "Agent::RequestPasskey for device: " << device_path << std::endl;
         return 123456;
     });
 
-    agent->set_on_display_passkey([&](uint32_t passkey, uint16_t entered) {
-        std::cout << "Agent::DisplayPasskey: " << passkey << " (" << entered << " entered)" << std::endl;
-    });
-
-    agent->set_on_request_confirmation([&](uint32_t passkey) {
-        std::cout << "Agent::RequestConfirmation: " << passkey << std::endl;
+    agent->set_on_display_passkey([&](const std::string& device_path, uint32_t passkey, uint16_t entered) {
+        std::cout << "Agent::DisplayPasskey for device: " << device_path << " with passkey: " << passkey << " (" << entered << " entered)" << std::endl;
         return true;
     });
 
-    agent->set_on_request_authorization([&]() {
-        std::cout << "Agent::RequestAuthorization" << std::endl;
+    agent->set_on_request_confirmation([&](const std::string& device_path, uint32_t passkey) {
+        std::cout << "Agent::RequestConfirmation for device: " << device_path << " with passkey: " << passkey << std::endl;
         return true;
     });
 
-    agent->set_on_authorize_service([&](const std::string& uuid) {
-        std::cout << "Agent::AuthorizeService: " << uuid << std::endl;
+    agent->set_on_request_authorization([&](const std::string& device_path) {
+        std::cout << "Agent::RequestAuthorization for device: " << device_path << std::endl;
         return true;
     });
 
-    bluez.register_agent();
+    agent->set_on_authorize_service([&](const std::string& device_path, const std::string& uuid) {
+        std::cout << "Agent::AuthorizeService for device: " << device_path << " with uuid: " << uuid << std::endl;
+        return true;
+    });
 
-    auto adapters = bluez.get_adapters();
+    bluez->register_agent();
+
+    auto adapters = bluez->get_adapters();
     std::cout << "Available adapters:" << std::endl;
     for (int i = 0; i < adapters.size(); i++) {
         std::cout << "[" << i << "] " << adapters[i]->identifier() << " [" << adapters[i]->address() << "]"

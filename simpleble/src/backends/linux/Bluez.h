@@ -3,6 +3,7 @@
 #include <simplebluez/Bluez.h>
 #include <atomic>
 #include <thread>
+#include <memory>
 
 namespace SimpleBLE {
 
@@ -10,7 +11,7 @@ class Bluez {
   public:
     static Bluez* get();
 
-    SimpleBluez::Bluez bluez;
+    std::shared_ptr<SimpleBluez::Bluez> bluez;
 
   private:
     Bluez();

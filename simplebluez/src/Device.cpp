@@ -24,13 +24,12 @@ std::shared_ptr<SimpleDBus::Proxy> Device::path_create(const std::string& path) 
 
 std::shared_ptr<SimpleDBus::Interface> Device::interfaces_create(const std::string& interface_name) {
     if (interface_name == "org.bluez.Device1") {
-        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Device1>(_conn, _path));
+        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Device1>(_conn, this));
     } else if (interface_name == "org.bluez.Battery1") {
-        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Battery1>(_conn, _path));
+        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Battery1>(_conn, this));
     }
 
-    auto interface = std::make_shared<SimpleDBus::Interface>(_conn, _bus_name, _path, interface_name);
-    return std::static_pointer_cast<SimpleDBus::Interface>(interface);
+    return std::make_shared<SimpleDBus::Interface>(_conn, this, interface_name);
 }
 
 std::shared_ptr<Device1> Device::device1() {
@@ -89,11 +88,13 @@ std::map<uint16_t, ByteArray> Device::manufacturer_data() { return device1()->Ma
 
 std::map<std::string, ByteArray> Device::service_data() { return device1()->ServiceData(); }
 
-bool Device::paired() { return device1()->Paired(); }
+bool Device::paired(bool refresh) { return device1()->Paired(refresh); }
 
-bool Device::connected() { return device1()->Connected(); }
+bool Device::bonded(bool refresh) { return device1()->Bonded(refresh); }
 
-bool Device::services_resolved() { return device1()->ServicesResolved(); }
+bool Device::connected(bool refresh) { return device1()->Connected(refresh); }
+
+bool Device::services_resolved(bool refresh) { return device1()->ServicesResolved(refresh); }
 
 void Device::set_on_disconnected(std::function<void()> callback) { device1()->OnDisconnected.load(callback); }
 

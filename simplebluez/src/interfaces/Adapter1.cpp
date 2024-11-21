@@ -1,9 +1,12 @@
 #include "simplebluez/interfaces/Adapter1.h"
 
+#include "simpledbus/interfaces/Properties.h"
+#include "simpledbus/advanced/Proxy.h"
+
 using namespace SimpleBluez;
 
-Adapter1::Adapter1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path)
-    : SimpleDBus::Interface(conn, "org.bluez", path, "org.bluez.Adapter1") {}
+Adapter1::Adapter1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* proxy)
+    : SimpleDBus::Interface(conn, proxy, "org.bluez.Adapter1") {}
 
 void Adapter1::StartDiscovery() {
     auto msg = create_method_call("StartDiscovery");
@@ -88,6 +91,23 @@ void Adapter1::RemoveDevice(std::string device_path) {
     _conn->send_with_reply_and_block(msg);
 }
 
+std::string Adapter1::Alias() {
+    std::scoped_lock lock(_property_update_mutex);
+    return _properties["Alias"].get_string();
+}
+
+void Adapter1::Alias(std::string alias) {
+    SimpleDBus::Holder alias_h = SimpleDBus::Holder::create_string(alias);
+
+    {
+        std::scoped_lock lock(_property_update_mutex);
+        _properties["Alias"] = alias_h;
+    }
+
+    std::shared_ptr<SimpleDBus::Properties> properties = std::dynamic_pointer_cast<SimpleDBus::Properties>(_proxy->interface_get("org.freedesktop.DBus.Properties"));
+    properties->Set("org.bluez.Adapter1", "Alias", alias_h);
+}
+
 bool Adapter1::Discovering(bool refresh) {
     if (refresh) {
         property_refresh("Discovering");
@@ -97,13 +117,21 @@ bool Adapter1::Discovering(bool refresh) {
     return _properties["Discovering"].get_boolean();
 }
 
-bool Adapter1::Powered(bool refresh) {
-    if (refresh) {
-        property_refresh("Powered");
-    }
-
+bool Adapter1::Powered() {
     std::scoped_lock lock(_property_update_mutex);
     return _properties["Powered"].get_boolean();
+}
+
+void Adapter1::Powered(bool powered) {
+    SimpleDBus::Holder powered_h = SimpleDBus::Holder::create_boolean(powered);
+
+    {
+        std::scoped_lock lock(_property_update_mutex);
+        _properties["Powered"] = powered_h;
+    }
+
+    std::shared_ptr<SimpleDBus::Properties> properties = std::dynamic_pointer_cast<SimpleDBus::Properties>(_proxy->interface_get("org.freedesktop.DBus.Properties"));
+    properties->Set("org.bluez.Adapter1", "Powered", powered_h);
 }
 
 std::string Adapter1::Address() {

@@ -8,12 +8,12 @@
 #include <iostream>
 #include <thread>
 
-SimpleBluez::Bluez bluez;
+std::shared_ptr<SimpleBluez::Bluez> bluez = SimpleBluez::Bluez::create();
 
 std::atomic_bool async_thread_active = true;
 void async_thread_function() {
     while (async_thread_active) {
-        bluez.run_async();
+        bluez->run_async();
         std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
 }
@@ -29,10 +29,9 @@ std::vector<std::shared_ptr<SimpleBluez::Device>> peripherals;
 int main(int argc, char* argv[]) {
     int selection = -1;
 
-    bluez.init();
     std::thread* async_thread = new std::thread(async_thread_function);
 
-    auto adapters = bluez.get_adapters();
+    auto adapters = bluez->get_adapters();
     std::cout << "Available adapters:" << std::endl;
     for (int i = 0; i < adapters.size(); i++) {
         std::cout << "[" << i << "] " << adapters[i]->identifier() << " [" << adapters[i]->address() << "]"

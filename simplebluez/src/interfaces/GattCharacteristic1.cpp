@@ -1,9 +1,11 @@
 #include "simplebluez/interfaces/GattCharacteristic1.h"
+#include "simpledbus/interfaces/Properties.h"
+#include "simpledbus/advanced/Proxy.h"
 
 using namespace SimpleBluez;
 
-GattCharacteristic1::GattCharacteristic1(std::shared_ptr<SimpleDBus::Connection> conn, std::string path)
-    : SimpleDBus::Interface(conn, "org.bluez", path, "org.bluez.GattCharacteristic1") {}
+GattCharacteristic1::GattCharacteristic1(std::shared_ptr<SimpleDBus::Connection> conn, SimpleDBus::Proxy* proxy)
+    : SimpleDBus::Interface(conn, proxy, "org.bluez.GattCharacteristic1") {}
 
 GattCharacteristic1::~GattCharacteristic1() { OnValueChanged.unload(); }
 
@@ -56,9 +58,44 @@ std::string GattCharacteristic1::UUID() {
     return _uuid;
 }
 
+void GattCharacteristic1::UUID(const std::string& uuid) {
+    std::scoped_lock lock(_property_update_mutex);
+    _properties["UUID"] = SimpleDBus::Holder::create_string(uuid);
+    _uuid = uuid;
+}
+
+std::string GattCharacteristic1::Service() {
+    std::scoped_lock lock(_property_update_mutex);
+    return _properties["Service"].get_string();
+}
+
+void GattCharacteristic1::Service(const std::string& service) {
+    std::scoped_lock lock(_property_update_mutex);
+    _properties["Service"] = SimpleDBus::Holder::create_object_path(service);
+}
+
 ByteArray GattCharacteristic1::Value() {
     std::scoped_lock lock(_property_update_mutex);
     return _value;
+}
+
+void GattCharacteristic1::Value(const ByteArray& value) {
+    SimpleDBus::Holder value_array = SimpleDBus::Holder::create_array();
+    for (size_t i = 0; i < value.size(); i++) {
+        value_array.array_append(SimpleDBus::Holder::create_byte(value[i]));
+    }
+
+    {
+        std::scoped_lock lock(_property_update_mutex);
+        _properties["Value"] = value_array;
+        _value = value;
+    }
+
+    std::map<std::string, SimpleDBus::Holder> changed_properties;
+    changed_properties["Value"] = value_array;
+
+    std::shared_ptr<SimpleDBus::Properties> properties = std::dynamic_pointer_cast<SimpleDBus::Properties>(_proxy->interface_get("org.freedesktop.DBus.Properties"));
+    properties->PropertiesChanged("org.bluez.GattCharacteristic1", changed_properties);
 }
 
 std::vector<std::string> GattCharacteristic1::Flags() {
@@ -72,9 +109,23 @@ std::vector<std::string> GattCharacteristic1::Flags() {
     return flags;
 }
 
+void GattCharacteristic1::Flags(const std::vector<std::string>& flags) {
+    std::scoped_lock lock(_property_update_mutex);
+    SimpleDBus::Holder flags_array = SimpleDBus::Holder::create_array();
+    for (const std::string& flag : flags) {
+        flags_array.array_append(SimpleDBus::Holder::create_string(flag));
+    }
+    _properties["Flags"] = flags_array;
+}
+
 uint16_t GattCharacteristic1::MTU() {
     std::scoped_lock lock(_property_update_mutex);
     return _properties["MTU"].get_uint16();
+}
+
+void GattCharacteristic1::MTU(uint16_t mtu) {
+    std::scoped_lock lock(_property_update_mutex);
+    _properties["MTU"] = SimpleDBus::Holder::create_uint16(mtu);
 }
 
 bool GattCharacteristic1::Notifying(bool refresh) {
@@ -106,4 +157,58 @@ void GattCharacteristic1::update_value(SimpleDBus::Holder& new_value) {
     }
     _value = ByteArray(value_data, value_array.size());
     delete[] value_data;
+}
+
+void GattCharacteristic1::message_handle(SimpleDBus::Message& msg) {
+    if (msg.is_method_call(_interface_name, "ReadValue")) {
+        SimpleDBus::Holder options = msg.extract();
+
+        OnReadValue();
+
+        SimpleDBus::Message reply = SimpleDBus::Message::create_method_return(msg);
+        reply.append_argument(_properties["Value"], "ay");
+        _conn->send(reply);
+    } else if (msg.is_method_call(_interface_name, "WriteValue")) {
+        SimpleDBus::Holder value = msg.extract();
+        msg.extract_next();
+        SimpleDBus::Holder options = msg.extract();
+
+        update_value(value);
+        SimpleDBus::Message reply = SimpleDBus::Message::create_method_return(msg);
+        _conn->send(reply);
+
+        OnWriteValue(_value);
+    } else if (msg.is_method_call(_interface_name, "StartNotify")) {
+        SimpleDBus::Message reply = SimpleDBus::Message::create_method_return(msg);
+        _conn->send(reply);
+
+        {
+            std::scoped_lock lock(_property_update_mutex);
+            _properties["Notifying"] = SimpleDBus::Holder::create_boolean(true);
+
+            std::map<std::string, SimpleDBus::Holder> changed_properties;
+            changed_properties["Notifying"] = SimpleDBus::Holder::create_boolean(true);
+
+            std::shared_ptr<SimpleDBus::Properties> properties = std::dynamic_pointer_cast<SimpleDBus::Properties>(_proxy->interface_get("org.freedesktop.DBus.Properties"));
+            properties->PropertiesChanged("org.bluez.GattCharacteristic1", changed_properties);
+        }
+
+        OnStartNotify();
+    } else if (msg.is_method_call(_interface_name, "StopNotify")) {
+        SimpleDBus::Message reply = SimpleDBus::Message::create_method_return(msg);
+        _conn->send(reply);
+
+        {
+            std::scoped_lock lock(_property_update_mutex);
+            _properties["Notifying"] = SimpleDBus::Holder::create_boolean(false);
+
+            std::map<std::string, SimpleDBus::Holder> changed_properties;
+            changed_properties["Notifying"] = SimpleDBus::Holder::create_boolean(false);
+
+            std::shared_ptr<SimpleDBus::Properties> properties = std::dynamic_pointer_cast<SimpleDBus::Properties>(_proxy->interface_get("org.freedesktop.DBus.Properties"));
+            properties->PropertiesChanged("org.bluez.GattCharacteristic1", changed_properties);
+        }
+
+        OnStopNotify();
+    }
 }

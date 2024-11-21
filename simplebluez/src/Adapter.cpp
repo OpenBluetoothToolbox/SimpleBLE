@@ -12,20 +12,33 @@ Adapter::~Adapter() {}
 
 std::shared_ptr<SimpleDBus::Proxy> Adapter::path_create(const std::string& path) {
     auto child = std::make_shared<Device>(_conn, _bus_name, path);
+    child->on_signal_received.load([this, child]() { _on_device_updated(child); });
+
     return std::static_pointer_cast<SimpleDBus::Proxy>(child);
 }
 
 std::shared_ptr<SimpleDBus::Interface> Adapter::interfaces_create(const std::string& interface_name) {
     if (interface_name == "org.bluez.Adapter1") {
-        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Adapter1>(_conn, _path));
+        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<Adapter1>(_conn, this));
+    } else if (interface_name == "org.bluez.LEAdvertisingManager1") {
+        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<LEAdvertisingManager1>(_conn, this));
+    } else if (interface_name == "org.bluez.GattManager1") {
+        return std::static_pointer_cast<SimpleDBus::Interface>(std::make_shared<GattManager1>(_conn, this));
     }
 
-    auto interface = std::make_shared<SimpleDBus::Interface>(_conn, _bus_name, _path, interface_name);
-    return std::static_pointer_cast<SimpleDBus::Interface>(interface);
+    return std::make_shared<SimpleDBus::Interface>(_conn, this, interface_name);
 }
 
 std::shared_ptr<Adapter1> Adapter::adapter1() {
     return std::dynamic_pointer_cast<Adapter1>(interface_get("org.bluez.Adapter1"));
+}
+
+std::shared_ptr<LEAdvertisingManager1> Adapter::le_advertising_manager1() {
+    return std::dynamic_pointer_cast<LEAdvertisingManager1>(interface_get("org.bluez.LEAdvertisingManager1"));
+}
+
+std::shared_ptr<GattManager1> Adapter::gatt_manager1() {
+    return std::dynamic_pointer_cast<GattManager1>(interface_get("org.bluez.GattManager1"));
 }
 
 std::string Adapter::identifier() const {
@@ -35,9 +48,15 @@ std::string Adapter::identifier() const {
 
 std::string Adapter::address() { return adapter1()->Address(); }
 
+std::string Adapter::alias() { return adapter1()->Alias(); }
+
+void Adapter::alias(std::string alias) { adapter1()->Alias(alias); }
+
 bool Adapter::discovering() { return adapter1()->Discovering(); }
 
 bool Adapter::powered() { return adapter1()->Powered(); }
+
+void Adapter::powered(bool powered) { adapter1()->Powered(powered); }
 
 void Adapter::discovery_filter(const DiscoveryFilter& filter) { adapter1()->SetDiscoveryFilter(filter); }
 
@@ -69,19 +88,66 @@ std::vector<std::shared_ptr<Device>> Adapter::device_paired_get() {
     return paired_devices;
 }
 
+std::vector<std::shared_ptr<Device>> Adapter::device_bonded_get() {
+    // Traverse all child paths and return only those that are bonded.
+    std::vector<std::shared_ptr<Device>> bonded_devices;
+
+    for (auto& [path, child] : _children) {
+        if (!child->valid()) continue;
+
+        std::shared_ptr<Device> device = std::dynamic_pointer_cast<Device>(child);
+        if (device->bonded()) {
+            bonded_devices.push_back(device);
+        }
+    }
+
+    return bonded_devices;
+}
+
+void Adapter::register_advertisement(const std::shared_ptr<CustomAdvertisement>& advertisement) {
+    if (supported_advertisement_instances() == 0) {
+        throw std::runtime_error("No available advertisement instances");
+    }
+
+    le_advertising_manager1()->RegisterAdvertisement(advertisement->path());
+    advertisement->activate();
+}
+
+void Adapter::unregister_advertisement(const std::shared_ptr<CustomAdvertisement>& advertisement) {
+    if (advertisement->active()) {
+        le_advertising_manager1()->UnregisterAdvertisement(advertisement->path());
+        advertisement->deactivate();
+    }
+}
+
+uint8_t Adapter::active_advertisement_instances(bool refresh) {
+    return le_advertising_manager1()->ActiveInstances(refresh);
+}
+
+uint8_t Adapter::supported_advertisement_instances(bool refresh) {
+    return le_advertising_manager1()->SupportedInstances(refresh);
+}
+
+void Adapter::register_application(const std::string& application_path) {
+    gatt_manager1()->RegisterApplication(application_path);
+}
+
+void Adapter::unregister_application(const std::string& application_path) {
+    gatt_manager1()->UnregisterApplication(application_path);
+}
+
 void Adapter::set_on_device_updated(std::function<void(std::shared_ptr<Device> device)> callback) {
-    auto on_device_updated = [this, callback](std::string child_path) {
+    _on_device_updated.load(callback);
+
+    on_child_created.load([this, callback](std::string child_path) {
         auto device = device_get(child_path);
         if (device) {
-            callback(device);
+            _on_device_updated(device);
         }
-    };
-
-    on_child_created.load(on_device_updated);
-    on_child_signal_received.load(on_device_updated);
+    });
 }
 
 void Adapter::clear_on_device_updated() {
+    _on_device_updated.unload();
     on_child_created.unload();
-    on_child_signal_received.unload();
 }
