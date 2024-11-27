@@ -65,6 +65,13 @@ void Bindings::RustyAdapter::link(SimpleRsBLE::Adapter& target) const {
         wrapper.internal = std::make_unique<Bindings::RustyPeripheral>(peripheral);
         p_adapter->on_callback_scan_updated(wrapper);
     });
+
+    _internal->set_callback_on_power_state_changed([this](SimpleBLE::PowerState power_state) {
+        SimpleRsBLE::Adapter* p_adapter = *this->_adapter;
+        if (p_adapter == nullptr) return;
+
+        p_adapter->on_callback_power_state_changed(power_state);
+    });
 }
 
 void Bindings::RustyAdapter::unlink() const {
@@ -75,6 +82,8 @@ void Bindings::RustyAdapter::unlink() const {
 rust::String Bindings::RustyAdapter::identifier() const { return rust::String(_internal->identifier()); }
 
 rust::String Bindings::RustyAdapter::address() const { return rust::String(_internal->address()); }
+
+SimpleBLE::PowerState Bindings::RustyAdapter::power_state() const { return _internal->power_state(); }
 
 void Bindings::RustyAdapter::scan_start() const { _internal->scan_start(); }
 

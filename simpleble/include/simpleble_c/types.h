@@ -14,6 +14,18 @@ typedef enum {
     SIMPLEBLE_FAILURE = 1,
 } simpleble_err_t;
 
+/**
+ * @brief Adapter state changes.
+ */
+typedef enum {
+    /** Power state is unknown. */
+    SIMPLEBLE_STATE_UNKNOWN = 0,
+    /** Bluetooth adapter is unavailable. */
+    SIMPLEBLE_STATE_POWERED_OFF = 1,
+    /** Bluetooth adapter is available. */
+    SIMPLEBLE_STATE_POWERED_ON = 2,
+} simpleble_power_state_t;
+
 typedef struct {
     char value[SIMPLEBLE_UUID_STR_LEN];
 } simpleble_uuid_t;

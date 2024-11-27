@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
     std::cout << "The following adapters were found:" << std::endl;
     for (int i = 0; i < adapters.size(); i++) {
         std::cout << "[" << i << "] " << adapters[i]->identifier() << " [" << adapters[i]->address() << "]"
-                  << std::endl;
+                  << " (" << adapters[i]->power_state << ")" << std::endl;
     }
 
     std::cout << "Please select an adapter to scan: ";

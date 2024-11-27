@@ -45,6 +45,14 @@ mod ffi {
         UNSPECIFIED,
     }
 
+    #[namespace = "SimpleBLE"]
+    #[repr(i32)]
+    enum PowerState {
+        UNKNOWN,
+        POWERED_OFF,
+        POWERED_ON,
+    }
+
     #[namespace = "SimpleRsBLE"]
     extern "Rust" {
         type Adapter;
@@ -53,6 +61,7 @@ mod ffi {
         fn on_callback_scan_stop(self: &mut Adapter);
         fn on_callback_scan_updated(self: &mut Adapter, peripheral: &mut RustyPeripheralWrapper);
         fn on_callback_scan_found(self: &mut Adapter, peripheral: &mut RustyPeripheralWrapper);
+        fn on_callback_power_state_changed(self: &mut Adapter, power_state: &PowerState);
 
         type Peripheral;
 
@@ -71,6 +80,9 @@ mod ffi {
 
         #[namespace = "SimpleBLE"]
         type BluetoothAddressType;
+
+        #[namespace = "SimpleBLE"]
+        type PowerState;
 
         #[namespace = "Bindings"]
         type RustyAdapter;
@@ -102,6 +114,7 @@ mod ffi {
 
         fn identifier(self: &RustyAdapter) -> Result<String>;
         fn address(self: &RustyAdapter) -> Result<String>;
+        fn power_state(self: &RustyAdapter) -> Result<PowerState>;
 
         fn scan_start(self: &RustyAdapter) -> Result<()>;
         fn scan_stop(self: &RustyAdapter) -> Result<()>;
@@ -213,6 +226,13 @@ pub enum BluetoothAddressType {
 }
 
 #[derive(Debug)]
+pub enum PowerState {
+    Unknown,
+    PoweredOff,
+    PoweredOn,
+}
+
+#[derive(Debug)]
 pub enum CharacteristicCapability {
     Read,
     WriteRequest,
@@ -227,6 +247,7 @@ pub struct Adapter {
     on_scan_stop: Box<dyn Fn() + Send + Sync + 'static>,
     on_scan_found: Box<dyn Fn(Pin<Box<Peripheral>>) + Send + Sync + 'static>,
     on_scan_updated: Box<dyn Fn(Pin<Box<Peripheral>>) + Send + Sync + 'static>,
+    on_power_state_changed: Box<dyn Fn(PowerState) + Send + Sync + 'static>,
 }
 
 pub struct Peripheral {
@@ -276,6 +297,7 @@ impl Adapter {
             on_scan_stop: Box::new(|| {}),
             on_scan_found: Box::new(|_| {}),
             on_scan_updated: Box::new(|_| {}),
+            on_power_state_changed: Box::new(|_| {}),
         };
 
         // Pin the object to guarantee that its location in memory is
@@ -299,6 +321,12 @@ impl Adapter {
 
     pub fn address(&self) -> Result<String, Error> {
         self.internal.address().map_err(|e| Error {
+            msg: e.what().to_string(),
+        })
+    }
+
+    pub fn power_state(&self) -> Result<PowerState, Error> {
+        self.internal.power_state().map_err(|e| Error {
             msg: e.what().to_string(),
         })
     }
@@ -376,6 +404,13 @@ impl Adapter {
         self.on_scan_found = cb;
     }
 
+    pub fn set_callback_on_power_state_changed(
+        &mut self,
+        cb: Box<dyn Fn(PowerState) + Send + Sync + 'static>,
+    ) {
+        self.on_power_state_changed = cb;
+    }
+
     fn on_callback_scan_start(&self) {
         (self.on_scan_start)();
     }
@@ -390,6 +425,10 @@ impl Adapter {
 
     fn on_callback_scan_found(&self, peripheral: &mut ffi::RustyPeripheralWrapper) {
         (self.on_scan_found)(Peripheral::new(peripheral));
+    }
+
+    fn on_callback_power_state_changed(&self, power_state: &ffi::PowerState) {
+        (self.on_power_state_changed)(power_state);
     }
 }
 
@@ -819,6 +858,16 @@ impl fmt::Display for BluetoothAddressType {
             BluetoothAddressType::Public => write!(f, "Public"),
             BluetoothAddressType::Random => write!(f, "Random"),
             BluetoothAddressType::Unspecified => write!(f, "Unspecified"),
+        }
+    }
+}
+
+impl fmt::Display for PowerState {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            PowerState::Unknown => write!(f, "Unknown"),
+            PowerState::PoweredOff => write!(f, "PoweredOn"),
+            PowerState::PoweredOn => write!(f, "PoweredOff"),
         }
     }
 }
