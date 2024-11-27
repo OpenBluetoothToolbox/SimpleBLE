@@ -21,6 +21,7 @@ class SIMPLEBLE_EXPORT Service {
     BluetoothUUID uuid();
     ByteArray data();
     std::vector<Characteristic> characteristics();
+    std::vector<BluetoothUUID> included_services();
 
   protected:
     std::shared_ptr<ServiceBase> internal_;

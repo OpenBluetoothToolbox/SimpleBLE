@@ -16,6 +16,7 @@ class Service : public SimpleDBus::Proxy {
 
     // ----- PROPERTIES -----
     std::vector<std::shared_ptr<Characteristic>> characteristics();
+    std::vector<std::shared_ptr<Service>> includes();
 
     std::string uuid();
 

@@ -127,6 +127,13 @@ void PeripheralBase::unpair() { throw Exception::OperationNotSupported(); }
 std::vector<Service> PeripheralBase::services() {
     std::vector<Service> service_list;
     for (auto& [service_uuid, service] : gatt_map_) {
+        // Build the list of included services.
+        // NOTE: Is building another copy really needed?
+        std::vector<BluetoothUUID> included_services_list;
+        for (BluetoothUUID included_service : service.included_services) {
+            included_services_list.push_back(included_service);
+        }
+
         // Build the list of characteristics for the service.
         std::vector<Characteristic> characteristic_list;
         for (auto& [characteristic_uuid, characteristic] : service.characteristics) {
@@ -147,7 +154,7 @@ std::vector<Service> PeripheralBase::services() {
                                                                 can_write_request, can_write_command, can_notify,
                                                                 can_indicate));
         }
-        service_list.push_back(ServiceBuilder(service_uuid, characteristic_list));
+        service_list.push_back(ServiceBuilder(service_uuid, characteristic_list, included_services_list));
     }
 
     return service_list;
@@ -362,6 +369,17 @@ bool PeripheralBase::_attempt_connect() {
         auto characteristics_result = async_get(service.GetCharacteristicsAsync(BluetoothCacheMode::Uncached));
         if (characteristics_result.Status() != GattCommunicationStatus::Success) {
             return false;
+        }
+
+        // Fetch the included services
+        auto included_services_result = async_get(service.GetIncludedServicesAsync(BluetoothCacheMode::Uncached));
+        if (included_services_result.Status() == GattCommunicationStatus::Success) {
+            auto gatt_included_services = included_services_result.Services();
+            for (GattDeviceService&& included_service : gatt_included_services) {
+                // Fetch the service UUID
+                std::string included_service_uuid = guid_to_uuid(included_service.Uuid());
+                gatt_service.included_services.push_back(included_service_uuid);
+            }
         }
 
         // Load the characteristics into the service

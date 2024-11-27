@@ -149,21 +149,25 @@ std::vector<Service> PeripheralBase::services() {
             bool can_write_command = std::find(flags.begin(), flags.end(), "write-without-response") != flags.end();
             bool can_notify = std::find(flags.begin(), flags.end(), "notify") != flags.end();
             bool can_indicate = std::find(flags.begin(), flags.end(), "indicate") != flags.end();
-
             characteristic_list.push_back(CharacteristicBuilder(bluez_characteristic->uuid(), descriptor_list, can_read,
                                                                 can_write_request, can_write_command, can_notify,
                                                                 can_indicate));
         }
 
-        service_list.push_back(ServiceBuilder(bluez_service->uuid(), characteristic_list));
+        std::vector<std::string> included_services_list;
+        for (auto bluez_included_service : bluez_service->includes()) {
+            included_services_list.push_back(bluez_included_service->uuid());
+        }
+
+        service_list.push_back(ServiceBuilder(bluez_service->uuid(), characteristic_list, included_services_list));
     }
 
     // If the battery service is not available, and the device has the appropriate interface, add it.
     if (!is_battery_service_available && device_->has_battery_interface()) {
         // Emulate the battery service through the Battery1 interface.
-        service_list.push_back(
-            ServiceBuilder(BATTERY_SERVICE_UUID,
-                           {CharacteristicBuilder(BATTERY_CHARACTERISTIC_UUID, {}, true, false, false, true, false)}));
+        service_list.push_back(ServiceBuilder(
+            BATTERY_SERVICE_UUID,
+            {CharacteristicBuilder(BATTERY_CHARACTERISTIC_UUID, {}, true, false, false, true, false)}, {}));
     }
 
     return service_list;

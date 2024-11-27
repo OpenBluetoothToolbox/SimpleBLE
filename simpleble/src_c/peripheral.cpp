@@ -208,6 +208,16 @@ simpleble_err_t simpleble_peripheral_services_get(simpleble_peripheral_t handle,
         }
     }
 
+    services->included_services_count = service.included_services().size();
+    if (services->included_services_count > SIMPLEBLE_INCLUDED_SERVICES_MAX_COUNT) {
+        services->included_services_count = SIMPLEBLE_INCLUDED_SERVICES_MAX_COUNT;
+    }
+
+    for (size_t i = 0; i < services->included_services_count; i++) {
+        SimpleBLE::BluetoothUUID included_service = service.included_services()[i];
+        memcpy(services->included_services[i].value, included_service.c_str(), SIMPLEBLE_UUID_STR_LEN);
+    }
+
     return SIMPLEBLE_SUCCESS;
 }
 

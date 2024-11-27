@@ -64,7 +64,7 @@ std::vector<Service> PeripheralBase::services() {
 
     service_list.push_back(
         ServiceBuilder(BATTERY_SERVICE_UUID,
-                       {CharacteristicBuilder(BATTERY_CHARACTERISTIC_UUID, {}, true, false, false, true, false)}));
+                       {CharacteristicBuilder(BATTERY_CHARACTERISTIC_UUID, {}, true, false, false, true, false)}, {}));
     return service_list;
 }
 

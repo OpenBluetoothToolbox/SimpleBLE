@@ -35,6 +35,7 @@ struct gatt_characteristic_t {
 struct gatt_service_t {
     GattDeviceService obj = nullptr;
     std::map<BluetoothUUID, gatt_characteristic_t> characteristics;
+    std::vector<BluetoothUUID> included_services;
 };
 
 class PeripheralBase {

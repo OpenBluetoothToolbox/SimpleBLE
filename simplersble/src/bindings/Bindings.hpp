@@ -123,6 +123,8 @@ class RustyService : private SimpleBLE::Service {
 
     rust::Vec<Bindings::RustyCharacteristicWrapper> characteristics() const;
 
+    rust::Vec<rust::String> included_services() const;
+
   private:
     // NOTE: All internal properties need to be handled as pointers,
     // allowing the calls to RustyService to always be const.
