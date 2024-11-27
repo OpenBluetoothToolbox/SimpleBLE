@@ -22,14 +22,32 @@ typedef struct {
     simpleble_uuid_t uuid;
 } simpleble_descriptor_t;
 
+/**
+ * @brief A Bluetooth LE characteristic.
+ * @sa Bluetooth Core Specification version 5.3 (Vol 3, Part G, Section 3.3)
+ */
 typedef struct {
+    /** Characteristic UUID. */
     simpleble_uuid_t uuid;
+    /** Indicates if the characteristic supports reading. */
     bool can_read;
+    /** Indicates if the characteristic supports write operations with a response. */
     bool can_write_request;
+    /** Indicates if the characteristic supports write operations with a response. */
     bool can_write_command;
+    /** Indicates if the characteristic supports authenticated signed writes. */
+    bool can_write_authenticated;
+    /** Indicates if the characteristic supports notifications. */
     bool can_notify;
+    /** Indicates if the characteristic supports indications. */
     bool can_indicate;
+    /** Indicates if the characteristic supports broadcasting. */
+    bool can_broadcast;
+    /** Indicates if the characteristic has extended properties. */
+    bool has_extended_properties;
+    /** The actual number of descriptors the characteristic has.*/
     size_t descriptor_count;
+    /** Every descriptor owned by the characteristic. */
     simpleble_descriptor_t descriptors[SIMPLEBLE_DESCRIPTOR_MAX_COUNT];
 } simpleble_characteristic_t;
 
