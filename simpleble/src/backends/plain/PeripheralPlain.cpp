@@ -1,13 +1,17 @@
-#include "PeripheralBase.h"
+#include "PeripheralPlain.h"
 
-#include "CharacteristicBuilder.h"
-#include "DescriptorBuilder.h"
-#include "ServiceBuilder.h"
+#include "BuilderBase.h"
+#include "CharacteristicBase.h"
+#include "DescriptorBase.h"
+#include "ServiceBase.h"
 
 #include <simpleble/Exceptions.h>
 #include <algorithm>
+#include <vector>
 #include "CommonUtils.h"
 #include "LoggingInternal.h"
+#include "simpleble/Characteristic.h"
+#include "simpleble/Descriptor.h"
 
 using namespace SimpleBLE;
 using namespace std::chrono_literals;
@@ -62,9 +66,10 @@ std::vector<Service> PeripheralBase::services() {
 
     std::vector<Service> service_list;
 
-    service_list.push_back(
-        ServiceBuilder(BATTERY_SERVICE_UUID,
-                       {CharacteristicBuilder(BATTERY_CHARACTERISTIC_UUID, {}, true, false, false, true, false)}));
+    std::vector<Descriptor> descriptor_list;
+    std::vector<Characteristic> characteristic_list = {Factory::Builder<Characteristic>(
+        BATTERY_CHARACTERISTIC_UUID, descriptor_list, true, false, false, true, false)};
+    service_list.push_back(Factory::Builder<Service>(BATTERY_SERVICE_UUID, characteristic_list));
     return service_list;
 }
 

@@ -1,10 +1,12 @@
 // This weird pragma is required for the compiler to properly include the necessary namespaces.
 #pragma comment(lib, "windowsapp")
-#include "AdapterBase.h"
+#include "AdapterWindows.h"
 
+#include "BuildVec.h"
+#include "BuilderBase.h"
 #include "CommonUtils.h"
 #include "LoggingInternal.h"
-#include "PeripheralBuilder.h"
+#include "PeripheralWindows.h"
 #include "Utils.h"
 
 #include "winrt/Windows.Devices.Bluetooth.h"
@@ -17,6 +19,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -218,13 +221,8 @@ void AdapterBase::scan_for(int timeout_ms) {
 bool AdapterBase::scan_is_active() { return scan_is_active_; }
 
 std::vector<Peripheral> AdapterBase::scan_get_results() {
-    std::vector<Peripheral> peripherals;
-    for (auto& [address, base_peripheral] : this->seen_peripherals_) {
-        PeripheralBuilder peripheral_builder(base_peripheral);
-        peripherals.push_back(peripheral_builder);
-    }
-
-    return peripherals;
+    std::vector<std::shared_ptr<PeripheralBase>> base_peripherals = Util::values(seen_peripherals_);
+    return Factory::vector(base_peripherals);
 }
 
 std::vector<Peripheral> AdapterBase::get_paired_peripherals() { return {}; }
@@ -283,14 +281,14 @@ void AdapterBase::_scan_received_callback(advertising_data_t data) {
     base_peripheral->update_advertising_data(data);
 
     // Convert the base object into an external-facing Peripheral object
-    PeripheralBuilder peripheral_builder(base_peripheral);
+    Peripheral peripheral = Factory::build(base_peripheral);
 
     // Check if the device has been seen before, to forward the correct call to the user.
     if (this->seen_peripherals_.count(data.mac_address) == 0) {
         // Store it in our table of seen peripherals
         this->seen_peripherals_.insert(std::make_pair(data.mac_address, base_peripheral));
-        SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral_builder);
+        SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral);
     } else {
-        SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral_builder);
+        SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral);
     }
 }

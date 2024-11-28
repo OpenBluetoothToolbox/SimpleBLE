@@ -1,7 +1,7 @@
-#include "AdapterBase.h"
+#include "AdapterPlain.h"
+#include "BuilderBase.h"
 #include "CommonUtils.h"
-#include "PeripheralBase.h"
-#include "PeripheralBuilder.h"
+#include "PeripheralPlain.h"
 
 #include <thread>
 
@@ -29,9 +29,9 @@ void AdapterBase::scan_start() {
     is_scanning_ = true;
     SAFE_CALLBACK_CALL(this->callback_on_scan_start_);
 
-    PeripheralBuilder peripheral_builder(std::make_shared<PeripheralBase>());
-    SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral_builder);
-    SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral_builder);
+    Peripheral peripheral = Factory::build();
+    SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral);
+    SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral);
 }
 
 void AdapterBase::scan_stop() {
@@ -50,8 +50,8 @@ bool AdapterBase::scan_is_active() { return is_scanning_; }
 std::vector<Peripheral> AdapterBase::scan_get_results() {
     std::vector<Peripheral> peripherals;
 
-    PeripheralBuilder peripheral_builder(std::make_shared<PeripheralBase>());
-    peripherals.push_back(peripheral_builder);
+    Peripheral peripheral = Factory::build();
+    peripherals.push_back(peripheral);
 
     return peripherals;
 }
@@ -59,8 +59,8 @@ std::vector<Peripheral> AdapterBase::scan_get_results() {
 std::vector<Peripheral> AdapterBase::get_paired_peripherals() {
     std::vector<Peripheral> peripherals;
 
-    PeripheralBuilder peripheral_builder(std::make_shared<PeripheralBase>());
-    peripherals.push_back(peripheral_builder);
+    Peripheral peripheral = Factory::build();
+    peripherals.push_back(peripheral);
 
     return peripherals;
 }

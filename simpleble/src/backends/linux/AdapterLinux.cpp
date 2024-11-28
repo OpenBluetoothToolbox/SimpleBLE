@@ -1,8 +1,9 @@
-#include "AdapterBase.h"
-#include "Bluez.h"
+#include "AdapterLinux.h"
+#include "BackendBluez.h"
+#include "BuildVec.h"
+#include "BuilderBase.h"
 #include "CommonUtils.h"
-#include "PeripheralBase.h"
-#include "PeripheralBuilder.h"
+#include "PeripheralLinux.h"
 
 using namespace SimpleBLE;
 
@@ -57,15 +58,15 @@ void AdapterBase::scan_start() {
         auto base_peripheral = this->peripherals_.at(device->address());
 
         // Convert the base object into an external-facing Peripheral object
-        PeripheralBuilder peripheral_builder(base_peripheral);
+        Peripheral peripheral = Factory::build(base_peripheral);
 
         // Check if the device has been seen before, to forward the correct call to the user.
         if (this->seen_peripherals_.count(device->address()) == 0) {
             // Store it in our table of seen peripherals
             this->seen_peripherals_.insert(std::make_pair(device->address(), base_peripheral));
-            SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral_builder);
+            SAFE_CALLBACK_CALL(this->callback_on_scan_found_, peripheral);
         } else {
-            SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral_builder);
+            SAFE_CALLBACK_CALL(this->callback_on_scan_updated_, peripheral);
         }
     });
 
@@ -97,12 +98,8 @@ void AdapterBase::scan_for(int timeout_ms) {
 bool AdapterBase::scan_is_active() { return is_scanning_ && adapter_->discovering(); }
 
 std::vector<Peripheral> AdapterBase::scan_get_results() {
-    std::vector<Peripheral> peripherals;
-    for (auto& [address, peripheral] : this->seen_peripherals_) {
-        PeripheralBuilder peripheral_builder(peripheral);
-        peripherals.push_back(peripheral_builder);
-    }
-    return peripherals;
+    std::vector<std::shared_ptr<PeripheralBase>> peripherals = Util::values(seen_peripherals_);
+    return Factory::vector(peripherals);
 }
 
 std::vector<Peripheral> AdapterBase::get_paired_peripherals() {
@@ -110,8 +107,7 @@ std::vector<Peripheral> AdapterBase::get_paired_peripherals() {
 
     auto paired_list = adapter_->device_paired_get();
     for (auto& device : paired_list) {
-        PeripheralBuilder peripheral_builder(std::make_shared<PeripheralBase>(device, this->adapter_));
-        peripherals.push_back(peripheral_builder);
+        peripherals.push_back(Factory::Builder<Peripheral>(device, this->adapter_));
     }
 
     return peripherals;

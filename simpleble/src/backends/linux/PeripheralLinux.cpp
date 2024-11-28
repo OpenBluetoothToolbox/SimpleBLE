@@ -1,16 +1,21 @@
-#include "PeripheralBase.h"
+#include "PeripheralLinux.h"
 
-#include "CharacteristicBuilder.h"
-#include "DescriptorBuilder.h"
-#include "ServiceBuilder.h"
+#include "BuildVec.h"
+#include "BuilderBase.h"
+#include "CharacteristicBase.h"
+#include "DescriptorBase.h"
+#include "ServiceBase.h"
 
+#include <simpleble/Characteristic.h>
+#include <simpleble/Descriptor.h>
 #include <simpleble/Exceptions.h>
+#include <simpleble/Service.h>
 #include <simplebluez/Exceptions.h>
 #include <algorithm>
 #include "CommonUtils.h"
 #include "LoggingInternal.h"
 
-#include "Bluez.h"
+#include "BackendBluez.h"
 
 const SimpleBLE::BluetoothUUID BATTERY_SERVICE_UUID = "0000180f-0000-1000-8000-00805f9b34fb";
 const SimpleBLE::BluetoothUUID BATTERY_CHARACTERISTIC_UUID = "00002a19-0000-1000-8000-00805f9b34fb";
@@ -139,7 +144,7 @@ std::vector<Service> PeripheralBase::services() {
             // Build the list of descriptors for the characteristic.
             std::vector<Descriptor> descriptor_list;
             for (auto bluez_descriptor : bluez_characteristic->descriptors()) {
-                descriptor_list.push_back(DescriptorBuilder(bluez_descriptor->uuid()));
+                descriptor_list.push_back(Factory::Builder<Descriptor>(bluez_descriptor->uuid()));
             }
 
             std::vector<std::string> flags = bluez_characteristic->flags();
@@ -150,20 +155,21 @@ std::vector<Service> PeripheralBase::services() {
             bool can_notify = std::find(flags.begin(), flags.end(), "notify") != flags.end();
             bool can_indicate = std::find(flags.begin(), flags.end(), "indicate") != flags.end();
 
-            characteristic_list.push_back(CharacteristicBuilder(bluez_characteristic->uuid(), descriptor_list, can_read,
-                                                                can_write_request, can_write_command, can_notify,
-                                                                can_indicate));
+            characteristic_list.push_back(
+                Factory::Builder<Characteristic>(bluez_characteristic->uuid(), descriptor_list, can_read,
+                                                 can_write_request, can_write_command, can_notify, can_indicate));
         }
 
-        service_list.push_back(ServiceBuilder(bluez_service->uuid(), characteristic_list));
+        service_list.push_back(Factory::Builder<Service>(bluez_service->uuid(), characteristic_list));
     }
 
     // If the battery service is not available, and the device has the appropriate interface, add it.
     if (!is_battery_service_available && device_->has_battery_interface()) {
         // Emulate the battery service through the Battery1 interface.
-        service_list.push_back(
-            ServiceBuilder(BATTERY_SERVICE_UUID,
-                           {CharacteristicBuilder(BATTERY_CHARACTERISTIC_UUID, {}, true, false, false, true, false)}));
+        std::vector<Descriptor> descriptor_list;
+        std::vector<Characteristic> battery_characteristics = {Factory::Builder<Characteristic>(
+            BATTERY_CHARACTERISTIC_UUID, descriptor_list, true, false, false, true, false)};
+        service_list.push_back(Factory::Builder<Service>(BATTERY_SERVICE_UUID, battery_characteristics));
     }
 
     return service_list;
@@ -172,7 +178,7 @@ std::vector<Service> PeripheralBase::services() {
 std::vector<Service> PeripheralBase::advertised_services() {
     std::vector<Service> service_list;
     for (auto& service_uuid : device_->uuids()) {
-        service_list.push_back(ServiceBuilder(service_uuid));
+        service_list.push_back(Factory::Builder<Service>(service_uuid));
     }
 
     return service_list;

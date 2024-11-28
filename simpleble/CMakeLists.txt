@@ -56,13 +56,7 @@ set(SIMPLEBLE_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logging.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/safe/AdapterSafe.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/safe/PeripheralSafe.cpp
-
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/AdapterBuilder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/PeripheralBuilder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/ServiceBuilder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/CharacteristicBuilder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/builders/DescriptorBuilder.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/safe/PeripheralSafe.cpp)
 
 set(SIMPLEBLE_C_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src_c/simpleble.cpp
@@ -149,18 +143,51 @@ endif()
 list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLE_LOG_LEVEL=SIMPLEBLE_LOG_LEVEL_${SIMPLEBLE_LOG_LEVEL})
 list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLE_VERSION="${PROJECT_VERSION}")
 
+if(NOT SIMPLEBLE_TEST)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        set(SIMPLEBLE_BACKEND_LINUX ON)
+    else()
+        set(SIMPLEBLE_BACKEND_LINUX OFF)
+    endif()
+
+    if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        set(SIMPLEBLE_BACKEND_WINDOWS ON)
+    else()
+        set(SIMPLEBLE_BACKEND_WINDOWS OFF)
+    endif()
+
+    if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
+        set(SIMPLEBLE_BACKEND_MACOS ON)
+    else()
+        set(SIMPLEBLE_BACKEND_MACOS OFF)
+    endif()
+
+    if(CMAKE_SYSTEM_NAME STREQUAL "Android")
+        set(SIMPLEBLE_BACKEND_ANDROID ON)
+    else()
+        set(SIMPLEBLE_BACKEND_ANDROID OFF)
+    endif()
+else()
+    set(SIMPLEBLE_BACKEND_LINUX OFF)
+    set(SIMPLEBLE_BACKEND_WINDOWS OFF)
+    set(SIMPLEBLE_BACKEND_MACOS OFF)
+    set(SIMPLEBLE_BACKEND_ANDROID OFF)
+endif()
+
+add_compile_definitions(SIMPLEBLE_BACKEND_PLAIN=$<BOOL:${SIMPLEBLE_PLAIN}>
+                        SIMPLEBLE_BACKEND_LINUX=$<BOOL:${SIMPLEBLE_BACKEND_LINUX}>
+                        SIMPLEBLE_BACKEND_WINDOWS=$<BOOL:${SIMPLEBLE_BACKEND_WINDOWS}>
+                        SIMPLEBLE_BACKEND_MACOS=$<BOOL:${SIMPLEBLE_BACKEND_MACOS}>
+                        SIMPLEBLE_BACKEND_ANDROID=$<BOOL:${SIMPLEBLE_BACKEND_ANDROID}>)
+
 # Detect the operating system and load the necessary dependencies
 if(SIMPLEBLE_PLAIN)
     message(STATUS "Plain Flavor Requested")
 
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/AdapterBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/PeripheralBase.cpp)
-
-    target_include_directories(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain)
-
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/AdapterPlain.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/PeripheralPlain.cpp)
+elseif(SIMPLEBLE_BACKEND_LINUX)
     message(STATUS "Linux Host Detected")
 
     find_package(DBus1 REQUIRED)
@@ -181,9 +208,9 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     endif()
 
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/AdapterBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/PeripheralBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/Bluez.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/AdapterLinux.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/PeripheralLinux.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux/BackendBluez.cpp)
 
     target_sources(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/src/ProxyOrg.cpp
@@ -224,13 +251,12 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/../simplebluez/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/linux)
+        ${CMAKE_CURRENT_SOURCE_DIR}/../simpledbus/include)
 
     set_property(TARGET simpleble PROPERTY INSTALL_RPATH $ORIGIN)
     set_property(TARGET simpleble-c PROPERTY INSTALL_RPATH $ORIGIN)
 
-elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+elseif(SIMPLEBLE_BACKEND_WINDOWS)
     message(STATUS "Windows Host Detected")
 
     set(WINVERSION_CODE 0x0A00) # Selected Windows 10 based on https://docs.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt
@@ -259,11 +285,11 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows)
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/AdapterBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/PeripheralBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/AdapterWindows.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/PeripheralWindows.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/Utils.cpp)
 
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
+elseif(SIMPLEBLE_BACKEND_MACOS)
     message(STATUS "Darwin / iOS Host Detected")
 
     list(APPEND PRIVATE_COMPILE_OPTIONS -fobjc-arc)
@@ -273,15 +299,15 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos)
     target_sources(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/Utils.mm
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/AdapterBase.mm
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/AdapterMac.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/AdapterBaseMacOS.mm
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/PeripheralBase.mm
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/PeripheralMac.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/PeripheralBaseMacOS.mm)
 
     set_property(TARGET simpleble PROPERTY INSTALL_RPATH @loader_path)
     set_property(TARGET simpleble-c PROPERTY INSTALL_RPATH @loader_path)
 
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
+elseif(SIMPLEBLE_BACKEND_ANDROID)
     message(STATUS "Configuring for Android")
 
     # Set the include directories for the Android NDK headers and other necessary directories
@@ -296,8 +322,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
     target_include_directories(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android)
     target_sources(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/AdapterBase.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/PeripheralBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/AdapterAndroid.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/PeripheralAndroid.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/BluetoothDevice.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/BluetoothGatt.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/BluetoothGattService.cpp

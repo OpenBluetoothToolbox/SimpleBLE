@@ -54,7 +54,6 @@ class PeripheralBase {
     void update_advertising_data(Android::ScanResult scan_result);
 
   private:
-
     Android::Bridge::BluetoothGattCallback _btGattCallback;
     Android::BluetoothDevice _device;
     Android::BluetoothGatt _gatt;
@@ -68,7 +67,6 @@ class PeripheralBase {
     Android::BluetoothGattDescriptor _fetch_descriptor(const BluetoothUUID& service_uuid,
                                                        const BluetoothUUID& characteristic_uuid,
                                                        const BluetoothUUID& descriptor_uuid);
-
 };
 
 }  // namespace SimpleBLE

@@ -4,8 +4,8 @@
 #include <simpleble/Service.h>
 #include <simpleble/Types.h>
 
-#include <kvn_safe_callback.hpp>
 #include <TaskRunner.hpp>
+#include <kvn_safe_callback.hpp>
 
 #include <atomic>
 #include <condition_variable>
@@ -66,7 +66,6 @@ class PeripheralBase {
     std::map<std::pair<BluetoothUUID, BluetoothUUID>, std::function<void(ByteArray payload)>> callbacks_;
 
     TaskRunner task_runner_;
-
 };
 
 }  // namespace SimpleBLE
