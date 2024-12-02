@@ -34,6 +34,8 @@ class Device : public SimpleDBus::Proxy {
 
     bool paired(bool refresh = true);
     bool bonded(bool refresh = true);
+    bool trusted();
+    void trusted(bool trusted);
     bool connected(bool refresh = true);
     bool services_resolved(bool refresh = true);
 

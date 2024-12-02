@@ -1,4 +1,6 @@
 #include "simplebluez/interfaces/Device1.h"
+#include "simpledbus/interfaces/Properties.h"
+#include "simpledbus/advanced/Proxy.h"
 
 using namespace SimpleBluez;
 
@@ -109,6 +111,26 @@ bool Device1::Bonded(bool refresh) {
 
     std::scoped_lock lock(_property_update_mutex);
     return _properties["Bonded"].get_boolean();
+}
+
+bool Device1::Trusted() {
+    std::scoped_lock lock(_property_update_mutex);
+    return _properties["Trusted"].get_boolean();
+}
+
+void Device1::Trusted(bool trusted) {
+    SimpleDBus::Holder value_array = SimpleDBus::Holder::create_boolean(trusted);
+
+    {
+        std::scoped_lock lock(_property_update_mutex);
+        _properties["Trusted"] = value_array;
+    }
+
+    std::map<std::string, SimpleDBus::Holder> changed_properties;
+    changed_properties["Trusted"] = value_array;
+
+    std::shared_ptr<SimpleDBus::Properties> properties = std::dynamic_pointer_cast<SimpleDBus::Properties>(_proxy->interface_get("org.freedesktop.DBus.Properties"));
+    properties->PropertiesChanged("org.bluez.Device1", changed_properties);
 }
 
 bool Device1::Connected(bool refresh) {

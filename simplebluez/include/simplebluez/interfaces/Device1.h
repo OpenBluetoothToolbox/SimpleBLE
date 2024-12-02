@@ -33,6 +33,8 @@ class Device1 : public SimpleDBus::Interface {
     std::map<std::string, ByteArray> ServiceData(bool refresh = true);
     bool Paired(bool refresh = true);
     bool Bonded(bool refresh = true);
+    bool Trusted();
+    void Trusted(bool trusted);
     bool Connected(bool refresh = true);
     bool ServicesResolved(bool refresh = true);
 
