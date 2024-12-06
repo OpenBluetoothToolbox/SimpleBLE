@@ -15,6 +15,16 @@ namespace SimpleBLE {
 
 class AdapterBase;
 
+/**
+ * Bluetooth Adapter.
+ *
+ * A default-constructed Adapter object is not initialized. Calling any method
+ * other than `initialized()` on an uninitialized Adapter will throw an exception
+ * of type `SimpleBLE::NotInitialized`.
+ *
+ * NOTE: This class is intended to be used by the user only. Library developers
+ * should use shared pointers to `AdapterBase` instead.
+ */
 class SIMPLEBLE_EXPORT Adapter {
   public:
     Adapter() = default;
@@ -42,11 +52,17 @@ class SIMPLEBLE_EXPORT Adapter {
     static bool bluetooth_enabled();
 
     /**
-     *  Fetches a list of all available adapters.
+     * Fetches a list of all available adapters from all available backends.
+     *
+     * This will cause backends to be instantiated/initialized and adapters
+     * too.
      */
     static std::vector<Adapter> get_adapters();
 
   protected:
+    AdapterBase* operator->();
+    const AdapterBase* operator->() const;
+
     std::shared_ptr<AdapterBase> internal_;
 };
 

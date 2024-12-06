@@ -1,5 +1,8 @@
 #pragma once
 
+#include <algorithm>
+#include <vector>
+
 #include "LoggingInternal.h"
 
 #define SAFE_CALLBACK_CALL(cb, ...)                                                           \
@@ -50,4 +53,9 @@ auto values(const MAP& map) {
     return ValueCollector<MAP>{map};
 }
 
-}  // namespace SimpleBLE::util
+}  // namespace SimpleBLE::Util
+
+namespace SimpleBLE {
+template <typename T>
+using vec_of_shared = std::vector<std::shared_ptr<T>>;
+}

@@ -16,9 +16,14 @@ class SIMPLEBLE_EXPORT Descriptor {
     Descriptor() = default;
     virtual ~Descriptor() = default;
 
+    bool initialized() const;
+
     BluetoothUUID uuid();
 
   protected:
+    DescriptorBase* operator->();
+    const DescriptorBase* operator->() const;
+
     std::shared_ptr<DescriptorBase> internal_;
 };
 

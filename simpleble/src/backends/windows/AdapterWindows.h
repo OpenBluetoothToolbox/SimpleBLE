@@ -4,8 +4,8 @@
 #include <simpleble/Peripheral.h>
 #include <simpleble/Types.h>
 
+#include "AdapterBase.h"
 #include "AdapterBaseTypes.h"
-#include "PeripheralBase.h"
 
 #include <kvn_safe_callback.hpp>
 
@@ -26,31 +26,33 @@ using namespace winrt::Windows::Devices::Radios;
 
 namespace SimpleBLE {
 
-class AdapterBase {
+class PeripheralWindows;
+class PeripheralBase;
+
+class AdapterWindows : public AdapterBase {
   public:
-    AdapterBase(std::string device_id);
-    virtual ~AdapterBase();
+    AdapterWindows(std::string device_id);
+    virtual ~AdapterWindows();
 
-    void* underlying() const;
+    virtual void* underlying() const override;
 
-    std::string identifier();
-    BluetoothAddress address();
+    virtual std::string identifier() const override;
+    virtual BluetoothAddress address() override;
 
-    void scan_start();
-    void scan_stop();
-    void scan_for(int timeout_ms);
-    bool scan_is_active();
-    std::vector<Peripheral> scan_get_results();
+    virtual void scan_start() override;
+    virtual void scan_stop() override;
+    virtual void scan_for(int timeout_ms) override;
+    virtual bool scan_is_active() override;
+    virtual std::vector<std::shared_ptr<PeripheralBase>> scan_get_results() override;
 
-    void set_callback_on_scan_start(std::function<void()> on_scan_start);
-    void set_callback_on_scan_stop(std::function<void()> on_scan_stop);
-    void set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated);
-    void set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found);
+    virtual void set_callback_on_scan_start(std::function<void()> on_scan_start) override;
+    virtual void set_callback_on_scan_stop(std::function<void()> on_scan_stop) override;
+    virtual void set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) override;
+    virtual void set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) override;
 
-    std::vector<Peripheral> get_paired_peripherals();
+    virtual std::vector<std::shared_ptr<PeripheralBase>> get_paired_peripherals() override;
 
-    static bool bluetooth_enabled();
-    static std::vector<std::shared_ptr<AdapterBase>> get_adapters();
+    virtual bool bluetooth_enabled() override;
 
   private:
     BluetoothAdapter adapter_;
@@ -64,7 +66,7 @@ class AdapterBase {
     std::condition_variable scan_stop_cv_;
     std::mutex scan_stop_mutex_;
     std::mutex scan_update_mutex_;
-    std::map<BluetoothAddress, std::shared_ptr<PeripheralBase>> peripherals_;
+    std::map<BluetoothAddress, std::shared_ptr<PeripheralWindows>> peripherals_;
     std::map<BluetoothAddress, std::shared_ptr<PeripheralBase>> seen_peripherals_;
 
     void _scan_stopped_callback();

@@ -8,7 +8,6 @@
 #include "../common/CharacteristicBase.h"
 #include "../common/DescriptorBase.h"
 #include "../common/ServiceBase.h"
-#include "BuilderBase.h"
 #include "simpleble/Characteristic.h"
 #include "simpleble/Descriptor.h"
 #include "simpleble/Service.h"
@@ -25,7 +24,7 @@
 using namespace SimpleBLE;
 using namespace std::chrono_literals;
 
-PeripheralBase::PeripheralBase(advertising_data_t advertising_data) {
+PeripheralWindows::PeripheralWindows(advertising_data_t advertising_data) {
     address_type_ = advertising_data.address_type;
     identifier_ = advertising_data.identifier;
     address_ = advertising_data.mac_address;
@@ -36,25 +35,27 @@ PeripheralBase::PeripheralBase(advertising_data_t advertising_data) {
     connectable_ = advertising_data.connectable;
 }
 
-PeripheralBase::~PeripheralBase() {
+PeripheralWindows::~PeripheralWindows() {
     if (connection_status_changed_token_ && device_ != nullptr) {
         device_.ConnectionStatusChanged(connection_status_changed_token_);
     }
 }
 
-void* PeripheralBase::underlying() const { return reinterpret_cast<void*>(const_cast<BluetoothLEDevice*>(&device_)); }
+void* PeripheralWindows::underlying() const {
+    return reinterpret_cast<void*>(const_cast<BluetoothLEDevice*>(&device_));
+}
 
-SimpleBLE::BluetoothAddressType PeripheralBase::address_type() { return address_type_; }
+SimpleBLE::BluetoothAddressType PeripheralWindows::address_type() { return address_type_; }
 
-std::string PeripheralBase::identifier() { return identifier_; }
+std::string PeripheralWindows::identifier() { return identifier_; }
 
-BluetoothAddress PeripheralBase::address() { return address_; }
+BluetoothAddress PeripheralWindows::address() { return address_; }
 
-int16_t PeripheralBase::rssi() { return rssi_; }
+int16_t PeripheralWindows::rssi() { return rssi_; }
 
-int16_t PeripheralBase::tx_power() { return tx_power_; }
+int16_t PeripheralWindows::tx_power() { return tx_power_; }
 
-uint16_t PeripheralBase::mtu() {
+uint16_t PeripheralWindows::mtu() {
     if (!is_connected()) return 0;
 
     // The value provided by the MaxPduSize includes an extra 3 bytes from the GATT header
@@ -62,7 +63,7 @@ uint16_t PeripheralBase::mtu() {
     return mtu_ - 3;
 }
 
-void PeripheralBase::update_advertising_data(advertising_data_t advertising_data) {
+void PeripheralWindows::update_advertising_data(advertising_data_t advertising_data) {
     if (advertising_data.identifier != "") {
         identifier_ = advertising_data.identifier;
     }
@@ -75,7 +76,7 @@ void PeripheralBase::update_advertising_data(advertising_data_t advertising_data
     service_data_ = advertising_data.service_data;
 }
 
-void PeripheralBase::connect() {
+void PeripheralWindows::connect() {
     device_ = async_get(BluetoothLEDevice::FromBluetoothAddressAsync(_str_to_mac_address(address_)));
 
     // Attempt to connect to the device.
@@ -101,7 +102,7 @@ void PeripheralBase::connect() {
     }
 }
 
-void PeripheralBase::disconnect() {
+void PeripheralWindows::disconnect() {
     gatt_map_.clear();
     if (device_ != nullptr) {
         device_.Close();
@@ -118,26 +119,26 @@ void PeripheralBase::disconnect() {
     }
 }
 
-bool PeripheralBase::is_connected() {
+bool PeripheralWindows::is_connected() {
     return device_ != nullptr && device_.ConnectionStatus() == BluetoothConnectionStatus::Connected;
 }
 
-bool PeripheralBase::is_connectable() { return connectable_; }
+bool PeripheralWindows::is_connectable() { return connectable_; }
 
-bool PeripheralBase::is_paired() { throw Exception::OperationNotSupported(); }
+bool PeripheralWindows::is_paired() { throw Exception::OperationNotSupported(); }
 
-void PeripheralBase::unpair() { throw Exception::OperationNotSupported(); }
+void PeripheralWindows::unpair() { throw Exception::OperationNotSupported(); }
 
-std::vector<Service> PeripheralBase::services() {
-    std::vector<Service> service_list;
+vec_of_shared<ServiceBase> PeripheralWindows::available_services() {
+    vec_of_shared<ServiceBase> service_list;
     for (auto& [service_uuid, service] : gatt_map_) {
         // Build the list of characteristics for the service.
-        std::vector<Characteristic> characteristic_list;
+        vec_of_shared<CharacteristicBase> characteristic_list;
         for (auto& [characteristic_uuid, characteristic] : service.characteristics) {
             // Build the list of descriptors for the characteristic.
-            std::vector<Descriptor> descriptor_list;
+            vec_of_shared<DescriptorBase> descriptor_list;
             for (auto& [descriptor_uuid, descriptor] : characteristic.descriptors) {
-                descriptor_list.push_back(Factory::Builder<Descriptor>(descriptor_uuid));
+                descriptor_list.push_back(std::make_shared<DescriptorBase>(descriptor_uuid));
             }
 
             uint32_t properties = (uint32_t)characteristic.obj.CharacteristicProperties();
@@ -148,27 +149,27 @@ std::vector<Service> PeripheralBase::services() {
             bool can_indicate = (properties & (uint32_t)GattCharacteristicProperties::Indicate) != 0;
 
             characteristic_list.push_back(
-                Factory::Builder<Characteristic>(characteristic_uuid, descriptor_list, can_read, can_write_request,
-                                                 can_write_command, can_notify, can_indicate));
+                std::make_shared<CharacteristicBase>(characteristic_uuid, descriptor_list, can_read, can_write_request,
+                                                     can_write_command, can_notify, can_indicate));
         }
-        service_list.push_back(Factory::Builder<Service>(service_uuid, characteristic_list));
+        service_list.push_back(std::make_shared<ServiceBase>(service_uuid, characteristic_list));
     }
 
     return service_list;
 }
 
-std::vector<Service> PeripheralBase::advertised_services() {
-    std::vector<Service> service_list;
+vec_of_shared<ServiceBase> PeripheralWindows::advertised_services() {
+    vec_of_shared<ServiceBase> service_list;
     for (auto& [service_uuid, data] : service_data_) {
-        service_list.push_back(Factory::Builder<Service>(service_uuid, data));
+        service_list.push_back(std::make_shared<ServiceBase>(service_uuid, data));
     }
 
     return service_list;
 }
 
-std::map<uint16_t, ByteArray> PeripheralBase::manufacturer_data() { return manufacturer_data_; }
+std::map<uint16_t, ByteArray> PeripheralWindows::manufacturer_data() { return manufacturer_data_; }
 
-ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
+ByteArray PeripheralWindows::read_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic).obj;
 
     // Validate that the operation can be performed.
@@ -185,8 +186,8 @@ ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const
     return ibuffer_to_bytearray(result.Value());
 }
 
-void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                   ByteArray const& data) {
+void PeripheralWindows::write_request_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                            ByteArray const& data) {
     GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic).obj;
 
     // Validate that the operation can be performed.
@@ -205,8 +206,8 @@ void PeripheralBase::write_request(BluetoothUUID const& service, BluetoothUUID c
     }
 }
 
-void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                   ByteArray const& data) {
+void PeripheralWindows::write_command_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                            ByteArray const& data) {
     GattCharacteristic gatt_characteristic = _fetch_characteristic(service, characteristic).obj;
 
     // Validate that the operation can be performed.
@@ -225,19 +226,19 @@ void PeripheralBase::write_command(BluetoothUUID const& service, BluetoothUUID c
     }
 }
 
-void PeripheralBase::notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                            std::function<void(ByteArray payload)> callback) {
+void PeripheralWindows::notify_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                     std::function<void(ByteArray payload)> callback) {
     _subscribe(service, characteristic, std::move(callback), GattCharacteristicProperties::Notify,
                GattClientCharacteristicConfigurationDescriptorValue::Notify);
 }
 
-void PeripheralBase::indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                              std::function<void(ByteArray payload)> callback) {
+void PeripheralWindows::indicate_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                       std::function<void(ByteArray payload)> callback) {
     _subscribe(service, characteristic, std::move(callback), GattCharacteristicProperties::Indicate,
                GattClientCharacteristicConfigurationDescriptorValue::Indicate);
 }
 
-void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
+void PeripheralWindows::unsubscribe_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     gatt_characteristic_t& gatt_characteristic_holder = _fetch_characteristic(service, characteristic);
     GattCharacteristic gatt_characteristic = gatt_characteristic_holder.obj;
 
@@ -256,8 +257,8 @@ void PeripheralBase::unsubscribe(BluetoothUUID const& service, BluetoothUUID con
     }
 }
 
-ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                               BluetoothUUID const& descriptor) {
+ByteArray PeripheralWindows::read_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                        BluetoothUUID const& descriptor) {
     GattDescriptor gatt_descriptor = _fetch_descriptor(service, characteristic, descriptor);
 
     // Read the value.
@@ -268,8 +269,8 @@ ByteArray PeripheralBase::read(BluetoothUUID const& service, BluetoothUUID const
     return ibuffer_to_bytearray(result.Value());
 }
 
-void PeripheralBase::write(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                           BluetoothUUID const& descriptor, ByteArray const& data) {
+void PeripheralWindows::write_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                    BluetoothUUID const& descriptor, ByteArray const& data) {
     GattDescriptor gatt_descriptor = _fetch_descriptor(service, characteristic, descriptor);
 
     // Convert the request data to a buffer.
@@ -282,7 +283,7 @@ void PeripheralBase::write(BluetoothUUID const& service, BluetoothUUID const& ch
     }
 }
 
-void PeripheralBase::set_callback_on_connected(std::function<void()> on_connected) {
+void PeripheralWindows::set_callback_on_connected(std::function<void()> on_connected) {
     if (on_connected) {
         callback_on_connected_.load(std::move(on_connected));
     } else {
@@ -290,7 +291,7 @@ void PeripheralBase::set_callback_on_connected(std::function<void()> on_connecte
     }
 }
 
-void PeripheralBase::set_callback_on_disconnected(std::function<void()> on_disconnected) {
+void PeripheralWindows::set_callback_on_disconnected(std::function<void()> on_disconnected) {
     if (on_disconnected) {
         callback_on_disconnected_.load(std::move(on_disconnected));
     } else {
@@ -300,9 +301,10 @@ void PeripheralBase::set_callback_on_disconnected(std::function<void()> on_disco
 
 // Private methods
 
-void PeripheralBase::_subscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                std::function<void(ByteArray payload)> callback, GattCharacteristicProperties property,
-                                GattClientCharacteristicConfigurationDescriptorValue descriptor_value) {
+void PeripheralWindows::_subscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                   std::function<void(ByteArray payload)> callback,
+                                   GattCharacteristicProperties property,
+                                   GattClientCharacteristicConfigurationDescriptorValue descriptor_value) {
     gatt_characteristic_t& gatt_characteristic_holder = _fetch_characteristic(service, characteristic);
     GattCharacteristic gatt_characteristic = gatt_characteristic_holder.obj;
 
@@ -340,7 +342,7 @@ void PeripheralBase::_subscribe(BluetoothUUID const& service, BluetoothUUID cons
     }
 }
 
-bool PeripheralBase::_attempt_connect() {
+bool PeripheralWindows::_attempt_connect() {
     gatt_map_.clear();
 
     // We need to cache all services, characteristics and descriptors in the class, else
@@ -409,8 +411,8 @@ bool PeripheralBase::_attempt_connect() {
     return true;
 }
 
-gatt_characteristic_t& PeripheralBase::_fetch_characteristic(const BluetoothUUID& service_uuid,
-                                                             const BluetoothUUID& characteristic_uuid) {
+gatt_characteristic_t& PeripheralWindows::_fetch_characteristic(const BluetoothUUID& service_uuid,
+                                                                const BluetoothUUID& characteristic_uuid) {
     if (gatt_map_.count(service_uuid) == 0) {
         throw SimpleBLE::Exception::ServiceNotFound(service_uuid);
     }
@@ -422,9 +424,9 @@ gatt_characteristic_t& PeripheralBase::_fetch_characteristic(const BluetoothUUID
     return gatt_map_[service_uuid].characteristics.at(characteristic_uuid);
 }
 
-GattDescriptor PeripheralBase::_fetch_descriptor(const BluetoothUUID& service_uuid,
-                                                 const BluetoothUUID& characteristic_uuid,
-                                                 const BluetoothUUID& descriptor_uuid) {
+GattDescriptor PeripheralWindows::_fetch_descriptor(const BluetoothUUID& service_uuid,
+                                                    const BluetoothUUID& characteristic_uuid,
+                                                    const BluetoothUUID& descriptor_uuid) {
     if (gatt_map_.count(service_uuid) == 0) {
         throw SimpleBLE::Exception::ServiceNotFound(service_uuid);
     }
