@@ -17,19 +17,19 @@ static std::shared_ptr<BackendBase> _get_enabled_backend() {
     using BackendPtr = std::shared_ptr<BackendBase>(void);
 
     if constexpr (SIMPLEBLE_BACKEND_LINUX) {
-        extern BackendPtr BACKEND_LINUX();
+        extern BackendPtr BACKEND_LINUX;
         return BACKEND_LINUX();
     } else if constexpr (SIMPLEBLE_BACKEND_WINDOWS) {
-        extern BackendPtr BACKEND_WINDOWS();
+        extern BackendPtr BACKEND_WINDOWS;
         return BACKEND_WINDOWS();
     } else if constexpr (SIMPLEBLE_BACKEND_ANDROID) {
-        extern BackendPtr BACKEND_ANDROID();
+        extern BackendPtr BACKEND_ANDROID;
         return BACKEND_ANDROID();
     } else if constexpr (SIMPLEBLE_BACKEND_MACOS) {
-        extern BackendPtr BACKEND_MACOS();
+        extern BackendPtr BACKEND_MACOS;
         return BACKEND_MACOS();
     } else if constexpr (SIMPLEBLE_BACKEND_PLAIN) {
-        extern BackendPtr BACKEND_PLAIN();
+        extern BackendPtr BACKEND_PLAIN;
         return BACKEND_PLAIN();
     }
 
