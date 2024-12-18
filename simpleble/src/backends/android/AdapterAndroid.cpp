@@ -1,4 +1,5 @@
 #include "AdapterAndroid.h"
+#include "BackendAndroid.h"
 #include "BuilderBase.h"
 #include "CommonUtils.h"
 #include "PeripheralAndroid.h"
@@ -13,62 +14,15 @@
 
 using namespace SimpleBLE;
 
-JNI::Class AdapterBase::_btAdapterCls;
-JNI::Class AdapterBase::_btScanResultCls;
+bool AdapterAndroid::bluetooth_enabled() { return backend_->bluetooth_enabled(); }
 
-JNI::Object AdapterBase::_btAdapter;
-JNI::Object AdapterBase::_btScanner;
-
-void AdapterBase::initialize() {
-    JNI::Env env;
-
-    // Check if the BluetoothAdapter class has been loaded
-    if (_btAdapterCls.get() == nullptr) {
-        _btAdapterCls = env.find_class("android/bluetooth/BluetoothAdapter");
-    }
-
-    if (_btScanResultCls.get() == nullptr) {
-        _btScanResultCls = env.find_class("android/bluetooth/le/ScanResult");
-    }
-
-    if (_btAdapter.get() == nullptr) {
-        _btAdapter = _btAdapterCls.call_static_method("getDefaultAdapter", "()Landroid/bluetooth/BluetoothAdapter;");
-    }
-
-    if (_btScanner.get() == nullptr) {
-        _btScanner = _btAdapter.call_object_method("getBluetoothLeScanner",
-                                                   "()Landroid/bluetooth/le/BluetoothLeScanner;");
-    }
-}
-
-std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
-    initialize();
-
-    // Create an instance of AdapterBase and add it to the vector
-    std::shared_ptr<AdapterBase> adapter = std::make_shared<AdapterBase>();
-    std::vector<std::shared_ptr<AdapterBase>> adapters;
-    adapters.push_back(adapter);
-
-    return adapters;
-}
-
-bool AdapterBase::bluetooth_enabled() {
-    initialize();
-
-    bool isEnabled = _btAdapter.call_boolean_method("isEnabled", "()Z");
-    int bluetoothState = _btAdapter.call_int_method("getState", "()I");
-    __android_log_write(ANDROID_LOG_INFO, "SimpleBLE", fmt::format("Bluetooth state: {}", bluetoothState).c_str());
-
-    return isEnabled;  // bluetoothState == 12;
-}
-
-AdapterBase::AdapterBase() {
+AdapterAndroid::AdapterAndroid(std::shared_ptr<BackendAndroid> backend) : backend_(backend) {
     _btScanCallback.set_callback_onScanResult([this](Android::ScanResult scan_result) {
         std::string address = scan_result.getDevice().getAddress();
 
         if (this->peripherals_.count(address) == 0) {
             // If the incoming peripheral has never been seen before, create and save a reference to it.
-            auto base_peripheral = std::make_shared<PeripheralBase>(scan_result);
+            auto base_peripheral = std::make_shared<PeripheralAndroid>(scan_result);
             this->peripherals_.insert(std::make_pair(address, base_peripheral));
         }
 
@@ -90,42 +44,46 @@ AdapterBase::AdapterBase() {
     });
 }
 
-AdapterBase::~AdapterBase() {}
+AdapterAndroid::~AdapterAndroid() {}
 
-void* AdapterBase::underlying() const { return nullptr; }
+void* AdapterAndroid::underlying() const { return nullptr; }
 
-std::string AdapterBase::identifier() { return _btAdapter.call_string_method("getName", "()Ljava/lang/String;"); }
-
-BluetoothAddress AdapterBase::address() {
-    return BluetoothAddress(_btAdapter.call_string_method("getAddress", "()Ljava/lang/String;"));
+std::string AdapterAndroid::identifier() const {
+    return backend_->get_btAdapter().call_string_method("getName", "()Ljava/lang/String;");
 }
 
-void AdapterBase::scan_start() {
+BluetoothAddress AdapterAndroid::address() {
+    return BluetoothAddress(backend_->get_btAdapter().call_string_method("getAddress", "()Ljava/lang/String;"));
+}
+
+void AdapterAndroid::scan_start() {
     seen_peripherals_.clear();
-    _btScanner.call_void_method("startScan", "(Landroid/bluetooth/le/ScanCallback;)V", _btScanCallback.get());
+    backend_->get_btScanner().call_void_method("startScan", "(Landroid/bluetooth/le/ScanCallback;)V",
+                                               _btScanCallback.get());
     scanning_ = true;
     SAFE_CALLBACK_CALL(this->callback_on_scan_start_);
 }
 
-void AdapterBase::scan_stop() {
-    _btScanner.call_void_method("stopScan", "(Landroid/bluetooth/le/ScanCallback;)V", _btScanCallback.get());
+void AdapterAndroid::scan_stop() {
+    backend_->get_btScanner().call_void_method("stopScan", "(Landroid/bluetooth/le/ScanCallback;)V",
+                                               _btScanCallback.get());
     scanning_ = false;
     SAFE_CALLBACK_CALL(this->callback_on_scan_stop_);
 }
 
-void AdapterBase::scan_for(int timeout_ms) {
+void AdapterAndroid::scan_for(int timeout_ms) {
     scan_start();
     std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
     scan_stop();
 }
 
-bool AdapterBase::scan_is_active() { return scanning_; }
+bool AdapterAndroid::scan_is_active() { return scanning_; }
 
-std::vector<Peripheral> AdapterBase::scan_get_results() { return std::vector<Peripheral>(); }
+SharedPtrVector<PeripheralBase> AdapterAndroid::scan_get_results() { return {}; }
 
-std::vector<Peripheral> AdapterBase::get_paired_peripherals() { return std::vector<Peripheral>(); }
+SharedPtrVector<PeripheralBase> AdapterAndroid::get_paired_peripherals() { return {}; }
 
-void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start) {
+void AdapterAndroid::set_callback_on_scan_start(std::function<void()> on_scan_start) {
     if (on_scan_start) {
         callback_on_scan_start_.load(on_scan_start);
     } else {
@@ -133,7 +91,7 @@ void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start
     }
 }
 
-void AdapterBase::set_callback_on_scan_stop(std::function<void()> on_scan_stop) {
+void AdapterAndroid::set_callback_on_scan_stop(std::function<void()> on_scan_stop) {
     if (on_scan_stop) {
         callback_on_scan_stop_.load(on_scan_stop);
     } else {
@@ -141,7 +99,7 @@ void AdapterBase::set_callback_on_scan_stop(std::function<void()> on_scan_stop) 
     }
 }
 
-void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) {
+void AdapterAndroid::set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) {
     if (on_scan_updated) {
         callback_on_scan_updated_.load(on_scan_updated);
     } else {
@@ -149,7 +107,7 @@ void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> o
     }
 }
 
-void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {
+void AdapterAndroid::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {
     if (on_scan_found) {
         callback_on_scan_found_.load(on_scan_found);
     } else {

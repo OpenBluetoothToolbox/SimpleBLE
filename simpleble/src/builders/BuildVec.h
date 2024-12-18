@@ -29,4 +29,4 @@ auto vector(V1 objs) {
     return BuildVecDeduce<V1>{std::move(objs)};
 }
 
-}  // namespace SimpleBLE::builder
+}  // namespace SimpleBLE::Factory

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <simpleble/Exceptions.h>
-#include <simpleble/Peripheral.h>
 #include <simpleble/Types.h>
 
+#include "AdapterBase.h"
 #include "AdapterBaseTypes.h"
 
 #include <kvn_safe_callback.hpp>
@@ -16,35 +16,38 @@
 
 namespace SimpleBLE {
 
+class Peripheral;
+class PeripheralBase;
+class PeripheralMac;
+
 /**
   This class definition acts as an abstraction layer between C++ and Objective-C.
   If Objective-C headers are included here, everything blows up.
  */
-class AdapterBase {
+class AdapterMac : public AdapterBase {
   public:
-    AdapterBase();
-    virtual ~AdapterBase();
+    AdapterMac();
+    virtual ~AdapterMac();
 
-    void* underlying() const;
+    virtual void* underlying() const override;
 
-    std::string identifier();
-    BluetoothAddress address();
+    virtual std::string identifier() const override;
+    virtual BluetoothAddress address() override;
 
-    void scan_start();
-    void scan_stop();
-    void scan_for(int timeout_ms);
-    bool scan_is_active();
-    std::vector<Peripheral> scan_get_results();
+    virtual void scan_start() override;
+    virtual void scan_stop() override;
+    virtual void scan_for(int timeout_ms) override;
+    virtual bool scan_is_active() override;
+    virtual std::vector<std::shared_ptr<PeripheralBase>> scan_get_results() override;
 
-    void set_callback_on_scan_start(std::function<void()> on_scan_start);
-    void set_callback_on_scan_stop(std::function<void()> on_scan_stop);
-    void set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated);
-    void set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found);
+    virtual void set_callback_on_scan_start(std::function<void()> on_scan_start) override;
+    virtual void set_callback_on_scan_stop(std::function<void()> on_scan_stop) override;
+    virtual void set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) override;
+    virtual void set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) override;
 
-    std::vector<Peripheral> get_paired_peripherals();
+    virtual std::vector<std::shared_ptr<PeripheralBase>> get_paired_peripherals() override;
 
-    static bool bluetooth_enabled();
-    static std::vector<std::shared_ptr<AdapterBase> > get_adapters();
+    virtual bool bluetooth_enabled() override;
 
     void delegate_did_discover_peripheral(void* opaque_peripheral, void* opaque_adapter,
                                           advertising_data_t advertising_data);
@@ -71,8 +74,11 @@ class AdapterBase {
      * can be wrapped in disposable Peripheral objects, so there is no need
      * be careful with them.
      */
-    std::map<void*, std::shared_ptr<PeripheralBase> > peripherals_;
-    std::map<void*, std::shared_ptr<PeripheralBase> > seen_peripherals_;
+    std::map<void*, std::shared_ptr<PeripheralMac>> peripherals_;
+    std::map<void*, std::shared_ptr<PeripheralMac>> seen_peripherals_;
+
+  private:
+    BluetoothAddress address() const;
 };
 
 }  // namespace SimpleBLE

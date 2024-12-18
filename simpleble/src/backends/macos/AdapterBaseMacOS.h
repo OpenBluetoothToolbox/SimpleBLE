@@ -12,7 +12,7 @@
 
 - (bool)isBluetoothEnabled;
 
-- (instancetype)init:(SimpleBLE::AdapterBase*)adapter;
+- (instancetype)init:(SimpleBLE::AdapterMac*)adapter;
 
 - (void*)underlying;
 
