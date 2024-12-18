@@ -6,7 +6,7 @@
 
 using namespace SimpleBLE;
 
-CharacteristicBase::CharacteristicBase(const BluetoothUUID& uuid, vec_of_shared<DescriptorBase> descriptors,
+CharacteristicBase::CharacteristicBase(const BluetoothUUID& uuid, SharedPtrVector<DescriptorBase> descriptors,
                                        bool can_read, bool can_write_request, bool can_write_command, bool can_notify,
                                        bool can_indicate)
     : uuid_(uuid),
@@ -19,7 +19,7 @@ CharacteristicBase::CharacteristicBase(const BluetoothUUID& uuid, vec_of_shared<
 
 BluetoothUUID CharacteristicBase::uuid() { return uuid_; }
 
-vec_of_shared<DescriptorBase> CharacteristicBase::descriptors() { return descriptors_; }
+SharedPtrVector<DescriptorBase> CharacteristicBase::descriptors() { return descriptors_; }
 
 bool CharacteristicBase::can_read() { return can_read_; }
 bool CharacteristicBase::can_write_request() { return can_write_request_; }

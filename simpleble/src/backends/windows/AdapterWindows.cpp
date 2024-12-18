@@ -1,7 +1,7 @@
 // This weird pragma is required for the compiler to properly include the necessary namespaces.
 #pragma comment(lib, "windowsapp")
 #include "AdapterWindows.h"
-#include "BackendWindows.h"
+#include "BackendWinRT.h"
 
 #include "BuilderBase.h"
 #include "CommonUtils.h"
@@ -146,7 +146,7 @@ AdapterWindows::~AdapterWindows() {
 }
 
 // FIXME: this should return wether this particular adapter is enabled, not if any adapter is enabled.
-bool AdapterWindows::bluetooth_enabled() { return BackendWindows::get()->bluetooth_enabled(); }
+bool AdapterWindows::bluetooth_enabled() { return BackendWinRT::get()->bluetooth_enabled(); }
 
 void* AdapterWindows::underlying() const { return reinterpret_cast<void*>(const_cast<BluetoothAdapter*>(&adapter_)); }
 
@@ -184,9 +184,9 @@ void AdapterWindows::scan_for(int timeout_ms) {
 
 bool AdapterWindows::scan_is_active() { return scan_is_active_; }
 
-vec_of_shared<PeripheralBase> AdapterWindows::scan_get_results() { return Util::values(seen_peripherals_); }
+SharedPtrVector<PeripheralBase> AdapterWindows::scan_get_results() { return Util::values(seen_peripherals_); }
 
-vec_of_shared<PeripheralBase> AdapterWindows::get_paired_peripherals() { return {}; }
+SharedPtrVector<PeripheralBase> AdapterWindows::get_paired_peripherals() { return {}; }
 
 void AdapterWindows::set_callback_on_scan_start(std::function<void()> on_scan_start) {
     if (on_scan_start) {

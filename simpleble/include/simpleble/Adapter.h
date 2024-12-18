@@ -31,6 +31,14 @@ class SIMPLEBLE_EXPORT Adapter {
     virtual ~Adapter() = default;
 
     bool initialized() const;
+
+    /**
+     * Retrieve the underlying OS object/handle.
+     *
+     * For certain compatibility with external libraries, we sometimes need to
+     * expose the actual OS handle to the user. This is particularly important
+     * for MacOS right now.
+     */
     void* underlying() const;
 
     std::string identifier();

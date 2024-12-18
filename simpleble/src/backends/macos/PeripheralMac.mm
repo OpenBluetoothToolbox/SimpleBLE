@@ -97,13 +97,13 @@ bool PeripheralMac::is_paired() { throw Exception::OperationNotSupported(); }
 
 void PeripheralMac::unpair() { throw Exception::OperationNotSupported(); }
 
-vec_of_shared<ServiceBase> PeripheralMac::available_services() {
+SharedPtrVector<ServiceBase> PeripheralMac::available_services() {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
     return [internal getServices];
 }
 
-vec_of_shared<ServiceBase> PeripheralMac::advertised_services() {
-    vec_of_shared<ServiceBase> service_list;
+SharedPtrVector<ServiceBase> PeripheralMac::advertised_services() {
+    SharedPtrVector<ServiceBase> service_list;
     for (auto& [service_uuid, data] : service_data_) {
         service_list.push_back(std::make_shared<ServiceBase>(service_uuid, data));
     }
@@ -113,7 +113,7 @@ vec_of_shared<ServiceBase> PeripheralMac::advertised_services() {
 
 std::map<uint16_t, ByteArray> PeripheralMac::manufacturer_data() { return manufacturer_data_; }
 
-ByteArray PeripheralMac::read_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
+ByteArray PeripheralMac::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
 
     NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
@@ -122,7 +122,7 @@ ByteArray PeripheralMac::read_inner(BluetoothUUID const& service, BluetoothUUID 
     return [internal read:service_uuid characteristic_uuid:characteristic_uuid];
 }
 
-void PeripheralMac::write_request_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& byte_array) {
+void PeripheralMac::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& byte_array) {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
 
     NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
@@ -132,7 +132,7 @@ void PeripheralMac::write_request_inner(BluetoothUUID const& service, BluetoothU
     [internal writeRequest:service_uuid characteristic_uuid:characteristic_uuid payload:payload];
 }
 
-void PeripheralMac::write_command_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& byte_array) {
+void PeripheralMac::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& byte_array) {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
 
     NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
@@ -142,8 +142,8 @@ void PeripheralMac::write_command_inner(BluetoothUUID const& service, BluetoothU
     [internal writeCommand:service_uuid characteristic_uuid:characteristic_uuid payload:payload];
 }
 
-void PeripheralMac::notify_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                 std::function<void(ByteArray payload)> callback) {
+void PeripheralMac::notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                           std::function<void(ByteArray payload)> callback) {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
 
     NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
@@ -151,8 +151,8 @@ void PeripheralMac::notify_inner(BluetoothUUID const& service, BluetoothUUID con
     [internal notify:service_uuid characteristic_uuid:characteristic_uuid callback:callback];
 }
 
-void PeripheralMac::indicate_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                   std::function<void(ByteArray payload)> callback) {
+void PeripheralMac::indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                             std::function<void(ByteArray payload)> callback) {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
 
     NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
@@ -160,7 +160,7 @@ void PeripheralMac::indicate_inner(BluetoothUUID const& service, BluetoothUUID c
     [internal indicate:service_uuid characteristic_uuid:characteristic_uuid callback:callback];
 }
 
-void PeripheralMac::unsubscribe_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
+void PeripheralMac::unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
 
     NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
@@ -168,7 +168,7 @@ void PeripheralMac::unsubscribe_inner(BluetoothUUID const& service, BluetoothUUI
     [internal unsubscribe:service_uuid characteristic_uuid:characteristic_uuid];
 }
 
-ByteArray PeripheralMac::read_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor) {
+ByteArray PeripheralMac::read(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor) {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
 
     NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];
@@ -178,8 +178,8 @@ ByteArray PeripheralMac::read_inner(BluetoothUUID const& service, BluetoothUUID 
     return [internal read:service_uuid characteristic_uuid:characteristic_uuid descriptor_uuid:descriptor_uuid];
 }
 
-void PeripheralMac::write_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor,
-                                ByteArray const& byte_array) {
+void PeripheralMac::write(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor,
+                          ByteArray const& byte_array) {
     PeripheralBaseMacOS* internal = (__bridge PeripheralBaseMacOS*)opaque_internal_;
 
     NSString* service_uuid = [NSString stringWithCString:service.c_str() encoding:NSString.defaultCStringEncoding];

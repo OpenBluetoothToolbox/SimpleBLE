@@ -287,7 +287,7 @@ elseif(SIMPLEBLE_BACKEND_WINDOWS)
     target_sources(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/AdapterWindows.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/PeripheralWindows.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/BackendWindows.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/BackendWinRT.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/Utils.cpp)
 
 elseif(SIMPLEBLE_BACKEND_MACOS)
@@ -302,7 +302,7 @@ elseif(SIMPLEBLE_BACKEND_MACOS)
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/AdapterBaseMacOS.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/PeripheralMac.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/PeripheralBaseMacOS.mm
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/BackendMac.mm)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/BackendCoreBluetooth.mm)
 
     set_property(TARGET simpleble PROPERTY INSTALL_RPATH @loader_path)
     set_property(TARGET simpleble-c PROPERTY INSTALL_RPATH @loader_path)

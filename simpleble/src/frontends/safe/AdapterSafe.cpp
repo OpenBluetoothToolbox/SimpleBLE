@@ -26,6 +26,8 @@ std::optional<SimpleBLE::BluetoothAddress> SAdapter::address() noexcept {
     }
 }
 
+SAdapter::operator SimpleBLE::Adapter() const noexcept { return internal_; }
+
 bool SAdapter::scan_start() noexcept {
     try {
         internal_.scan_start();

@@ -57,5 +57,5 @@ auto values(const MAP& map) {
 
 namespace SimpleBLE {
 template <typename T>
-using vec_of_shared = std::vector<std::shared_ptr<T>>;
+using SharedPtrVector = std::vector<std::shared_ptr<T>>;
 }

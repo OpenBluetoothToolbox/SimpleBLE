@@ -79,9 +79,9 @@ void AdapterAndroid::scan_for(int timeout_ms) {
 
 bool AdapterAndroid::scan_is_active() { return scanning_; }
 
-vec_of_shared<PeripheralBase> AdapterAndroid::scan_get_results() { return {}; }
+SharedPtrVector<PeripheralBase> AdapterAndroid::scan_get_results() { return {}; }
 
-vec_of_shared<PeripheralBase> AdapterAndroid::get_paired_peripherals() { return {}; }
+SharedPtrVector<PeripheralBase> AdapterAndroid::get_paired_peripherals() { return {}; }
 
 void AdapterAndroid::set_callback_on_scan_start(std::function<void()> on_scan_start) {
     if (on_scan_start) {

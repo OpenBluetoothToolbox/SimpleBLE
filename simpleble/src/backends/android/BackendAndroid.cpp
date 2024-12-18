@@ -34,10 +34,10 @@ BackendAndroid::BackendAndroid(buildToken) {
     }
 }
 
-std::string BackendAndroid::backend_name() const noexcept { return "Android"; }
+std::string BackendAndroid::name() const noexcept { return "Android"; }
 
-vec_of_shared<AdapterBase> BackendAndroid::get_adapters() {
-    vec_of_shared<AdapterBase> adapters;
+SharedPtrVector<AdapterBase> BackendAndroid::get_adapters() {
+    SharedPtrVector<AdapterBase> adapters;
     adapters.push_back(std::make_shared<AdapterAndroid>(shared_from_this()));
 
     return adapters;

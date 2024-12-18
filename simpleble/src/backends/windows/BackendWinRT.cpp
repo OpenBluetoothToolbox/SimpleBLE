@@ -1,4 +1,4 @@
-#include "BackendWindows.h"
+#include "BackendWinRT.h"
 
 #include "AdapterWindows.h"
 #include "CommonUtils.h"
@@ -12,11 +12,11 @@
 
 namespace SimpleBLE {
 
-std::shared_ptr<BackendBase> BACKEND_WINDOWS() { return BackendWindows::get(); }
+std::shared_ptr<BackendBase> BACKEND_WINDOWS() { return BackendWinRT::get(); }
 
-BackendWindows::BackendWindows(buildToken) { initialize_winrt(); }
+BackendWinRT::BackendWinRT(buildToken) { initialize_winrt(); }
 
-bool BackendWindows::bluetooth_enabled() {
+bool BackendWinRT::bluetooth_enabled() {
     bool enabled = false;
     auto radio_collection = async_get(Radio::GetRadiosAsync());
     for (uint32_t i = 0; i < radio_collection.Size(); i++) {
@@ -37,12 +37,12 @@ bool BackendWindows::bluetooth_enabled() {
     return enabled;
 }
 
-vec_of_shared<AdapterBase> BackendWindows::get_adapters() {
+SharedPtrVector<AdapterBase> BackendWinRT::get_adapters() {
     auto device_selector = BluetoothAdapter::GetDeviceSelector();
     auto device_information_collection = async_get(
         Devices::Enumeration::DeviceInformation::FindAllAsync(device_selector));
 
-    vec_of_shared<AdapterBase> adapter_list;
+    SharedPtrVector<AdapterBase> adapter_list;
     for (uint32_t i = 0; i < device_information_collection.Size(); i++) {
         auto dev_info = device_information_collection.GetAt(i);
         adapter_list.push_back(std::make_shared<AdapterWindows>(winrt::to_string(dev_info.Id())));
@@ -50,6 +50,6 @@ vec_of_shared<AdapterBase> BackendWindows::get_adapters() {
     return adapter_list;
 }
 
-std::string BackendWindows::backend_name() const noexcept { return "Windows"; }
+std::string BackendWinRT::name() const noexcept { return "Windows"; }
 
 };  // namespace SimpleBLE

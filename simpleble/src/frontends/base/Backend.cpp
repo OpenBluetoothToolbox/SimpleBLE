@@ -13,21 +13,34 @@ using namespace SimpleBLE;
 
 namespace SimpleBLE {
 
-#define SIMPLEBLE_ENABLE(name)                  \
-    extern std::shared_ptr<BackendBase> name(); \
-    if constexpr (SIMPLEBLE_##name) return name();
+static std::shared_ptr<BackendBase> _get_enabled_backend() {
+    using BackendPtr = std::shared_ptr<BackendBase>(void);
 
-static std::shared_ptr<BackendBase> _get_enabled_backend(){
-    SIMPLEBLE_ENABLE(BACKEND_LINUX) SIMPLEBLE_ENABLE(BACKEND_WINDOWS) SIMPLEBLE_ENABLE(BACKEND_ANDROID)
-        SIMPLEBLE_ENABLE(BACKEND_MACOS) SIMPLEBLE_ENABLE(BACKEND_PLAIN)}
+    if constexpr (SIMPLEBLE_BACKEND_LINUX) {
+        extern BackendPtr BACKEND_LINUX();
+        return BACKEND_LINUX();
+    } else if constexpr (SIMPLEBLE_BACKEND_WINDOWS) {
+        extern BackendPtr BACKEND_WINDOWS();
+        return BACKEND_WINDOWS();
+    } else if constexpr (SIMPLEBLE_BACKEND_ANDROID) {
+        extern BackendPtr BACKEND_ANDROID();
+        return BACKEND_ANDROID();
+    } else if constexpr (SIMPLEBLE_BACKEND_MACOS) {
+        extern BackendPtr BACKEND_MACOS();
+        return BACKEND_MACOS();
+    } else if constexpr (SIMPLEBLE_BACKEND_PLAIN) {
+        extern BackendPtr BACKEND_PLAIN();
+        return BACKEND_PLAIN();
+    }
 
-Backend get_enabled_backend() {
-    return Factory::build(_get_enabled_backend());
+    throw Exception::NotInitialized();
 }
 
+Backend get_enabled_backend() { return Factory::build(_get_enabled_backend()); }
+
 // NOTE: in the future, this can return multiple backends
-static vec_of_shared<BackendBase> _get_backends() {
-    vec_of_shared<BackendBase> backends = {_get_enabled_backend()};
+static SharedPtrVector<BackendBase> _get_backends() {
+    SharedPtrVector<BackendBase> backends = {_get_enabled_backend()};
     return backends;
 }
 
@@ -64,4 +77,4 @@ std::optional<Backend> Backend::first_bluetooth_enabled() {
     return std::nullopt;
 }
 
-std::string Backend::backend_name() const noexcept { return (*this)->backend_name(); }
+std::string Backend::name() const noexcept { return (*this)->name(); }

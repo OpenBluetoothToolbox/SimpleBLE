@@ -46,15 +46,15 @@ class PeripheralLinux : public SimpleBLE::PeripheralBase {
     virtual std::map<uint16_t, ByteArray> manufacturer_data() override;
 
     // clang-format off
-    virtual ByteArray read_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic) override;
-    virtual void write_request_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) override;
-    virtual void write_command_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) override;
-    virtual void notify_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback) override;
-    virtual void indicate_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback) override;
-    virtual void unsubscribe_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic) override;
+    virtual ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic) override;
+    virtual void write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) override;
+    virtual void write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) override;
+    virtual void notify(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback) override;
+    virtual void indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback) override;
+    virtual void unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) override;
 
-    virtual ByteArray read_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor) override;
-    virtual void write_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor, ByteArray const& data) override;
+    virtual ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor) override;
+    virtual void write(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor, ByteArray const& data) override;
     // clang-format on
 
     virtual void set_callback_on_connected(std::function<void()> on_connected) override;

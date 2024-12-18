@@ -5,14 +5,14 @@
 
 namespace SimpleBLE {
 
-class BackendWindows : public BackendSingleton<BackendWindows> {
+class BackendWinRT : public BackendSingleton<BackendWinRT> {
   public:
-    BackendWindows(buildToken);
-    virtual ~BackendWindows() = default;
+    BackendWinRT(buildToken);
+    virtual ~BackendWinRT() = default;
 
     virtual std::vector<std::shared_ptr<AdapterBase>> get_adapters() override;
     virtual bool bluetooth_enabled() override;
-    virtual std::string backend_name() const noexcept override;
+    virtual std::string name() const noexcept override;
 };
 
 }  // namespace SimpleBLE

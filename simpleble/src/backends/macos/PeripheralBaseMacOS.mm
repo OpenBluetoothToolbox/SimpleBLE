@@ -250,14 +250,14 @@
     return self.peripheral.state == CBPeripheralStateConnected;
 }
 
-- (SimpleBLE::vec_of_shared<SimpleBLE::ServiceBase>)getServices {
-    SimpleBLE::vec_of_shared<SimpleBLE::ServiceBase> service_list;
+- (SimpleBLE::SharedPtrVector<SimpleBLE::ServiceBase>)getServices {
+    SimpleBLE::SharedPtrVector<SimpleBLE::ServiceBase> service_list;
     for (CBService* service in self.peripheral.services) {
         // Build the list of characteristics for the service.
-        SimpleBLE::vec_of_shared<SimpleBLE::CharacteristicBase> characteristic_list;
+        SimpleBLE::SharedPtrVector<SimpleBLE::CharacteristicBase> characteristic_list;
         for (CBCharacteristic* characteristic in service.characteristics) {
             // Build the list of descriptors for the characteristic.
-            SimpleBLE::vec_of_shared<SimpleBLE::DescriptorBase> descriptor_list;
+            SimpleBLE::SharedPtrVector<SimpleBLE::DescriptorBase> descriptor_list;
             for (CBDescriptor* descriptor in characteristic.descriptors) {
                 descriptor_list.push_back(std::make_shared<SimpleBLE::DescriptorBase>(uuidToSimpleBLE(descriptor.UUID)));
             }

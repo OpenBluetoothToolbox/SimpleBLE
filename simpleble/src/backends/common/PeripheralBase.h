@@ -58,21 +58,18 @@ class PeripheralBase {
     virtual std::map<uint16_t, ByteArray> manufacturer_data() = 0;
 
     // clang-format off
-    /* These methods call the virtual counterparts ONLY if the device is connected,
-       otherwise they throw Exception::NotConnected */
-
     /* These methods are called by the frontend ONLY when the device is connected.
     */
     // clang-format off
-    virtual ByteArray read_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic) = 0;
-    virtual void write_request_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) = 0;
-    virtual void write_command_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) = 0;
-    virtual void notify_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback) = 0;
-    virtual void indicate_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback) = 0;
-    virtual void unsubscribe_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic) = 0;
+    virtual ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic) = 0;
+    virtual void write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) = 0;
+    virtual void write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) = 0;
+    virtual void notify(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback) = 0;
+    virtual void indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback) = 0;
+    virtual void unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) = 0;
 
-    virtual ByteArray read_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor) = 0;
-    virtual void write_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor, ByteArray const& data) = 0;
+    virtual ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor) = 0;
+    virtual void write(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor, ByteArray const& data) = 0;
     // clang-format on
 
     virtual void set_callback_on_connected(std::function<void()> on_connected) = 0;

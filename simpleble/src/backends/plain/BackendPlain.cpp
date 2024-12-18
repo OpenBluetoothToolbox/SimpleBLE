@@ -10,19 +10,19 @@ class BackendPlain : public BackendSingleton<BackendPlain> {
     BackendPlain(buildToken) {};
     virtual ~BackendPlain() = default;
 
-    virtual vec_of_shared<AdapterBase> get_adapters() override;
+    virtual SharedPtrVector<AdapterBase> get_adapters() override;
     virtual bool bluetooth_enabled() override;
-    std::string backend_name() const noexcept override;
+    std::string name() const noexcept override;
 };
 
 std::shared_ptr<BackendBase> BACKEND_PLAIN() { return BackendPlain::get(); }
 
-std::string BackendPlain::backend_name() const noexcept { return "Plain"; }
+std::string BackendPlain::name() const noexcept { return "Plain"; }
 
 bool BackendPlain::bluetooth_enabled() { return true; }
 
-vec_of_shared<AdapterBase> BackendPlain::get_adapters() {
-    vec_of_shared<AdapterBase> adapters;
+SharedPtrVector<AdapterBase> BackendPlain::get_adapters() {
+    SharedPtrVector<AdapterBase> adapters;
     adapters.push_back(std::make_shared<AdapterPlain>());
     return adapters;
 }

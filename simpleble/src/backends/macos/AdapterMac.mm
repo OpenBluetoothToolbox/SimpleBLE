@@ -77,8 +77,8 @@ bool AdapterMac::scan_is_active() {
     return [internal scanIsActive];
 }
 
-vec_of_shared<PeripheralBase> AdapterMac::scan_get_results() {
-    vec_of_shared<PeripheralBase> peripherals = Util::values(seen_peripherals_);
+SharedPtrVector<PeripheralBase> AdapterMac::scan_get_results() {
+    SharedPtrVector<PeripheralBase> peripherals = Util::values(seen_peripherals_);
     return peripherals;
 }
 
@@ -111,7 +111,7 @@ void AdapterMac::set_callback_on_scan_found(std::function<void(Peripheral)> on_s
     }
 }
 
-vec_of_shared<PeripheralBase> AdapterMac::get_paired_peripherals() { return {}; }
+SharedPtrVector<PeripheralBase> AdapterMac::get_paired_peripherals() { return {}; }
 
 // Delegate methods passed for AdapterBaseMacOS
 

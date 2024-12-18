@@ -14,7 +14,7 @@ class BackendAndroid : public BackendSingleton<BackendAndroid> {
 
     virtual std::vector<std::shared_ptr<AdapterBase>> get_adapters() override;
     virtual bool bluetooth_enabled() override;
-    virtual std::string backend_name() const noexcept override;
+    virtual std::string name() const noexcept override;
 
     JNI::Object& get_btAdapter() { return _btAdapter; }
     JNI::Object& get_btScanner() { return _btScanner; }

@@ -44,15 +44,15 @@ void AdapterPlain::scan_for(int timeout_ms) {
 }
 
 bool AdapterPlain::scan_is_active() { return is_scanning_; }
-vec_of_shared<PeripheralBase> AdapterPlain::scan_get_results() {
-    vec_of_shared<PeripheralBase> peripherals;
+SharedPtrVector<PeripheralBase> AdapterPlain::scan_get_results() {
+    SharedPtrVector<PeripheralBase> peripherals;
     peripherals.push_back(std::make_shared<PeripheralPlain>());
 
     return peripherals;
 }
 
-vec_of_shared<PeripheralBase> AdapterPlain::get_paired_peripherals() {
-    vec_of_shared<PeripheralBase> peripherals;
+SharedPtrVector<PeripheralBase> AdapterPlain::get_paired_peripherals() {
+    SharedPtrVector<PeripheralBase> peripherals;
     peripherals.push_back(std::make_shared<PeripheralPlain>());
 
     return peripherals;

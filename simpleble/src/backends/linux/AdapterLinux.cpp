@@ -16,7 +16,6 @@ AdapterLinux::AdapterLinux(std::shared_ptr<SimpleBluez::Adapter> adapter) : adap
 
 AdapterLinux::~AdapterLinux() { adapter_->clear_on_device_updated(); }
 
-// TODO: why is this necessary?
 void* AdapterLinux::underlying() const { return adapter_.get(); }
 
 std::string AdapterLinux::identifier() const { return adapter_->identifier(); }
@@ -77,10 +76,10 @@ void AdapterLinux::scan_for(int timeout_ms) {
 
 bool AdapterLinux::scan_is_active() { return is_scanning_ && adapter_->discovering(); }
 
-vec_of_shared<PeripheralBase> AdapterLinux::scan_get_results() { return Util::values(seen_peripherals_); }
+SharedPtrVector<PeripheralBase> AdapterLinux::scan_get_results() { return Util::values(seen_peripherals_); }
 
-vec_of_shared<PeripheralBase> AdapterLinux::get_paired_peripherals() {
-    vec_of_shared<PeripheralBase> peripherals;
+SharedPtrVector<PeripheralBase> AdapterLinux::get_paired_peripherals() {
+    SharedPtrVector<PeripheralBase> peripherals;
 
     auto paired_list = adapter_->device_paired_get();
     for (auto& device : paired_list) {

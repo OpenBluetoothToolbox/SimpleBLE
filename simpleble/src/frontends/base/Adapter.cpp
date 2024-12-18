@@ -1,5 +1,3 @@
-#include "fmt/format.h"
-
 #include <simpleble/Adapter.h>
 #include "Backend.h"
 

@@ -55,6 +55,8 @@ class SIMPLEBLE_EXPORT Peripheral {
     std::vector<Service> services();
     std::map<uint16_t, ByteArray> manufacturer_data();
 
+    /* Calling any of the methods below when the device is not connected will throw
+       Exception::NotConnected */
     // clang-format off
     ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic);
     void write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data);

@@ -127,10 +127,10 @@ void PeripheralLinux::unpair() {
     }
 }
 
-vec_of_shared<ServiceBase> PeripheralLinux::available_services() {
+SharedPtrVector<ServiceBase> PeripheralLinux::available_services() {
     bool is_battery_service_available = false;
 
-    vec_of_shared<ServiceBase> service_list;
+    SharedPtrVector<ServiceBase> service_list;
     for (auto bluez_service : device_->services()) {
         // Check if the service is the battery service.
         if (bluez_service->uuid() == BATTERY_SERVICE_UUID) {
@@ -138,10 +138,10 @@ vec_of_shared<ServiceBase> PeripheralLinux::available_services() {
         }
 
         // Build the list of characteristics for the service.
-        vec_of_shared<CharacteristicBase> characteristic_list;
+        SharedPtrVector<CharacteristicBase> characteristic_list;
         for (auto bluez_characteristic : bluez_service->characteristics()) {
             // Build the list of descriptors for the characteristic.
-            vec_of_shared<DescriptorBase> descriptor_list;
+            SharedPtrVector<DescriptorBase> descriptor_list;
             for (auto bluez_descriptor : bluez_characteristic->descriptors()) {
                 descriptor_list.push_back(std::make_shared<DescriptorBase>(bluez_descriptor->uuid()));
             }
@@ -165,8 +165,8 @@ vec_of_shared<ServiceBase> PeripheralLinux::available_services() {
     // If the battery service is not available, and the device has the appropriate interface, add it.
     if (!is_battery_service_available && device_->has_battery_interface()) {
         // Emulate the battery service through the Battery1 interface.
-        vec_of_shared<DescriptorBase> descriptor_list;
-        vec_of_shared<CharacteristicBase> characteristic_list = {std::make_shared<CharacteristicBase>(
+        SharedPtrVector<DescriptorBase> descriptor_list;
+        SharedPtrVector<CharacteristicBase> characteristic_list = {std::make_shared<CharacteristicBase>(
             BATTERY_CHARACTERISTIC_UUID, descriptor_list, true, false, false, true, false)};
         service_list.push_back(std::make_shared<ServiceBase>(BATTERY_SERVICE_UUID, characteristic_list));
     }
@@ -174,8 +174,8 @@ vec_of_shared<ServiceBase> PeripheralLinux::available_services() {
     return service_list;
 }
 
-vec_of_shared<ServiceBase> PeripheralLinux::advertised_services() {
-    vec_of_shared<ServiceBase> service_list;
+SharedPtrVector<ServiceBase> PeripheralLinux::advertised_services() {
+    SharedPtrVector<ServiceBase> service_list;
     for (auto& service_uuid : device_->uuids()) {
         service_list.push_back(std::make_shared<ServiceBase>(service_uuid));
     }
@@ -185,7 +185,7 @@ vec_of_shared<ServiceBase> PeripheralLinux::advertised_services() {
 
 std::map<uint16_t, ByteArray> PeripheralLinux::manufacturer_data() { return device_->manufacturer_data(); }
 
-ByteArray PeripheralLinux::read_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
+ByteArray PeripheralLinux::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     // Check if the user is attempting to read the battery service/characteristic and if so,
     //  emulate the battery service through the Battery1 interface if it's not available.
     if (service == BATTERY_SERVICE_UUID && characteristic == BATTERY_CHARACTERISTIC_UUID &&
@@ -199,24 +199,24 @@ ByteArray PeripheralLinux::read_inner(BluetoothUUID const& service, BluetoothUUI
     return _get_characteristic(service, characteristic)->read();
 }
 
-void PeripheralLinux::write_request_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                          ByteArray const& data) {
+void PeripheralLinux::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                    ByteArray const& data) {
     // TODO: Check if the characteristic is writable.
     // TODO: SimpleBluez::Characteristic::write_request() should also take ByteArray by const reference (but that's
     // another library)
     _get_characteristic(service, characteristic)->write_request(data);
 }
 
-void PeripheralLinux::write_command_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                          ByteArray const& data) {
+void PeripheralLinux::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                    ByteArray const& data) {
     // TODO: Check if the characteristic is writable.
     // TODO: SimpleBluez::Characteristic::write_command() should also take ByteArray by const reference (but that's
     // another library)
     _get_characteristic(service, characteristic)->write_command(data);
 }
 
-void PeripheralLinux::notify_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                   std::function<void(ByteArray payload)> callback) {
+void PeripheralLinux::notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                             std::function<void(ByteArray payload)> callback) {
     // Check if the user is attempting to notify the battery service/characteristic and if so,
     //  emulate the battery service through the Battery1 interface if it's not available.
     if (service == BATTERY_SERVICE_UUID && characteristic == BATTERY_CHARACTERISTIC_UUID &&
@@ -235,12 +235,12 @@ void PeripheralLinux::notify_inner(BluetoothUUID const& service, BluetoothUUID c
     characteristic_object->start_notify();
 }
 
-void PeripheralLinux::indicate_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                     std::function<void(ByteArray payload)> callback) {
-    notify_inner(service, characteristic, callback);
+void PeripheralLinux::indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                               std::function<void(ByteArray payload)> callback) {
+    notify(service, characteristic, callback);
 }
 
-void PeripheralLinux::unsubscribe_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
+void PeripheralLinux::unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     // Check if the user is attempting to read the battery service/characteristic and if so,
     //  emulate the battery service through the Battery1 interface if it's not available.
     if (service == BATTERY_SERVICE_UUID && characteristic == BATTERY_CHARACTERISTIC_UUID &&
@@ -262,13 +262,13 @@ void PeripheralLinux::unsubscribe_inner(BluetoothUUID const& service, BluetoothU
     }
 }
 
-ByteArray PeripheralLinux::read_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                      BluetoothUUID const& descriptor) {
+ByteArray PeripheralLinux::read(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                BluetoothUUID const& descriptor) {
     return _get_descriptor(service, characteristic, descriptor)->read();
 }
 
-void PeripheralLinux::write_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                  BluetoothUUID const& descriptor, ByteArray const& data) {
+void PeripheralLinux::write(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                            BluetoothUUID const& descriptor, ByteArray const& data) {
     _get_descriptor(service, characteristic, descriptor)->write(data);
 }
 

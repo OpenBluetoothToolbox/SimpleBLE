@@ -59,32 +59,32 @@ bool PeripheralPlain::is_paired() { return paired_; }
 
 void PeripheralPlain::unpair() { paired_ = false; }
 
-vec_of_shared<ServiceBase> PeripheralPlain::available_services() {
+SharedPtrVector<ServiceBase> PeripheralPlain::available_services() {
     if (!connected_) return {};
 
-    vec_of_shared<ServiceBase> service_list;
-    vec_of_shared<DescriptorBase> descriptor_list;
-    vec_of_shared<CharacteristicBase> characteristic_list = {std::make_shared<CharacteristicBase>(
+    SharedPtrVector<ServiceBase> service_list;
+    SharedPtrVector<DescriptorBase> descriptor_list;
+    SharedPtrVector<CharacteristicBase> characteristic_list = {std::make_shared<CharacteristicBase>(
         BATTERY_CHARACTERISTIC_UUID, descriptor_list, true, false, false, true, false)};
 
     service_list.push_back(std::make_shared<ServiceBase>(BATTERY_SERVICE_UUID, characteristic_list));
     return service_list;
 }
 
-vec_of_shared<ServiceBase> PeripheralPlain::advertised_services() { return {}; }
+SharedPtrVector<ServiceBase> PeripheralPlain::advertised_services() { return {}; }
 
 std::map<uint16_t, ByteArray> PeripheralPlain::manufacturer_data() { return {{0x004C, "test"}}; }
 
-ByteArray PeripheralPlain::read_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic) { return {}; }
+ByteArray PeripheralPlain::read(BluetoothUUID const& service, BluetoothUUID const& characteristic) { return {}; }
 
-void PeripheralPlain::write_request_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                          ByteArray const& data) {}
+void PeripheralPlain::write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                    ByteArray const& data) {}
 
-void PeripheralPlain::write_command_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                          ByteArray const& data) {}
+void PeripheralPlain::write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                    ByteArray const& data) {}
 
-void PeripheralPlain::notify_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                   std::function<void(ByteArray payload)> callback) {
+void PeripheralPlain::notify(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                             std::function<void(ByteArray payload)> callback) {
     if (callback) {
         callback_mutex_.lock();
         callbacks_[{service, characteristic}] = std::move(callback);
@@ -106,8 +106,8 @@ void PeripheralPlain::notify_inner(BluetoothUUID const& service, BluetoothUUID c
     }
 }
 
-void PeripheralPlain::indicate_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                     std::function<void(ByteArray payload)> callback) {
+void PeripheralPlain::indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                               std::function<void(ByteArray payload)> callback) {
     if (callback) {
         callback_mutex_.lock();
         callbacks_[{service, characteristic}] = std::move(callback);
@@ -129,18 +129,18 @@ void PeripheralPlain::indicate_inner(BluetoothUUID const& service, BluetoothUUID
     }
 }
 
-void PeripheralPlain::unsubscribe_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
+void PeripheralPlain::unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) {
     std::lock_guard<std::mutex> lock(callback_mutex_);
     callbacks_.erase({service, characteristic});
 }
 
-ByteArray PeripheralPlain::read_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                      BluetoothUUID const& descriptor) {
+ByteArray PeripheralPlain::read(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                                BluetoothUUID const& descriptor) {
     return {};
 }
 
-void PeripheralPlain::write_inner(BluetoothUUID const& service, BluetoothUUID const& characteristic,
-                                  BluetoothUUID const& descriptor, ByteArray const& data) {}
+void PeripheralPlain::write(BluetoothUUID const& service, BluetoothUUID const& characteristic,
+                            BluetoothUUID const& descriptor, ByteArray const& data) {}
 
 void PeripheralPlain::set_callback_on_connected(std::function<void()> on_connected) {
     if (on_connected) {

@@ -49,7 +49,7 @@ class SIMPLEBLE_EXPORT Backend {
     /**
      * Get the name of the backend.
      */
-    std::string backend_name() const noexcept;
+    std::string name() const noexcept;
 
     /**
      * Get all available backends.
