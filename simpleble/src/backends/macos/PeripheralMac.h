@@ -1,10 +1,10 @@
 #pragma once
 
 #include <simpleble/Exceptions.h>
-#include <simpleble/Service.h>
 #include <simpleble/Types.h>
 
 #include "AdapterBaseTypes.h"
+#include "PeripheralBase.h"
 
 #include <kvn_safe_callback.hpp>
 
@@ -12,45 +12,45 @@
 
 namespace SimpleBLE {
 
-class PeripheralBase {
+class PeripheralMac : public PeripheralBase {
   public:
-    PeripheralBase(void* opaque_peripheral, void* opaque_adapter, advertising_data_t advertising_data);
-    ~PeripheralBase();
+    PeripheralMac(void* opaque_peripheral, void* opaque_adapter, advertising_data_t advertising_data);
+    ~PeripheralMac();
 
-    void* underlying() const;
+    virtual void* underlying() const override;
 
-    std::string identifier();
-    BluetoothAddress address();
-    BluetoothAddressType address_type();
-    int16_t tx_power();
-    int16_t rssi();
-    uint16_t mtu();
+    virtual std::string identifier() override;
+    virtual BluetoothAddress address() override;
+    virtual BluetoothAddressType address_type() override;
+    virtual int16_t tx_power() override;
+    virtual int16_t rssi() override;
+    virtual uint16_t mtu() override;
 
-    void connect();
-    void disconnect();
-    bool is_connected();
-    bool is_connectable();
-    bool is_paired();
-    void unpair();
+    virtual void connect() override;
+    virtual void disconnect() override;
+    virtual bool is_connected() override;
+    virtual bool is_connectable() override;
+    virtual bool is_paired() override;
+    virtual void unpair() override;
 
-    std::vector<Service> services();
-    std::vector<Service> advertised_services();
-    std::map<uint16_t, ByteArray> manufacturer_data();
+    virtual std::vector<std::shared_ptr<ServiceBase>> available_services() override;
+    virtual std::vector<std::shared_ptr<ServiceBase>> advertised_services() override;
+    virtual std::map<uint16_t, ByteArray> manufacturer_data() override;
 
     // clang-format off
-    ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic);
-    void write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data);
-    void write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data);
-    void notify(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback);
-    void indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback);
-    void unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic);
+    virtual ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic) override;
+    virtual void write_request(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) override;
+    virtual void write_command(BluetoothUUID const& service, BluetoothUUID const& characteristic, ByteArray const& data) override;
+    virtual void notify(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback) override;
+    virtual void indicate(BluetoothUUID const& service, BluetoothUUID const& characteristic, std::function<void(ByteArray payload)> callback) override;
+    virtual void unsubscribe(BluetoothUUID const& service, BluetoothUUID const& characteristic) override;
 
-    ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor);
-    void write(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor, ByteArray const& data);
+    virtual ByteArray read(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor) override;
+    virtual void write(BluetoothUUID const& service, BluetoothUUID const& characteristic, BluetoothUUID const& descriptor, ByteArray const& data) override;
     // clang-format on
 
-    void set_callback_on_connected(std::function<void()> on_connected);
-    void set_callback_on_disconnected(std::function<void()> on_disconnected);
+    virtual void set_callback_on_connected(std::function<void()> on_connected) override;
+    virtual void set_callback_on_disconnected(std::function<void()> on_disconnected) override;
 
     void delegate_did_connect();
     void delegate_did_fail_to_connect(void* opaque_error);

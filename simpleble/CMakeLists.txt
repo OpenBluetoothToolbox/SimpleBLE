@@ -46,6 +46,7 @@ set(SIMPLEBLE_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/base/Service.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/base/Characteristic.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/base/Descriptor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/frontends/base/Backend.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/common/ServiceBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/common/CharacteristicBase.cpp
@@ -143,7 +144,7 @@ endif()
 list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLE_LOG_LEVEL=SIMPLEBLE_LOG_LEVEL_${SIMPLEBLE_LOG_LEVEL})
 list(APPEND PRIVATE_COMPILE_DEFINITIONS SIMPLEBLE_VERSION="${PROJECT_VERSION}")
 
-if(NOT SIMPLEBLE_TEST)
+if(NOT SIMPLEBLE_TEST AND NOT SIMPLEBLE_PLAIN)
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         set(SIMPLEBLE_BACKEND_LINUX ON)
     else()
@@ -186,7 +187,8 @@ if(SIMPLEBLE_PLAIN)
 
     target_sources(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/AdapterPlain.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/PeripheralPlain.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/PeripheralPlain.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain/BackendPlain.cpp)
 elseif(SIMPLEBLE_BACKEND_LINUX)
     message(STATUS "Linux Host Detected")
 
@@ -282,11 +284,10 @@ elseif(SIMPLEBLE_BACKEND_WINDOWS)
         list(APPEND PRIVATE_COMPILE_OPTIONS "/W1")
     endif()
 
-    target_include_directories(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows)
     target_sources(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/AdapterWindows.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/PeripheralWindows.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/BackendWinRT.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/windows/Utils.cpp)
 
 elseif(SIMPLEBLE_BACKEND_MACOS)
@@ -295,14 +296,13 @@ elseif(SIMPLEBLE_BACKEND_MACOS)
     list(APPEND PRIVATE_COMPILE_OPTIONS -fobjc-arc)
 
     target_link_libraries(simpleble PUBLIC "-framework Foundation" "-framework CoreBluetooth" ObjC)
-    target_include_directories(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos)
     target_sources(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/Utils.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/AdapterMac.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/AdapterBaseMacOS.mm
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/PeripheralMac.mm
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/PeripheralBaseMacOS.mm)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/PeripheralBaseMacOS.mm
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/macos/BackendCoreBluetooth.mm)
 
     set_property(TARGET simpleble PROPERTY INSTALL_RPATH @loader_path)
     set_property(TARGET simpleble-c PROPERTY INSTALL_RPATH @loader_path)
@@ -319,11 +319,10 @@ elseif(SIMPLEBLE_BACKEND_ANDROID)
 
     # Specify the source files for the Android backend
     # NOTE: These files have been commented out and replaced by the PLAIN version in order to develop the Android wrapper code.
-    target_include_directories(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android)
     target_sources(simpleble PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/AdapterAndroid.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/PeripheralAndroid.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/BackendAndroid.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/BluetoothDevice.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/BluetoothGatt.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/android/BluetoothGattService.cpp
@@ -334,9 +333,6 @@ elseif(SIMPLEBLE_BACKEND_ANDROID)
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/bridge/BluetoothGattCallback.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/android/bridge/ScanCallback.cpp
     )
-
-    target_include_directories(simpleble PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/backends/plain)
 
     target_link_libraries(simpleble PUBLIC
         android

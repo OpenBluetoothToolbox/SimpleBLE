@@ -1,8 +1,8 @@
 // This weird pragma is required for the compiler to properly include the necessary namespaces.
 #pragma comment(lib, "windowsapp")
 #include "AdapterWindows.h"
+#include "BackendWinRT.h"
 
-#include "BuildVec.h"
 #include "BuilderBase.h"
 #include "CommonUtils.h"
 #include "LoggingInternal.h"
@@ -11,7 +11,6 @@
 
 #include "winrt/Windows.Devices.Bluetooth.h"
 #include "winrt/Windows.Devices.Enumeration.h"
-#include "winrt/Windows.Devices.Radios.h"
 #include "winrt/Windows.Foundation.Collections.h"
 #include "winrt/Windows.Foundation.h"
 #include "winrt/base.h"
@@ -28,7 +27,7 @@
 using namespace SimpleBLE;
 using namespace std::chrono_literals;
 
-AdapterBase::AdapterBase(std::string device_id)
+AdapterWindows::AdapterWindows(std::string device_id)
     : adapter_(async_get(BluetoothAdapter::FromIdAsync(winrt::to_hstring(device_id)))) {
     auto device_information = async_get(
         Devices::Enumeration::DeviceInformation::CreateFromIdAsync(winrt::to_hstring(device_id)));
@@ -134,7 +133,7 @@ AdapterBase::AdapterBase(std::string device_id)
         });
 }
 
-AdapterBase::~AdapterBase() {
+AdapterWindows::~AdapterWindows() {
     // TODO: What happens if the adapter is still scanning?
 
     if (scanner_received_token_) {
@@ -146,51 +145,16 @@ AdapterBase::~AdapterBase() {
     }
 }
 
-bool AdapterBase::bluetooth_enabled() {
-    initialize_winrt();
+// FIXME: this should return wether this particular adapter is enabled, not if any adapter is enabled.
+bool AdapterWindows::bluetooth_enabled() { return BackendWinRT::get()->bluetooth_enabled(); }
 
-    bool enabled = false;
-    auto radio_collection = async_get(Radio::GetRadiosAsync());
-    for (uint32_t i = 0; i < radio_collection.Size(); i++) {
-        auto radio = radio_collection.GetAt(i);
+void* AdapterWindows::underlying() const { return reinterpret_cast<void*>(const_cast<BluetoothAdapter*>(&adapter_)); }
 
-        // Skip non-bluetooth radios
-        if (radio.Kind() != RadioKind::Bluetooth) {
-            continue;
-        }
+std::string AdapterWindows::identifier() const { return identifier_; }
 
-        // Assume that bluetooth is enabled if any of the radios are enabled
-        if (radio.State() == RadioState::On) {
-            enabled = true;
-            break;
-        }
-    }
+BluetoothAddress AdapterWindows::address() { return _mac_address_to_str(adapter_.BluetoothAddress()); }
 
-    return enabled;
-}
-
-std::vector<std::shared_ptr<AdapterBase>> AdapterBase::get_adapters() {
-    initialize_winrt();
-
-    auto device_selector = BluetoothAdapter::GetDeviceSelector();
-    auto device_information_collection = async_get(
-        Devices::Enumeration::DeviceInformation::FindAllAsync(device_selector));
-
-    std::vector<std::shared_ptr<AdapterBase>> adapter_list;
-    for (uint32_t i = 0; i < device_information_collection.Size(); i++) {
-        auto dev_info = device_information_collection.GetAt(i);
-        adapter_list.push_back(std::make_shared<AdapterBase>(winrt::to_string(dev_info.Id())));
-    }
-    return adapter_list;
-}
-
-void* AdapterBase::underlying() const { return reinterpret_cast<void*>(const_cast<BluetoothAdapter*>(&adapter_)); }
-
-std::string AdapterBase::identifier() { return identifier_; }
-
-BluetoothAddress AdapterBase::address() { return _mac_address_to_str(adapter_.BluetoothAddress()); }
-
-void AdapterBase::scan_start() {
+void AdapterWindows::scan_start() {
     this->seen_peripherals_.clear();
 
     scanner_.ScanningMode(Advertisement::BluetoothLEScanningMode::Active);
@@ -200,7 +164,7 @@ void AdapterBase::scan_start() {
     SAFE_CALLBACK_CALL(this->callback_on_scan_start_);
 }
 
-void AdapterBase::scan_stop() {
+void AdapterWindows::scan_stop() {
     scanner_.Stop();
 
     std::unique_lock<std::mutex> lock(scan_stop_mutex_);
@@ -212,22 +176,19 @@ void AdapterBase::scan_stop() {
     }
 }
 
-void AdapterBase::scan_for(int timeout_ms) {
+void AdapterWindows::scan_for(int timeout_ms) {
     scan_start();
     std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
     scan_stop();
 }
 
-bool AdapterBase::scan_is_active() { return scan_is_active_; }
+bool AdapterWindows::scan_is_active() { return scan_is_active_; }
 
-std::vector<Peripheral> AdapterBase::scan_get_results() {
-    std::vector<std::shared_ptr<PeripheralBase>> base_peripherals = Util::values(seen_peripherals_);
-    return Factory::vector(base_peripherals);
-}
+SharedPtrVector<PeripheralBase> AdapterWindows::scan_get_results() { return Util::values(seen_peripherals_); }
 
-std::vector<Peripheral> AdapterBase::get_paired_peripherals() { return {}; }
+SharedPtrVector<PeripheralBase> AdapterWindows::get_paired_peripherals() { return {}; }
 
-void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start) {
+void AdapterWindows::set_callback_on_scan_start(std::function<void()> on_scan_start) {
     if (on_scan_start) {
         callback_on_scan_start_.load(on_scan_start);
     } else {
@@ -235,7 +196,7 @@ void AdapterBase::set_callback_on_scan_start(std::function<void()> on_scan_start
     }
 }
 
-void AdapterBase::set_callback_on_scan_stop(std::function<void()> on_scan_stop) {
+void AdapterWindows::set_callback_on_scan_stop(std::function<void()> on_scan_stop) {
     if (on_scan_stop) {
         callback_on_scan_stop_.load(on_scan_stop);
     } else {
@@ -243,7 +204,7 @@ void AdapterBase::set_callback_on_scan_stop(std::function<void()> on_scan_stop) 
     }
 }
 
-void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) {
+void AdapterWindows::set_callback_on_scan_updated(std::function<void(Peripheral)> on_scan_updated) {
     if (on_scan_updated) {
         callback_on_scan_updated_.load(on_scan_updated);
     } else {
@@ -251,7 +212,7 @@ void AdapterBase::set_callback_on_scan_updated(std::function<void(Peripheral)> o
     }
 }
 
-void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {
+void AdapterWindows::set_callback_on_scan_found(std::function<void(Peripheral)> on_scan_found) {
     if (on_scan_found) {
         callback_on_scan_found_.load(on_scan_found);
     } else {
@@ -261,7 +222,7 @@ void AdapterBase::set_callback_on_scan_found(std::function<void(Peripheral)> on_
 
 // Private functions
 
-void AdapterBase::_scan_stopped_callback() {
+void AdapterWindows::_scan_stopped_callback() {
     std::lock_guard<std::mutex> lock(scan_update_mutex_);
     scan_is_active_ = false;
     scan_stop_cv_.notify_all();
@@ -269,10 +230,10 @@ void AdapterBase::_scan_stopped_callback() {
     SAFE_CALLBACK_CALL(this->callback_on_scan_stop_);
 }
 
-void AdapterBase::_scan_received_callback(advertising_data_t data) {
+void AdapterWindows::_scan_received_callback(advertising_data_t data) {
     if (this->peripherals_.count(data.mac_address) == 0) {
         // If the incoming peripheral has never been seen before, create and save a reference to it.
-        auto base_peripheral = std::make_shared<PeripheralBase>(data);
+        auto base_peripheral = std::make_shared<PeripheralWindows>(data);
         this->peripherals_.insert(std::make_pair(data.mac_address, base_peripheral));
     }
 

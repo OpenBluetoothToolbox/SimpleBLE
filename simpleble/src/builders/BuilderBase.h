@@ -24,14 +24,20 @@ template <typename T>
 struct Builder : public T {
     using T::internal_;
     using PtrT = decltype(Builder::internal_);
-    using InternalT = typename std::remove_reference<decltype(*(Builder::internal_))>::type;
 
     Builder() { this->internal_ = std::make_shared<InternalT>(); }
+    using InternalT = typename std::remove_reference<decltype(*(Builder::internal_))>::type;
 
     Builder(PtrT&& internal) { this->internal_ = std::move(internal); }
 
+    template <typename dPtr>
+    Builder(dPtr&& internal) {
+        this->internal_ = internal;
+    }
+
     template <typename... ARG>
     Builder(ARG&&... args) {
+        using InternalT = typename std::remove_reference<decltype(*(Builder::internal_))>::type;
         this->internal_ = std::make_shared<InternalT>(std::forward<ARG>(args)...);
     }
 };
@@ -45,6 +51,7 @@ struct BuildDeduce {
     operator T() && {
         return Builder<T>(std::move(arg));
     }
+
     ARG arg;
 };
 
@@ -77,4 +84,4 @@ auto build() {
     return BuildDeduce0{};
 }
 
-}  // namespace SimpleBLE::builder
+}  // namespace SimpleBLE::Factory
