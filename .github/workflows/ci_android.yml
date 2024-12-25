@@ -1,0 +1,113 @@
+name: Android
+
+on:
+  workflow_dispatch:
+  workflow_call:  # This allows it to be called from ci_main.yml
+    inputs:
+      tag:
+        description: "The tag to upload artifacts"
+        required: false
+        type: string
+
+jobs:
+  bridge:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Android Setup
+        uses: ./.github/actions/android-setup
+
+      - name: Build simpleble-bridge AAR
+        working-directory: ./simpledroidble
+        run: |
+          ./gradlew simpleble-bridge:bundleReleaseAar \
+                    --no-daemon                       \
+                    -PbuildDir="${{ github.workspace }}"
+
+      - name: Upload simpleble-bridge AAR to job
+        uses: actions/upload-artifact@v4
+        with:
+          name: simpleble-bridge
+          path: outputs/aar/simpleble-bridge*.aar
+
+      - name: Upload simpleble-bridge AAR to release
+        uses: svenstaro/upload-release-action@v2
+        if: github.event_name == 'release'
+        env:
+          TAG: ${{ inputs.tag }}
+        with:
+          file: outputs/aar/simpleble-bridge*.aar
+          tag: ${{ env.TAG }}
+          overwrite: true
+          file_glob: true
+
+  simpledroidble:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Android Setup
+        uses: ./.github/actions/android-setup
+
+      - name: Build simpledroidble AAR
+        working-directory: ./simpledroidble
+        run: |
+          ./gradlew simpledroidble:bundleReleaseAar   \
+                    --no-daemon                       \
+                    -PbuildDir="${{ github.workspace }}"
+
+      - name: Upload simpledroidble AAR to job
+        uses: actions/upload-artifact@v4
+        with:
+          name: simpledroidble
+          path: outputs/aar/simpledroidble*.aar
+
+      - name: Upload simpledroidble AAR to release
+        uses: svenstaro/upload-release-action@v2
+        if: github.event_name == 'release'
+        env:
+          TAG: ${{ inputs.tag }}
+        with:
+          file: outputs/aar/simpledroidble*.aar
+          tag: ${{ env.TAG }}
+          overwrite: true
+          file_glob: true
+
+  example:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Android Setup
+        uses: ./.github/actions/android-setup
+
+      - name: Build example APK
+        working-directory: ./examples/simpleble-android
+        run: ./gradlew build
+
+      - name: Upload example APK to job
+        uses: actions/upload-artifact@v4
+        with:
+          name: simpledroidble-example
+          path: examples/simpleble-android/app/build/outputs/apk/debug/*.apk
+
+      - name: Upload lint report to job
+        uses: actions/upload-artifact@v4
+        with:
+          name: simpledroidble-example-lint-report
+          path: examples/simpleble-android/app/build/reports/lint-results-debug.html
+
+      - name: Upload simpledroidble-example to release
+        uses: svenstaro/upload-release-action@v2
+        if: github.event_name == 'release'
+        env:
+          TAG: ${{ inputs.tag }}
+        with:
+          file: examples/simpleble-android/app/build/outputs/apk/debug/*.apk
+          tag: ${{ env.TAG }}
+          overwrite: true
+          file_glob: true
